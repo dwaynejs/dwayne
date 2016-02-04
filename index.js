@@ -666,9 +666,9 @@
 		var a = [];
 		var bool = D.Array && x instanceof D.Array;
 		var node = x.$;
-		if (node)
-			for (var key in node)
-				key != "toString" && key != "valueOf" && a.push({key:bool?Number(key):key,val:node[key]});
+		if (node){
+			Object.keys(node).forEach((key) => key != "toString" && key != "valueOf" && a.push({key:bool?Number(key):key,val:node[key]}));
+		}
 		return a;
 	}
 	Object.defineProperty(D,"toString",{value:() => "© Крутой Поцык Данил, 2015"});
