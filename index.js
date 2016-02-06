@@ -805,7 +805,7 @@
 				return Object.defineProperty(
 					this,
 					prop.match(/^get /) ? prop.replace(/^get /,"") : prop.match(/^set /) ? prop.replace(/^set /,"") : prop,
-					prop.match(/^get /) ? {get:value,enumerable:true,configurable:true} : prop.match(/^set /) ? {set:value,enumerable:true,configurable:true} : {value:value,enumerable:true,configurable:true}
+					prop.match(/^get /) ? {get:value,enumerable:true,configurable:true} : prop.match(/^set /) ? {set:value,enumerable:true,configurable:true} : {value:value,writable:true,enumerable:true,configurable:true}
 				),this;
 			else if (arguments.length == 1)
 				return D(prop).do((x,key) => this.properties(key,x)), this;
@@ -864,7 +864,7 @@
 						var start = (!(this instanceof D.Array) ? "\"" + p + "\"" + ":" : "");
 						if (x instanceof Array){
 							type = "array";
-							string += s + start + ":[" + "\r\n";
+							string += s + start + "[" + "\r\n";
 						}
 						else if (x instanceof Function){
 							var ss = x.toString(),
@@ -898,7 +898,7 @@
 						n = j;
 					}
 					else
-						string += s + (!(this instanceof D.Array) ? "\"" + p + "\"" + ":" : "") + (typeof x == "string" ? "\"" + x.replace(/\\/g,"\\\\") + "\"" : x) + end + "\r\n";
+						string += s + (!(this instanceof D.Array) ? '"' + p + '"' + ":" : "") + (typeof x == "string" ? '"' + x.replace(/"/g,'\\"') + '"' : x) + end + "\r\n";
 					counter++;
 				},typeof f == "function" ? f : typeof f == "object" ? f[n] : null)
 				if (n == 1)
@@ -1017,11 +1017,35 @@
 			"get doc" : () => D(document),
 			"get body" : () => document.body && D(document.body),
 			"get head" : () => document.head && D(document.head),
-			$modules : [],
-			module : function(module){
-				this.$modules.push(module);
-				return this;
-			},
+			modules : {},
+			injected : [],
+			module : (() => {
+				var module = function(module){
+					module = D(D.$modules).match(module);
+					return module && module.val;
+				}
+				D(module).setter("exports", (module) => {
+					D.modules[module.name] = module;
+				})
+				return module;
+			})(),
+			inject : (() => {
+				var injected = {};
+				return function(){
+					D(arguments).do((module) => {
+						if (!injected[module] && D.modules[module]){
+							injected[module] = true;
+							D.injected.push(module);
+							D.modules[module].oninject && D.modules[module].oninject();
+							return;
+						}
+						else if (injected[module])
+							return;
+						throw new Error("There is no such module!");
+					})
+					return this;
+				};
+			})(),
 			storage : {
 				get : (key) => localStorage[key] && JSON.parse(localStorage[key]),
 				set : function(key, value){
@@ -1401,7 +1425,7 @@
 						else if (arguments.length == 2){
 							if (this.$){
 								this.$.setAttribute(prop,value);
-								D(D.$modules).match("D.router") && (prop == "d-href" || prop == "d-state") && this.transformAnchor();
+								D.module("$router") && (prop == "d-href" || prop == "d-state") && this.transformAnchor();
 							}
 							return this;
 						}
@@ -1592,14 +1616,17 @@
 					return this.new.apply(this,arguments);
 				},
 				transformAnchor : function(){
-					!this.attr("d-href") && this.src && this.src() && this.attr("d-href", this.src());
-					this.src && this.src("javascript:void(0);");
-					return this instanceof D.A ? this.click(function(e){
-						e.preventDefault();
-						this.attr("d-state") ? D.router.directByName(this.attr("d-state")) : D.router.direct(this.attr("d-href"));
-					}) : this.catch("click", function(e){
-						this.attr("d-state") ? D.router.directByName(this.attr("d-state")) : D.router.direct(this.attr("d-href"));
-					})
+					if (D.module("$router")){
+						!this.attr("d-href") && this.src && this.src() && this.attr("d-href", this.src());
+						this.src && this.src("javascript:void(0);");
+						return this instanceof D.A ? this.click(function(e){
+							e.preventDefault();
+							this.attr("d-state") ? D.module("$router").directByName(this.attr("d-state")) : D.module("$router").direct(this.attr("d-href"));
+						}) : this.catch("click", function(e){
+							this.attr("d-state") ? D.module("$router").directByName(this.attr("d-state")) : D.module("$router").direct(this.attr("d-href"));
+						})
+					}
+					return this;
 				},
 				setOf : function(options,array,cb){
 					var type = options.match(/^[\-\w]+/)[0];
