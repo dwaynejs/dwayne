@@ -709,14 +709,14 @@
 	})
 	Object.defineProperties(D.Object.prototype,D({
 		count : function(){return this.$ && Object.keys(this.$).length},
-		max : function(){return this.reduce((o,x) => D.max(o,x),-Infinity)},
-		min : function(){return this.reduce((o,x) => D.min(o,x),Infinity)},
-		sum : function(){return this.reduce((o,x) => o + Number(x),0)},
+		max : function(){return this.$ && this.reduce((o,x) => D.max(o,x),-Infinity)},
+		min : function(){return this.$ && this.reduce((o,x) => D.min(o,x),Infinity)},
+		sum : function(){return this.$ && this.reduce((o,x) => o + Number(x),0)},
 		avg : function(){return this.$ && this.sum/this.count},
 		json : function(){return this.$ && JSON.stringify(this.$)},
 		keys : function(){return this.$ && D(Object.keys(this.$))},
 		copy : function(){return this.$ && JSON.parse(this.json)},
-		objectName : function(){return this.$ === undefined ? this.constructor.name : this.__proto__.constructor.name.replace(/^[A-Za-z]/,(x) => x.toLowerCase())}
+		objectName : function(){return this.$ === undefined ? this.constructor.name : this.__proto__.constructor.name.replace(/^[A-Z]+/,(x) => x.toLowerCase())}
 	}).do(x => ({get:x,enumerable:true})).assign(D({
 		get : function(prop){
 			return this.$ && this.$[prop];
@@ -816,7 +816,7 @@
 				return this.$ && Object.defineProperty(
 					this.$,
 					prop.match(/^get /) ? prop.replace(/^get /,"") : prop.match(/^set /) ? prop.replace(/^set /,"") : prop,
-					prop.match(/^get /) ? {get:value,enumerable:true,configurable:true} : prop.match(/^set /) ? {set:value,enumerable:true,configurable:true} : {value:value,enumerable:true,configurable:true}
+					prop.match(/^get /) ? {get:value,enumerable:true,configurable:true} : prop.match(/^set /) ? {set:value,enumerable:true,configurable:true} : {value:value,writable:true,enumerable:true,configurable:true}
 				),this;
 			}
 			else if (arguments.length == 1)
