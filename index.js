@@ -861,7 +861,7 @@
 					if (x instanceof Object){
 						var j = n;
 						var type;
-						var start = (!(this instanceof D.Array) ? "\"" + p + "\"" + ":" : "");
+						var start = (!(this instanceof D.Array) ? "\"" + p + "\"" + ": " : "");
 						if (x instanceof Array){
 							type = "array";
 							string += s + start + "[" + "\r\n";
@@ -898,7 +898,7 @@
 						n = j;
 					}
 					else
-						string += s + (!(this instanceof D.Array) ? '"' + p + '"' + ":" : "") + (typeof x == "string" ? '"' + x.replace(/"/g,'\\"') + '"' : x) + end + "\r\n";
+						string += s + (!(this instanceof D.Array) ? '"' + p + '"' + ": " : "") + (typeof x == "string" ? '"' + x.replace(/"/g,'\\"') + '"' : x) + end + "\r\n";
 					counter++;
 				},typeof f == "function" ? f : typeof f == "object" ? f[n] : null)
 				if (n == 1)
@@ -1021,8 +1021,8 @@
 			injected : [],
 			module : (() => {
 				var module = function(module){
-					module = D(D.$modules).match(module);
-					return module && module.val;
+					module = D(D.injected).match(module);
+					return module && D.modules[module.val];
 				}
 				D(module).setter("exports", (module) => {
 					D.modules[module.name] = module;

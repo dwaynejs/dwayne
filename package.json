@@ -15,6 +15,6 @@
   "homepage": "https://droooney@bitbucket.org/hexagonwars/test#readme",
   "private": true,
   "dependencies": {
-    "doms": "^0.2.34"
+    "doms": "0.2.39"
   }
 }
