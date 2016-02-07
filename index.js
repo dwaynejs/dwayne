@@ -553,110 +553,6 @@
 	function create(node,name){
 		name = name || (!node ? "null" : node.nodeName ? node.nodeName.toLowerCase() : "object");
 		name = name[0].toUpperCase() + name.substring(1);
-		/*var n = function(string,value){
-			if (arguments.length){
-				if (typeof string == "string" && n instanceof D.HtmlElement){
-					D(string.split(/(\s)+/)).reduce((o,x) => {
-						if (!o.value){
-							if (x.match(/^\#/))
-								n.id(x.replace(/^\#/,""));
-							else if (x.match(/^\./))
-								n.class(x.replace(/^\./,"+"));
-							else if (x.match(/^\->/)){
-								src = x.replace(/^\->/,"");
-								if (n instanceof D.Source)
-									n.src(src);
-							}
-							else if (x.match(/^('.*[^\$](\$\$)*'|`.*[^\$](\$\$)*`|".*[^\$](\$\$)*")$/))
-								n.text(D.textDecode(x.replace(/^('|`|")|('|`|")$/g,"")));
-							else if (x.match(/^('|`|")/)){
-								o.separator = x[0];
-								o.value = x.substring(1);
-								o.mode = "text";
-								return o;
-							}
-							else if (x.match(/^\$[^\=\s]+$/))
-								n.attr(x.substring(1),"");
-							else if (x.match(/^\$[^\=\s]+\=('.*[^\$](\$\$)*'|`.*[^\$](\$\$)*`|".*[^\$](\$\$)*")$/))
-								n.attr(x.match(/^\$[^\=\s]+(?=\=)/g)[0].substring(1),D.textDecode(x.replace(/^\$[^\=\s]+\=('|`|")|('|`|")$/g,"")));
-							else if (x.match(/^\$[^\=\s]+\=('|`|")/)){
-								var value = x.match(/^\$[^\=\s]+(?=\=)/g)[0].substring(1);
-								x = x.replace(/^\$[^\=\s]+\=/,"");
-								o.separator = x[0];
-								o.value = x.substring(1);
-								o.mode = "attr/" + value;
-								return o;
-							}
-							else if (x.match(/^\$[^\=\s]+\=/))
-								n.attr(x.match(/^\$[^\=\s]+(?=\=)/g)[0].substring(1),D.textDecode(x.replace(/^\$[^\=\s]+\=/,"")));
-							else if (x.match(/^\-\$/))
-								n.attr(x.replace(/^\-\$/,"-"));
-							else if (x.match(/^@[^\=\s]+\=('.*[^\$](\$\$)*'|`.*[^\$](\$\$)*`|".*[^\$](\$\$)*")$/))
-								n.css(x.match(/^@[^\=\s]+(?=\=)/g)[0].substring(1),D.textDecode(x.replace(/^@[^\=\s]+\=('|`|")|('|`|")$/g,"")));
-							else if (x.match(/^@[^\=\s]+\=('|`|")/)){
-								var value = x.match(/^@[^\=\s]+(?=\=)/g)[0].substring(1);
-								x = x.replace(/^@[^\=\s]+\=/,"");
-								o.separator = x[0];
-								o.value = x.substring(1);
-								o.mode = "css/" + value;
-								return o;
-							}
-							else if (x.match(/^@[^\=\s]+\=/))
-								n.css(x.match(/^@[^\=\s]+(?=\=)/g)[0].substring(1),D.textDecode(x.replace(/^@[^\=\s]+\=/,"")));
-							else if (x.match(/^\-@/))
-								n.css(x.replace(/^\-@/,""),"");
-							return o;
-						}
-						else{
-							if (o.mode == "text" && x.match(new RegExp("[^\\$](\\$\\$)*" + o.separator + "$"))){
-								o.value += x.substring(0,x.length - 1);
-								n.text(D.textDecode(o.value));
-								o.separator = o.value = o.mode = "";
-								return o;
-							}
-							else if (o.mode.match(/^attr\//) && x.match(new RegExp("[^\\$](\\$\\$)*" + o.separator + "$"))){
-								o.value += x.substring(0,x.length - 1);
-								n.attr(o.mode.replace(/^attr\//,""),D.textDecode(o.value));
-								o.separator = o.value = o.mode = "";
-								return o;
-							}
-							else if (o.mode.match(/^css\//) && x.match(new RegExp("[^\\$](\\$\\$)*" + o.separator + "$"))){
-								o.value += x.substring(0,x.length - 1);
-								n.css(o.mode.replace(/^css\//,""),D.textDecode(o.value));
-								o.separator = o.value = o.mode = "";
-								return o;
-							}
-							else{
-								o.value += x;
-								return o;
-							}
-						}
-					},{
-						value : "",
-						mode : "",
-						separator : ""
-					})
-				}
-				else if (typeof string == "string" || typeof string == "number"){
-					if (arguments.length == 2)
-						node[string] = value;
-					else if (arguments.length == 1)
-						return node[string];
-				}
-				else if (string instanceof D.Object)
-					string.do((x,key) => node[key] = x);
-				else if (typeof string == "function"){
-					if (D.EventTarget && n instanceof D.EventTarget)
-						string.call(n);
-					else if (n instanceof D.Object)
-						n.do(string);
-				}
-			}
-			if (!arguments.length)
-				return node;
-			return n;
-		}
-		n.__proto__ = typeof D[name] == "function" ? D[name].prototype : D.Object.prototype;*/
 		var n = Object.create(typeof D[name] == "function" ? D[name].prototype : D.Object.prototype);
 		node && (node[Symbol.for("D.Object")] = n);
 		Object.defineProperty(n, "$", { value: node });
@@ -908,57 +804,14 @@
 			return this.$ && print(this.$,0);
 		},
 		proxy : function(){
+			var wrap = this;
 			this.$ && delete(this.$[Symbol.for("D.Object")]);
-			return this.$ && window.Proxy ? new Proxy(this, {
+			return this.$ && window.Proxy ? new Proxy(this.$, {
 				get (receiver,name){
-					return name in receiver ? receiver[name] : receiver.$[name];
-				},
-				set (receiver,name,value){
-					receiver.$[name] = value;
+					return name in wrap ? wrap[name] : receiver[name];
 				}
 			}) : this;
-		},
-		/*observe : function(o1, o2){
-			this.$ && delete(this.$[Symbol.for("D.Object")]);
-			if (this.$){
-				while(proto){
-					D(proto).do((x,key) => { !(key in this) && (typeof x != "function" ? (this[key] = x) : (this[key] = x.bind(this.$))); });
-					proto = proto.__proto__;
-				}
-				this.$[Symbol.for("D.Object/observers")] = this.$[Symbol.for("D.Object/observers")] || [];
-				if (typeof o1 != "object"){
-					if (o1){
-						D(this.$).return(function(o,x,k){
-							var observer = (changes) => {
-								D(changes).do((x,k) => x.type == "delete" ? delete(o.this[x.name]) : (o[x.name] = x.object[x.name]));
-							}
-							Object.observe(this.$, observer);
-							this.$[Symbol.for("D.Object/observers")].push(observer);
-						}, { this: this, observers });
-					}
-					else{
-						
-					}
-				}
-				if (typeof ){
-					Object.observe(this.$, D(this.$[Symbol.for("D.Object/observers")]).push((changes) => changes.map((x, key) => x.type == "delete" ? delete(n[x.name]) : (n[x.name] = x.object[x.name]))).last);
-					Object.observe(n, (changes) => D(changes).do((x,key) => x.type == "delete" ? delete(node[x.name]) : (node[x.name] = x.object[x.name])));
-					
-				}
-				else{
-					
-				}
-			}
-			if (this.$ && !arguments.length){
-				var proto = this.$;
-				
-				var observers1 = o1 && D(o1).return((o,x,k) => D(k.split(/\s+/)).do((y) => o[y] = x), {});
-				var observers2 = o2 && D(o2).return((o,x,k) => D(k.split(/\s+/)).do((y) => o[y] = x), {});
-				observers1 && ();
-				var observer1 = ;
-				
-			}
-		}*/
+		}
 	}).do(x => ({value:x,enumerable:true}))).$)
 		.inherit(function Array(){}).properties({
 			"get last" : function(){return this.$ && this.$[this.count-1]},
