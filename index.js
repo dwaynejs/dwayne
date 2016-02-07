@@ -1199,8 +1199,8 @@
 					})
 				}
 				return switcher && switcher.return || (m ? 
-					typeof m.val.then == "function" && !(m.val.then instanceof D.Object) ? m.val.then(switcher.value) : m.val.then : 
-					typeof switcher.default == "function" && !(switcher.default instanceof D.Object) ? switcher.default() : switcher.default
+					typeof m.val.then == "function" ? m.val.then(switcher.value) : m.val.then : 
+					typeof switcher.default == "function" ? switcher.default(switcher.value) : switcher.default
 				)
 			}
 		}).proto(1)
@@ -1500,10 +1500,10 @@
 					), this) : this.$ && this.$.innerHTML;
 				},
 				text : function(text){
-					return arguments.length ? (this.$ && (
+					return arguments.length ? (this.$ && this.html("") && (
 						typeof text != "function" || text instanceof D.Object ? 
-						(this.$.textContent = text) : (this.$.textContent = text.call(this,this.text()))
-					), this) : this.$ && this.$.textContent;
+						this.$.appendChild(document.createTextNode(text)) : this.$.appendChild(document.createTextNode(text.call(this,this.text())))
+					), this) : this.$ && ("innerText" in this.$ ? this.$.innerText : this.$.textContent);
 				},
 				addHtml : function(html){return this.$ && (this.$.innerHTML += html) ,this},
 				addText : function(text){return this.$ && this.$.appendChild(document.createTextNode(text)), this},
