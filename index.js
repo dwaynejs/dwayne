@@ -488,6 +488,11 @@
 	}
 	const events = {
 		"onabort":"abort",
+		"onautocomplete":"autocomplete",
+		"onautocompleteerror":"autocompleteerror",
+		"onbeforecopy":"beforecopy",
+		"onbeforecut":"beforecut",
+		"onbeforepaste":"beforepaste",
 		"onblur":"blur",
 		"oncancel":"cancel",
 		"oncanplay":"canplay",
@@ -495,6 +500,8 @@
 		"change":"change",
 		"click":"click",
 		"onclose":"close",
+		"oncopy":"copy",
+		"oncut":"cut",
 		"rightClick":"contextmenu",
 		"oncuechange":"cuechange",
 		"ondblclick":"dblclick",
@@ -527,6 +534,7 @@
 		"onmouseover":"mouseover",
 		"onmouseup":"mouseup",
 		"onmousewheel":"mousewheel",
+		"onpaste":"paste",
 		"onpause":"pause",
 		"onplay":"play",
 		"onplaying":"playing",
@@ -534,6 +542,7 @@
 		"onratechange":"ratechange",
 		"onreset":"reset",
 		"onresize":"resize",
+		"onsearch":"search",
 		"onscroll":"scroll",
 		"onseeked":"seeked",
 		"onseeking":"seeking",
@@ -547,8 +556,7 @@
 		"ontoggle":"toggle",
 		"onvolumechange":"volumechange",
 		"onwaiting":"waiting",
-		"onautocomplete":"autocomplete",
-		"onautocompleteerror":"autocompleteerror"
+		"onwheel":"wheel"
 	}
 	function create(node,name){
 		name = name || (!node ? "null" : node.nodeName ? node.nodeName.toLowerCase() : "object");
@@ -752,7 +760,7 @@
 				var counter = 0;
 				var end = ",";
 				D(o).do(function(x,p){
-					if (counter == Object.keys(o).length-1)
+					if (counter == this.count - 1)
 						end = "";
 					if (x instanceof Object){
 						var j = n;
@@ -807,7 +815,7 @@
 			var wrap = this;
 			this.$ && delete(this.$[Symbol.for("D.Object")]);
 			return this.$ && window.Proxy ? new Proxy(this.$, {
-				get (receiver,name){
+				get (receiver, name){
 					return name in wrap ? wrap[name] : receiver[name];
 				}
 			}) : this;
@@ -1196,7 +1204,7 @@
 				"get offsetWidth" : function(){return this.$ && this.$.offsetWidth},
 				"get offsetHeight" : function(){return this.$ && this.$.offsetHeight},
 				"get offsetLeft" : function(){return this.$ && this.$.offsetLeft},
-				"get offsetRight" : function(){return this.$ && this.$.offsetRight},
+				"get offsetTop" : function(){return this.$ && this.$.offsetTop},
 				attach : function(options){
 					options = options.toString();
 					return D(options.split(/(\s)+/)).reduce((o,x) => {
@@ -1246,17 +1254,17 @@
 								this.attr(x.match(/^[^\=\s]+(?=\=)/g)[0],D.textDecode(x.replace(/^[^\=\s]+\=/,"")));
 						}
 						else{
-							if (o.mode == "text" && x.match(new RegExp("[^\\$](\\$\\$)*" + o.separator + "$"))){
+							if (o.mode == "text" && x.match(new RegExp("(^|[^\\$])(\\$\\$)*" + o.separator + "$"))){
 								o.value += x.substring(0,x.length - 1);
 								this.text(D.textDecode(o.value));
 								o.separator = o.value = o.mode = "";
 							}
-							else if (o.mode.match(/^attr\//) && x.match(new RegExp("[^\\$](\\$\\$)*" + o.separator + "$"))){
+							else if (o.mode.match(/^attr\//) && x.match(new RegExp("(^|[^\\$])(\\$\\$)*" + o.separator + "$"))){
 								o.value += x.substring(0,x.length - 1);
 								this.attr(o.mode.replace(/^attr\//,""),D.textDecode(o.value));
 								o.separator = o.value = o.mode = "";
 							}
-							else if (o.mode.match(/^css\//) && x.match(new RegExp("[^\\$](\\$\\$)*" + o.separator + "$"))){
+							else if (o.mode.match(/^css\//) && x.match(new RegExp("(^|[^\\$])(\\$\\$)*" + o.separator + "$"))){
 								o.value += x.substring(0,x.length - 1);
 								this.css(o.mode.replace(/^css\//,""),D.textDecode(o.value));
 								o.separator = o.value = o.mode = "";
@@ -1434,6 +1442,9 @@
 				},
 				contains : function(node){
 					return this.$ && D(node).up == this;
+				},
+				clone : function(){
+					return this.$ && D(this.$.cloneNode());
 				},
 				delete : function(){
 					var parent = this.$ && this.up;
