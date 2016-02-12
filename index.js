@@ -8,10 +8,10 @@
 			return create(a,"array");
 		}
 		else if (typeof node == "string")
-			return D(document.querySelector.call(element || document, node));
+			return D(document.querySelector.call(D(element || document).$, node));
 		else if (node instanceof D.Object)
 			return node;
-		else if (node && Object.getOwnPropertyNames(node).some((x) => x == Symbol.for("D.Object")))
+		else if (node && node[Symbol.for("D.Object")])
 			return node[Symbol.for("D.Object")];
 		else if (node instanceof EventTarget){
 			var name = node.nodeName && node.nodeName.toLowerCase().replace(/^#/g,"");
@@ -704,6 +704,10 @@
 		add : function(f,sort){
 			return this.reduce((a,x,key) => a + Number(f.call(this,x,key)),0,sort);
 		},
+		console : function(){
+			console.log(this);
+			return this;
+		},
 		properties : function(prop,value){
 			if (arguments.length == 2)
 				return Object.defineProperty(
@@ -871,7 +875,7 @@
 			.inherit(function HtmlCollection(){}).properties(D({
 				
 			}).assign(D(["hide","show","delete","into","class","on","attr","css","attach"]).return((o,x) => o[x] = function(){
-				return this.do((y) => y[x] && y[x](...arguments))
+				return this.do((y) => y[x] && y[x].apply(y, arguments))
 			}, {}), D(events).do((x,key) => function(f){return this.on(x,f)})).$).proto(2)
 		.inherit(D).properties(D({
 			"get window" : () => D(window),
@@ -916,8 +920,9 @@
 						return D(key).do((val,key) => this.set(key,val)), this;
 				},
 				delete : function(key){
-					delete(localStorage[key]);
-					return this;
+					return D(arguments).do((key) => {
+						delete(localStorage[key]);
+					}), this;
 				}
 			},
 			all : (node, element) => D(document.querySelectorAll.call(element || document, node)),
@@ -965,14 +970,17 @@
 			},
 			extension : src => src.match(/\.[^\.]+$/) ? src.match(/\.[^\.]+$/g)[0].replace(/\./,"") : "",
 			icon : function(){
-				var icon = this.link("rel=`shortcut icon`").attach(...arguments);
+				var icon = this.link("rel=`shortcut icon`");
+				icon.attach.apply(icon, arguments);
 				return icon.type("image/" + (D.extension(icon.src()) == "ico" ? "x-icon" : "png"));
 			},
 			stylesheet : function(){
-				return this.link("type=text/css rel=stylesheet").attach(...arguments);
+				var link = this.link("type=text/css rel=stylesheet");
+				return link.attach.apply(link, arguments);
 			},
 			js : function(){
-				return this.script("type=text/javascript").attach(...arguments);
+				var js = this.script("type=text/javascript");
+				return js.attach.apply(js, arguments);
 			},
 			anchor : function(){
 				return this.a.apply(this,arguments).transformAnchor();
@@ -1005,11 +1013,26 @@
 				.replace(/\$`/g,"`")
 				.replace(/\$"/g,"\"")
 			).join("$"),
-			random : (a,b) => a + D.floor((b - a + 1)*D.rand()),
+			random : (a, b) => a + D.floor((b - a + 1)*D.rand()),
 			ajax : function(){
 				return new Promise((resolve, reject) => {
 					jQuery.ajax.apply(jQuery, arguments).then((data) => resolve(data), (err) => reject(err));
 				})
+			},
+			propsChain : function(){
+				var object = Array.prototype.shift.call(arguments);
+				if (!arguments.length)
+					return null;
+				var prop = Array.prototype.shift.call(arguments);
+				if (!object || !(prop in object))
+					return null;
+				if (!arguments.length)
+					return { key: prop, val: object[prop] };
+				Array.prototype.unshift.call(arguments, object[prop]);
+				return D.propsChain.apply(D, arguments);
+			},
+			safe : function(f){
+				try{ f(); }catch(e){};
 			}
 		}).assign(D(htmlTags).filter((x,key) => key!="document"&&key!="html"&&key!="body"&&key!="head").do((x,key) => function(){ return D.doc[key].apply(D.doc,arguments); }),D(math).do((x,key) => Math[x||key])).$).proto(1)
 		.inherit(function Switch(){}).properties({
@@ -1206,7 +1229,7 @@
 				"get offsetLeft" : function(){return this.$ && this.$.offsetLeft},
 				"get offsetTop" : function(){return this.$ && this.$.offsetTop},
 				attach : function(options){
-					options = options.toString();
+					options = options ? options.toString() : "";
 					return D(options.split(/(\s)+/)).reduce((o,x) => {
 						if (!o.mode){
 							if (x.match(/^\#/))
@@ -1278,6 +1301,12 @@
 						mode : "",
 						separator : ""
 					}), this;
+				},
+				find : function(selector){
+					return this.$ && D(this.$.querySelector(selector));
+				},
+				findAll : function(selector){
+					return this.$ && D(this.$.querySelectorAll(selector));
 				},
 				attr : function(prop,value){
 					if (this.$){
@@ -1463,14 +1492,17 @@
 					}
 				},
 				icon : function(){
-					var icon = this.link("rel=`shortcut icon`").attach(...arguments);
+					var icon = this.link("rel=`shortcut icon`");
+					icon.attach.apply(icon, arguments);
 					return icon.type("image/" + (D.extension(icon.src()) == "ico" ? "x-icon" : "png"));
 				},
 				stylesheet : function(){
-					return this.link("type=text/css rel=stylesheet").attach(...arguments);
+					var link = this.link("type=text/css rel=stylesheet");
+					return link.attach.apply(link, arguments);
 				},
 				js : function(){
-					return this.script("type=text/javascript").attach(...arguments);
+					var js = this.script("type=text/javascript");
+					return js.attach.apply(js, arguments);
 				},
 				anchor : function(){
 					return this.a.apply(this,arguments).transformAnchor();
