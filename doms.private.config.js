@@ -2,7 +2,8 @@ var D = require("doms");
 module.exports = {
 	cli : {
 		"before publish" : () => {
-			D.exec("doms upgrade");
+			if (!D(process.argv).match("--forget"))
+				D.exec("doms upgrade");
 		}
 	}
 }

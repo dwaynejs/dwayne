@@ -24,7 +24,7 @@
 			return create(Array.prototype.map.call(node,x => D(x)),"htmlCollection");
 		else if (node instanceof Array)
 			return create(node,"array");
-		else if (node && node.__proto__.constructor.name == "Socket")
+		else if (node && node.__proto__ && node.__proto__.constructor.name == "Socket")
 			return create(node,"socket");
 		else if (node instanceof Object)
 			return create(node,"object");
@@ -558,6 +558,8 @@
 		"onwaiting":"waiting",
 		"onwheel":"wheel"
 	}
+	var running = null;
+	var classes = {};
 	function create(node,name){
 		name = name || (!node ? "null" : node.nodeName ? node.nodeName.toLowerCase() : "object");
 		name = name[0].toUpperCase() + name.substring(1);
@@ -619,6 +621,11 @@
 		avg : function(){return this.$ && this.sum/this.count},
 		json : function(){return this.$ && JSON.stringify(this.$)},
 		keys : function(){return this.$ && D(Object.keys(this.$))},
+		allKeys : function(){
+			return this.$ && (function(o, keys){
+				return !o ? keys : arguments.callee(o.__proto__, keys.concat(Object.getOwnPropertyNames(o)));
+			})(this.$, D(0));
+		},
 		copy : function(){return this.$ && JSON.parse(this.json)},
 		objectName : function(){return this.$ === undefined ? this.constructor.name : this.__proto__.constructor.name.replace(/^[A-Z]+/,(x) => x.toLowerCase())}
 	}).do(x => ({get:x,enumerable:true})).assign(D({
@@ -882,6 +889,7 @@
 			"get doc" : () => D(document),
 			"get body" : () => document.body && D(document.body),
 			"get head" : () => document.head && D(document.head),
+			"get running" : () => running,
 			modules : {},
 			injected : [],
 			module : (() => {
@@ -1301,6 +1309,10 @@
 						mode : "",
 						separator : ""
 					}), this;
+				},
+				toggle : function(cls){
+					classes[cls] && classes[cls].class(`-${ cls }`);
+					return classes[cls] = this.class(`+${ cls }`);
 				},
 				find : function(selector){
 					return this.$ && D(this.$.querySelector(selector));
