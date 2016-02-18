@@ -558,8 +558,8 @@
 		"onwaiting":"waiting",
 		"onwheel":"wheel"
 	}
-	var running = null;
 	var classes = {};
+	var running = null;
 	function create(node,name){
 		name = name || (!node ? "null" : node.nodeName ? node.nodeName.toLowerCase() : "object");
 		name = name[0].toUpperCase() + name.substring(1);
