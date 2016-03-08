@@ -560,6 +560,7 @@
 	}
 	var classes = {};
 	var running = null;
+	var customEvents = {};
 	function create(node,name){
 		name = name || (!node ? "null" : node.nodeName ? node.nodeName.toLowerCase() : "object");
 		name = name[0].toUpperCase() + name.substring(1);
@@ -1041,6 +1042,9 @@
 			},
 			safe : function(f){
 				try{ f(); }catch(e){};
+			},
+			listeners : function(event){
+				return D(customEvents[event] || []);
 			}
 		}).assign(D(htmlTags).filter((x,key) => key!="document"&&key!="html"&&key!="body"&&key!="head").do((x,key) => function(){ return D.doc[key].apply(D.doc,arguments); }),D(math).do((x,key) => Math[x||key])).$).proto(1)
 		.inherit(function Switch(){}).properties({
@@ -1056,12 +1060,7 @@
 					var m = D(switcher.conditions).match((x,k) => {
 						var cb = x.then;
 						x = x.condition;
-						if (switcher.mode == "match"){
-							var m = switcher.value.match(x);
-							m && (switcher.return = typeof cb == "function" ? cb(m) : cb);
-							return m;
-						}
-						else if (switcher.mode == "range"){
+						if (switcher.mode == "range"){
 							var range = {
 								left : {value:Number(x.split(";")[0].replace(/^(\[|\()/,"").replace(/Inf/,"Infinity")),includes:x.match(/^\(/) ? false : true},
 								right : {value:Number(x.split(";")[1].replace(/(\]|\))$/,"").replace(/Inf/,"Infinity")),includes:x.match(/\)$/) ? false : true}
@@ -1070,6 +1069,8 @@
 							var right = range.right.includes ? switcher.value <= range.right.value : switcher.value < range.right.value;
 							return left && right;
 						}
+						else if (switcher.mode == "match")
+							return x.test(switcher.value);
 						else if (switcher.mode == "equals")
 							return switcher.value == x;
 						else if (switcher.mode == "equalsStrict")
@@ -1084,16 +1085,17 @@
 							return typeof switcher.value == x;
 						else if (switcher.mode == "instanceof")
 							return switcher.value instanceof x;
+						else if (switcher.mode == "in")
+							return switcher.value in x;
 						else if (switcher.mode == "boolean")
 							return x;
 						else
 							return false;
 					})
+					return m ? 
+						typeof m.val.then == "function" ? m.val.then(switcher.value) : m.val.then : 
+						typeof switcher.default == "function" ? switcher.default(switcher.value) : switcher.default
 				}
-				return switcher && switcher.return || (m ? 
-					typeof m.val.then == "function" ? m.val.then(switcher.value) : m.val.then : 
-					typeof switcher.default == "function" ? switcher.default(switcher.value) : switcher.default
-				)
 			}
 		}).proto(1)
 		.inherit(function EventTarget(){}).properties(D({
@@ -1124,8 +1126,17 @@
 			catch : function(action,f){
 				if (arguments.length == 1)
 					D(action).do((f,act) => this.catch(act,f));
-				else if (arguments.length == 2)
-					this.$ && this.$.addEventListener(action,e => f.call(D(this),e||window.event));
+				else if (arguments.length == 2){
+					if (this.$){
+						let listeners = customEvents[action] = customEvents[action] || [];
+						listeners.push(this);
+						this.$.addEventListener(action,(e) => f.call(this,e||window.event));
+					}
+				}
+				return this;
+			},
+			trigger : function(event){
+				this.$ && this.$.dispatchEvent(event);
 				return this;
 			}
 		}).assign(D(events).do((x,key) => {
