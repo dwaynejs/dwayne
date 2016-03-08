@@ -1398,7 +1398,7 @@
 					return arguments.length ? (this.$ && (this instanceof D.Img || this instanceof D.Canvas ? 
 						(this.$.height = typeof height == "function" ? height.call(this,this.height()) : height) :
 						(this.$.style.height = typeof height == "function" ? height.call(this,this.$.style.height) : height)
-					), this) : this.$ && (this.$.width || parseInt(this.$.style.height));
+					), this) : this.$ && (this.$.height || parseInt(this.$.style.height));
 				},
 				id : function(id){
 					return arguments.length ? (this.$ && (
