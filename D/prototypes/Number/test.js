@@ -1,0 +1,41 @@
+import Class from './';
+const assert = require('assert');
+
+export default () => {
+	describe('it should test D.Number.prototype.[methods]', () => {
+		// TODO: .abs()
+		// TODO: .acos()
+		// TODO: .acosh()
+		// TODO: .array()
+		// TODO: .asin()
+		// TODO: .asinh()
+		// TODO: .atan()
+		// TODO: .atanh()
+		// TODO: .cbrt()
+		// TODO: .ceil()
+		// TODO: .cos()
+		// TODO: .cosh()
+		// TODO: .cube()
+		// TODO: .exp()
+		// TODO: .floor()
+		// TODO: .interval()
+		// TODO: .log()
+		// TODO: .log2()
+		// TODO: .log10()
+		// TODO: .pow()
+		// TODO: .root()
+		// TODO: .round()
+		// TODO: .sign()
+		// TODO: .sin()
+		// TODO: .sinh()
+		// TODO: .sqrt()
+		// TODO: .square()
+		// TODO: .tan()
+		// TODO: .tanh()
+		// TODO: .timeout()
+		// TODO: .toExponential()
+		// TODO: .toFixed()
+		// TODO: .toPrecision()
+		// TODO: .valueOf()
+	});
+};
