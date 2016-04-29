@@ -44,11 +44,11 @@ export default () => {
 			});
 		});
 		// TODO: .clone()
-		describe('count()', () => {
+		describe('get count', () => {
 			it('should return count of own properties context', () => {
 				const o = { a: 1, b: 2, c: 3 },
 					wrap = new Class(o);
-				assert.strictEqual(wrap.count(), 3);
+				assert.strictEqual(wrap.count, 3);
 			});
 		});
 		// TODO: .deepAssign()

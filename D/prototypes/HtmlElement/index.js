@@ -1,22 +1,25 @@
 import D from '../../';
-import methods from '../../methods';
 import css from './css';
 import elements from './elements';
-import childrenGenerator from './children';
 import { default as parent, transform } from '../Object';
 import Arr from '../Array';
 import Num from '../Number';
-import { assign, dynamicDefineProperties, defineProperties, validate } from '../../libs';
+import HtmlCollection from '../HtmlCollection';
+import {
+	isArrayAlike, isFunction, isNumber, isString,
+	assign, dynamicDefineProperties, defineProperties,
+	validate, toString, toCamelCase
+} from '../../libs';
+import applyRegexps from './applied';
 
 const Obj = parent;
 
-const cls = class HtmlElement extends parent {
+export class HtmlElement extends parent {
 	constructor(elem) {
 		super(elem);
 
 		if (this.$) {
 			this.$.domcData = {};
-			//defineProperties(this.$, { domcData: {} });
 		}
 	}
 
@@ -111,7 +114,7 @@ const cls = class HtmlElement extends parent {
 			return new Obj(o);
 		}
 
-		if (arguments.length <= 1 && methods.isString(attr)) {
+		if (arguments.length <= 1 && isString(attr)) {
 			return elem.getAttribute(attr);
 		}
 
@@ -152,7 +155,7 @@ const cls = class HtmlElement extends parent {
 		return new HtmlElement(find(element)).into(this);
 	}
 	children() {
-		return new D.HtmlCollection(this.$.childNodes);
+		return new HtmlCollection(this.$.childNodes);
 	}
 	['class'](cls) {
 		const elem = this.$;
@@ -192,8 +195,8 @@ const cls = class HtmlElement extends parent {
 		return this.$.contains(element);
 	}
 	create(type, strings) {
-		const elem = this.$,
-			element = htmlElement(document.createElement(type));
+		const elem = this.$;
+		const element = htmlElement(document.createElement(type));
 
 		if (elem !== document) {
 			element.into(this);
@@ -205,9 +208,9 @@ const cls = class HtmlElement extends parent {
 		const elem = this.$;
 
 		if (!arguments.length) {
-			const css = this.$.style.cssText.split(/; ?/),
-				length = css.length,
-				o = {};
+			const css = this.$.style.cssText.split(/; ?/);
+			const length = css.length;
+			const o = {};
 
 			for (let i = 0; i < length; i++) {
 				if (!css[i]) {
@@ -216,13 +219,13 @@ const cls = class HtmlElement extends parent {
 
 				property = css[i].split(/: /);
 
-				o[new D.String(property[0]).toCamelCase()] = property[1];
+				o[toCamelCase(property[0])] = property[1];
 			}
 
 			return new Obj(o);
 		}
 
-		if (arguments.length <= 1 && methods.isString(property)) {
+		if (arguments.length <= 1 && isString(property)) {
 			return elem.style[property];
 		}
 
@@ -277,7 +280,7 @@ const cls = class HtmlElement extends parent {
 		return htmlElement(this.$.querySelector(selector));
 	}
 	findAll(selector) {
-		return new D.HtmlCollection(this.$.querySelectorAll(selector));
+		return new HtmlCollection(this.$.querySelectorAll(selector));
 	}
 	firstChild() {
 		return htmlElement(this.$.firstElementChild);
@@ -413,18 +416,18 @@ const cls = class HtmlElement extends parent {
 		return this;
 	}
 	parent() {
-		return htmlElement(this.$.parentElement);
+		return htmlElement(this.$.parentNode);
 	}
 	parentTree() {
 		const collection = [];
-		let elem = this.$.parentElement;
+		let elem = this.$.parentNode;
 
 		while (elem) {
 			collection.push(elem);
-			elem = elem.parentElement;
+			elem = elem.parentNode;
 		}
 
-		return new D.HtmlCollection(collection);
+		return new HtmlCollection(collection);
 	}
 	pointer() {
 		this.$.style.cursor = 'pointer';
@@ -500,7 +503,7 @@ const cls = class HtmlElement extends parent {
 		const elem = this.$;
 
 		element = find(transform(element));
-		elem.parentElement.replaceChild(elem, element);
+		elem.parentNode.replaceChild(elem, element);
 
 		return this;
 	}
@@ -516,10 +519,10 @@ const cls = class HtmlElement extends parent {
 	get scrollWidth() {
 		return this.$.scrollWidth;
 	}
-	setOf(type, iterator, applied, mapFn) {
+	setOf(type, iterator, applied) {
 		iterator = transform(iterator);
 
-		if (methods.isNumber(iterator)) {
+		if (isNumber(iterator)) {
 			try {
 				validate([null, iterator], { 1: ['int', '>=0'] });
 			} catch (e) {
@@ -535,21 +538,19 @@ const cls = class HtmlElement extends parent {
 			throw new Error('No applied expression or map function is present!');
 		}
 
-		if (arguments.length < 4 && methods.isFunction(applied)) {
-			mapFn = applied;
-			applied = '';
-		}
-
 		const elem = this.$;
+		const func = isFunction(applied);
 
 		for (const key in iterator) {
 			if (iterator.hasOwnProperty(key)) {
-				const value = iterator[key],
-					created = elem.new(type, applied.replace(/%key%/g, key).replace(/%value%/g, value)),
-					array = methods.isArrayAlike(iterator);
+				const value = iterator[key];
+				const array = isArrayAlike(iterator);
+				const created = elem.create(type);
 
-				if (mapFn) {
-					mapFn(created, value, array ? Number(key) : key, iterator);
+				if (func) {
+					applied(created, value, array ? Number(key) : key, iterator);
+				} else {
+					created.apply(applied.replace(/%key%/g, key).replace(/%value%/g, value));
 				}
 			}
 		}
@@ -591,18 +592,6 @@ const cls = class HtmlElement extends parent {
 
 		return this.removeAttr(attr);
 	}
-	toggleAttrNS(ns, attr, condition) {
-		const elem = this.$,
-			cond = arguments.length < 2 ? elem.hasAttributeNS(ns, attr) : condition;
-
-		if (cond) {
-			elem.setAttributeNS(ns, attr, '');
-		} else {
-			elem.removeAttributeNS(ns, attr);
-		}
-
-		return this;
-	}
 	toggleClass() {
 		const list = this.$.classList;
 
@@ -637,7 +626,7 @@ const cls = class HtmlElement extends parent {
 				return htmlElement(null);
 			}
 
-			elem = elem.parentElement;
+			elem = elem.parentNode;
 		}
 
 		return htmlElement(elem);
@@ -657,9 +646,9 @@ const cls = class HtmlElement extends parent {
 
 		return elem.value;
 	}
-};
+}
 
-dynamicDefineProperties(cls.prototype, css, (prop) => {
+dynamicDefineProperties(HtmlElement.prototype, css, (prop) => {
 	return function (value) {
 		if (arguments.length) {
 			this.$.style[prop] = value;
@@ -670,7 +659,7 @@ dynamicDefineProperties(cls.prototype, css, (prop) => {
 	};
 });
 
-dynamicDefineProperties(cls.prototype, elements.filter((elem) => elem !== 'html'), (elem) => {
+dynamicDefineProperties(HtmlElement.prototype, elements.filter((elem) => elem !== 'html'), (elem) => {
 	return function () {
 		Array.prototype.unshift.call(arguments, elem);
 
@@ -678,7 +667,7 @@ dynamicDefineProperties(cls.prototype, elements.filter((elem) => elem !== 'html'
 	};
 });
 
-defineProperties(cls.prototype, {
+defineProperties(HtmlElement.prototype, {
 	closest: (() => {
 		if (Element.prototype.closest) {
 			return function closest(selector) {
@@ -694,7 +683,7 @@ defineProperties(cls.prototype, {
 					return htmlElement(elem);
 				}
 
-				elem = elem.parentElement;
+				elem = elem.parentNode;
 			}
 
 			return htmlElement(null);
@@ -702,231 +691,27 @@ defineProperties(cls.prototype, {
 	})()
 });
 
-const children = childrenGenerator(cls),
-	classes = {},
-	attrs = {},
-	applyRegexps = [
-		{
-			test: /^#(\(|"|'|`)/,
-			regexp: /^#(\([\s\S]+\)|"[\s\S]+"|'[\s\S]+'|`[\s\S]+`)$/,
-			match(wrap, string) {
-				wrap.id(String(string).substring(2, string.length - 1));
-			}
-		},
-		{
-			regexp: /^#/,
-			match(wrap, string) {
-				wrap.id(String(string).substring(1));
-			}
-		},
-		{
-			regexp: /^\./,
-			match(wrap, string) {
-				wrap.addClasses(String(string).substring(1));
-			}
-		},
-		{
-			regexp: /^<\-\-$/,
-			match(wrap) {
-				wrap.float('left');
-			}
-		},
-		{
-			regexp: /^\-\->$/,
-			match(wrap) {
-				wrap.float('right');
-			}
-		},
-		{
-			regexp: /^\->/,
-			match(wrap, string) {
-				wrap.ref(String(string).substring(2));
-			}
-		},
-		{
-			regexp: /^\-\./,
-			match(wrap, string) {
-				wrap.removeClasses(String(string).substring(2));
-			}
-		},
-		{
-			regexp: /^\-@/,
-			match(wrap, string) {
-				wrap.removeCss(String(string).substring(2));
-			}
-		},
-		{
-			regexp: /^\-/,
-			match(wrap, string) {
-				wrap.removeAttr(String(string).substring(1));
-			}
-		},
-		{
-			test: /^=>(\(|"|'|`)/,
-			regexp: /^=>(\([\s\S]+\)|"[\s\S]+"|'[\s\S]+'|`[\s\S]+`)$/,
-			match(wrap, string) {
-				wrap.into(String(string).substring(3, string.length - 1));
-			}
-		},
-		{
-			regexp: /^=>\./,
-			match(wrap, string) {
-				wrap.moveClass(String(string).substring(3));
-			}
-		},
-		{
-			regexp: /^=>/,
-			match(wrap, string) {
-				wrap.moveAttr(String(string).substring(2));
-			}
-		},
-		{
-			regexp: /^~\./,
-			match(wrap, string) {
-				wrap.toggleClass(String(string).substring(2));
-			}
-		},
-		{
-			regexp: /^~/,
-			match(wrap, string) {
-				wrap.toggleAttr(String(string).substring(1));
-			}
-		},
-		{
-			test: /^\*/,
-			regexp: /^\*[\s\S]+\*$/,
-			match(wrap, string) {
-				wrap.text(String(string).substring(1, string.length - 1));
-			}
-		},
-		{
-			test: /^\+\*/,
-			regexp: /^\+\*[\s\S]+\*$/,
-			match(wrap, string) {
-				wrap.addText(String(string).substring(2, string.length - 1));
-			}
-		},
-		{
-			test: /^>(\(|"|'|`)/,
-			regexp: /^>(\([\s\S]+\)|"[\s\S]+"|'[\s\S]+'|`[\s\S]+`)<$/,
-			match(wrap, string) {
-				wrap.html(String(string).substring(2, string.length - 2));
-			}
-		},
-		{
-			test: /^\+>(\(|"|'|`)/,
-			regexp: /^\+>(\([\s\S]+\)|"[\s\S]+"|'[\s\S]+'|`[\s\S]+`)<$/,
-			match(wrap, string) {
-				wrap.addHtml(String(string).substring(3, string.length - 2));
-			}
-		},
-		{
-			regexp: /^\$/,
-			match(wrap, string) {
-				switch (String(string).substring(1)) {
-					case 'a':
-						return wrap.absolute();
-					case 'b':
-						return wrap.bold();
-					case 'c':
-						return wrap.centerText();
-					case 'f':
-						return wrap.fixed();
-					case 'h':
-						return wrap.hide();
-					case 'i':
-						return wrap.italic();
-					case 'r':
-						return wrap.relative();
-					case 's':
-						return wrap.show();
-					case 't':
-						return wrap.opacity(0);
-					case 'u':
-						return wrap.underline();
-				}
-			}
-		},
-		{
-			test: /^[^:]+:(\(|"|'|`)/,
-			regexp: /^[^:]+:(\([\s\S]+\)|"[\s\S]+"|'[\s\S]+'|`[\s\S]+`)$/,
-			match(wrap, string) {
-				const match = string.match(/^[^:]+/)[0],
-					prop = new D.String(match).toCamelCase().$;
+const classes = {};
+const attrs = {};
 
-				wrap.css(prop, String(string).substring(match.length + 2, string.length - 1));
-			}
-		},
-		{
-			regexp: /^[^:]+:[\s\S]+$/,
-			match(wrap, string) {
-				const match = string.match(/^[^:]+/)[0],
-					prop = new D.String(match).toCamelCase().$;
-
-				wrap.css(prop, String(string).substring(match.length + 1));
-			}
-		},
-		{
-			test: /^[^=]+=(\(|"|'|`)/,
-			regexp: /^[^=]+=(\([\s\S]+\)|"[\s\S]+"|'[\s\S]+'|`[\s\S]+`)$/,
-			match(wrap, string) {
-				const attr = string.match(/^[^=]+/)[0];
-
-				wrap.attr(attr, String(string).substring(attr.length + 2, string.length - 1));
-			}
-		},
-		{
-			regexp: /^[^=]+=[\s\S]+$/,
-			match(wrap, string) {
-				const attr = string.match(/^[^=]+/)[0];
-
-				wrap.attr(attr, String(string).substring(attr.length + 1));
-			}
-		}
-	];
-
-let elementToCheck;
-
-for (const name in children) {
-	if (children.hasOwnProperty(name)) {
-		D[`Html${ name[0].toUpperCase() + name.substring(1) }Element`] = children[name];
-	}
-}
-
-function htmlElement(elem) {
-	if (!elem) {
-		return new children.null(elem);
-	}
-
-	const constructor = children[String(elem.tagName || '').toLowerCase()] || cls;
-
-	return new constructor(elem);
+export function htmlElement(elem) {
+	return new HtmlElement(elem);
 }
 
 function find(element) {
 	element = transform(element);
 
-	if (methods.isString(element)) {
+	if (isString(element)) {
 		element = document.querySelector(element);
 	}
 
 	return element;
 }
 
-D.HtmlElement = cls;
+D.HtmlElement = HtmlElement;
 D.constructors.unshift({
-	check: (elem) => {
-		if (!(elem instanceof HTMLElement)) {
-			return false;
-		}
-
-		elementToCheck = elem;
-
-		return true;
-	},
-	get cls() {
-		return children[String(elementToCheck.tagName || '').toLowerCase()] || cls;
-	}
+	check: (elem) => /^HTML\w*Element$/.test(toString(elem)),
+	cls: HtmlElement
 });
 
-export default cls;
+export default HtmlElement;

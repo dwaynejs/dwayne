@@ -1,87 +1,70 @@
-import { assign } from '../../libs/assign';
+import { toString } from '../../libs/to-string';
 
-const methods = {
-	isArray(array) {
-		return Object.prototype.toString.call(array) === '[object Array]';
-	},
-	isBoolean(boolean) {
-		return Object.prototype.toString.call(boolean) === '[object Boolean]';
-	},
-	isDate(date) {
-		return Object.prototype.toString.call(date) === '[object Date]';
-	},
-	isFunction(func) {
-		return typeof func === 'function';
-	},
-	isNaN(nan) {
-		return nan !== nan;
-	},
-	isNumber(number) {
-		return Object.prototype.toString.call(number) === '[object Number]';
-	},
-	isNull(nul) {
-		return nul === null;
-	},
-	isNullOrUndefined(nul) {
-		return nul === null || typeof nul === 'undefined';
-	},
-	isObject(object) {
-		return !!object && (typeof object === 'object' || Object.prototype.toString.call(object) === '[object Object]');
-	},
-	isRegexp(regexp) {
-		return regexp instanceof RegExp;
-	},
-	isString(string) {
-		return Object.prototype.toString.call(string) === '[object String]';
-	},
-	isUndefined(undef) {
-		return typeof undef === 'undefined';
-	}
+export const isArray = Array.isArray || function isArray(array) {
+	return toString(array) === 'Array';
 };
-
-methods.isNaN = Number.isNaN || methods.isNaN;
-methods.isArray = Array.isArray || methods.isArray;
-
-assign(methods, {
-	isDateAlike(date) {
-		date = new Date(date);
-		return !methods.isNaN(date.getTime());
-	},
-	isFinite(number) {
-		return methods.isNumber(number) && !methods.isNaN(number) && number !== Infinity && number !== -Infinity;
-	},
-	isInteger(integer) {
-		return methods.isNumber(integer) &&
-			integer % 1 === 0;
-	},
-	isNumberAlike(number) {
-		if (methods.isNaN(number) || number === 'NaN') {
-			return true;
-		}
-
-		number = Number(number);
-
-		return !!(number || number === 0);
+export function isArrayAlike(array) {
+	if (!array || isFunction(array)) {
+		return false;
 	}
-});
-
-methods.isInteger = Number.isInteger || methods.isInteger;
-methods.isFinite = Number.isFinite || methods.isFinite;
-
-assign(methods, {
-	isArrayAlike(array) {
-		if (!array || methods.isFunction(array)) {
-			return false;
-		}
-
-		const length = array.length;
-
-		return methods.isInteger(length) && length >= 0;
-	},
-	isIntegerAlike(integer) {
-		integer = parseInt(Number(integer));
-		return !!(integer || integer === 0);
+	
+	const length = array.length;
+	
+	return isInteger(length) && length >= 0;
+}
+export function isBoolean(boolean) {
+	return toString(boolean) === 'Boolean';
+}
+export function isDate(date) {
+	return toString(date) === 'Date';
+}
+export function isDateAlike(date) {
+	date = new Date(date);
+	return !isNaN(date.getTime());
+}
+export const isFinite = Number.isFinite || function isFinite(number) {
+	return isNumber(number) && !isNaN(number) && number !== Infinity && number !== -Infinity;
+};
+export function isFunction(func) {
+	return toString(func) === 'Function';
+}
+export const isInteger = Number.isInteger || function isInteger(integer) {
+	return isNumber(integer) && integer % 1 === 0;
+};
+export function isIntegerAlike(integer) {
+	integer = parseInt(Number(integer));
+	return !!(integer || integer === 0);
+}
+export const isNaN = Number.isNaN || function isNaN(nan) {
+	return nan !== nan;
+};
+export function isNull(nul) {
+	return nul === null;
+}
+export function isNullOrUndefined(nul) {
+	return nul === null || typeof nul === 'undefined';
+}
+export function isNumber(number) {
+	return toString(number) === 'Number';
+}
+export function isNumberAlike(number) {
+	if (isNaN(number) || number === 'NaN') {
+		return true;
 	}
-});
-
-export default methods;
+	
+	number = Number(number);
+	
+	return !!(number || number === 0);
+}
+export function isObject(object) {
+	return !!object && typeof object === 'object';
+}
+export function isRegExp(regexp) {
+	return toString(regexp) === 'RegExp';
+}
+export function isString(string) {
+	return toString(string) === 'String';
+}
+export function isUndefined(undef) {
+	return typeof undef === 'undefined';
+}

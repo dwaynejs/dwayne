@@ -1,12 +1,11 @@
 import D from '../../';
-import methods from '../../methods';
-import { default as parent, transform } from '../Object';
-import S from '../String';
-import { defineProperties, validate } from '../../libs';
+import { isFunction, defineProperties, validate } from '../../libs';
 
 const secret = {};
 
-const cls = /*typeof Promise !== 'undefined' ? Promise : */class Promise {
+const NativePromise = window.Promise || (() => {});
+
+export class Promise {
 	constructor(func) {
 		validate([func], ['function']);
 
@@ -22,7 +21,7 @@ const cls = /*typeof Promise !== 'undefined' ? Promise : */class Promise {
 				get() {
 					return hiddenPromise.handled;
 				},
-				set({ secret: key }) {
+				set(key) {
 					if (key === secret) {
 						hiddenPromise.handled = true;
 					}
@@ -30,7 +29,7 @@ const cls = /*typeof Promise !== 'undefined' ? Promise : */class Promise {
 			},
 			$$handle(status, f, resolve, reject, key) {
 				if (key === secret) {
-					const proxy = methods.isFunction(f) ? (value) => {
+					const proxy = isFunction(f) ? (value) => {
 						try {
 							resolve(f(value));
 						} catch (err) {
@@ -61,14 +60,6 @@ const cls = /*typeof Promise !== 'undefined' ? Promise : */class Promise {
 
 		function reject(err) {
 			if (hiddenPromise.status === 'pending') {
-				if (err instanceof Promise) {
-					return err.then((value) => {
-						resolve(value);
-					}, (err) => {
-						reject(err);
-					});
-				}
-
 				hiddenPromise.status = 'rejected';
 				hiddenPromise.value = err;
 
@@ -87,7 +78,7 @@ const cls = /*typeof Promise !== 'undefined' ? Promise : */class Promise {
 		}
 		function resolve(value) {
 			if (hiddenPromise.status === 'pending') {
-				if (value instanceof Promise) {
+				if (value instanceof Promise || value instanceof NativePromise) {
 					return value.then((value) => {
 						resolve(value);
 					}, (err) => {
@@ -110,8 +101,8 @@ const cls = /*typeof Promise !== 'undefined' ? Promise : */class Promise {
 	static all(array) {
 		validate([array], ['array']);
 
-		let length = array.length,
-			toResolve = length;
+		const length = array.length;
+		let toResolve = length;
 
 		if (!length) {
 			return Promise.resolve([]);
@@ -147,7 +138,7 @@ const cls = /*typeof Promise !== 'undefined' ? Promise : */class Promise {
 		});
 	}
 	static resolve(value) {
-		if (value instanceof Promise) {
+		if (value instanceof Promise || value instanceof NativePromise) {
 			return value;
 		}
 
@@ -156,23 +147,23 @@ const cls = /*typeof Promise !== 'undefined' ? Promise : */class Promise {
 		});
 	}
 
-	['catch'](onReject) {
+	'catch'(onReject) {
 		return resolveOrReject(this, null, onReject);
 	}
 	then(onResolve, onReject) {
 		return resolveOrReject(this, onResolve, onReject);
 	}
-};
+}
 
 function resolveOrReject(promise, onResolve, onReject) {
 	if (promise.status === 'pending') {
-		return new cls((resolve, reject) => {
+		return new Promise((resolve, reject) => {
 			promise.$$handle('reject', onReject, resolve, reject, secret);
 			promise.$$handle('resolve', onResolve, resolve, reject, secret);
 		});
 	}
 
-	promise.handled = { secret };
+	promise.handled = secret;
 
 	const { value } = promise;
 
@@ -187,17 +178,17 @@ function resolveOrReject(promise, onResolve, onReject) {
 		handler = onReject;
 	}
 
-	if (!methods.isFunction(handler)) {
-		return cls[method](value);
+	if (!isFunction(handler)) {
+		return Promise[method](value);
 	}
 
 	try {
-		return cls.resolve(handler(value));
+		return Promise.resolve(handler(value));
 	} catch (err) {
-		return cls.reject(err);
+		return Promise.reject(err);
 	}
 }
 
-D.Promise = cls;
+D.Promise = Promise;
 
-export default cls;
+export default Promise;

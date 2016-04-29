@@ -1,9 +1,8 @@
 import D from '../../';
-import methods from '../../methods';
 import { default as parent, transform } from '../Object';
 import Num from '../Number';
 import Str from '../String';
-import { validate } from '../../libs';
+import { isDate } from '../../libs';
 
 const NativeDate = Date;
 const coeffs = {
@@ -86,7 +85,7 @@ const monthsAliases = {
 };
 const zero = new D.String('0');
 
-const cls = class Date extends parent {
+export class Date extends parent {
 	constructor(date = new NativeDate()) {
 		super(new NativeDate(date));
 	}
@@ -262,10 +261,10 @@ const cls = class Date extends parent {
 	valueOf() {
 		return this.$.valueOf();
 	}
-};
+}
 
 function invalidDate() {
-	return new cls('a');
+	return new Date('a');
 }
 
 function isInvalid(date) {
@@ -273,7 +272,7 @@ function isInvalid(date) {
 }
 
 function now() {
-	return Date.now();
+	return NativeDate.now();
 }
 
 function round(number, digits) {
@@ -288,10 +287,10 @@ function cut(number, max, digits) {
 	return (number/Math.pow(10, max)).toFixed(digits);
 }
 
-D.Date = cls;
+D.Date = Date;
 D.constructors.unshift({
-	check: methods.isDate,
-	cls
+	check: isDate,
+	cls: Date
 });
 
-export default cls;
+export default Date;

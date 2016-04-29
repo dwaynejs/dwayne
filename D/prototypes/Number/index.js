@@ -1,18 +1,21 @@
 import D from '../../';
-import methods from '../../methods';
 import { default as parent, transform } from '../Object';
 import Arr from '../Array';
 import Promise from '../Promise';
-import { defineProperties, validate } from '../../libs';
+import { isNumber, defineProperties, validate } from '../../libs';
 
-const NativeNumber = Number,
-	//toAngle = 180 / Math.PI,
-	toRadian = Math.PI / 180;
+window.D = D;
 
-const cls = class Number extends parent {
+const NativeNumber = window.Number;
+const toRadian = Math.PI / 180;
+const toDegree = 180 / Math.PI;
+const ln2 = Math.LN2;
+const ln10 = Math.LN10;
+
+export class Number extends parent {
 	constructor(number = 0) {
 		super((() => {
-			if (methods.isNumber(number)) {
+			if (isNumber(number)) {
 				return number;
 			}
 
@@ -23,11 +26,8 @@ const cls = class Number extends parent {
 	get abs() {
 		return Math.abs(this.$);
 	}
-	get acos() {
-		return Math.acos(this.$);
-	}
-	get acosh() {
-		return Math.acosh(this.$);
+	acos(cond) {
+		return (cond ? toDegree : 1) * Math.acos(this.$);
 	}
 	array(mapFn) {
 		const array = [];
@@ -38,26 +38,17 @@ const cls = class Number extends parent {
 
 		return new Arr(array);
 	}
-	get asin() {
-		return Math.asin(this.$);
+	asin(cond) {
+		return (cond ? toDegree : 1) * Math.asin(this.$);
 	}
-	get asinh() {
-		return Math.asinh(this.$);
-	}
-	get atan() {
-		return Math.atan(this.$);
-	}
-	get atanh() {
-		return Math.atanh(this.$);
+	atan(cond) {
+		return (cond ? toDegree : 1) * Math.atan(this.$);
 	}
 	get ceil() {
 		return Math.ceil(this.$);
 	}
 	cos(cond) {
 		return Math.cos((cond ? toRadian : 1) * this.$);
-	}
-	get cosh() {
-		return Math.cosh(this.$);
 	}
 	get cube() {
 		return this.$ * this.$ * this.$;
@@ -79,26 +70,29 @@ const cls = class Number extends parent {
 		const args = Array.prototype.slice.call(arguments, 1);
 
 		let timeout;
+		let cleared;
 
 		(function interval() {
 			f.apply(null, args);
-			timeout = setTimeout(interval, number);
+
+			if (!cleared) {
+				timeout = setTimeout(interval, number);
+			}
 		})();
 
 		function clear() {
+			cleared = true;
+
 			return clearTimeout(timeout);
 		}
 
 		return clear;
 	}
-	get log() {
+	get ln() {
 		return Math.log(this.$);
 	}
-	get log2() {
-		return Math.log2(this.$);
-	}
-	get log10() {
-		return Math.log10(this.$);
+	log(x) {
+		return Math.log(x) / Math.log(this.$);
 	}
 	pow(power) {
 		return Math.pow(this.$, power);
@@ -111,9 +105,6 @@ const cls = class Number extends parent {
 	}
 	sin(cond) {
 		return Math.sin((cond ? toRadian : 1) * this.$);
-	}
-	get sinh() {
-		return Math.sinh(this.$);
 	}
 	get sqrt() {
 		return Math.sqrt(this.$);
@@ -129,18 +120,25 @@ const cls = class Number extends parent {
 	}
 	timeout(value) {
 		let timeout;
+		let rej;
 
-		const promise = new Promise((resolve) => {
+		const promise = new Promise((resolve, reject) => {
+			rej = reject;
 			timeout = setTimeout(resolve, this.$, value);
 		});
 
 		promise.clear = function clear() {
 			clearTimeout(timeout);
+			
+			rej(new Error('Timeout was aborted'));
 
 			return this;
 		};
 
 		return promise;
+	}
+	toBase(base = 10) {
+		return this.$.toString(base);
 	}
 	toExponential() {
 		return this.$.toExponential.apply(this.$, arguments);
@@ -154,9 +152,48 @@ const cls = class Number extends parent {
 	valueOf() {
 		return NativeNumber(this.$);
 	}
-};
+}
 
-defineProperties(cls.prototype, {
+defineProperties(Number.prototype, {
+	'get acosh': (() => {
+		if (Math.acosh) {
+			return function () {
+				return Math.acosh(this.$);
+			};
+		}
+
+		return function () {
+			const number = this.$;
+
+			return Math.log(number + Math.sqrt(number*number - 1));
+		};
+	})(),
+	'get asinh': (() => {
+		if (Math.asinh) {
+			return function () {
+				return Math.asinh(this.$);
+			};
+		}
+
+		return function () {
+			const number = this.$;
+
+			return Math.log(number + Math.sqrt(number*number + 1));
+		};
+	})(),
+	'get atanh': (() => {
+		if (Math.atanh) {
+			return function () {
+				return Math.atanh(this.$);
+			};
+		}
+
+		return function () {
+			const number = this.$;
+
+			return Math.log((1 + number) / (1 - number)) / 2;
+		};
+	})(),
 	'get cbrt': (() => {
 		if (Math.cbrt) {
 			return function () {
@@ -168,6 +205,41 @@ defineProperties(cls.prototype, {
 			const y = Math.pow(Math.abs(this.$), 1/3);
 
 			return x > 0 ? y : -y;
+		};
+	})(),
+	'get cosh': (() => {
+		if (Math.cosh) {
+			return function () {
+				return Math.cosh(this.$);
+			};
+		}
+
+		return function () {
+			const exp = Math.exp(this.$);
+
+			return (exp + 1/exp) / 2;
+		};
+	})(),
+	'get log2': (() => {
+		if (Math.log2) {
+			return function () {
+				return Math.log2(this.$);
+			};
+		}
+
+		return function () {
+			return Math.log(this.$) / ln2;
+		};
+	})(),
+	'get log10': (() => {
+		if (Math.log10) {
+			return function () {
+				return Math.log10(this.$);
+			};
+		}
+
+		return function () {
+			return Math.log(this.$) / ln10;
 		};
 	})(),
 	'get sign': (() => {
@@ -186,13 +258,49 @@ defineProperties(cls.prototype, {
 
 			return number > 0 ? 1 : -1;
 		};
+	})(),
+	'get sinh': (() => {
+		if (Math.sinh) {
+			return function () {
+				return Math.sinh(this.$);
+			};
+		}
+
+		return function () {
+			const exp = Math.exp(this.$);
+
+			return (exp - 1/exp) / 2;
+		};
+	})(),
+	'get tanh': (() => {
+		if (Math.tanh) {
+			return function () {
+				return Math.tanh(this.$);
+			};
+		}
+
+		return function () {
+			const number = this.$;
+
+			if (number === Infinity) {
+				return 1;
+			}
+
+			if (number === -Infinity) {
+				return -1;
+			}
+
+			const exp = Math.exp(2 * number);
+
+			return (exp - 1) / (exp + 1);
+		};
 	})()
 });
 
-D.Number = cls;
+D.Number = Number;
 D.constructors.unshift({
-	check: methods.isNumber,
-	cls
+	check: isNumber,
+	cls: Number
 });
 
-export default cls;
+export default Number;

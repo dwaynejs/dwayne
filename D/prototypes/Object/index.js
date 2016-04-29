@@ -1,19 +1,26 @@
 import D from '../../';
-import methods from '../../methods';
-import { validate, defineProperties } from '../../libs';
+import {
+	isArrayAlike, isDate, isFunction, isNaN,
+	isNull, isObject, isRegExp, isUndefined,
+	validate
+} from '../../libs';
 
-const NativeObject = Object;
+const NativeObject = window.Object;
 
 const cls = class Object {
 	constructor(object = {}) {
-		defineProperties(this, { $: object });
+		NativeObject.defineProperty(this, '$', { value: object });
+	}
+
+	static defineProperty() {
+		return NativeObject.defineProperty.apply(NativeObject, arguments);
 	}
 
 	array(mapFn) {
 		validate([mapFn], ['function']);
 
 		const object = this.$;
-		const array = methods.isArrayAlike(object);
+		const array = isArrayAlike(object);
 		const a = [];
 
 		for (const key in object) {
@@ -57,7 +64,7 @@ const cls = class Object {
 	get count() {
 		const object = this.$;
 
-		if (!methods.isObject(object)) {
+		if (!isObject(object)) {
 			return 0;
 		}
 
@@ -69,7 +76,7 @@ const cls = class Object {
 		return deepEqual(this.$, o);
 	}
 	deepEvery(mapFn, n) {
-		if (arguments.length === 1 && !methods.isFunction(mapFn)) {
+		if (arguments.length === 1 && !isFunction(mapFn)) {
 			n = mapFn;
 			mapFn = Boolean;
 		} else if (arguments.length === 1) {
@@ -86,7 +93,7 @@ const cls = class Object {
 		return deepEvery(this.$, mapFn, n, [{ key: null, value: this.$ }]);
 	}
 	deepFilter(mapFn, n) {
-		if (arguments.length === 1 && !methods.isFunction(mapFn)) {
+		if (arguments.length === 1 && !isFunction(mapFn)) {
 			n = mapFn;
 			mapFn = Boolean;
 		} else if (arguments.length === 1) {
@@ -100,10 +107,10 @@ const cls = class Object {
 
 		const filtered = deepFilter(this.$, mapFn, n, [{ key: null, value: this.$ }]);
 
-		return methods.isArrayAlike(filtered) ? new D.Array(filtered) : new Object(filtered);
+		return isArrayAlike(filtered) ? new D.Array(filtered) : new Object(filtered);
 	}
 	deepFind(mapFn, n) {
-		if (arguments.length === 1 && !methods.isFunction(mapFn)) {
+		if (arguments.length === 1 && !isFunction(mapFn)) {
 			n = mapFn;
 			mapFn = Boolean;
 		} else if (arguments.length === 1) {
@@ -129,7 +136,7 @@ const cls = class Object {
 
 		const map = deepMap(this.$, mapFn, n, [{ key: null, value: this.$ }]);
 
-		return methods.isArrayAlike(map) ? new D.Array(map) : new Object(map);
+		return isArrayAlike(map) ? new D.Array(map) : new Object(map);
 	}
 	deepReduce(mapFn, n = 1, IV) {
 		validate([mapFn, n], ['function', ['intAlike', '>0']]);
@@ -139,7 +146,7 @@ const cls = class Object {
 		return deepReduce(this.$, mapFn, n, false, IV, [{ key: null, value: this.$ }]);
 	}
 	deepSome(mapFn, n) {
-		if (arguments.length === 1 && !methods.isFunction(mapFn)) {
+		if (arguments.length === 1 && !isFunction(mapFn)) {
 			n = mapFn;
 			mapFn = Boolean;
 		} else if (arguments.length === 1) {
@@ -156,7 +163,7 @@ const cls = class Object {
 		return deepSome(this.$, mapFn, n, [{ key: null, value: this.$ }]);
 	}
 	deepStrictEquals(o = null) {
-		return deepStrictEqual(this.$, o);
+		return deepEqual(this.$, o, true);
 	}
 	define(property, descriptor) {
 		if (arguments.length >= 2) {
@@ -165,13 +172,13 @@ const cls = class Object {
 
 		property = transform(property);
 
-		if (methods.isObject(this.$)) {
+		if (isObject(this.$)) {
 			NativeObject.defineProperties(this.$, property);
 		}
 
 		return this;
 	}
-	['delete']() {
+	'delete'() {
 		const object = this.$;
 
 		if (object) {
@@ -187,11 +194,11 @@ const cls = class Object {
 
 		return this.$ == o;
 	}
-	every(mapFn = Boolean) {
+	every(mapFn) {
 		validate([mapFn], ['function']);
 
 		const object = this.$;
-		const array = methods.isArrayAlike(object);
+		const array = isArrayAlike(object);
 
 		let iterated = 0;
 
@@ -211,12 +218,12 @@ const cls = class Object {
 
 		return true;
 	}
-	filter(mapFn = Boolean) {
+	filter(mapFn) {
 		validate([mapFn], ['function']);
 
 		const object = this.$;
-		const array = methods.isArrayAlike(object);
-		const nul = methods.isNull(this.$);
+		const array = isArrayAlike(object);
+		const nul = isNull(this.$);
 		const o = array ? [] : nul ? null : {};
 
 		let iterated = 0;
@@ -243,7 +250,7 @@ const cls = class Object {
 		validate([mapFn], ['function']);
 
 		const object = this.$;
-		const array = methods.isArrayAlike(object);
+		const array = isArrayAlike(object);
 
 		let iterated = 0;
 
@@ -265,11 +272,11 @@ const cls = class Object {
 
 		return null;
 	}
-	forEach(mapFn = Boolean) {
+	forEach(mapFn) {
 		validate([mapFn], ['function']);
 
 		const object = this.$;
-		const array = methods.isArrayAlike(object);
+		const array = isArrayAlike(object);
 
 		let iterated = 0;
 
@@ -301,7 +308,7 @@ const cls = class Object {
 
 		property = transform(property);
 
-		if (methods.isObject(object)) {
+		if (isObject(object)) {
 			for (const key in property) {
 				if (property.hasOwnProperty(key)) {
 					NativeObject.defineProperty(object, key, { get: property[key] });
@@ -314,7 +321,7 @@ const cls = class Object {
 	has(key) {
 		const object = this.$;
 
-		if (!methods.isObject(object)) {
+		if (!isObject(object)) {
 			return false;
 		}
 
@@ -323,7 +330,7 @@ const cls = class Object {
 	hasOwn(key) {
 		const object = this.$;
 
-		if (!methods.isObject(object)) {
+		if (!isObject(object)) {
 			return false;
 		}
 
@@ -333,20 +340,20 @@ const cls = class Object {
 	isFrozen() {
 		return NativeObject.isFrozen(this.$);
 	}
-	json(f, indent) {
-		if (arguments.length === 1 && !methods.isFunction(f)) {
-			indent = f;
-			f = null;
+	json(mapFn, indent) {
+		if (arguments.length === 1 && !isFunction(f)) {
+			indent = mapFn;
+			mapFn = null;
 		} else if (!arguments.length) {
-			f = null;
+			mapFn = null;
 		}
 
-		validate([f], ['function||!']);
+		validate([mapFn], ['function||!']);
 
 		return JSON.stringify(this.$, function (key, value) {
 			value = transform(value);
 
-			return f ? f.apply(null, arguments) : value;
+			return mapFn ? mapFn.apply(null, arguments) : value;
 		}, indent);
 	}
 	keyOf(value) {
@@ -356,7 +363,7 @@ const cls = class Object {
 			if (object.hasOwnProperty(key)) {
 				const val = object[key];
 
-				if (val == value || (methods.isNaN(val) && methods.isNaN(value))) {
+				if (val == value || (isNaN(val) && isNaN(value))) {
 					return key;
 				}
 			}
@@ -369,7 +376,9 @@ const cls = class Object {
 
 		for (const key in object) {
 			if (object.hasOwnProperty(key)) {
-				if (object[key] === value) {
+				const val = object[key];
+				
+				if (val === value || (isNaN(val) && isNaN(value))) {
 					return key;
 				}
 			}
@@ -380,23 +389,18 @@ const cls = class Object {
 	keys() {
 		const object = this.$;
 
-		if (!methods.isObject(object)) {
+		if (!isObject(object)) {
 			return new D.Array();
 		}
 
 		return new D.Array(NativeObject.keys(object));
 	}
-	log(method = 'log') {
-		console[method](this);
-
-		return this;
-	}
 	map(mapFn) {
 		validate([mapFn], ['function']);
 
 		const object = this.$;
-		const array = methods.isArrayAlike(object);
-		const nul = methods.isNull(object);
+		const array = isArrayAlike(object);
+		const nul = isNull(object);
 		const o = array ? [] : nul ? null : {};
 
 		let iterated = 0;
@@ -419,7 +423,7 @@ const cls = class Object {
 		validate([mapFn], ['function||!']);
 
 		const object = this.$;
-		const array = methods.isArrayAlike(object);
+		const array = isArrayAlike(object);
 
 		let max = { key: null, value: -Infinity };
 		let iterated = 0;
@@ -447,7 +451,7 @@ const cls = class Object {
 		validate([mapFn], ['function||!']);
 
 		const object = this.$;
-		const array = methods.isArrayAlike(object);
+		const array = isArrayAlike(object);
 
 		let min = { key: null, value: Infinity };
 		let iterated = 0;
@@ -475,7 +479,7 @@ const cls = class Object {
 		validate([mapFn], ['function']);
 
 		const object = this.$;
-		const array = methods.isArrayAlike(object);
+		const array = isArrayAlike(object);
 		const o = {};
 
 		let iterated = 0;
@@ -497,7 +501,7 @@ const cls = class Object {
 	propertyDescriptor(key) {
 		const object = this.$;
 
-		if (!methods.isObject(object)) {
+		if (!isObject(object)) {
 			return;
 		}
 
@@ -506,7 +510,7 @@ const cls = class Object {
 	propertyNames() {
 		const object = this.$;
 
-		if (!methods.isObject(object)) {
+		if (!isObject(object)) {
 			return new D.Array();
 		}
 
@@ -515,7 +519,7 @@ const cls = class Object {
 	propertySymbols() {
 		const object = this.$;
 
-		if (!methods.isObject(object)) {
+		if (!isObject(object)) {
 			return new D.Array();
 		}
 
@@ -525,13 +529,13 @@ const cls = class Object {
 		const object = this.$;
 
 		if (arguments.length) {
-			if (methods.isObject(object)) {
+			if (isObject(object)) {
 				NativeObject.setPrototypeOf(object, proto);
 			}
 			return this;
 		}
 
-		if (!methods.isObject(object)) {
+		if (!isObject(object)) {
 			return;
 		}
 
@@ -541,7 +545,7 @@ const cls = class Object {
 		validate([mapFn], ['function']);
 
 		const object = this.$;
-		const array = methods.isArrayAlike(object);
+		const array = isArrayAlike(object);
 
 		let startKey;
 		let iterated = 0;
@@ -580,7 +584,7 @@ const cls = class Object {
 
 		const object = this.$;
 
-		if (methods.isObject(object)) {
+		if (isObject(object)) {
 			for (const key in property) {
 				if (property.hasOwnProperty(key)) {
 					NativeObject.defineProperty(object, key, { set: property[key] });
@@ -590,11 +594,11 @@ const cls = class Object {
 
 		return this;
 	}
-	some(mapFn = Boolean) {
+	some(mapFn) {
 		validate([mapFn], ['function']);
 
 		const object = this.$;
-		const array = methods.isArrayAlike(object);
+		const array = isArrayAlike(object);
 
 		let iterated = 0;
 
@@ -623,7 +627,7 @@ const cls = class Object {
 		validate([mapFn], ['function||!']);
 
 		const object = this.$;
-		const array = methods.isArrayAlike(object);
+		const array = isArrayAlike(object);
 
 		let sum = 0;
 		let iterated = 0;
@@ -661,7 +665,7 @@ const cls = class Object {
 		validate([mapFn], ['function||!']);
 
 		const object = this.$;
-		const array = methods.isArrayAlike(object);
+		const array = isArrayAlike(object);
 
 		let word = '';
 		let iterated = 0;
@@ -684,21 +688,44 @@ const cls = class Object {
 	}
 };
 
-function deepEqual(o1, o2) {
+function deepEqual(o1, o2, strict) {
 	o1 = transform(o1);
 	o2 = transform(o2);
 
-	if (methods.isNull(o1) && methods.isNull(o2)) {
+	if (isNull(o1) && isNull(o2)) {
 		return true;
 	}
 
-	if (methods.isNull(o1) || methods.isNull(o2)) {
+	if (isNull(o1) || isNull(o2)) {
+		return false;
+	}
+	
+	if (isUndefined(o1) && isUndefined(o2)) {
+		return true;
+	}
+	
+	if (isUndefined(o1) || isUndefined(o2)) {
+		return false;
+	}
+	
+	if (isNaN(o1) && isNaN(o2)) {
+		return true;
+	}
+	
+	if (isNaN(o1) || isNaN(o2)) {
 		return false;
 	}
 
+	if (isDate(o1) && isDate(o2)) {
+		return o1.getTime() === o2.getTime();
+	}
+
+	if (isRegExp(o1) && isRegExp(o2)) {
+		return o1.toString() === o2.toString();
+	}
+
 	if (
-		o1 != o2 &&
-		(!methods.isNaN(o1) || !methods.isNaN(o2)) &&
+		(strict ? o1 !== o2 : o1 != o2) &&
 		NativeObject.keys(o1).length !== NativeObject.keys(o2).length
 	) {
 		return false;
@@ -706,7 +733,7 @@ function deepEqual(o1, o2) {
 
 	for (const key in o1) {
 		if (o1.hasOwnProperty(key)) {
-			if (!(key in o2) || !deepEqual(o1[key], o2[key])) {
+			if (!(key in o2) || !deepEqual(o1[key], o2[key], strict)) {
 				return false;
 			}
 		}
@@ -717,7 +744,7 @@ function deepEqual(o1, o2) {
 function deepEvery(object = {}, mapFn, n, tree) {
 	object = transform(object);
 
-	const array = methods.isArrayAlike(object);
+	const array = isArrayAlike(object);
 	const end = n === 1;
 
 	let iterated = 0;
@@ -748,8 +775,8 @@ function deepEvery(object = {}, mapFn, n, tree) {
 function deepFilter(object = {}, mapFn, n, tree) {
 	object = transform(object);
 
-	const array = methods.isArrayAlike(object);
-	const nul = methods.isNull(object);
+	const array = isArrayAlike(object);
+	const nul = isNull(object);
 	const o = array ? [] : nul ? null : {};
 	const end = n === 1;
 
@@ -794,7 +821,7 @@ function deepFilter(object = {}, mapFn, n, tree) {
 function deepFind(object = {}, mapFn, n, tree) {
 	object = transform(object);
 
-	const array = methods.isArrayAlike(object);
+	const array = isArrayAlike(object);
 	const end = n === 1;
 
 	let iterated = 0;
@@ -839,8 +866,8 @@ function deepFreeze(object = {}) {
 function deepMap(object = {}, mapFn, n, tree) {
 	object = transform(object);
 
-	const array = methods.isArrayAlike(object);
-	const nul = methods.isNull(object);
+	const array = isArrayAlike(object);
+	const nul = isNull(object);
 	const o = array ? [] : nul ? null : {};
 	const end = n === 1;
 
@@ -868,7 +895,7 @@ function deepMap(object = {}, mapFn, n, tree) {
 function deepReduce(object = {}, mapFn, n, start, IV, tree) {
 	object = transform(object);
 
-	const array = methods.isArrayAlike(object);
+	const array = isArrayAlike(object);
 	const end = n === 1;
 
 	let startKey;
@@ -908,7 +935,7 @@ function deepReduce(object = {}, mapFn, n, start, IV, tree) {
 function deepSome(object = {}, mapFn, n, tree) {
 	object = transform(object);
 
-	const array = methods.isArrayAlike(object);
+	const array = isArrayAlike(object);
 	const end = n === 1;
 
 	let iterated = 0;
@@ -936,40 +963,10 @@ function deepSome(object = {}, mapFn, n, tree) {
 
 	return false;
 }
-function deepStrictEqual(o1, o2) {
-	o1 = transform(o1);
-	o2 = transform(o2);
-
-	if (methods.isNull(o1) && methods.isNull(o2)) {
-		return true;
-	}
-
-	if (methods.isNull(o1) || methods.isNull(o2)) {
-		return false;
-	}
-
-	if (
-		o1 !== o2 &&
-		(!methods.isNaN(o1) || !methods.isNaN(o2)) &&
-		NativeObject.keys(o1).length !== NativeObject.keys(o2).length
-	) {
-		return false;
-	}
-
-	for (const key in o1) {
-		if (o1.hasOwnProperty(key)) {
-			if (!(key in o2) || !deepStrictEqual(o1[key], o2[key])) {
-				return false;
-			}
-		}
-	}
-
-	return true;
-}
 
 D.Object = cls;
 D.constructors.unshift({
-	check: D.isObject,
+	check: isObject,
 	cls
 });
 
@@ -980,5 +977,7 @@ export function transform(object) {
 
 	return object;
 }
+
+export const Obj = cls;
 
 export default cls;

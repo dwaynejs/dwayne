@@ -11,7 +11,9 @@ export default () => {
 			});
 		});
 		// TODO: .endsWith()
+		// TODO: .escapeFor()
 		// TODO: .find()
+		// TODO: .findAll()
 		// TODO: .in()
 		describe('indexOf()', () => {
 			it('should work the same as String.prototype.indexOf', () => {
@@ -30,7 +32,9 @@ export default () => {
 				assert.deepEqual(wrap.match(/o/g).$, ['o', 'o']);
 			});
 		});
-		// TODO: .parse(string('json' | 'html' | 'xml'?))
+		// TODO: .parseHTML
+		// TODO: .parseJSON
+		// TODO: .parseNumber
 		describe('repeat()', () => {
 			it('should return empty string with 0 argument', () => {
 				const o = 'foobar',

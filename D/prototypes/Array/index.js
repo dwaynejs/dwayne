@@ -1,59 +1,26 @@
 import D from '../../';
-import methods from '../../methods';
 import { default as parent, transform } from '../Object';
-import { validate, assign, toArray } from '../../libs';
+import {
+	isArrayAlike, isNaN, isString,
+	toArray, validate
+} from '../../libs';
 
-const NativeArray = Array;
+const NativeArray = window.Array;
 
-const sortMethods = {
-	asc: (x, y) => {
-		x = Number(x);
-		y = Number(y);
-
-		if (x > y) {
-			return 1;
-		}
-
-		if (x < y) {
-			return -1;
-		}
-
-		if (methods.isNaN(y) && !methods.isNaN(x)) {
-			return 1;
-		}
-
-		if (methods.isNaN(x) && !methods.isNaN(y)) {
-			return -1;
-		}
-
-		return 0;
-	}
-};
-
-assign(sortMethods, {
-	desc: (x, y) => {
-		return sortMethods.asc(y, x);
-	}
-});
-
-const cls = class Array extends parent {
+export class Array extends parent {
 	constructor(array = []) {
 		super(array);
 	}
 
-	static from(array) {
-		return new this(toArray(array));
-	}
-
 	concat() {
-		const array = from(this.$),
-			length = arguments.length;
+		const array = toArray(this.$);
+		const length = arguments.length;
 
 		for (let i = 0; i < length; i++) {
-			const value = arguments[i],
-				transformed = transform(value);
+			const value = arguments[i];
+			const transformed = transform(value);
 
-			if (methods.isArrayAlike(transformed) && !methods.isString(transformed)) {
+			if (isArrayAlike(transformed) && !isString(transformed)) {
 				for (let k = 0, len = transformed.length; k < len; k++) {
 					array.push(transformed[k]);
 				}
@@ -88,9 +55,9 @@ const cls = class Array extends parent {
 		return this;
 	}
 	reverse() {
-		const array = this.$,
-			length = array.length,
-			a = [];
+		const array = this.$;
+		const length = array.length;
+		const a = [];
 
 		for (let i = length - 1; i >= 0; i--) {
 			a.push(array[i]);
@@ -104,13 +71,13 @@ const cls = class Array extends parent {
 		return this;
 	}
 	shuffle() {
-		const array = from(this.$),
-			length = array.length,
-			a = [];
+		const array = this.$;
+		const length = array.length;
+		const a = [];
 
 		for (let i = 0; i < length; i++) {
-			const k = i + Math.floor((length - i) * Math.random()),
-				change = array[i];
+			const k = i + Math.floor((length - i) * Math.random());
+			const change = array[i];
 
 			a.push(array[k]);
 			array[i] = array[k];
@@ -123,19 +90,17 @@ const cls = class Array extends parent {
 		return new Array(NativeArray.prototype.slice.apply(this.$, arguments));
 	}
 	sort(f) {
-		try {
-			validate([f], ['function']);
-		} catch (e) {
-			if (!(f in sortMethods)) {
-				throw new TypeError(
-					`1st argument must either or function, or method from [${ Object.keys(sortMethods).join(', ') }]!`
-				);
-			}
-
-			f = sortMethods[f];
-		}
-
-		return new Array(from(this.$).sort(f));
+		validate([f], ['function']);
+		
+		return new Array(toArray(this.$).sort(f));
+	}
+	sortAsc() {
+		return new Array(toArray(this.$).sort(asc));
+	}
+	sortDesc() {
+		return new Array(toArray(this.$).sort((y, x) => {
+			return asc(x, y);
+		}));
 	}
 	splice() {
 		NativeArray.prototype.splice.apply(this.$, arguments);
@@ -150,12 +115,35 @@ const cls = class Array extends parent {
 
 		return this;
 	}
-};
+}
 
-D.Array = cls;
+function asc(x, y) {
+	x = Number(x);
+	y = Number(y);
+	
+	if (x > y) {
+		return 1;
+	}
+	
+	if (x < y) {
+		return -1;
+	}
+	
+	if (isNaN(y) && !isNaN(x)) {
+		return 1;
+	}
+	
+	if (isNaN(x) && !isNaN(y)) {
+		return -1;
+	}
+	
+	return 0;
+}
+
+D.Array = Array;
 D.constructors.unshift({
-	check: (value) => methods.isArrayAlike(value) && !methods.isString(value),
-	cls
+	check: (value) => isArrayAlike(value) && !isString(value),
+	cls: Array
 });
 
-export default cls;
+export default Array;

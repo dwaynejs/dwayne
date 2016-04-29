@@ -1,18 +1,28 @@
 import D from '../../';
-import methods from '../../methods';
 import { default as parent, transform } from '../Object';
 import Alphabet from '../Alphabet';
 import Arr from '../Array';
-import HtmlElement from '../Alphabet';
-import { validate } from '../../libs';
+import { htmlElement } from '../HtmlElement';
+import {
+	isArray, isFunction, isNumberAlike, isObject, isString,
+	validate
+} from '../../libs';
+import regexpSpecialCharacters from './regexp-special-characters';
 
 const NativeString = String;
 const Obj = parent;
+const htmlSpecials = {
+	'&': '&amp;',
+	'<': '&lt;',
+	'>': '&gt;'
+};
+const regexpSpecialsRegexp = new RegExp(new Arr(regexpSpecialCharacters).map((x) => '\\' + x).join('|'), 'g');
+const dateRegexp = /^\d\d\d\d-\d\d-\d\dt\d\d:\d\d:\d\d\.\d\d\dz$/i;
 
-const cls = class String extends parent {
+export class String extends parent {
 	constructor(string = '') {
 		super((() => {
-			if (methods.isString(string)) {
+			if (isString(string)) {
 				return string;
 			}
 
@@ -21,14 +31,14 @@ const cls = class String extends parent {
 	}
 
 	alphabet() {
-		const ranges = this.$.match(/[\s\S]-[\s\S]/g) || [],
-			length = ranges.length,
-			alphabet = [];
+		const ranges = this.$.match(/[\s\S]-[\s\S]/g) || [];
+		const length = ranges.length;
+		const alphabet = [];
 
 		for (let i = 0; i < length; i++) {
-			const range = ranges[i],
-				start = range.charCodeAt(0),
-				end = range.charCodeAt(2);
+			const range = ranges[i];
+			const start = range.charCodeAt(0);
+			const end = range.charCodeAt(2);
 
 			if (start > end) {
 				throw new Error('Start of the range must be before its end!');
@@ -45,39 +55,95 @@ const cls = class String extends parent {
 		const string = NativeString(this.$);
 		const S = String;
 
-		return new S(string[0] + string.substring(1));
+		return new S(string[0].toUpperCase() + string.substring(1));
 	}
-	// TODO: .endsWith()
+	endsWith(string) {
+		const Str = String;
+		
+		return this.revert().startsWith(new Str(string).revert().$);
+	}
+	escapeFor(what) {
+		let string = this.$;
+
+		if (what === 'html') {
+			for (const symbol in htmlSpecials) {
+				if (htmlSpecials.hasOwnProperty(symbol)) {
+					string = string.replace(new RegExp(symbol, 'g'));
+				}
+			}
+		} else if (what === 'regexp') {
+			string = string.replace(regexpSpecialsRegexp, '\\$&');
+		}
+
+		return string;
+	}
 	find() {
 		if (!arguments.length) {
-			const S = String,
-				found = document.querySelector(this.$),
-				name = found ? found.tagName.toLowerCase() : 'null',
-				constructor = D[`Html${ new S(name).toCapitalCase() }Element`];
+			const found = document.querySelector(this.$);
 
-			if (constructor) {
-				return new constructor(found);
-			}
-
-			return new HtmlElement(found);
+			return htmlElement(found);
 		}
 
 		return Object.getPrototypeOf(String.prototype).find.apply(this, arguments);
 	}
-	// TODO: .in()
+	findAll() {
+		if (!arguments.length) {
+			const found = document.querySelectorAll(this.$);
+
+			return htmlElement(found);
+		}
+
+		return Object.getPrototypeOf(String.prototype).find.apply(this, arguments);
+	}
+	'in'(object) {
+		if (!isObject(object)) {
+			return false;
+		}
+
+		return this.$ in object;
+	}
 	indexOf() {
 		return this.$.indexOf.apply(this.$, arguments);
 	}
 	match() {
 		const match = this.$.match.apply(this.$, arguments);
 
-		if (methods.isArray(match)) {
+		if (isArray(match)) {
 			return new Arr(match);
 		}
 
 		return new Obj(match);
 	}
-	// TODO: .parse(string('json' | 'html' | 'xml'?))
+	parseHTML() {
+		const doc = document.createElement('div');
+
+		doc.innerHTML = this.$;
+
+		return htmlElement(doc).children();
+	}
+	parseJSON(params, mapFn) {
+		if (isFunction(params)) {
+			mapFn = params;
+			params = {};
+		}
+
+		const parseNumbers = params.numbers;
+		const parseDates = params.dates;
+		const parsed = JSON.parse(this.$, function (key, value) {
+			if (parseDates && dateRegexp.test(value)) {
+				value = new Date(value);
+			} else if (parseNumbers && isNumberAlike(value)) {
+				value = Number(value);
+			}
+
+			return mapFn ? mapFn.apply(null, arguments) : value;
+		});
+
+		return isArray(parsed) ? new Arr(parsed) : new Obj(parsed);
+	}
+	parseNumber(base = 10) {
+		return parseInt(this.$, base);
+	}
 	repeat(n) {
 		validate([n], [['intAlike', '>=0']]);
 
@@ -107,12 +173,33 @@ const cls = class String extends parent {
 
 		return new S(this.$.split(string).join(replacer));
 	}
+	revert() {
+		const Str = String;
+		const string = this.$;
+		let str = '';
+
+		for (let i = string.length - 1; i >= 0; i++) {
+			str += string[i];
+		}
+
+		return new Str(str);
+	}
 	split(delimiter) {
 		return new Arr(this.$.split(delimiter));
 	}
-	// TODO: .startsWith()
-	// TODO: .substring()
-	// TODO: .substr()
+	startsWith(string) {
+		return this.$.indexOf(string) === 0;
+	}
+	substring() {
+		const string = String(this.$);
+
+		return string.substring.apply(string, arguments);
+	}
+	substr() {
+		const string = String(this.$);
+
+		return string.substr.apply(string, arguments);
+	}
 	toCamelCase() {
 		const S = String;
 
@@ -121,6 +208,9 @@ const cls = class String extends parent {
 			.replace(/\-[^\-]/g, (match) => {
 				return match[1].toUpperCase();
 			})
+			.replace(/^[\S]/, (match) => {
+				return match.toLowerCase();
+			})
 		);
 	}
 	toCapitalCase() {
@@ -128,8 +218,20 @@ const cls = class String extends parent {
 
 		return new S(trim(this.$)
 			.replace(/[\s\-_\.]+/g, ' ')
-			.replace(/[\S]+/g, (match) => {
-				return match[0].toUpperCase() + match.substring(1);
+			.replace(/[\S]/g, (match) => {
+				if (match.toLowerCase() !== match) {
+					return ' ' + match;
+				}
+
+				return match;
+			})
+			.replace(/\s[\S]/g, (match) => {
+				return match.toUpperCase();
+			})
+			.replace(/\s+/g, ' ')
+			.replace(/^\s/, '')
+			.replace(/^[\S]/, (match) => {
+				return match.toUpperCase();
 			})
 		);
 	}
@@ -138,6 +240,15 @@ const cls = class String extends parent {
 
 		return new S(trim(this.$)
 			.replace(/[\s\-_\.]+/g, '.')
+			.replace(/[^\.]/g, (match) => {
+				if (match.toLowerCase() !== match) {
+					return '.' + match;
+				}
+
+				return match;
+			})
+			.replace(/\.+/g, '.')
+			.replace(/^\./, '')
 			.toLowerCase()
 		);
 	}
@@ -151,6 +262,15 @@ const cls = class String extends parent {
 
 		return new S(trim(this.$)
 			.replace(/[\s\-_\.]+/g, '_')
+			.replace(/[^_]/g, (match) => {
+				if (match.toLowerCase() !== match) {
+					return '_' + match;
+				}
+
+				return match;
+			})
+			.replace(/_+/g, '_')
+			.replace(/^_/, '')
 			.toLowerCase()
 		);
 	}
@@ -159,6 +279,15 @@ const cls = class String extends parent {
 
 		return new S(trim(this.$)
 			.replace(/[\s\-_\.]+/g, ' ')
+			.replace(/[\S]/g, (match) => {
+				if (match.toLowerCase() !== match) {
+					return ' ' + match;
+				}
+
+				return match;
+			})
+			.replace(/\s+/g, ' ')
+			.replace(/^\s/, '')
 			.toLowerCase()
 		);
 	}
@@ -167,6 +296,15 @@ const cls = class String extends parent {
 
 		return new S(trim(this.$)
 			.replace(/[\s\-_\.]+/g, '-')
+			.replace(/[^\-]/g, (match) => {
+				if (match.toLowerCase() !== match) {
+					return '-' + match;
+				}
+
+				return match;
+			})
+			.replace(/\-+/g, '-')
+			.replace(/^\-/, '')
 			.toLowerCase()
 		);
 	}
@@ -191,16 +329,16 @@ const cls = class String extends parent {
 
 		return new S(this.$.replace(/^\s+|\s+$/g, ''));
 	}
-};
+}
 
 function trim(string) {
 	return string.replace(/^[\s\-_\.]+|[\s\-_\.]+$/g, '');
 }
 
-D.String = cls;
+D.String = String;
 D.constructors.unshift({
-	check: methods.isString,
-	cls
+	check: isString,
+	cls: String
 });
 
-export default cls;
+export default String;

@@ -6,14 +6,6 @@ const assert = require('assert');
 
 export default () => {
 	describe('it should test D.HtmlElement.prototype.[methods]', () => {
-		/*describe('async', () => {
-			it('should test async', (done) => {
-				setTimeout(() => {
-					assert(true);
-					done();
-				}, 1000);
-			});
-		});*/
 		describe('.absolute()', () => {
 			it('should set position to absolute', () => {
 				const elem = document.createElement('div'),

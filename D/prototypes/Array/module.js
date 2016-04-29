@@ -1,5 +1,6 @@
 import cls from './';
 
-import '../HtmlCollection';
+export * from '../HtmlCollection/module';
+export * from './';
 
 export default cls;

@@ -3,6 +3,7 @@
   "plugins": [
     "transform-object-rest-spread",
     "transform-function-bind",
-    "transform-class-properties"
+    "transform-class-properties",
+    "transform-class-constructor-call"
   ]
 }

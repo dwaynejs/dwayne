@@ -144,6 +144,8 @@ export default () => {
 				}).$, [-1, 5, 7, 9, 13, -2, 0, 6, 8, 12]);
 			});
 		});
+		// TODO: .sortAsc()
+		// TODO: .sortDesc()
 		describe('splice()', () => {
 			it('should work the same as Array.prototype.splice', () => {
 				let o = [1, 2, 3, 4, 5],

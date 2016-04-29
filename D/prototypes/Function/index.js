@@ -1,76 +1,78 @@
 import D from '../../';
-import methods from '../../methods';
 import { default as parent, transform } from '../Object';
 import Promise from '../Promise';
-import Arr from '../Array';
-import { assign, validate, toArray } from '../../libs';
+import { isFunction, assign, validate, toArray } from '../../libs';
 
-const cls = class Function extends parent {
+export class Function extends parent {
 	constructor(func = () => {}) {
-		super((() => {
-			validate([func], ['function']);
+		super();
 
-			function proxy() {
-				if (proxy.called < proxy.canBeCalled) {
-					proxy.called++;
+		validate([func], ['function']);
 
-					let { before, after, original, context, args, sync, contextLocked } = proxy;
-					let ret;
+		function proxy() {
+			if (proxy.$.called < proxy.$.canBeCalled) {
+				proxy.$.called++;
 
-					context = contextLocked ? context : this;
-					args = args.concat(toArray(arguments));
+				let { before, after, context, args, sync, contextLocked } = proxy.$;
+				let ret;
 
-					if (sync) {
-						for (let i = 0; i < before.length; i++) {
-							args = before[i].apply(null, toArray(args));
-						}
+				context = contextLocked ? context : this;
+				args = args.concat(toArray(arguments));
 
-						ret = original.apply(context, toArray(args));
-
-						for (let i = 0; i < after.length; i++) {
-							ret = after[i](ret);
-						}
-
-						return ret;
-					}
-
-					let promise = Promise.resolve(args);
-
+				if (sync) {
 					for (let i = 0; i < before.length; i++) {
-						promise = promise.then((args) => {
-							return before[i].apply(null, toArray(args));
-						});
+						args = before[i].apply(null, toArray(args));
 					}
 
-					promise = promise.then((args) => {
-						return original.apply(this, toArray(args));
-					});
+					ret = func.apply(context, toArray(args));
 
 					for (let i = 0; i < after.length; i++) {
-						promise = promise.then((ret) => {
-							return after[i](ret);
-						});
+						ret = after[i](ret);
 					}
 
-					return promise;
+					return ret;
 				}
+
+				let promise = Promise.resolve(args);
+
+				for (let i = 0; i < before.length; i++) {
+					promise = promise.then((args) => {
+						return before[i].apply(null, toArray(args));
+					});
+				}
+
+				promise = promise.then((args) => {
+					return func.apply(this, toArray(args));
+				});
+
+				for (let i = 0; i < after.length; i++) {
+					promise = promise.then((ret) => {
+						return after[i](ret);
+					});
+				}
+
+				return promise;
 			}
+		}
 
-			assign(proxy, {
-				after: [],
-				args: [],
-				argsLocked: [],
-				before: [],
-				called: 0,
-				canBeCalled: Infinity,
-				context: null,
-				contextLocked: false,
-				original: func,
-				sync: true
-			});
+		Object.defineProperty(this, '$', { value: {} });
+		Object.defineProperty(proxy, '$', { value: {} });
+		Object.setPrototypeOf(proxy, Function.prototype);
 
-			return proxy;
-		})());
+		assign(proxy.$, {
+			after: [],
+			args: [],
+			argsLocked: [],
+			before: [],
+			called: 0,
+			canBeCalled: Infinity,
+			context: null,
+			contextLocked: false,
+			originalName: func.name || 'anonymous',
+			sync: true
+		});
+
+		return proxy;
 	}
 
 	after(f, where = 1) {
@@ -89,10 +91,12 @@ const cls = class Function extends parent {
 		return this;
 	}
 	apply(context, args) {
-		return this.$.function.apply(context, args);
+		return this.$.apply(context, args);
 	}
 	async(cond = true) {
 		this.$.sync = !cond;
+
+		return this;
 	}
 	before(f, where = -1) {
 		f = transform(f);
@@ -118,7 +122,7 @@ const cls = class Function extends parent {
 	bindArgs(args) {
 		const func = this.$;
 
-		func.args = func.args.concat(Arr.from(args).$);
+		func.args = func.args.concat(toArray(args));
 
 		return this;
 	}
@@ -132,7 +136,7 @@ const cls = class Function extends parent {
 		return this;
 	}
 	call(context) {
-		return this.$.function.apply(context, Array.prototype.slice.call(arguments, 1));
+		return this.$.apply(context, Array.prototype.slice.call(arguments, 1));
 	}
 	canBeCalled(n) {
 		this.$.canBeCalled = n;
@@ -140,18 +144,18 @@ const cls = class Function extends parent {
 		return this;
 	}
 	interval(number) {
-		const f = this.$.function.bind({ clear });
+		const f = this.$.bind({ clear });
+		const args = Array.prototype.slice.call(arguments, 1);
 
-		let timeout,
-			args = Array.prototype.slice.call(arguments, 1);
+		let interval;
 
 		(() => {
 			f.apply(null, args);
-			timeout = setTimeout.apply(null, [f, this.$].concat(args));
+			interval = setInterval.apply(null, [f, number].concat(args));
 		})();
 
 		function clear() {
-			return clearTimeout(timeout);
+			return clearInterval(interval);
 		}
 
 		return clear;
@@ -165,7 +169,7 @@ const cls = class Function extends parent {
 	lockArgs(args) {
 		const func = this.$;
 
-		func.args = func.argsLocked = func.argsLocked.concat(Array.from(args).$);
+		func.args = func.argsLocked = func.argsLocked.concat(toArray(args));
 
 		return this;
 	}
@@ -180,7 +184,7 @@ const cls = class Function extends parent {
 		return this;
 	}
 	timing(mark) {
-		mark = !arguments.length ? this.$.original.name || 'anonymous' : String(mark);
+		mark = !arguments.length ? this.$.originalName : String(mark);
 
 		this.before(function () {
 			console.time(mark);
@@ -218,12 +222,12 @@ const cls = class Function extends parent {
 
 		return this;
 	}
-};
+}
 
-D.Function = cls;
+D.Function = Function;
 D.constructors.unshift({
-	check: methods.isFunction,
-	cls
+	check: isFunction,
+	cls: Function
 });
 
-export default cls;
+export default Function;

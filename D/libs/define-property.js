@@ -1,6 +1,6 @@
-const getRegexp = /^get /,
-	setRegexp = /^set /,
-	getSetRegexp = /^get\/set /;
+const getRegexp = /^get /;
+const setRegexp = /^set /;
+const getSetRegexp = /^get\/set /;
 
 export function dynamicDefineProperties(object, methods, descriptorGenerator) {
 	for (let i = 0, length = methods.length; i < length; i++) {

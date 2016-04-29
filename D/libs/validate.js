@@ -1,4 +1,4 @@
-import checkTypeMethods from '../methods/check-type-methods';
+import * as checkTypeMethods from '../methods/check-type-methods';
 
 const numbers = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th'];
 
@@ -134,7 +134,7 @@ const check = {
 		error: TypeError
 	},
 	'regexp||!': {
-		check: (n) => checkTypeMethods.isRegexp(n) || checkTypeMethods.isUndefined(n) || checkTypeMethods.isNull(n),
+		check: (n) => checkTypeMethods.isRegExp(n) || checkTypeMethods.isUndefined(n) || checkTypeMethods.isNull(n),
 		text: '$n argument must be a regular expression, or undefined, or null!',
 		error: TypeError
 	},

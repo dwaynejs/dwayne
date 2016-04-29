@@ -1,10 +1,9 @@
 import D from '../../';
-import methods from '../../methods';
 import { default as parent, transform } from '../Object/index';
-import Array from '../String';
-import { validate } from '../../libs';
+import Array from '../Array';
+import { isString, validate } from '../../libs';
 
-const cls = class Alphabet extends parent {
+export class Alphabet extends parent {
 	constructor(alphabet = []) {
 		super({});
 
@@ -52,7 +51,7 @@ const cls = class Alphabet extends parent {
 
 		return true;
 	}
-	['delete']() {
+	'delete'() {
 		for (let i = 0, length = arguments.length; i < length; i++) {
 			const char = arguments[i];
 
@@ -68,8 +67,8 @@ const cls = class Alphabet extends parent {
 	token(length) {
 		validate([length], [['intAlike', '>0']]);
 
-		const alphabet = Object.keys(this.$),
-			len = alphabet.length;
+		const alphabet = Object.keys(this.$);
+		const len = alphabet.length;
 		let token = '';
 
 		for (let i = 0; i < length; i++) {
@@ -78,12 +77,12 @@ const cls = class Alphabet extends parent {
 
 		return token;
 	}
-};
-
-D.Alphabet = cls;
-
-function check(char) {
-	return methods.isString(char) && char.length === 1;
 }
 
-export default cls;
+D.Alphabet = Alphabet;
+
+function check(char) {
+	return isString(char) && char.length === 1;
+}
+
+export default Alphabet;

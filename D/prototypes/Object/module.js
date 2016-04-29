@@ -1,13 +1,14 @@
-import cls from './';
+import cls, { Obj as O } from './';
 
-import '../Alphabet/module';
-import '../Array/module';
-import '../Date/module';
-import '../Fetch/module';
-import '../Function/module';
-import '../HtmlElement/module';
-import '../Number/module';
-import '../Promise/module';
-import '../String/module';
+export * from '../Alphabet/module';
+export * from '../Array/module';
+export * from '../Date/module';
+export * from '../Fetch/module';
+export * from '../Function/module';
+export * from '../HtmlElement/module';
+export * from '../Number/module';
+export * from '../Promise/module';
+export * from '../String/module';
+export const Obj = O;
 
 export default cls;
