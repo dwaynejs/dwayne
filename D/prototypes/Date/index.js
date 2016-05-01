@@ -4,7 +4,7 @@ import Num from '../Number';
 import Str from '../String';
 import { isDate } from '../../libs';
 
-const NativeDate = Date;
+const NativeDate = global.Date;
 const coeffs = {
 	c: 1,
 	s: 1000,

@@ -9,7 +9,7 @@ import {
 } from '../../libs';
 import regexpSpecialCharacters from './regexp-special-characters';
 
-const NativeString = String;
+const NativeString = global.String;
 const Obj = parent;
 const htmlSpecials = {
 	'&': '&amp;',
@@ -127,12 +127,11 @@ export class String extends parent {
 			params = {};
 		}
 
-		const parseNumbers = params.numbers;
-		const parseDates = params.dates;
+		const { numbers, dates } = params;
 		const parsed = JSON.parse(this.$, function (key, value) {
-			if (parseDates && dateRegexp.test(value)) {
+			if (dates && dateRegexp.test(value)) {
 				value = new Date(value);
-			} else if (parseNumbers && isNumberAlike(value)) {
+			} else if (numbers && isNumberAlike(value)) {
 				value = Number(value);
 			}
 
@@ -141,7 +140,7 @@ export class String extends parent {
 
 		return isArray(parsed) ? new Arr(parsed) : new Obj(parsed);
 	}
-	parseNumber(base = 10) {
+	parseInt(base = 10) {
 		return parseInt(this.$, base);
 	}
 	repeat(n) {

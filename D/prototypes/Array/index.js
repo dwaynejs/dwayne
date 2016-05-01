@@ -5,7 +5,7 @@ import {
 	toArray, validate
 } from '../../libs';
 
-const NativeArray = window.Array;
+const NativeArray = global.Array;
 
 export class Array extends parent {
 	constructor(array = []) {

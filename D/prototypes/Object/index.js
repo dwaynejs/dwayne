@@ -5,7 +5,7 @@ import {
 	validate
 } from '../../libs';
 
-const NativeObject = window.Object;
+const NativeObject = global.Object;
 
 const cls = class Object {
 	constructor(object = {}) {

@@ -4,9 +4,9 @@ import Arr from '../Array';
 import Promise from '../Promise';
 import { isNumber, defineProperties, validate } from '../../libs';
 
-window.D = D;
+global.D = D;
 
-const NativeNumber = window.Number;
+const NativeNumber = global.Number;
 const toRadian = Math.PI / 180;
 const toDegree = 180 / Math.PI;
 const ln2 = Math.LN2;
@@ -138,7 +138,7 @@ export class Number extends parent {
 		return promise;
 	}
 	toBase(base = 10) {
-		return this.$.toString(base);
+		return NativeNumber(this.$).toString(base);
 	}
 	toExponential() {
 		return this.$.toExponential.apply(this.$, arguments);

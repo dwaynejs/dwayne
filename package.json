@@ -26,5 +26,9 @@
     "babel-register": "^6.7.2",
     "body-parser": "^1.15.0",
     "express": "^4.13.4"
+  },
+  "scripts": {
+    "start": "webpack-dev-server --progress --colors --watch",
+    "test": "webpack-dev-server --config webpack.tests.config.js --progress --colors --watch"
   }
 }

@@ -3,7 +3,7 @@ import { isFunction, defineProperties, validate } from '../../libs';
 
 const secret = {};
 
-const NativePromise = window.Promise || (() => {});
+const NativePromise = global.Promise || (() => {});
 
 export class Promise {
 	constructor(func) {
@@ -147,7 +147,7 @@ export class Promise {
 		});
 	}
 
-	'catch'(onReject) {
+	['catch'](onReject) {
 		return resolveOrReject(this, null, onReject);
 	}
 	then(onResolve, onReject) {
