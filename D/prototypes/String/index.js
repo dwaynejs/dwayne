@@ -62,20 +62,19 @@ export class String extends parent {
 		
 		return this.revert().startsWith(new Str(string).revert().$);
 	}
-	escapeFor(what) {
+	escapeHtml() {
 		let string = this.$;
 
-		if (what === 'html') {
-			for (const symbol in htmlSpecials) {
-				if (htmlSpecials.hasOwnProperty(symbol)) {
-					string = string.replace(new RegExp(symbol, 'g'));
-				}
+		for (const symbol in htmlSpecials) {
+			if (htmlSpecials.hasOwnProperty(symbol)) {
+				string = string.replace(new RegExp(symbol, 'g'), htmlSpecials[symbol]);
 			}
-		} else if (what === 'regexp') {
-			string = string.replace(regexpSpecialsRegexp, '\\$&');
 		}
 
 		return string;
+	}
+	escapeRegExp() {
+		return this.$.replace(regexpSpecialsRegexp, '\\$&');
 	}
 	find() {
 		if (!arguments.length) {
@@ -177,7 +176,7 @@ export class String extends parent {
 		const string = this.$;
 		let str = '';
 
-		for (let i = string.length - 1; i >= 0; i++) {
+		for (let i = string.length - 1; i >= 0; i--) {
 			str += string[i];
 		}
 

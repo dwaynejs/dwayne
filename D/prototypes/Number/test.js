@@ -44,7 +44,7 @@ export default () => {
 				assert.strictEqual(isNaN(wrap6.abs), true);
 			});
 		});
-		describe('.acos()', () => {
+		describe('acos()', () => {
 			it('should work the same as Math.acos with falsey argument', () => {
 				const n1 = 1;
 				const n2 = -1;
@@ -90,7 +90,7 @@ export default () => {
 				assert.strictEqual(diff5 <= eps, true, `acos(1/sqrt2): ${ diff5 } <= ${ eps }`);
 			});
 		});
-		describe('.array()', () => {
+		describe('array()', () => {
 			it('should return a wrap of an array from 0 to n without arguments', () => {
 				const n = 7;
 				const wrap = new Class(n);
@@ -105,7 +105,7 @@ export default () => {
 				assert.deepEqual(array, [0, 2, 4, 6, 8, 10, 12]);
 			});
 		});
-		describe('.asin()', () => {
+		describe('asin()', () => {
 			it('should work the same as Math.asin with falsey argument', () => {
 				const n1 = 1;
 				const n2 = -1;
@@ -151,7 +151,7 @@ export default () => {
 				assert.strictEqual(diff5 <= eps, true, `asin(1/sqrt2): ${ diff5 } <= ${ eps }`);
 			});
 		});
-		describe('.atan()', () => {
+		describe('atan()', () => {
 			it('should work the same as Math.atan with falsey argument', () => {
 				const n1 = 1;
 				const n2 = -1;
@@ -237,7 +237,7 @@ export default () => {
 				assert.strictEqual(isNaN(wrap6.ceil), true);
 			});
 		});
-		describe('.cos()', () => {
+		describe('cos()', () => {
 			it('should work the same as Math.cos with falsey argument', () => {
 				const n1 = 0;
 				const n2 = pi;
@@ -353,7 +353,7 @@ export default () => {
 				assert.strictEqual(isNaN(wrap6.floor), true);
 			});
 		});
-		describe('.interval()', () => {
+		describe('interval()', () => {
 			it('should return clear-interval function', (done) => {
 				const n = 100;
 				const wrap = new Class(n);
@@ -430,7 +430,7 @@ export default () => {
 				assert.strictEqual(isNaN(wrap6.ln), true);
 			});
 		});
-		describe('.log()', () => {
+		describe('log()', () => {
 			it('should return logarithm with context base of an argument', () => {
 				const n1 = 2;
 				const n2 = 7;
@@ -512,7 +512,7 @@ export default () => {
 				assert.strictEqual(isNaN(wrap6.log10), true);
 			});
 		});
-		describe('.pow()', () => {
+		describe('pow()', () => {
 			it('should work the same as Math.pow', () => {
 				const n1 = 1;
 				const n2 = 6;
@@ -534,7 +534,7 @@ export default () => {
 				assert.strictEqual(isNaN(wrap6.pow(1)), true);
 			});
 		});
-		describe('.root()', () => {
+		describe('root()', () => {
 			it('should return root of the context', () => {
 				const n1 = 1;
 				const n2 = 6;
@@ -603,7 +603,7 @@ export default () => {
 				assert.strictEqual(isNaN(wrap7.sign), true);
 			});
 		});
-		describe('.sin()', () => {
+		describe('sin()', () => {
 			it('should work the same as Math.sin with falsey argument', () => {
 				const n1 = 0;
 				const n2 = pi;
@@ -697,7 +697,7 @@ export default () => {
 				assert.strictEqual(isNaN(wrap6.square), true);
 			});
 		});
-		describe('.tan()', () => {
+		describe('tan()', () => {
 			it('should work the same as Math.tan with falsey argument', () => {
 				const n1 = 0;
 				const n2 = pi;
@@ -743,7 +743,7 @@ export default () => {
 				assert.strictEqual(diff5 <= eps, true, `tan(45): ${ diff5 } <= ${ eps }`);
 			});
 		});
-		describe('.timeout()', () => {
+		describe('timeout()', () => {
 			it('should return promise with clear method', (done) => {
 				const n = 150;
 				const wrap = new Class(n);
@@ -769,7 +769,7 @@ export default () => {
 				});
 			});
 		});
-		describe('.toBase()', () => {
+		describe('toBase()', () => {
 			it('should work the same as Number.prototype.toString', () => {
 				const n1 = 1;
 				const n2 = -5.5;
@@ -803,7 +803,7 @@ export default () => {
 				assert.strictEqual(wrap10.toBase(4), toString(n10, 4));
 			});
 		});
-		describe('.toExponential()', () => {
+		describe('toExponential()', () => {
 			it('should work the same as Number.prototype.toExponential', () => {
 				const n1 = 1;
 				const n2 = -5.5;
@@ -825,7 +825,7 @@ export default () => {
 				assert.strictEqual(wrap6.toExponential(), toExp(n6));
 			});
 		});
-		describe('.toFixed()', () => {
+		describe('toFixed()', () => {
 			it('should work the same as Number.prototype.toFixed', () => {
 				const n1 = 1.456;
 				const n2 = -5.5234;
@@ -847,7 +847,7 @@ export default () => {
 				assert.strictEqual(wrap6.toFixed(9), toFixed(n6, 9));
 			});
 		});
-		describe('.toPrecision()', () => {
+		describe('toPrecision()', () => {
 			it('should work the same as Number.prototype.toPrecision', () => {
 				const n1 = 1.456;
 				const n2 = -5.5234;
@@ -869,7 +869,7 @@ export default () => {
 				assert.strictEqual(wrap6.toPrecision(9), toPrecision(n6, 9));
 			});
 		});
-		describe('.valueOf()', () => {
+		describe('valueOf()', () => {
 			it('should return value of context', () => {
 				const n1 = 1.456;
 				const n2 = -5.5234;

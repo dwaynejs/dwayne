@@ -15,5 +15,5 @@ import testsOfHtmlElement from './D/prototypes/HtmlElement/test';
 //testsOfHtmlElement();
 //testsOfNumber();
 //testsOfObject();
-testsOfPromise();
-//testsOfString();
+//testsOfPromise();
+testsOfString();
