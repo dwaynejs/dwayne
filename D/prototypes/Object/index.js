@@ -34,8 +34,8 @@ const cls = class Object {
 		return new D.Array(a);
 	}
 	assign() {
-		const object = this.$,
-			length = arguments.length;
+		const object = this.$;
+    const length = arguments.length;
 
 		for (let i = 0; i < length; i++) {
 			const o = transform(arguments[i]);
@@ -54,11 +54,8 @@ const cls = class Object {
 	}
 	call(f) {
 		validate([f], ['function']);
-
-		const g = f;
-		Array.prototype.shift.call(arguments);
-
-		return g.apply(this, arguments);
+    
+		return f.apply(this, Array.prototype.slice.call(arguments, 1));
 	}
 	// TODO: .copy()
 	get count() {

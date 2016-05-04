@@ -40,13 +40,19 @@ export class Fetch extends parent {
 		}
 
 		const conf = assign({}, defaults, config);
+    const headers = conf.headers = assign({}, conf.headers);
 
-		conf.after = assign([], conf.after);
+		conf.after = [];
 		conf.auth = assign({}, conf.auth);
-		conf.before = assign([], conf.before);
-		conf.headers = assign({}, conf.headers);
-		conf.params = assign({}, conf.params);
-		conf.query = assign({}, conf.query);
+		conf.before = [];
+    conf.params = assign({}, conf.params);
+    conf.query = assign({}, conf.query);
+    
+    for (const header in headers) {
+      if (headers.hasOwnProperty(header)) {
+        headers[header] = headers[header].slice();
+      }
+    }
 
 		Object.defineProperty(fetch, '$', { value: conf });
 		Object.setPrototypeOf(fetch, Fetch.prototype);
@@ -57,16 +63,6 @@ export class Fetch extends parent {
 	after(onResolve, onReject) {
 		this.$.after.push({ onResolve, onReject });
 
-		return this;
-	}
-	auth(username = '', password = '') {
-		this.$.auth = { username, password };
-
-		return this;
-	}
-	baseURL(url) {
-		this.$.baseURL = url;
-		
 		return this;
 	}
 	before(onResolve, onReject) {
@@ -109,17 +105,29 @@ export class Fetch extends parent {
 
 		for (const key in header) {
 			if (header.hasOwnProperty(key)) {
-				headers[key] = (headers[key] ? headers[key] + ', ' : '') + header[key];
+				headers[key] = (headers[key] || []).push(header[key]);
 			}
 		}
 
 		return this;
 	}
 	instance(config = {}) {
-		const conf = assign({}, this.$);
-		const headers = assign({}, conf.headers, config.headers);
+    const conf = assign({}, this.$, config);
+    const headers = conf.headers = assign({}, conf.headers);
+    
+    conf.after = assign([], conf.after);
+    conf.auth = assign({}, conf.auth);
+    conf.before = assign([], conf.before);
+    conf.params = assign({}, conf.params);
+    conf.query = assign({}, conf.query);
+    
+    for (const header in headers) {
+      if (headers.hasOwnProperty(header)) {
+        headers[header] = headers[header].slice();
+      }
+    }
 
-		return new Fetch(assign(conf, config, { headers }));
+		return new Fetch(assign(conf, config));
 	}
 	patch(url, data = {}, config = {}) {
 		if (!isString(url)) {
@@ -224,14 +232,15 @@ export class Fetch extends parent {
 						xhr.onprogress = onprogress;
 					}
 				}
+        
+        conf.constructedUrl = constructUrl(baseURL, URL, params, query);
+        conf.constructedData = transformData(transform(notTransformedData), headers);
 
-				xhr.open(method.toUpperCase(), constructUrl(baseURL, URL, params, query), true, username, password);
-
-				const data = transformData(transform(notTransformedData), headers);
+				xhr.open(method.toUpperCase(), conf.constructedUrl, true, username, password);
 
 				for (const header in headers) {
 					if (headers.hasOwnProperty(header)) {
-						xhr.setRequestHeader(new Str(header).toCapitalCase().replace(/\s+/g, '-').$, headers[header]);
+						xhr.setRequestHeader(new Str(header).toCapitalCase().replace(/\s+/g, '-').$, headers[header].join(', '));
 					}
 				}
 
@@ -312,39 +321,16 @@ export class Fetch extends parent {
 					resolve(promise);
 				};
 
-				xhr.send(data);
+				xhr.send(conf.constructedData);
 			});
 		});
 
 		return promise;
 	}
-	timeout(timeout) {
-		const config = this.$;
-
-		if (arguments.length) {
-			return config.timeout;
-		}
-
-		config.timeout = timeout;
-
-		return this;
-	}
-	url(url) {
-		this.$.url = url;
-		
-		return this;
-	}
-	withCredentials(bool = true) {
-		this.$.withCredentials = !!bool;
-
-		return this;
-	}
 }
 
 D.Fetch = Fetch;
 
-export const fetch = new Fetch();
-
-D.fetch = fetch;
+export const fetch = D.fetch = new Fetch();
 
 export default Fetch;

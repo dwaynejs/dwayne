@@ -1,11 +1,13 @@
-export const assign = Object.assign || ((target, ...objects) => {
-	for (let i = 0; i < objects.length; i++) {
-		const source = objects[i];
-		for (let key in source) {
+export const assign = Object.assign || function (target) {
+	for (let i = 1; i < arguments.length; i++) {
+		const source = arguments[i];
+    
+		for (const key in source) {
 			if (source.hasOwnProperty(key)) {
 				target[key] = source[key];
 			}
 		}
 	}
+    
 	return target;
-});
+};
