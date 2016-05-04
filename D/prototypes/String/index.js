@@ -63,6 +63,7 @@ export class String extends parent {
 		return this.revert().startsWith(new Str(string).revert().$);
 	}
 	escapeHtml() {
+		const S = String;
 		let string = this.$;
 
 		for (const symbol in htmlSpecials) {
@@ -71,10 +72,10 @@ export class String extends parent {
 			}
 		}
 
-		return string;
+		return new S(string);
 	}
 	escapeRegExp() {
-		return this.$.replace(regexpSpecialsRegexp, '\\$&');
+		return this.replace(regexpSpecialsRegexp, '\\$&');
 	}
 	find() {
 		if (!arguments.length) {
@@ -314,18 +315,20 @@ export class String extends parent {
 
 		return new S(this.$.toUpperCase());
 	}
-	trim(side) {
+	trim() {
 		const S = String;
 
-		if (side === 'left') {
-			return new S(this.$.replace(/^\s+/, ''));
-		}
-
-		if (side === 'right') {
-			return new S(this.$.replace(/\s+$/, ''));
-		}
-
 		return new S(this.$.replace(/^\s+|\s+$/g, ''));
+	}
+	trimLeft() {
+		const S = String;
+
+		return new S(this.$.replace(/^\s+/, ''));
+	}
+	trimRight() {
+		const S = String;
+
+		return new S(this.$.replace(/\s+$/, ''));
 	}
 }
 
