@@ -1,4 +1,5 @@
-import D from '../../';
+import classes from '../../classes';
+import constructors from '../../constructors';
 import {
 	isArrayAlike, isDate, isFunction, isNaN,
 	isNull, isObject, isRegExp, isUndefined,
@@ -10,10 +11,6 @@ const NativeObject = global.Object;
 const cls = class Object {
 	constructor(object = {}) {
 		NativeObject.defineProperty(this, '$', { value: object });
-	}
-
-	static defineProperty() {
-		return NativeObject.defineProperty.apply(NativeObject, arguments);
 	}
 
 	array(mapFn) {
@@ -31,7 +28,7 @@ const cls = class Object {
 			}
 		}
 
-		return new D.Array(a);
+		return new classes.Array(a);
 	}
 	assign() {
 		const object = this.$;
@@ -104,7 +101,7 @@ const cls = class Object {
 
 		const filtered = deepFilter(this.$, mapFn, n, [{ key: null, value: this.$ }]);
 
-		return isArrayAlike(filtered) ? new D.Array(filtered) : new Object(filtered);
+		return isArrayAlike(filtered) ? new classes.Array(filtered) : new Object(filtered);
 	}
 	deepFind(mapFn, n) {
 		if (arguments.length === 1 && !isFunction(mapFn)) {
@@ -133,7 +130,7 @@ const cls = class Object {
 
 		const map = deepMap(this.$, mapFn, n, [{ key: null, value: this.$ }]);
 
-		return isArrayAlike(map) ? new D.Array(map) : new Object(map);
+		return isArrayAlike(map) ? new classes.Array(map) : new Object(map);
 	}
 	deepReduce(mapFn, n = 1, IV) {
 		validate([mapFn, n], ['function', ['intAlike', '>0']]);
@@ -191,7 +188,7 @@ const cls = class Object {
 
 		return this.$ == o;
 	}
-	every(mapFn) {
+	every(mapFn = Boolean) {
 		validate([mapFn], ['function']);
 
 		const object = this.$;
@@ -215,7 +212,7 @@ const cls = class Object {
 
 		return true;
 	}
-	filter(mapFn) {
+	filter(mapFn = Boolean) {
 		validate([mapFn], ['function']);
 
 		const object = this.$;
@@ -241,7 +238,7 @@ const cls = class Object {
 			}
 		}
 
-		return array ? new D.Array(o) : new Object(o);
+		return array ? new classes.Array(o) : new Object(o);
 	}
 	find(mapFn) {
 		validate([mapFn], ['function']);
@@ -338,7 +335,7 @@ const cls = class Object {
 		return NativeObject.isFrozen(this.$);
 	}
 	json(mapFn, indent) {
-		if (arguments.length === 1 && !isFunction(f)) {
+		if (arguments.length === 1 && !isFunction(mapFn)) {
 			indent = mapFn;
 			mapFn = null;
 		} else if (!arguments.length) {
@@ -386,11 +383,7 @@ const cls = class Object {
 	keys() {
 		const object = this.$;
 
-		if (!isObject(object)) {
-			return new D.Array();
-		}
-
-		return new D.Array(NativeObject.keys(object));
+		return new classes.Array(!isObject(object) ? [] : NativeObject.keys(object));
 	}
 	map(mapFn) {
 		validate([mapFn], ['function']);
@@ -414,7 +407,7 @@ const cls = class Object {
 			}
 		}
 
-		return array ? new D.Array(o) : new Object(o);
+		return array ? new classes.Array(o) : new Object(o);
 	}
 	max(mapFn = null) {
 		validate([mapFn], ['function||!']);
@@ -433,8 +426,8 @@ const cls = class Object {
 
 				iterated++;
 
-				const value = object[key],
-					val = mapFn ? mapFn(value, array ? Number(key) : key, object) : value;
+				const value = object[key];
+        const val = mapFn ? mapFn(value, array ? Number(key) : key, object) : value;
 
 				if (val > max.value) {
 					max = { key, value };
@@ -461,8 +454,8 @@ const cls = class Object {
 
 				iterated++;
 
-				const value = object[key],
-					val = mapFn ? mapFn(value, array ? Number(key) : key, object) : value;
+				const value = object[key];
+        const val = mapFn ? mapFn(value, array ? Number(key) : key, object) : value;
 
 				if (val < min.value) {
 					min = { key, value };
@@ -507,20 +500,12 @@ const cls = class Object {
 	propertyNames() {
 		const object = this.$;
 
-		if (!isObject(object)) {
-			return new D.Array();
-		}
-
-		return new D.Array(NativeObject.getOwnPropertyNames(object));
+		return new classes.Array(!isObject(object) ? [] : NativeObject.getOwnPropertyNames(object));
 	}
 	propertySymbols() {
 		const object = this.$;
 
-		if (!isObject(object)) {
-			return new D.Array();
-		}
-
-		return new D.Array(NativeObject.getOwnPropertySymbols(object));
+		return new classes.Array(!isObject(object) ? [] : NativeObject.getOwnPropertySymbols(object));
 	}
 	proto(proto) {
 		const object = this.$;
@@ -591,7 +576,7 @@ const cls = class Object {
 
 		return this;
 	}
-	some(mapFn) {
+	some(mapFn = Boolean) {
 		validate([mapFn], ['function']);
 
 		const object = this.$;
@@ -656,7 +641,7 @@ const cls = class Object {
 			}
 		}
 
-		return new D.Array(array);
+		return new classes.Array(array);
 	}
 	word(mapFn = null) {
 		validate([mapFn], ['function||!']);
@@ -961,9 +946,9 @@ function deepSome(object = {}, mapFn, n, tree) {
 	return false;
 }
 
-D.Object = cls;
-D.constructors.unshift({
-	check: isObject,
+classes.Object = cls;
+constructors.unshift({
+	check: () => true,
 	cls
 });
 

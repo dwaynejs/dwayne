@@ -1,4 +1,5 @@
-import D from '../../';
+import classes from '../../classes';
+import constructors from '../../constructors';
 import { isFunction, defineProperties, validate } from '../../libs';
 
 const secret = {};
@@ -189,6 +190,6 @@ function resolveOrReject(promise, onResolve, onReject) {
 	}
 }
 
-D.Promise = Promise;
+classes.Promise = Promise;
 
 export default Promise;

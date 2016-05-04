@@ -1,4 +1,5 @@
-import D from '../../';
+import classes from '../../classes';
+import constructors from '../../constructors';
 import { default as parent, transform } from '../Object';
 import Promise from '../Promise';
 import { isFunction, assign, validate, toArray } from '../../libs';
@@ -224,8 +225,8 @@ export class Function extends parent {
 	}
 }
 
-D.Function = Function;
-D.constructors.unshift({
+classes.Function = Function;
+constructors.unshift({
 	check: isFunction,
 	cls: Function
 });

@@ -1,6 +1,5 @@
-import D from './D';
+import D from './D/module';
 
-export * from './D/prototypes/Object/module';
-export * from './D';
+export * from './D/module';
 
 export default D;

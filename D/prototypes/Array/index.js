@@ -1,4 +1,5 @@
-import D from '../../';
+import classes from '../../classes';
+import constructors from '../../constructors';
 import { default as parent, transform } from '../Object';
 import {
 	isArrayAlike, isNaN, isString,
@@ -71,7 +72,7 @@ export class Array extends parent {
 		return this;
 	}
 	shuffle() {
-		const array = this.$;
+		const array = toArray(this.$);
 		const length = array.length;
 		const a = [];
 
@@ -140,8 +141,8 @@ function asc(x, y) {
 	return 0;
 }
 
-D.Array = Array;
-D.constructors.unshift({
+classes.Array = Array;
+constructors.unshift({
 	check: (value) => isArrayAlike(value) && !isString(value),
 	cls: Array
 });

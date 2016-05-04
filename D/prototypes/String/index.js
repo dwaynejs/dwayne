@@ -1,4 +1,5 @@
-import D from '../../';
+import classes from '../../classes';
+import constructors from '../../constructors';
 import { default as parent, transform } from '../Object';
 import Alphabet from '../Alphabet';
 import Arr from '../Array';
@@ -336,8 +337,8 @@ function trim(string) {
 	return string.replace(/^[\s\-_\.]+|[\s\-_\.]+$/g, '');
 }
 
-D.String = String;
-D.constructors.unshift({
+classes.String = String;
+constructors.unshift({
 	check: isString,
 	cls: String
 });

@@ -1,10 +1,9 @@
-import D from '../../';
+import classes from '../../classes';
+import constructors from '../../constructors';
 import { default as parent, transform } from '../Object';
 import Arr from '../Array';
 import Promise from '../Promise';
 import { isNumber, defineProperties, validate } from '../../libs';
-
-global.D = D;
 
 const NativeNumber = global.Number;
 const toRadian = Math.PI / 180;
@@ -114,9 +113,6 @@ export class Number extends parent {
 	}
 	tan(cond) {
 		return Math.tan((cond ? toRadian : 1) * this.$);
-	}
-	get tanh() {
-		return Math.tanh(this.$);
 	}
 	timeout(value) {
 		let timeout;
@@ -297,8 +293,8 @@ defineProperties(Number.prototype, {
 	})()
 });
 
-D.Number = Number;
-D.constructors.unshift({
+classes.Number = Number;
+constructors.unshift({
 	check: isNumber,
 	cls: Number
 });

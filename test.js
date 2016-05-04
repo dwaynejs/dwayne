@@ -1,3 +1,2 @@
-import tests from './D/prototypes/Fetch/test';
-
-tests();
+import './D/prototypes/Fetch/test';
+//import './all-tests';

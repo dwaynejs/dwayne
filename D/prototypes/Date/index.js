@@ -1,4 +1,5 @@
-import D from '../../';
+import classes from '../../classes';
+import constructors from '../../constructors';
 import { default as parent, transform } from '../Object';
 import Num from '../Number';
 import Str from '../String';
@@ -83,7 +84,7 @@ const monthsAliases = {
 	10: 'Nov',
 	11: 'Dec'
 };
-const zero = new D.String('0');
+const zero = new Str('0');
 
 export class Date extends parent {
 	constructor(date = new NativeDate()) {
@@ -266,15 +267,12 @@ export class Date extends parent {
 function invalidDate() {
 	return new Date('a');
 }
-
 function isInvalid(date) {
 	return date.toString() === 'Invalid Date';
 }
-
 function now() {
 	return NativeDate.now();
 }
-
 function round(number, digits) {
 	const string = String(number);
 	let zeroes = digits - string.length;
@@ -282,13 +280,12 @@ function round(number, digits) {
 
 	return zero.repeat(zeroes).$ + string;
 }
-
 function cut(number, max, digits) {
 	return (number/Math.pow(10, max)).toFixed(digits);
 }
 
-D.Date = Date;
-D.constructors.unshift({
+classes.Date = Date;
+constructors.unshift({
 	check: isDate,
 	cls: Date
 });

@@ -1,4 +1,5 @@
-import D from '../../';
+import Classes from '../../classes';
+import constructors from '../../constructors';
 import css from './css';
 import elements from './elements';
 import { default as parent, transform } from '../Object';
@@ -157,7 +158,7 @@ export class HtmlElement extends parent {
 	children() {
 		return new HtmlCollection(this.$.childNodes);
 	}
-	['class'](cls) {
+	'class'(cls) {
 		const elem = this.$;
 
 		if (!arguments.length) {
@@ -695,6 +696,10 @@ const classes = {};
 const attrs = {};
 
 export function htmlElement(elem) {
+  if (elem instanceof parent) {
+    return elem;
+  }
+
 	return new HtmlElement(elem);
 }
 
@@ -708,8 +713,8 @@ function find(element) {
 	return element;
 }
 
-D.HtmlElement = HtmlElement;
-D.constructors.unshift({
+Classes.HtmlElement = HtmlElement;
+constructors.unshift({
 	check: (elem) => /^HTML\w*Element$/.test(toString(elem)),
 	cls: HtmlElement
 });

@@ -1,0 +1,10 @@
+import './D/test';
+import './D/prototypes/Alphabet/test';
+import './D/prototypes/Array/test';
+import './D/prototypes/Fetch/test';
+import './D/prototypes/Function/test';
+import './D/prototypes/HtmlElement/test';
+import './D/prototypes/Number/test';
+import './D/prototypes/Object/test';
+import './D/prototypes/Promise/test';
+import './D/prototypes/String/test';

@@ -1,4 +1,5 @@
-import D from '../../';
+import classes from '../../classes';
+import constructors from '../../constructors';
 import { default as parent, transform } from '../Object';
 import Arr from '../Array';
 import Promise from '../Promise';
@@ -88,13 +89,28 @@ export class Fetch extends parent {
 		return this;
 	}
 	'delete'(url, config = {}) {
+    if (!isString(url)) {
+      config = url;
+      url = undefined;
+    }
+
 		return this.request(url, assign({ method: 'delete' }, config));
 	}
 	get(url, config = {}) {
-		return this.request(url, assign({ method: 'get' }, config));
+    if (!isString(url)) {
+      config = url;
+      url = undefined;
+    }
+
+    return this.request(url, assign({ method: 'get' }, config));
 	}
 	head(url, config = {}) {
-		return this.request(url, assign({ method: 'head' }, config));
+    if (!isString(url)) {
+      config = url;
+      url = undefined;
+    }
+
+    return this.request(url, assign({ method: 'head' }, config));
 	}
 	headers(header, value) {
 		const { headers } = this.$;
@@ -133,7 +149,7 @@ export class Fetch extends parent {
 		if (!isString(url)) {
 			config = data;
 			data = url;
-			url = null;
+			url = undefined;
 		}
 
 		return this.request(url, assign({ method: 'patch', data }, config));
@@ -142,7 +158,7 @@ export class Fetch extends parent {
 		if (!isString(url)) {
 			config = data;
 			data = url;
-			url = null;
+			url = undefined;
 		}
 
 		return this.request(url, assign({ method: 'post', data }, config));
@@ -151,7 +167,7 @@ export class Fetch extends parent {
 		if (!isString(url)) {
 			config = data;
 			data = url;
-			url = null;
+			url = undefined;
 		}
 
 		return this.request(url, assign({ method: 'put', data }, config));
@@ -222,7 +238,7 @@ export class Fetch extends parent {
 
 				let xhr = new XMLHttpRequest();
 				xhr.responseType = responseType;
-				xhr.timeout = timeout;
+				xhr.timeout = Number(timeout) || 0;
 				xhr.withCredentials = !!withCredentials;
 
 				if (onprogress) {
@@ -232,11 +248,13 @@ export class Fetch extends parent {
 						xhr.onprogress = onprogress;
 					}
 				}
+
+        const METHOD = method.toUpperCase();
         
         conf.constructedUrl = constructUrl(baseURL, URL, params, query);
-        conf.constructedData = transformData(transform(notTransformedData), headers);
+        conf.constructedData = transformData(transform(notTransformedData), METHOD, headers);
 
-				xhr.open(method.toUpperCase(), conf.constructedUrl, true, username, password);
+				xhr.open(METHOD, conf.constructedUrl, true, username, password);
 
 				for (const header in headers) {
 					if (headers.hasOwnProperty(header)) {
@@ -329,8 +347,8 @@ export class Fetch extends parent {
 	}
 }
 
-D.Fetch = Fetch;
+classes.Fetch = Fetch;
 
-export const fetch = D.fetch = new Fetch();
+export const fetch = new Fetch();
 
 export default Fetch;

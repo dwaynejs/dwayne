@@ -1,4 +1,5 @@
-import D from '../../';
+import classes from '../../classes';
+import constructors from '../../constructors';
 import { default as parent } from '../Array';
 import { htmlElement } from '../HtmlElement';
 import { dynamicDefineProperties, toString } from '../../libs';
@@ -20,8 +21,8 @@ dynamicDefineProperties(HtmlCollection.prototype, methods, (prop) => {
 	};
 });
 
-D.HtmlCollection = HtmlCollection;
-D.constructors.unshift({
+classes.HtmlCollection = HtmlCollection;
+constructors.unshift({
 	check: (collection) => toString(collection) === 'HtmlCollection' || toString(collection) === 'NodeList',
 	cls: HtmlCollection
 });

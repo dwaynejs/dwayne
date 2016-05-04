@@ -1,4 +1,9 @@
-import D from './domc';
+import D, * as statics from './domc';
+import { assign } from './D/libs/assign';
 
-window.top.D = D;
-//console.dir(D);
+delete statics['transform'];
+delete statics['htmlElement'];
+
+assign(D, statics);
+
+window.D = D;

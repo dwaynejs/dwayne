@@ -1,4 +1,5 @@
-import D from '../../';
+import classes from '../../classes';
+import constructors from '../../constructors';
 import { default as parent, transform } from '../Object/index';
 import Array from '../Array';
 import { isString, validate } from '../../libs';
@@ -79,7 +80,7 @@ export class Alphabet extends parent {
 	}
 }
 
-D.Alphabet = Alphabet;
+classes.Alphabet = Alphabet;
 
 function check(char) {
 	return isString(char) && char.length === 1;
