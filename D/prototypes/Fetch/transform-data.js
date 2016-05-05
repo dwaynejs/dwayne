@@ -5,7 +5,7 @@ const notToTransform = new Obj(['FormData', 'File', 'Blob', 'ArrayBuffer', 'Stri
 const withoutBody = new Obj(['DELETE', 'GET', 'HEAD']);
 
 export default (data, method, headers) => {
-  if (withoutBody.keyOfStrict(method) === null) {
+  if (withoutBody.keyOfStrict(method) !== null) {
     return null;
   }
 

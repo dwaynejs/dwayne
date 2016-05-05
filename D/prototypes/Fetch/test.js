@@ -205,10 +205,354 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.head(URL, { timeout: rand });
     });
   });
-  // TODO: .headers()
-  // TODO: .instance()
-  // TODO: .patch()
-  // TODO: .post()
-  // TODO: .put()
-  // TODO: .request()
+  describe('headers()', () => {
+    it('should support (header, value: String) syntax', () => {
+      const fetch = new Class();
+
+      fetch.headers('foo', 'bar');
+
+      assert.deepEqual(fetch.$.headers, { foo: ['bar'] });
+    });
+    it('should support (header, value: Array) syntax', () => {
+      const fetch = new Class();
+
+      fetch.headers('foo', ['bar', 'baz']);
+
+      assert.deepEqual(fetch.$.headers, { foo: ['bar', 'baz'] });
+    });
+    it('should support { header: value: String, ... } syntax', () => {
+      const fetch = new Class();
+
+      fetch.headers({ foo: 'bar' });
+
+      assert.deepEqual(fetch.$.headers, { foo: ['bar'] });
+    });
+    it('should support { header: value: Array, ... } syntax', () => {
+      const fetch = new Class();
+
+      fetch.headers({ foo: ['bar', 'baz'] });
+
+      assert.deepEqual(fetch.$.headers, { foo: ['bar', 'baz'] });
+    });
+    it('should add header to array if it was one', () => {
+      const fetch = new Class();
+
+      fetch.headers('foo', 'bar1');
+      fetch.headers('foo', 'baz1');
+
+      assert.deepEqual(fetch.$.headers, { foo: ['bar1', 'baz1'] });
+
+      fetch.headers('foo', ['bar2']);
+
+      assert.deepEqual(fetch.$.headers, { foo: ['bar1', 'baz1', 'bar2'] });
+
+      fetch.headers({ foo: 'baz2' });
+
+      assert.deepEqual(fetch.$.headers, { foo: ['bar1', 'baz1', 'bar2', 'baz2'] });
+
+      fetch.headers({ foo: ['bar3', 'baz3'] });
+
+      assert.deepEqual(fetch.$.headers, { foo: ['bar1', 'baz1', 'bar2', 'baz2', 'bar3', 'baz3'] });
+    });
+  });
+  describe('instance()', () => {
+    it('should create new instance without config without arguments', () => {
+      const fetch = new Class({ headers: { foo: 'bar' } });
+      const instance = fetch.instance();
+      const old = fetch.config();
+
+      instance.config((config) => {
+        assert.notEqual(old.auth, config.auth);
+        assert.notEqual(old.headers, config.headers);
+        assert.notEqual(old.headers.foo, config.headers.foo);
+        assert.deepEqual(old.headers.foo, config.headers.foo);
+        assert.notEqual(old.query, config.query);
+        assert.notEqual(old.params, config.params);
+      });
+    });
+    it('should not modify context\'s config', () => {
+      const fetch = new Class();
+      fetch.instance({
+        auth: { username: 'foo', password: 'bar' },
+        baseURL: '//foo',
+        headers: { foo: 'bar', bar: 'foo' },
+        params: { foo: 'bar', bar: 'foo' },
+        query: { foo: 'bar', bar: 'foo' },
+        timeout: 5000
+      });
+
+      fetch.config((config) => {
+        assert.deepEqual(config.auth, { username: '', password: '' });
+        assert.strictEqual(config.baseURL, global.location.origin);
+        assert.deepEqual(config.headers, {});
+        assert.deepEqual(config.params, {});
+        assert.deepEqual(config.query, {});
+        assert.strictEqual(config.timeout, 0);
+      });
+    });
+    it('should create new instance with config argument', () => {
+      const fetch = new Class({
+        auth: { username: 'foo', password: 'bar' },
+        baseURL: '//foo',
+        headers: { foo: 'bar', bar: 'foo' },
+        params: { foo: 'bar', bar: 'foo' },
+        query: { foo: 'bar', bar: 'foo' }
+      });
+      const instance = fetch.instance({
+        auth: { username: 'baz' },
+        headers: { foo: 'baz', baz: 'foo' },
+        params: { foo: 'baz', baz: 'foo' },
+        query: { foo: 'baz', baz: 'foo' },
+        timeout: 5000
+      });
+
+      instance.config((config) => {
+        assert.deepEqual(config.auth, { username: 'baz', password: 'bar' });
+        assert.strictEqual(config.baseURL, '//foo');
+        assert.deepEqual(config.headers, { foo: ['baz'], bar: ['foo'], baz: ['foo'] });
+        assert.deepEqual(config.params, { foo: 'baz', bar: 'foo', baz: 'foo' });
+        assert.deepEqual(config.query, { foo: 'baz', bar: 'foo', baz: 'foo' });
+        assert.strictEqual(config.timeout, 5000);
+      });
+    });
+  });
+  describe('patch()', () => {
+    it('should support call without arguments', () => {
+      const fetch = new Class();
+
+      fetch.request = (url, config) => {
+        assert.strictEqual(url, undefined);
+        assert.deepEqual(config, { method: 'patch', data: {} });
+      };
+
+      fetch.patch();
+    });
+    it('should support call with only url', () => {
+      const fetch = new Class();
+      const URL = '/foo';
+
+      fetch.request = (url, config) => {
+        assert.strictEqual(url, URL);
+        assert.deepEqual(config, { method: 'patch', data: {} });
+      };
+
+      fetch.patch(URL);
+    });
+    it('should support call with only data', () => {
+      const fetch = new Class();
+      const data = { foo: 'bar' };
+
+      fetch.request = (url, config) => {
+        assert.strictEqual(url, undefined);
+        assert.deepEqual(config, { method: 'patch', data });
+      };
+
+      fetch.patch(data);
+    });
+    it('should support call with url and data', () => {
+      const fetch = new Class();
+      const URL = '/foo';
+      const data = { foo: 'bar' };
+
+      fetch.request = (url, config) => {
+        assert.strictEqual(url, URL);
+        assert.deepEqual(config, { method: 'patch', data });
+      };
+
+      fetch.patch(URL, data);
+    });
+    it('should support call with data and config', () => {
+      const fetch = new Class();
+      const data = { foo: 'bar' };
+      const rand = random();
+
+      fetch.request = (url, config) => {
+        assert.strictEqual(url, undefined);
+        assert.deepEqual(config, { method: 'patch', data, timeout: rand });
+      };
+
+      fetch.patch(data, { timeout: rand });
+    });
+    it('should support call with url, data and config', () => {
+      const fetch = new Class();
+      const URL = '/foo';
+      const data = { foo: 'bar' };
+      const rand = random();
+
+      fetch.request = (url, config) => {
+        assert.strictEqual(url, URL);
+        assert.deepEqual(config, { method: 'patch', data, timeout: rand });
+      };
+
+      fetch.patch(URL, data, { timeout: rand });
+    });
+  });
+  describe('post()', () => {
+    it('should support call without arguments', () => {
+      const fetch = new Class();
+
+      fetch.request = (url, config) => {
+        assert.strictEqual(url, undefined);
+        assert.deepEqual(config, { method: 'post', data: {} });
+      };
+
+      fetch.post();
+    });
+    it('should support call with only url', () => {
+      const fetch = new Class();
+      const URL = '/foo';
+
+      fetch.request = (url, config) => {
+        assert.strictEqual(url, URL);
+        assert.deepEqual(config, { method: 'post', data: {} });
+      };
+
+      fetch.post(URL);
+    });
+    it('should support call with only data', () => {
+      const fetch = new Class();
+      const data = { foo: 'bar' };
+
+      fetch.request = (url, config) => {
+        assert.strictEqual(url, undefined);
+        assert.deepEqual(config, { method: 'post', data });
+      };
+
+      fetch.post(data);
+    });
+    it('should support call with url and data', () => {
+      const fetch = new Class();
+      const URL = '/foo';
+      const data = { foo: 'bar' };
+
+      fetch.request = (url, config) => {
+        assert.strictEqual(url, URL);
+        assert.deepEqual(config, { method: 'post', data });
+      };
+
+      fetch.post(URL, data);
+    });
+    it('should support call with data and config', () => {
+      const fetch = new Class();
+      const data = { foo: 'bar' };
+      const rand = random();
+
+      fetch.request = (url, config) => {
+        assert.strictEqual(url, undefined);
+        assert.deepEqual(config, { method: 'post', data, timeout: rand });
+      };
+
+      fetch.post(data, { timeout: rand });
+    });
+    it('should support call with url, data and config', () => {
+      const fetch = new Class();
+      const URL = '/foo';
+      const data = { foo: 'bar' };
+      const rand = random();
+
+      fetch.request = (url, config) => {
+        assert.strictEqual(url, URL);
+        assert.deepEqual(config, { method: 'post', data, timeout: rand });
+      };
+
+      fetch.post(URL, data, { timeout: rand });
+    });
+  });
+  describe('put()', () => {
+    it('should support call without arguments', () => {
+      const fetch = new Class();
+
+      fetch.request = (url, config) => {
+        assert.strictEqual(url, undefined);
+        assert.deepEqual(config, { method: 'put', data: {} });
+      };
+
+      fetch.put();
+    });
+    it('should support call with only url', () => {
+      const fetch = new Class();
+      const URL = '/foo';
+
+      fetch.request = (url, config) => {
+        assert.strictEqual(url, URL);
+        assert.deepEqual(config, { method: 'put', data: {} });
+      };
+
+      fetch.put(URL);
+    });
+    it('should support call with only data', () => {
+      const fetch = new Class();
+      const data = { foo: 'bar' };
+
+      fetch.request = (url, config) => {
+        assert.strictEqual(url, undefined);
+        assert.deepEqual(config, { method: 'put', data });
+      };
+
+      fetch.put(data);
+    });
+    it('should support call with url and data', () => {
+      const fetch = new Class();
+      const URL = '/foo';
+      const data = { foo: 'bar' };
+
+      fetch.request = (url, config) => {
+        assert.strictEqual(url, URL);
+        assert.deepEqual(config, { method: 'put', data });
+      };
+
+      fetch.put(URL, data);
+    });
+    it('should support call with data and config', () => {
+      const fetch = new Class();
+      const data = { foo: 'bar' };
+      const rand = random();
+
+      fetch.request = (url, config) => {
+        assert.strictEqual(url, undefined);
+        assert.deepEqual(config, { method: 'put', data, timeout: rand });
+      };
+
+      fetch.put(data, { timeout: rand });
+    });
+    it('should support call with url, data and config', () => {
+      const fetch = new Class();
+      const URL = '/foo';
+      const data = { foo: 'bar' };
+      const rand = random();
+
+      fetch.request = (url, config) => {
+        assert.strictEqual(url, URL);
+        assert.deepEqual(config, { method: 'put', data, timeout: rand });
+      };
+
+      fetch.put(URL, data, { timeout: rand });
+    });
+  });
+  describe('request()', () => {
+    it('should construct url the right way', (done) => {
+      const fetch = new Class({
+        baseURL: '//foo/',
+        url: '/bar/:baz/:baz/:foo/:bar?foo=bar'
+      });
+
+      fetch.before((config, next) => {
+        assert.strictEqual(
+          config.constructedUrl,
+          '//foo/bar/foo/foo/bar/baz?foo=bar&bar[]=foo&bar[]=baz&baz=foo'
+        );
+
+        next();
+      });
+
+      fetch.before(() => {
+        throw new Error();
+      });
+
+      fetch.request({
+        params: { foo: 'bar', bar: 'baz', baz: 'foo' },
+        query: { bar: ['foo', 'baz'], baz: 'foo' }
+      }).catch(() => done());
+    });
+  });
 });

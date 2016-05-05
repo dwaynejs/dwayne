@@ -1,17 +1,16 @@
 import classes from '../../classes';
-import constructors from '../../constructors';
 import { default as parent, transform } from '../Object';
 import Arr from '../Array';
 import Promise from '../Promise';
 import Str from '../String';
-import { isFunction, isString, assign } from '../../libs';
+import { isArray, isFunction, isString, assign } from '../../libs';
 import constructUrl from './construct-url';
 import parseHeaders from './parse-headers';
 import transformData from './transform-data';
 
 import axios from 'axios';
 
-window.top.axios = axios;
+global.top.axios = axios;
 
 const defaults = {
 	after: [],
@@ -19,7 +18,7 @@ const defaults = {
 		username: '',
 		password: ''
 	},
-	baseURL: window.location.origin,
+	baseURL: global.location.origin,
 	before: [],
 	headers: {},
 	method: 'get',
@@ -36,22 +35,24 @@ export class Fetch extends parent {
 	constructor(config = {}) {
 		super();
 
-		function fetch(url, config) {
-			return fetch.request(url, config);
+		function fetch() {
+			return fetch.request.apply(fetch, arguments);
 		}
 
 		const conf = assign({}, defaults, config);
     const headers = conf.headers = assign({}, conf.headers);
 
 		conf.after = [];
-		conf.auth = assign({}, conf.auth);
+		conf.auth = assign({}, defaults.auth, conf.auth);
 		conf.before = [];
     conf.params = assign({}, conf.params);
     conf.query = assign({}, conf.query);
     
     for (const header in headers) {
       if (headers.hasOwnProperty(header)) {
-        headers[header] = headers[header].slice();
+        const array = headers[header];
+  
+        headers[header] = isArray(array) ? new Arr(array).slice().$ : [array];
       }
     }
 
@@ -115,38 +116,45 @@ export class Fetch extends parent {
 	headers(header, value) {
 		const { headers } = this.$;
 
-		if (arguments.length >= 1) {
+		if (arguments.length >= 2) {
 			header = { [header]: value };
 		}
 
 		for (const key in header) {
 			if (header.hasOwnProperty(key)) {
-				headers[key] = (headers[key] || []).push(header[key]);
+        const value = header[key];
+        const array = headers[key] || [];
+        const toPush = isArray(value) ? value : [value];
+        
+        (headers[key] = array).push.apply(array, toPush);
 			}
 		}
 
 		return this;
 	}
 	instance(config = {}) {
-    const conf = assign({}, this.$, config);
-    const headers = conf.headers = assign({}, conf.headers);
+    const old = this.$;
+    const conf = assign({}, old, config);
+    const headers = conf.headers = assign({}, old.headers, conf.headers);
     
-    conf.after = assign([], conf.after);
-    conf.auth = assign({}, conf.auth);
-    conf.before = assign([], conf.before);
-    conf.params = assign({}, conf.params);
-    conf.query = assign({}, conf.query);
+    conf.after = assign([], old.after);
+    conf.auth = assign({}, old.auth, conf.auth);
+    conf.before = assign([], old.before);
+    conf.params = assign({}, old.params, conf.params);
+    conf.query = assign({}, old.params, conf.query);
     
     for (const header in headers) {
       if (headers.hasOwnProperty(header)) {
-        headers[header] = headers[header].slice();
+        const array = headers[header];
+  
+        headers[header] = isArray(array) ? new Arr(array).slice().$ : [array];
       }
     }
 
-		return new Fetch(assign(conf, config));
+		return new Fetch(conf);
 	}
 	patch(url, data = {}, config = {}) {
-		if (!isString(url)) {
+		if (arguments.length && !isString(url)) {
 			config = data;
 			data = url;
 			url = undefined;
@@ -155,7 +163,7 @@ export class Fetch extends parent {
 		return this.request(url, assign({ method: 'patch', data }, config));
 	}
 	post(url, data = {}, config = {}) {
-		if (!isString(url)) {
+		if (arguments.length && !isString(url)) {
 			config = data;
 			data = url;
 			url = undefined;
@@ -164,7 +172,7 @@ export class Fetch extends parent {
 		return this.request(url, assign({ method: 'post', data }, config));
 	}
 	put(url, data = {}, config = {}) {
-		if (!isString(url)) {
+		if (arguments.length && !isString(url)) {
 			config = data;
 			data = url;
 			url = undefined;
@@ -180,7 +188,20 @@ export class Fetch extends parent {
 		const urlConf = isString(url) ? { url } : {};
 		const conf = assign({}, this.$, urlConf, config);
 
-		const { before } = conf;
+		const {
+      baseURL,
+      before,
+      data,
+      headers,
+      params,
+      query,
+      url: URL
+    } = conf;
+    
+    const METHOD = conf.method.toUpperCase();
+    
+    conf.constructedUrl = constructUrl(baseURL, URL, params, query);
+    conf.constructedData = transformData(transform(data), METHOD, headers);
 
 		let promise = Promise.resolve(conf);
 
@@ -223,16 +244,9 @@ export class Fetch extends parent {
 				const {
 					after,
 					auth: { username, password },
-					baseURL,
-					data: notTransformedData,
-					headers,
-					method,
 					onprogress,
-					params,
 					responseType,
-					query,
 					timeout,
-					url: URL,
 					withCredentials
 				} = conf;
 
@@ -242,18 +256,13 @@ export class Fetch extends parent {
 				xhr.withCredentials = !!withCredentials;
 
 				if (onprogress) {
-					if (uploadMethods.keyOf(method.toUpperCase()) !== null) {
+					if (uploadMethods.keyOf(METHOD) !== null) {
 						xhr.upload.onprogress = onprogress;
 					} else {
 						xhr.onprogress = onprogress;
 					}
 				}
-
-        const METHOD = method.toUpperCase();
         
-        conf.constructedUrl = constructUrl(baseURL, URL, params, query);
-        conf.constructedData = transformData(transform(notTransformedData), METHOD, headers);
-
 				xhr.open(METHOD, conf.constructedUrl, true, username, password);
 
 				for (const header in headers) {
@@ -348,7 +357,5 @@ export class Fetch extends parent {
 }
 
 classes.Fetch = Fetch;
-
-export const fetch = new Fetch();
 
 export default Fetch;

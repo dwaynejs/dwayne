@@ -14,7 +14,7 @@ export default (baseURL, url, params, query) => {
 		}
 	}
 
-	let queryParams = [];
+	const queryParams = [];
 
 	for (let param in query) {
 		if (query.hasOwnProperty(param)) {
