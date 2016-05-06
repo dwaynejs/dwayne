@@ -1,5 +1,5 @@
-import cls from './';
+import Number from './';
 
 export * from './';
 
-export default cls;
+export default Number;

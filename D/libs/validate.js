@@ -1,4 +1,4 @@
-import * as checkTypeMethods from '../methods/check-type-methods';
+import * as methods from '../methods';
 
 const numbers = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th'];
 
@@ -24,143 +24,145 @@ const check = {
 		error: RangeError
 	},
 	'!!': {
-		check: (n) => n != null,
+		check: methods.isNullOrUndefined,
 		text: '$n argument must be not null or undefined!',
 		error: TypeError
 	},
 	'array': {
-		check: checkTypeMethods.isArray,
+		check: methods.isArray,
 		text: '$n argument must be an array!',
 		error: TypeError
 	},
 	'array||!': {
-		check: (n) => checkTypeMethods.isArray(n) || checkTypeMethods.isUndefined(n) || checkTypeMethods.isNull(n),
+		check: (a) => methods.isArray(a) || methods.isNullOrUndefined(a),
 		text: '$n argument must be an array, or undefined, or null!',
 		error: TypeError
 	},
-	'arrayAlike': {
-		check: checkTypeMethods.isArrayAlike,
-		text: '$n argument must be array alike!',
+	'arrayLike': {
+		check: methods.isArrayLike,
+		text: '$n argument must be array-like!',
 		error: TypeError
 	},
-	'arrayAlike||!': {
-		check: (n) => checkTypeMethods.isArrayAlike(n) || checkTypeMethods.isUndefined(n) || checkTypeMethods.isNull(n),
-		text: '$n argument must be array alike, or undefined, or null!',
+	'arrayLike||!': {
+		check: (a) => methods.isArrayLike(a) || methods.isNullOrUndefined(a),
+		text: '$n argument must be array-like, or undefined, or null!',
 		error: TypeError
 	},
 	'date': {
-		check: checkTypeMethods.isDate,
+		check: methods.isDate,
 		text: '$n argument must be a date!',
 		error: TypeError
 	},
 	'date||!': {
-		check: (n) => checkTypeMethods.isDate(n) || checkTypeMethods.isUndefined(n) || checkTypeMethods.isNull(n),
+		check: (d) => methods.isDate(d) || methods.isNullOrUndefined(d),
 		text: '$n argument must be a date, or undefined, or null!',
 		error: TypeError
 	},
-	'dateAlike': {
-		check: checkTypeMethods.isDateAlike,
-		text: '$n argument must be date alike!',
+	'dateLike': {
+		check: methods.isDateLike,
+		text: '$n argument must be date-like!',
 		error: TypeError
 	},
-	'dateAlike||!': {
-		check: (n) => checkTypeMethods.isDateAlike(n) || checkTypeMethods.isUndefined(n) || checkTypeMethods.isNull(n),
-		text: '$n argument must be date alike, or undefined, or null!',
+	'dateLike||!': {
+		check: (d) => methods.isDateLike(d) || methods.isNullOrUndefined(d),
+		text: '$n argument must be date-like, or undefined, or null!',
 		error: TypeError
 	},
 	'function': {
-		check: checkTypeMethods.isFunction,
+		check: methods.isFunction,
 		text: '$n argument must be a function!',
 		error: TypeError
 	},
 	'function||!': {
-		check: (n) => checkTypeMethods.isFunction(n) || checkTypeMethods.isUndefined(n) || checkTypeMethods.isNull(n),
+		check: (f) => methods.isFunction(f) || methods.isNullOrUndefined(f),
 		text: '$n argument must be a function, or undefined, or null!',
 		error: TypeError
 	},
 	'int': {
-		check: checkTypeMethods.isInteger,
+		check: methods.isInteger,
 		text: '$n argument must be an integer!',
 		error: TypeError
 	},
 	'int||!': {
-		check: (n) => checkTypeMethods.isInteger(n) || checkTypeMethods.isUndefined(n) || checkTypeMethods.isNull(n),
+		check: (i) => methods.isInteger(i) || methods.isNullOrUndefined(i),
 		text: '$n argument must be an integer, or undefined, or null!',
 		error: TypeError
 	},
-	'intAlike': {
-		check: checkTypeMethods.isIntegerAlike,
-		text: '$n argument must be integer alike!',
+	'intLike': {
+		check: methods.isIntegerLike,
+		text: '$n argument must be integer-like!',
 		error: TypeError
 	},
-	'intAlike||!': {
-		check: (n) => checkTypeMethods.isIntegerAlike(n) || checkTypeMethods.isUndefined(n) || checkTypeMethods.isNull(n),
-		text: '$n argument must be integer alike, or undefined, or null!',
+	'intLike||!': {
+		check: (i) => methods.isIntegerLike(i) || methods.isNullOrUndefined(i),
+		text: '$n argument must be integer-like, or undefined, or null!',
 		error: TypeError
 	},
 	'number': {
-		check: checkTypeMethods.isNumber,
+		check: methods.isNumber,
 		text: '$n argument must be a number!',
 		error: TypeError
 	},
 	'number||!': {
-		check: (n) => checkTypeMethods.isNumber(n) || checkTypeMethods.isUndefined(n) || checkTypeMethods.isNull(n),
+		check: (n) => methods.isNumber(n) || methods.isNullOrUndefined(n),
 		text: '$n argument must be a number, or undefined, or null!',
 		error: TypeError
 	},
-	'numberAlike': {
-		check: checkTypeMethods.isNumberAlike,
-		text: '$n argument must be number alike!',
+	'numberLike': {
+		check: methods.isNumberLike,
+		text: '$n argument must be number-like!',
 		error: TypeError
 	},
-	'numberAlike||!': {
-		check: (n) => checkTypeMethods.isNumberAlike(n) || checkTypeMethods.isUndefined(n) || checkTypeMethods.isNull(n),
-		text: '$n argument must be number alike, or undefined, or null!',
+	'numberLike||!': {
+		check: (n) => methods.isNumberLike(n) || methods.isNullOrUndefined(n),
+		text: '$n argument must be number-like, or undefined, or null!',
 		error: TypeError
 	},
 	'object': {
-		check: checkTypeMethods.isObject,
+		check: methods.isObject,
 		text: '$n argument must be an object!',
 		error: TypeError
 	},
 	'object||!': {
-		check: (n) => checkTypeMethods.isObject(n) || checkTypeMethods.isUndefined(n) || checkTypeMethods.isNull(n),
+		check: (o) => methods.isObject(o) || methods.isNullOrUndefined(o),
 		text: '$n argument must be an object, or undefined, or null!',
 		error: TypeError
 	},
 	'regexp': {
-		check: checkTypeMethods.isRegexp,
+		check: methods.isRegExp,
 		text: '$n argument must be a regular expression!',
 		error: TypeError
 	},
 	'regexp||!': {
-		check: (n) => checkTypeMethods.isRegExp(n) || checkTypeMethods.isUndefined(n) || checkTypeMethods.isNull(n),
+		check: (r) => methods.isRegExp(r) || methods.isNullOrUndefined(r),
 		text: '$n argument must be a regular expression, or undefined, or null!',
 		error: TypeError
 	},
 	'string': {
-		check: checkTypeMethods.isString,
+		check: methods.isString,
 		text: '$n argument must be a string!',
 		error: TypeError
 	},
 	'string||!': {
-		check: (n) => checkTypeMethods.isString(n) || checkTypeMethods.isUndefined(n) || checkTypeMethods.isNull(n),
+		check: (s) => methods.isString(s) || methods.isNullOrUndefined(s),
 		text: '$n argument must be a string, or undefined, or null!',
 		error: TypeError
 	}
 };
 
-export function validate(args, options) {
+export function validate(args, options, name) {
 	for (let number in options) {
 		if (options.hasOwnProperty(number)) {
 			let array = options[number];
-			if (!checkTypeMethods.isArray(array)) {
+      
+			if (!methods.isArray(array)) {
 				array = [array];
 			}
+      
 			for (let i = 0; i < array.length; i++) {
 				const checker = check[array[i]];
 				if (!checker.check(args[number])) {
-					throw new checker.error(checker.text.replace('$n', numbers[number]));
+					throw new checker.error(`${ checker.text.replace('$n', numbers[number]) } (in ${ name })`);
 				}
 			}
 		}

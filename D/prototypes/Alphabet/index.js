@@ -1,16 +1,15 @@
 import classes from '../../classes';
-import constructors from '../../constructors';
-import { default as parent, transform } from '../Object/index';
-import Array from '../Array';
-import { isString, validate } from '../../libs';
+import Super from '../Super';
+import Arr from '../Array';
+import { isString, validate, supportSymbol } from '../../libs';
 
-export class Alphabet extends parent {
+export class Alphabet extends Super {
 	constructor(alphabet = []) {
 		super({});
 
 		const a = this.$;
 
-		alphabet = transform(alphabet);
+		alphabet = new Super(alphabet).$;
 
 		for (let i = 0, length = alphabet.length; i < length; i++) {
 			const char = alphabet[i];
@@ -37,12 +36,12 @@ export class Alphabet extends parent {
 		return this;
 	}
 	alphabet() {
-		return new Array(Object.keys(this.$));
+		return new Arr(Object.keys(this.$));
 	}
 	contains(word) {
-		word = transform(word);
+		word = new Super(word).$;
 
-		validate([word], ['string']);
+		validate([word], ['string'], 'Alphabet.prototype.contains');
 
 		for (let i = 0, length = word.length; i < length; i++) {
 			if (!this.$[word[i]]) {
@@ -66,7 +65,7 @@ export class Alphabet extends parent {
 		return this;
 	}
 	token(length) {
-		validate([length], [['intAlike', '>0']]);
+		validate([length], [['intLike', '>0']], 'Alphabet.prototype.token');
 
 		const alphabet = Object.keys(this.$);
 		const len = alphabet.length;
@@ -78,6 +77,10 @@ export class Alphabet extends parent {
 
 		return token;
 	}
+}
+
+if (supportSymbol) {
+  Alphabet.prototype[Symbol.toStringTag] = 'Alphabet';
 }
 
 classes.Alphabet = Alphabet;

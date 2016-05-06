@@ -8,20 +8,14 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       const fetch = new Class();
       const middleware1 = () => {};
       const middleware2 = () => {};
-      const middleware3 = () => {};
 
       fetch.after(middleware1);
 
-      assert.deepEqual(fetch.$.after, [
-        { onResolve: middleware1, onReject: undefined }
-      ]);
+      assert.deepEqual(fetch.$.after, [middleware1]);
 
-      fetch.after(middleware2, middleware3);
+      fetch.after(middleware2);
 
-      assert.deepEqual(fetch.$.after, [
-        { onResolve: middleware1, onReject: undefined },
-        { onResolve: middleware2, onReject: middleware3 }
-      ]);
+      assert.deepEqual(fetch.$.after, [middleware1, middleware2]);
     });
   });
   describe('before()', () => {
@@ -29,20 +23,14 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       const fetch = new Class();
       const middleware1 = () => {};
       const middleware2 = () => {};
-      const middleware3 = () => {};
 
       fetch.before(middleware1);
 
-      assert.deepEqual(fetch.$.before, [
-        { onResolve: middleware1, onReject: undefined }
-      ]);
+      assert.deepEqual(fetch.$.before, [middleware1]);
 
-      fetch.before(middleware2, middleware3);
+      fetch.before(middleware2);
 
-      assert.deepEqual(fetch.$.before, [
-        { onResolve: middleware1, onReject: undefined },
-        { onResolve: middleware2, onReject: middleware3 }
-      ]);
+      assert.deepEqual(fetch.$.before, [middleware1, middleware2]);
     });
   });
   describe('config()', () => {

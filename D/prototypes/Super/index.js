@@ -1,23 +1,30 @@
+import D from '../../';
 import classes from '../../classes';
 import constructors from '../../constructors';
 import {
-	isArrayAlike, isDate, isFunction, isNaN,
+	isArrayLike, isDate, isFunction, isNaN,
 	isNull, isObject, isRegExp, isUndefined,
 	validate
 } from '../../libs';
 
-const NativeObject = global.Object;
-
-const cls = class Object {
+export class Super {
 	constructor(object = {}) {
-		NativeObject.defineProperty(this, '$', { value: object });
+    while (
+      object instanceof Super &&
+      !(classes.Fetch && object instanceof classes.Fetch) &&
+      !(classes.Function && object instanceof classes.Function)
+    ) {
+      object = object.$;
+    }
+    
+		Object.defineProperty(this, '$', { value: object });
 	}
 
 	array(mapFn) {
-		validate([mapFn], ['function']);
+		validate([mapFn], ['function'], 'Super.prototype.array');
 
 		const object = this.$;
-		const array = isArrayAlike(object);
+		const array = isArrayLike(object);
 		const a = [];
 
 		for (const key in object) {
@@ -28,14 +35,14 @@ const cls = class Object {
 			}
 		}
 
-		return new classes.Array(a);
+		return D(a);
 	}
 	assign() {
 		const object = this.$;
     const length = arguments.length;
 
 		for (let i = 0; i < length; i++) {
-			const o = transform(arguments[i]);
+			const o = new Super(arguments[i]).$;
 
 			for (const key in o) {
 				if (o.hasOwnProperty(key)) {
@@ -50,7 +57,7 @@ const cls = class Object {
 		return this.sum(mapFn) / this.count;
 	}
 	call(f) {
-		validate([f], ['function']);
+		validate([f], ['function'], 'Super.prototype.call');
     
 		return f.apply(this, Array.prototype.slice.call(arguments, 1));
 	}
@@ -62,7 +69,7 @@ const cls = class Object {
 			return 0;
 		}
 
-		return NativeObject.keys(object).length;
+		return Object.keys(object).length;
 	}
 	// TODO: .deepAssign()
 	// TODO: .deepCopy()
@@ -80,7 +87,7 @@ const cls = class Object {
 			mapFn = Boolean;
 		}
 
-		validate([mapFn, n], ['function', ['intAlike', '>0']]);
+		validate([mapFn, n], ['function', ['intLike', '>0']], 'Super.prototype.deepEvery');
 
 		n = Number(n);
 
@@ -97,11 +104,11 @@ const cls = class Object {
 			mapFn = Boolean;
 		}
 
-		validate([mapFn, n], ['function', ['intAlike', '>0']]);
+		validate([mapFn, n], ['function', ['intLike', '>0']], 'Super.prototype.deepFilter');
 
 		const filtered = deepFilter(this.$, mapFn, n, [{ key: null, value: this.$ }]);
 
-		return isArrayAlike(filtered) ? new classes.Array(filtered) : new Object(filtered);
+		return D(filtered);
 	}
 	deepFind(mapFn, n) {
 		if (arguments.length === 1 && !isFunction(mapFn)) {
@@ -114,7 +121,7 @@ const cls = class Object {
 			mapFn = Boolean;
 		}
 
-		validate([mapFn, n], ['function', ['intAlike', '>0']]);
+		validate([mapFn, n], ['function', ['intLike', '>0']], 'Super.prototype.deepFind');
 
 		return deepFind(this.$, mapFn, n, [{ key: null, value: this.$ }]);
 	}
@@ -124,16 +131,16 @@ const cls = class Object {
 		return this;
 	}
 	deepMap(mapFn, n = 1) {
-		validate([mapFn, n], ['function', ['intAlike', '>0']]);
+		validate([mapFn, n], ['function', ['intLike', '>0']], 'Super.prototype.deepMap');
 
 		n = Number(n);
 
 		const map = deepMap(this.$, mapFn, n, [{ key: null, value: this.$ }]);
 
-		return isArrayAlike(map) ? new classes.Array(map) : new Object(map);
+		return D(map);
 	}
 	deepReduce(mapFn, n = 1, IV) {
-		validate([mapFn, n], ['function', ['intAlike', '>0']]);
+		validate([mapFn, n], ['function', ['intLike', '>0']], 'Super.prototype.deepReduce');
 
 		n = Number(n);
 
@@ -150,7 +157,7 @@ const cls = class Object {
 			mapFn = Boolean;
 		}
 
-		validate([mapFn, n], ['function', ['intAlike', '>0']]);
+		validate([mapFn, n], ['function', ['intLike', '>0']], 'Super.prototype.deepSome');
 
 		n = Number(n);
 
@@ -164,10 +171,10 @@ const cls = class Object {
 			property = { [property]: descriptor };
 		}
 
-		property = transform(property);
+		property = new Super(property).$;
 
 		if (isObject(this.$)) {
-			NativeObject.defineProperties(this.$, property);
+			Object.defineProperties(this.$, property);
 		}
 
 		return this;
@@ -184,15 +191,15 @@ const cls = class Object {
 		return this;
 	}
 	equals(o) {
-		o = transform(o);
+		o = new Super(o).$;
 
 		return this.$ == o;
 	}
 	every(mapFn = Boolean) {
-		validate([mapFn], ['function']);
+		validate([mapFn], ['function'], 'Super.prototype.every');
 
 		const object = this.$;
-		const array = isArrayAlike(object);
+		const array = isArrayLike(object);
 
 		let iterated = 0;
 
@@ -213,10 +220,10 @@ const cls = class Object {
 		return true;
 	}
 	filter(mapFn = Boolean) {
-		validate([mapFn], ['function']);
+		validate([mapFn], ['function'], 'Super.prototype.filter');
 
 		const object = this.$;
-		const array = isArrayAlike(object);
+		const array = isArrayLike(object);
 		const nul = isNull(this.$);
 		const o = array ? [] : nul ? null : {};
 
@@ -238,13 +245,13 @@ const cls = class Object {
 			}
 		}
 
-		return array ? new classes.Array(o) : new Object(o);
+		return D(o);
 	}
 	find(mapFn) {
-		validate([mapFn], ['function']);
+		validate([mapFn], ['function'], 'Super.prototype.find');
 
 		const object = this.$;
-		const array = isArrayAlike(object);
+		const array = isArrayLike(object);
 
 		let iterated = 0;
 
@@ -267,10 +274,10 @@ const cls = class Object {
 		return null;
 	}
 	forEach(mapFn) {
-		validate([mapFn], ['function']);
+		validate([mapFn], ['function'], 'Super.prototype.forEach');
 
 		const object = this.$;
-		const array = isArrayAlike(object);
+		const array = isArrayLike(object);
 
 		let iterated = 0;
 
@@ -289,7 +296,7 @@ const cls = class Object {
 		return this;
 	}
 	freeze() {
-		NativeObject.freeze(this.$);
+		Object.freeze(this.$);
 
 		return this;
 	}
@@ -300,12 +307,12 @@ const cls = class Object {
 
 		const object = this.$;
 
-		property = transform(property);
+		property = new Super(property).$;
 
 		if (isObject(object)) {
 			for (const key in property) {
 				if (property.hasOwnProperty(key)) {
-					NativeObject.defineProperty(object, key, { get: property[key] });
+					Object.defineProperty(object, key, { get: property[key] });
 				}
 			}
 		}
@@ -332,7 +339,7 @@ const cls = class Object {
 	}
 	// TODO: .instanceof()
 	isFrozen() {
-		return NativeObject.isFrozen(this.$);
+		return Object.isFrozen(this.$);
 	}
 	json(mapFn, indent) {
 		if (arguments.length === 1 && !isFunction(mapFn)) {
@@ -342,10 +349,10 @@ const cls = class Object {
 			mapFn = null;
 		}
 
-		validate([mapFn], ['function||!']);
+		validate([mapFn], ['function||!'], 'Super.prototype.json');
 
 		return JSON.stringify(this.$, function (key, value) {
-			value = transform(value);
+			value = new Super(value).$;
 
 			return mapFn ? mapFn.apply(null, arguments) : value;
 		}, indent);
@@ -383,13 +390,13 @@ const cls = class Object {
 	keys() {
 		const object = this.$;
 
-		return new classes.Array(!isObject(object) ? [] : NativeObject.keys(object));
+		return D(!isObject(object) ? [] : Object.keys(object));
 	}
 	map(mapFn) {
-		validate([mapFn], ['function']);
+		validate([mapFn], ['function'], 'Super.prototype.map');
 
 		const object = this.$;
-		const array = isArrayAlike(object);
+		const array = isArrayLike(object);
 		const nul = isNull(object);
 		const o = array ? [] : nul ? null : {};
 
@@ -407,13 +414,13 @@ const cls = class Object {
 			}
 		}
 
-		return array ? new classes.Array(o) : new Object(o);
+		return D(o);
 	}
 	max(mapFn = null) {
-		validate([mapFn], ['function||!']);
+		validate([mapFn], ['function||!'], 'Super.prototype.max');
 
 		const object = this.$;
-		const array = isArrayAlike(object);
+		const array = isArrayLike(object);
 
 		let max = { key: null, value: -Infinity };
 		let iterated = 0;
@@ -427,10 +434,10 @@ const cls = class Object {
 				iterated++;
 
 				const value = object[key];
-        const val = mapFn ? mapFn(value, array ? Number(key) : key, object) : value;
+        const val = Number(mapFn ? mapFn(value, array ? Number(key) : key, object) : value);
 
 				if (val > max.value) {
-					max = { key, value };
+					max = { key, value: val };
 				}
 			}
 		}
@@ -438,10 +445,10 @@ const cls = class Object {
 		return max;
 	}
 	min(mapFn = null) {
-		validate([mapFn], ['function||!']);
+		validate([mapFn], ['function||!'], 'Super.prototype.min');
 
 		const object = this.$;
-		const array = isArrayAlike(object);
+		const array = isArrayLike(object);
 
 		let min = { key: null, value: Infinity };
 		let iterated = 0;
@@ -455,10 +462,10 @@ const cls = class Object {
 				iterated++;
 
 				const value = object[key];
-        const val = mapFn ? mapFn(value, array ? Number(key) : key, object) : value;
+        const val = Number(mapFn ? mapFn(value, array ? Number(key) : key, object) : value);
 
 				if (val < min.value) {
-					min = { key, value };
+					min = { key, value: val };
 				}
 			}
 		}
@@ -466,10 +473,10 @@ const cls = class Object {
 		return min;
 	}
 	object(mapFn) {
-		validate([mapFn], ['function']);
+		validate([mapFn], ['function'], 'Super.prototype.object');
 
 		const object = this.$;
-		const array = isArrayAlike(object);
+		const array = isArrayLike(object);
 		const o = {};
 
 		let iterated = 0;
@@ -486,7 +493,7 @@ const cls = class Object {
 			}
 		}
 
-		return new Object(o);
+		return new Super(o);
 	}
 	propertyDescriptor(key) {
 		const object = this.$;
@@ -495,24 +502,24 @@ const cls = class Object {
 			return;
 		}
 
-		return NativeObject.getOwnPropertyDescriptor(object, key);
+		return Object.getOwnPropertyDescriptor(object, key);
 	}
 	propertyNames() {
 		const object = this.$;
 
-		return new classes.Array(!isObject(object) ? [] : NativeObject.getOwnPropertyNames(object));
+		return D(!isObject(object) ? [] : Object.getOwnPropertyNames(object));
 	}
 	propertySymbols() {
 		const object = this.$;
 
-		return new classes.Array(!isObject(object) ? [] : NativeObject.getOwnPropertySymbols(object));
+		return D(!isObject(object) ? [] : Object.getOwnPropertySymbols(object));
 	}
 	proto(proto) {
 		const object = this.$;
 
 		if (arguments.length) {
 			if (isObject(object)) {
-				NativeObject.setPrototypeOf(object, proto);
+				Object.setPrototypeOf(object, proto);
 			}
 			return this;
 		}
@@ -521,13 +528,13 @@ const cls = class Object {
 			return;
 		}
 
-		return NativeObject.getPrototypeOf(object);
+		return Object.getPrototypeOf(object);
 	}
 	reduce(mapFn, IV) {
-		validate([mapFn], ['function']);
+		validate([mapFn], ['function'], 'Super.prototype.reduce');
 
 		const object = this.$;
-		const array = isArrayAlike(object);
+		const array = isArrayLike(object);
 
 		let startKey;
 		let iterated = 0;
@@ -562,14 +569,14 @@ const cls = class Object {
 			property = { [property]: setter };
 		}
 
-		property = transform(property);
+		property = new Super(property).$;
 
 		const object = this.$;
 
 		if (isObject(object)) {
 			for (const key in property) {
 				if (property.hasOwnProperty(key)) {
-					NativeObject.defineProperty(object, key, { set: property[key] });
+					Object.defineProperty(object, key, { set: property[key] });
 				}
 			}
 		}
@@ -577,10 +584,10 @@ const cls = class Object {
 		return this;
 	}
 	some(mapFn = Boolean) {
-		validate([mapFn], ['function']);
+		validate([mapFn], ['function'], 'Super.prototype.some');
 
 		const object = this.$;
-		const array = isArrayAlike(object);
+		const array = isArrayLike(object);
 
 		let iterated = 0;
 
@@ -601,15 +608,15 @@ const cls = class Object {
 		return false;
 	}
 	strictEquals(o) {
-		o = transform(o);
+		o = new Super(o).$;
 
 		return this.$ === o;
 	}
 	sum(mapFn = null) {
-		validate([mapFn], ['function||!']);
+		validate([mapFn], ['function||!'], 'Super.prototype.sum');
 
 		const object = this.$;
-		const array = isArrayAlike(object);
+		const array = isArrayLike(object);
 
 		let sum = 0;
 		let iterated = 0;
@@ -641,13 +648,13 @@ const cls = class Object {
 			}
 		}
 
-		return new classes.Array(array);
+		return D(array);
 	}
 	word(mapFn = null) {
-		validate([mapFn], ['function||!']);
+		validate([mapFn], ['function||!'], 'Super.prototype.word');
 
 		const object = this.$;
-		const array = isArrayAlike(object);
+		const array = isArrayLike(object);
 
 		let word = '';
 		let iterated = 0;
@@ -668,11 +675,11 @@ const cls = class Object {
 
 		return word;
 	}
-};
+}
 
 function deepEqual(o1, o2, strict) {
-	o1 = transform(o1);
-	o2 = transform(o2);
+	o1 = new Super(o1).$;
+	o2 = new Super(o2).$;
 
 	if (isNull(o1) && isNull(o2)) {
 		return true;
@@ -708,7 +715,7 @@ function deepEqual(o1, o2, strict) {
 
 	if (
 		(strict ? o1 !== o2 : o1 != o2) &&
-		NativeObject.keys(o1).length !== NativeObject.keys(o2).length
+		Object.keys(o1).length !== Object.keys(o2).length
 	) {
 		return false;
 	}
@@ -724,9 +731,9 @@ function deepEqual(o1, o2, strict) {
 	return true;
 }
 function deepEvery(object = {}, mapFn, n, tree) {
-	object = transform(object);
+	object = new Super(object).$;
 
-	const array = isArrayAlike(object);
+	const array = isArrayLike(object);
 	const end = n === 1;
 
 	let iterated = 0;
@@ -755,9 +762,9 @@ function deepEvery(object = {}, mapFn, n, tree) {
 	return true;
 }
 function deepFilter(object = {}, mapFn, n, tree) {
-	object = transform(object);
+	object = new Super(object).$;
 
-	const array = isArrayAlike(object);
+	const array = isArrayLike(object);
 	const nul = isNull(object);
 	const o = array ? [] : nul ? null : {};
 	const end = n === 1;
@@ -801,9 +808,9 @@ function deepFilter(object = {}, mapFn, n, tree) {
 	return o;
 }
 function deepFind(object = {}, mapFn, n, tree) {
-	object = transform(object);
+	object = new Super(object).$;
 
-	const array = isArrayAlike(object);
+	const array = isArrayLike(object);
 	const end = n === 1;
 
 	let iterated = 0;
@@ -838,7 +845,7 @@ function deepFind(object = {}, mapFn, n, tree) {
 	return null;
 }
 function deepFreeze(object = {}) {
-	NativeObject.freeze(object);
+	Object.freeze(object);
 	for (const key in object) {
 		if (object.hasOwnProperty(key)) {
 			deepFreeze(object[key]);
@@ -846,9 +853,9 @@ function deepFreeze(object = {}) {
 	}
 }
 function deepMap(object = {}, mapFn, n, tree) {
-	object = transform(object);
+	object = new Super(object).$;
 
-	const array = isArrayAlike(object);
+	const array = isArrayLike(object);
 	const nul = isNull(object);
 	const o = array ? [] : nul ? null : {};
 	const end = n === 1;
@@ -875,9 +882,9 @@ function deepMap(object = {}, mapFn, n, tree) {
 	return o;
 }
 function deepReduce(object = {}, mapFn, n, start, IV, tree) {
-	object = transform(object);
+	object = new Super(object).$;
 
-	const array = isArrayAlike(object);
+	const array = isArrayLike(object);
 	const end = n === 1;
 
 	let startKey;
@@ -915,9 +922,9 @@ function deepReduce(object = {}, mapFn, n, start, IV, tree) {
 	return IV;
 }
 function deepSome(object = {}, mapFn, n, tree) {
-	object = transform(object);
+	object = new Super(object).$;
 
-	const array = isArrayAlike(object);
+	const array = isArrayLike(object);
 	const end = n === 1;
 
 	let iterated = 0;
@@ -946,20 +953,10 @@ function deepSome(object = {}, mapFn, n, tree) {
 	return false;
 }
 
-classes.Object = cls;
+classes.Super = Super;
 constructors.unshift({
 	check: () => true,
-	cls
+	cls: Super
 });
 
-export function transform(object) {
-	while (object instanceof cls) {
-		object = object.$;
-	}
-
-	return object;
-}
-
-export const Obj = cls;
-
-export default cls;
+export default Super;

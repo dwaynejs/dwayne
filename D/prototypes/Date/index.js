@@ -1,6 +1,6 @@
 import classes from '../../classes';
 import constructors from '../../constructors';
-import { default as parent, transform } from '../Object';
+import Super from '../Super';
 import Num from '../Number';
 import Str from '../String';
 import { isDate } from '../../libs';
@@ -86,7 +86,7 @@ const monthsAliases = {
 };
 const zero = new Str('0');
 
-export class Date extends parent {
+export class Date extends Super {
 	constructor(date = new NativeDate()) {
 		super(new NativeDate(date));
 	}
@@ -102,7 +102,7 @@ export class Date extends parent {
 			what = { [what]: number };
 		}
 
-		what = transform(what);
+		what = new Super(what).$;
 
 		let increment = 0;
 
@@ -121,7 +121,7 @@ export class Date extends parent {
 		return new Date(date.getTime() + increment);
 	}
 	between(date) {
-		date = new NativeDate(transform(date));
+		date = new NativeDate(new Super(date).$);
 
 		return this.$.getTime() > date.getTime();
 	}
@@ -129,8 +129,8 @@ export class Date extends parent {
 		return new Num(this.$ - now()).timeout(value);
 	}
 	format(string, prefix = '') {
-		string = new Str(transform(string));
-		prefix = String(transform(prefix));
+		string = new Str(new Super(string).$);
+		prefix = String(new Super(prefix).$);
 
 		for (const f in formats) {
 			if (formats.hasOwnProperty(f)) {
@@ -172,12 +172,12 @@ export class Date extends parent {
 	}
 	// TODO: .isInRange(range) -> Boolean
 	isAfter(date) {
-		date = new NativeDate(transform(date));
+		date = new NativeDate(new Super(date).$);
 
 		return date.getTime() > this.$.getTime();
 	}
 	isBefore(date) {
-		date = new NativeDate(transform(date));
+		date = new NativeDate(new Super(date).$);
 
 		return date.getTime() > this.$.getTime();
 	}
@@ -185,10 +185,10 @@ export class Date extends parent {
 		return isInvalid(this.$);
 	}
 	isPassed() {
-		return Date.now() > this.$.getTime();
+		return now() > this.$.getTime();
 	}
 	ofOne(what, secondDate) {
-		secondDate = new Date(transform(secondDate));
+		secondDate = new Date(new Super(secondDate).$);
 		const date = this.$;
 		const diff = Math.abs(date.getTime() - secondDate.getTime());
 
@@ -211,9 +211,9 @@ export class Date extends parent {
 			what = { [what]: number };
 		}
 
-		what = transform(what);
+		what = new Super(what).$;
 
-		for (let key in what) {
+		for (const key in what) {
 			if (what.hasOwnProperty(key)) {
 				const value = what[key];
 
@@ -270,7 +270,7 @@ function invalidDate() {
 function isInvalid(date) {
 	return date.toString() === 'Invalid Date';
 }
-function now() {
+export function now() {
 	return NativeDate.now();
 }
 function round(number, digits) {
@@ -281,7 +281,7 @@ function round(number, digits) {
 	return zero.repeat(zeroes).$ + string;
 }
 function cut(number, max, digits) {
-	return (number/Math.pow(10, max)).toFixed(digits);
+	return (number / Math.pow(10, max)).toFixed(digits);
 }
 
 classes.Date = Date;

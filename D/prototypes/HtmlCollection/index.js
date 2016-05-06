@@ -1,29 +1,15 @@
 import classes from '../../classes';
 import constructors from '../../constructors';
-import { default as parent } from '../Array';
-import { htmlElement } from '../HtmlElement';
-import { dynamicDefineProperties, toString } from '../../libs';
-import methods from './methods';
+import Arr from '../Array';
+import { toStringTag } from '../../libs';
 
-export class HtmlCollection extends parent {
+export class HtmlCollection extends Arr {
 	
 }
 
-dynamicDefineProperties(HtmlCollection.prototype, methods, (prop) => {
-	return function () {
-		const collection = this.$;
-		
-		for (let i = 0, length = collection.length; i < length; i++) {
-			const item = htmlElement(collection[i]);
-			
-			item[prop].apply(item, arguments);
-		}
-	};
-});
-
 classes.HtmlCollection = HtmlCollection;
 constructors.unshift({
-	check: (collection) => toString(collection) === 'HtmlCollection' || toString(collection) === 'NodeList',
+	check: (collection) => /^(HtmlCollection|NodeList)$/.test(toStringTag(collection)),
 	cls: HtmlCollection
 });
 

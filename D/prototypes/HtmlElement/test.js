@@ -26,19 +26,23 @@ describe('it should test D.HtmlElement.prototype.[methods]', () => {
   });
   describe('.addHtml()', () => {
     it('should add html to the end', () => {
-      const elem = document.createElement('div'),
-        wrap = new Class(elem);
+      const elem = document.createElement('div');
+      const wrap = new Class(elem);
+      
       elem.innerHTML = '123';
       wrap.addHtml('<div></div>');
+      
       assert.strictEqual(elem.innerHTML, '123<div></div>');
     });
   });
   describe('.addText()', () => {
     it('should add text to the end', () => {
-      const elem = document.createElement('div'),
-        wrap = new Class(elem);
+      const elem = document.createElement('div');
+      const wrap = new Class(elem);
+      
       elem.innerHTML = '123';
       wrap.addText('<div></div>');
+      
       assert.strictEqual(elem.innerHTML, '123&lt;div&gt;&lt;/div&gt;');
     });
   });

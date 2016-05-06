@@ -1,5 +1,5 @@
-import cls from './';
+import HtmlCollection from './';
 
 export * from './';
 
-export default cls;
+export default HtmlCollection;

@@ -1,23 +1,46 @@
 import classes from '../../classes';
-import constructors from '../../constructors';
-import { isFunction, defineProperties, validate } from '../../libs';
+import { isFunction, isPromise, defineProperties, supportSymbol } from '../../libs';
 
 const secret = {};
 
-const NativePromise = global.Promise || (() => {});
+const iterator = supportSymbol && global.Symbol.iterator ? Symbol.iterator : Math.random().toString(36);
 
 export class Promise {
 	constructor(func) {
-		validate([func], ['function']);
+    if (!isFunction(func)) {
+      throw new TypeError(`Promise resolver ${ Object.prototype.toString.call(func) } is not a function`);
+    }
 
-		const hiddenPromise = {
-			handled: false,
-			status: 'pending'
-		};
+    let hiddenStatus;
+    let hiddenValue;
+    
 		const	onResolve = [];
 		const onReject = [];
+    const realPromise = this;
+    const hiddenPromise = {
+      handled: false,
+      get status() {
+        return hiddenStatus;
+      },
+      set status(value) {
+        hiddenStatus = value;
+        realPromise.status = value;
+      },
+      get value() {
+        return hiddenValue;
+      },
+      set value(val) {
+        hiddenValue = val;
+        realPromise.value = val;
+      }
+    };
 
-		defineProperties(this, {
+    hiddenPromise.status = 'pending';
+    hiddenPromise.value = undefined;
+
+    Object.defineProperty(this, '$', { value: {} });
+
+		defineProperties(this.$, {
 			'get/set handled': {
 				get() {
 					return hiddenPromise.handled;
@@ -28,7 +51,7 @@ export class Promise {
 					}
 				}
 			},
-			$$handle(status, f, resolve, reject, key) {
+			handle(status, f, resolve, reject, key) {
 				if (key === secret) {
 					const proxy = isFunction(f) ? (value) => {
 						try {
@@ -46,8 +69,8 @@ export class Promise {
 				}
 			},
 			'get status'() {
-				return hiddenPromise.status;
-			},
+        return hiddenPromise.status;
+      },
 			'get value'() {
 				return hiddenPromise.value;
 			}
@@ -79,7 +102,7 @@ export class Promise {
 		}
 		function resolve(value) {
 			if (hiddenPromise.status === 'pending') {
-				if (value instanceof Promise || value instanceof NativePromise) {
+				if (isPromise(value) || value instanceof Promise) {
 					return value.then((value) => {
 						resolve(value);
 					}, (err) => {
@@ -99,68 +122,118 @@ export class Promise {
 		}
 	}
 
-	static all(array) {
-		validate([array], ['array']);
+	static all(iterable) {
+    const array = [];
 
-		const length = array.length;
-		let toResolve = length;
+    let toResolve = 0;
 
-		if (!length) {
-			return Promise.resolve([]);
+    if (iterable[iterator]) {
+      iterable = iterable[iterator]();
+
+      return new this((resolve, reject) => {
+        let next = iterable.next();
+        let i = 0;
+
+        while (!next.done) {
+          const promise = this.resolve(next.value);
+
+          toResolve++;
+
+          promise.then((value) => {
+            toResolve--;
+            array[i] = value;
+
+            setTimeout(() => {
+              if (next.done && !toResolve) {
+                resolve(array);
+              }
+            }, 1);
+          }, reject);
+
+          i++;
+          next = iterable.next();
+        }
+
+        if (!i) {
+          return this.resolve([]);
+        }
+      });
+    }
+
+    const length = iterable.length;
+
+    if (!length) {
+			return this.resolve([]);
 		}
 
-		return new Promise((resolve, reject) => {
-			for (let i = 0; i < length; i++) {
-				const promise = Promise.resolve(array[i]);
+    toResolve = length;
 
-				promise.then((value) => {
-					toResolve--;
-					array[i] = value;
+		return new this((resolve, reject) => {
+      for (let i = 0; i < length; i++) {
+        const promise = this.resolve(array[i]);
 
-					if (!toResolve) {
-						resolve(array);
-					}
-				}, reject);
-			}
+        promise.then((value) => {
+          toResolve--;
+          array[i] = value;
+
+          if (!toResolve) {
+            resolve(array);
+          }
+        }, reject);
+      }
 		});
 	}
-	static race(array) {
-		validate([array], ['array']);
+	static race(iterable) {
+    const array = [];
 
-		return new Promise((resolve, reject) => {
+    if (iterable[iterator]) {
+      iterable = iterable[iterator]();
+
+      return new this((resolve, reject) => {
+        for (const promise of iterable) {
+          promise.then(resolve, reject);
+        }
+      });
+    }
+
+		return new this((resolve, reject) => {
 			for (let i = 0, length = array.length; i < length; i++) {
 				array[i].then(resolve, reject);
 			}
 		});
 	}
 	static reject(value) {
-		return new Promise((resolve, reject) => {
+		return new this((resolve, reject) => {
 			reject(value);
 		});
 	}
 	static resolve(value) {
-		if (value instanceof Promise || value instanceof NativePromise) {
+		if (isPromise(value) || value instanceof this) {
 			return value;
 		}
 
-		return new Promise((resolve) => {
+		return new this((resolve) => {
 			resolve(value);
 		});
 	}
 
 	['catch'](onReject) {
-		return resolveOrReject(this, null, onReject);
+		return resolveOrReject(this.$, null, onReject);
 	}
 	then(onResolve, onReject) {
-		return resolveOrReject(this, onResolve, onReject);
+		return resolveOrReject(this.$, onResolve, onReject);
 	}
+}
+
+if (supportSymbol) {
+  Promise.prototype[Symbol.toStringTag] = 'Promise';
 }
 
 function resolveOrReject(promise, onResolve, onReject) {
 	if (promise.status === 'pending') {
 		return new Promise((resolve, reject) => {
-			promise.$$handle('reject', onReject, resolve, reject, secret);
-			promise.$$handle('resolve', onResolve, resolve, reject, secret);
+			promise.handle('reject', onReject, resolve, reject, secret);
+			promise.handle('resolve', onResolve, resolve, reject, secret);
 		});
 	}
 
@@ -191,5 +264,10 @@ function resolveOrReject(promise, onResolve, onReject) {
 }
 
 classes.Promise = Promise;
+
+export const all = Promise.all.bind(Promise);
+export const race = Promise.race.bind(Promise);
+export const reject = Promise.reject.bind(Promise);
+export const resolve = Promise.resolve.bind(Promise);
 
 export default Promise;

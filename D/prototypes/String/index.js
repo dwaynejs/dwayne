@@ -1,17 +1,17 @@
+import D from '../../';
 import classes from '../../classes';
 import constructors from '../../constructors';
-import { default as parent, transform } from '../Object';
+import Super from '../Super';
 import Alphabet from '../Alphabet';
 import Arr from '../Array';
-import { htmlElement } from '../HtmlElement';
+import HtmlElement from '../HtmlElement';
 import {
-	isArray, isFunction, isNumberAlike, isObject, isString,
+	isFunction, isNumberLike, isObject, isString,
 	validate
 } from '../../libs';
 import regexpSpecialCharacters from './regexp-special-characters';
 
 const NativeString = global.String;
-const Obj = parent;
 const htmlSpecials = {
 	'&': '&amp;',
 	'<': '&lt;',
@@ -20,7 +20,7 @@ const htmlSpecials = {
 const regexpSpecialsRegexp = new RegExp(new Arr(regexpSpecialCharacters).map((x) => '\\' + x).join('|'), 'g');
 const dateRegexp = /^\d\d\d\d-\d\d-\d\dt\d\d:\d\d:\d\d\.\d\d\dz$/i;
 
-export class String extends parent {
+export class String extends Super {
 	constructor(string = '') {
 		super((() => {
 			if (isString(string)) {
@@ -82,7 +82,7 @@ export class String extends parent {
 		if (!arguments.length) {
 			const found = document.querySelector(this.$);
 
-			return htmlElement(found);
+			return new HtmlElement(found);
 		}
 
 		return Object.getPrototypeOf(String.prototype).find.apply(this, arguments);
@@ -91,7 +91,7 @@ export class String extends parent {
 		if (!arguments.length) {
 			const found = document.querySelectorAll(this.$);
 
-			return htmlElement(found);
+			return new HtmlElement(found);
 		}
 
 		return Object.getPrototypeOf(String.prototype).find.apply(this, arguments);
@@ -108,19 +108,15 @@ export class String extends parent {
 	}
 	match() {
 		const match = this.$.match.apply(this.$, arguments);
-
-		if (isArray(match)) {
-			return new Arr(match);
-		}
-
-		return new Obj(match);
+    
+    return D(match);
 	}
 	parseHTML() {
 		const doc = document.createElement('div');
 
 		doc.innerHTML = this.$;
 
-		return htmlElement(doc).children();
+		return new HtmlElement(doc).children();
 	}
 	parseJSON(params, mapFn) {
 		if (isFunction(params)) {
@@ -132,20 +128,20 @@ export class String extends parent {
 		const parsed = JSON.parse(this.$, function (key, value) {
 			if (dates && dateRegexp.test(value)) {
 				value = new Date(value);
-			} else if (numbers && isNumberAlike(value)) {
+			} else if (numbers && isNumberLike(value)) {
 				value = Number(value);
 			}
 
 			return mapFn ? mapFn.apply(null, arguments) : value;
 		});
 
-		return isArray(parsed) ? new Arr(parsed) : new Obj(parsed);
+		return D(parsed);
 	}
 	parseInt(base = 10) {
 		return parseInt(this.$, base);
 	}
 	repeat(n) {
-		validate([n], [['intAlike', '>=0']]);
+		validate([n], [['intLike', '>=0']], 'String.prototype.repeat');
 
 		n = Number(n);
 
@@ -165,9 +161,9 @@ export class String extends parent {
 		return new S(this.$.replace(regexp, replacer));
 	}
 	replaceString(string, replacer = '') {
-		string = transform(string);
+		string = new Super(string).$;
 
-		validate([string], ['string']);
+		validate([string], ['string'], 'String.prototype.replaceString');
 
 		const S = String;
 

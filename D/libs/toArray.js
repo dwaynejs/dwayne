@@ -1,9 +1,9 @@
-import { isArrayAlike } from '../methods/check-type-methods';
+import { isArrayLike } from '../methods';
 
 export function toArray(array) {
 	const a = [];
 
-	if (isArrayAlike(array)) {
+	if (isArrayLike(array)) {
 		for (let i = 0, length = array.length; i < length; i++) {
 			a.push(array[i]);
 		}

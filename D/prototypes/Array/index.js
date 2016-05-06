@@ -1,14 +1,14 @@
 import classes from '../../classes';
 import constructors from '../../constructors';
-import { default as parent, transform } from '../Object';
+import Super from '../Super';
 import {
-	isArrayAlike, isNaN, isString,
+  isArrayLike, isNaN, isString,
 	toArray, validate
 } from '../../libs';
 
 const NativeArray = global.Array;
 
-export class Array extends parent {
+export class Array extends Super {
 	constructor(array = []) {
 		super(array);
 	}
@@ -19,9 +19,9 @@ export class Array extends parent {
 
 		for (let i = 0; i < length; i++) {
 			const value = arguments[i];
-			const transformed = transform(value);
+			const transformed = new Super(value).$;
 
-			if (isArrayAlike(transformed) && !isString(transformed)) {
+			if (isArrayLike(transformed) && !isString(transformed)) {
 				for (let k = 0, len = transformed.length; k < len; k++) {
 					array.push(transformed[k]);
 				}
@@ -34,6 +34,16 @@ export class Array extends parent {
 
 		return new Array(array);
 	}
+  indexOf(value) {
+    const key = this.keyOf(value);
+    
+    return key === null ? -1 : key;
+  }
+  indexOfStrict(value) {
+    const key = this.keyOfStrict(value);
+  
+    return key === null ? -1 : key;
+  }
 	join() {
 		return NativeArray.prototype.join.apply(this.$, arguments);
 	}
@@ -91,7 +101,7 @@ export class Array extends parent {
 		return new Array(NativeArray.prototype.slice.apply(this.$, arguments));
 	}
 	sort(f) {
-		validate([f], ['function']);
+		validate([f], ['function'], 'Array.prototype.contains');
 		
 		return new Array(toArray(this.$).sort(f));
 	}
@@ -143,7 +153,7 @@ function asc(x, y) {
 
 classes.Array = Array;
 constructors.unshift({
-	check: (value) => isArrayAlike(value) && !isString(value),
+	check: (value) => isArrayLike(value) && !isString(value),
 	cls: Array
 });
 

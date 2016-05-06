@@ -1,5 +1,5 @@
-import cls from './';
+import Date from './';
 
 export * from './';
 
-export default cls;
+export default Date;

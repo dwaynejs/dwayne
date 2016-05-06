@@ -101,6 +101,7 @@ describe('it should test D.Promise.prototype.[methods]', () => {
           done();
         });
     });
+    // TODO: add tests for Symbol.iterator
   });
   describe('static race()', () => {
     it('should return resolved promise with first resolved value', (done) => {
@@ -137,6 +138,7 @@ describe('it should test D.Promise.prototype.[methods]', () => {
           done();
         });
     });
+    // TODO: add tests for Symbol.iterator
   });
   describe('static resolve()', () => {
     it('should return resolved promise with resolved value', (done) => {

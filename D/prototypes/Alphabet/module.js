@@ -1,5 +1,5 @@
-import cls from './';
+import Alphabet from './';
 
 export * from './';
 
-export default cls;
+export default Alphabet;

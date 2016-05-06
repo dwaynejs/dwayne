@@ -1,5 +1,5 @@
-import cls from './';
+import Fetch from './';
 
 export * from './';
 
-export default cls;
+export default Fetch;

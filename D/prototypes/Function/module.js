@@ -1,5 +1,5 @@
-import cls from './';
+import Function from './';
 
 export * from './';
 
-export default cls;
+export default Function;

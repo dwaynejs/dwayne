@@ -14,6 +14,7 @@ describe('it should test D.Function.prototype.[methods]', () => {
   // TODO: .lock()
   // TODO: .lockArgs()
   // TODO: .lockContext()
+  // TODO: .promise()
   // TODO: .sync()
   // TODO: .timing()
   // TODO: .unbind()

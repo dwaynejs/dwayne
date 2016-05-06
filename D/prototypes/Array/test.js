@@ -1,23 +1,25 @@
 import Class from './module';
-import '../String';
-import { isNaN } from '../../libs';
 const assert = require('assert');
 
 describe('it should test D.Array.prototype.[methods]', () => {
   describe('concat()', () => {
     it('should return a wrap of a different array', () => {
-      const o = [1, 2, 3, 4, 5],
-        wrap = new Class(o);
+      const o = [1, 2, 3, 4, 5];
+      const wrap = new Class(o);
+      
       assert.notEqual(wrap.concat().$, o);
     });
     it('should work the same as Array.prototype.concat', () => {
-      const o = [1, 2, 3],
-        wrap = new Class(o);
+      const o = [1, 2, 3];
+      const wrap = new Class(o);
+      
       assert.deepEqual(wrap.concat(4).$, o.concat(4));
       assert.deepEqual(wrap.concat(4, [5]).$, o.concat(4, [5]));
       assert.deepEqual(wrap.concat(4, [5], [[6]]).$, o.concat(4, [5], [[6]]));
     });
   });
+  // TODO: .indexOf()
+  // TODO: .indexOfStrict()
   describe('join()', () => {
     it('should return a wrap of joined string', () => {
       const a = [1, 2, 3, 4, 5];
@@ -31,38 +33,47 @@ describe('it should test D.Array.prototype.[methods]', () => {
   // TODO: get length
   describe('pop()', () => {
     it('should delete last element', () => {
-      const o = [1, 2, 3],
-        wrap = new Class(o);
+      const o = [1, 2, 3];
+      const wrap = new Class(o);
+      
       wrap.pop();
+      
       assert.deepEqual(o, [1, 2]);
     });
   });
   describe('push()', () => {
     it('should add elements from arguments to the end of context', () => {
-      const o = [1, 2, 3],
-        wrap = new Class(o);
+      const o = [1, 2, 3];
+      const wrap = new Class(o);
+      
       wrap.push(4, [5], [[6]]);
+      
       assert.deepEqual(o, [1, 2, 3, 4, [5], [[6]]]);
     });
   });
   describe('reverse()', () => {
     it('should not modify original array', () => {
-      const o = [1, 2, 3],
-        wrap = new Class(o);
+      const o = [1, 2, 3];
+      const wrap = new Class(o);
+      
       wrap.reverse();
+      
       assert.deepEqual(o, [1, 2, 3]);
     });
     it('should return wrap of reversed array', () => {
-      const o = [1, 2, 3],
-        wrap = new Class(o);
+      const o = [1, 2, 3];
+      const wrap = new Class(o);
+      
       assert.deepEqual(wrap.reverse().$, [3, 2, 1]);
     });
   });
   describe('shift()', () => {
     it('should delete first element', () => {
-      const o = [1, 2, 3],
-        wrap = new Class(o);
+      const o = [1, 2, 3];
+      const wrap = new Class(o);
+      
       wrap.shift();
+      
       assert.deepEqual(o, [2, 3]);
     });
   });
@@ -72,35 +83,39 @@ describe('it should test D.Array.prototype.[methods]', () => {
       const wrap = new Class(o);
 
       wrap.shuffle();
+      
       assert.deepEqual(o, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
     });
     it('should return wrap of shuffled array', () => {
-      const o = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-        wrap = new Class(o),
-        shuffled = wrap.shuffle().$;
+      const o = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+      const wrap = new Class(o);
+      const shuffled = wrap.shuffle();
       assert.notDeepEqual(shuffled, o);
 
-      assert(shuffled.indexOf(0) !== -1);
-      assert(shuffled.indexOf(1) !== -1);
-      assert(shuffled.indexOf(2) !== -1);
-      assert(shuffled.indexOf(3) !== -1);
-      assert(shuffled.indexOf(4) !== -1);
-      assert(shuffled.indexOf(5) !== -1);
-      assert(shuffled.indexOf(6) !== -1);
-      assert(shuffled.indexOf(7) !== -1);
-      assert(shuffled.indexOf(8) !== -1);
-      assert(shuffled.indexOf(9) !== -1);
+      assert.strictEqual(shuffled.count, 10);
+      assert.notEqual(shuffled.keyOfStrict(0), null);
+      assert.notEqual(shuffled.keyOfStrict(1), null);
+      assert.notEqual(shuffled.keyOfStrict(2), null);
+      assert.notEqual(shuffled.keyOfStrict(3), null);
+      assert.notEqual(shuffled.keyOfStrict(4), null);
+      assert.notEqual(shuffled.keyOfStrict(5), null);
+      assert.notEqual(shuffled.keyOfStrict(6), null);
+      assert.notEqual(shuffled.keyOfStrict(7), null);
+      assert.notEqual(shuffled.keyOfStrict(8), null);
+      assert.notEqual(shuffled.keyOfStrict(9), null);
     });
   });
   describe('slice()', () => {
     it('should return a wrap of a different array', () => {
-      const o = [1, 2, 3, 4, 5],
-        wrap = new Class(o);
+      const o = [1, 2, 3, 4, 5];
+      const wrap = new Class(o);
+      
       assert.notEqual(wrap.slice().$, o);
     });
     it('should work the same as Array.prototype.slice', () => {
-      const o = [1, 2, 3, 4, 5],
-        wrap = new Class(o);
+      const o = [1, 2, 3, 4, 5];
+      const wrap = new Class(o);
+      
       assert.deepEqual(wrap.slice().$, o.slice());
       assert.deepEqual(wrap.slice(3).$, o.slice(3));
       assert.deepEqual(wrap.slice(2, -1).$, o.slice(2, -1));
@@ -109,8 +124,9 @@ describe('it should test D.Array.prototype.[methods]', () => {
   });
   describe('sort()', () => {
     it('should use argument function for sorting values', () => {
-      const o = [8, 13, 12, 0, 5, 9, -1, 6, 7, -2],
-        wrap = new Class(o);
+      const o = [8, 13, 12, 0, 5, 9, -1, 6, 7, -2];
+      const wrap = new Class(o);
+      
       assert.deepEqual(wrap.sort((x, y) => {
         if (y % 2 && !(x % 2)) {
           return 1;
@@ -153,8 +169,11 @@ describe('it should test D.Array.prototype.[methods]', () => {
   * */
   describe('splice()', () => {
     it('should work the same as Array.prototype.splice', () => {
-      let o = [1, 2, 3, 4, 5],
-        wrap = new Class(o);
+      let o;
+      let wrap;
+      
+      o = [1, 2, 3, 4, 5];
+      wrap = new Class(o);
       assert.deepEqual(wrap.splice().$, [1, 2, 3, 4, 5]);
 
       o = [1, 2, 3, 4, 5];
@@ -176,16 +195,19 @@ describe('it should test D.Array.prototype.[methods]', () => {
   });
   describe('string()', () => {
     it('should return concatenated into string array', () => {
-      const o = [1, 2, 3],
-        wrap = new Class(o);
+      const o = [1, 2, 3];
+      const wrap = new Class(o);
+      
       assert.strictEqual(wrap.string(), '123');
     });
   });
   describe('unshift()', () => {
     it('should add elements from arguments to the start of context', () => {
-      const o = [1, 2, 3],
-        wrap = new Class(o);
+      const o = [1, 2, 3];
+      const wrap = new Class(o);
+      
       wrap.unshift([[-2]], [-1], 0);
+      
       assert.deepEqual(o, [[[-2]], [-1], 0, 1, 2, 3]);
     });
   });

@@ -1,14 +1,16 @@
 import classes from '../../classes';
 import constructors from '../../constructors';
-import { default as parent, transform } from '../Object';
+import Super from '../Super';
 import Promise from '../Promise';
 import { isFunction, assign, validate, toArray } from '../../libs';
 
-export class Function extends parent {
-	constructor(func = () => {}) {
-		super();
+const nativeFunction = global.Function;
 
-		validate([func], ['function']);
+export class Function extends Super {
+	constructor(func = () => {}) {
+    super();
+
+		validate([func], ['function'], 'new Function');
 
 		function proxy() {
 			if (proxy.$.called < proxy.$.canBeCalled) {
@@ -56,7 +58,6 @@ export class Function extends parent {
 			}
 		}
 
-		Object.defineProperty(this, '$', { value: {} });
 		Object.defineProperty(proxy, '$', { value: {} });
 		Object.setPrototypeOf(proxy, Function.prototype);
 
@@ -77,9 +78,7 @@ export class Function extends parent {
 	}
 
 	after(f, where = 1) {
-		f = transform(f);
-
-		validate([f], ['function']);
+		validate([f], ['function'], 'Function.prototype.after');
 
 		const func = this.$;
 
@@ -92,7 +91,7 @@ export class Function extends parent {
 		return this;
 	}
 	apply(context, args) {
-		return this.$.apply(context, args);
+		return nativeFunction.apply.call(this, context, args);
 	}
 	async(cond = true) {
 		this.$.sync = !cond;
@@ -100,9 +99,7 @@ export class Function extends parent {
 		return this;
 	}
 	before(f, where = -1) {
-		f = transform(f);
-
-		validate([f], ['function']);
+		validate([f], ['function'], 'Function.prototype.before');
 
 		const func = this.$;
 
@@ -137,7 +134,7 @@ export class Function extends parent {
 		return this;
 	}
 	call(context) {
-		return this.$.apply(context, Array.prototype.slice.call(arguments, 1));
+    return nativeFunction.apply.call(this, context, Array.prototype.slice.call(arguments, 1));
 	}
 	canBeCalled(n) {
 		this.$.canBeCalled = n;
@@ -184,6 +181,9 @@ export class Function extends parent {
 
 		return this;
 	}
+  promise() {
+    return new Promise(this);
+  }
 	timing(mark) {
 		mark = !arguments.length ? this.$.originalName : String(mark);
 

@@ -1,9 +1,9 @@
 import classes from '../../classes';
-import { default as parent, transform } from '../Object';
+import Super from '../Super';
 import Arr from '../Array';
 import Promise from '../Promise';
 import Str from '../String';
-import { isArray, isFunction, isString, assign } from '../../libs';
+import { isArray, isFunction, isString, assign, supportSymbol, validate } from '../../libs';
 import constructUrl from './construct-url';
 import parseHeaders from './parse-headers';
 import transformData from './transform-data';
@@ -31,7 +31,7 @@ const defaults = {
 };
 const uploadMethods = new Arr(['post', 'put']);
 
-export class Fetch extends parent {
+export class Fetch extends Super {
 	constructor(config = {}) {
 		super();
 
@@ -62,13 +62,17 @@ export class Fetch extends parent {
 		return fetch;
 	}
 
-	after(onResolve, onReject) {
-		this.$.after.push({ onResolve, onReject });
+	after(middleware) {
+    validate([middleware], ['function'], 'Fetch.prototype.after');
+
+		this.$.after.push(middleware);
 
 		return this;
 	}
-	before(onResolve, onReject) {
-		this.$.before.push({ onResolve, onReject });
+	before(middleware) {
+    validate([middleware], ['function'], 'Fetch.prototype.before');
+
+    this.$.before.push(middleware);
 
 		return this;
 	}
@@ -79,11 +83,10 @@ export class Fetch extends parent {
 			return config;
 		}
 
-		f = transform(f);
-
 		if (isFunction(f)) {
 			f(config);
 		} else {
+      f = new Super(f).$;
 			assign(config, f);
 		}
 
@@ -201,18 +204,14 @@ export class Fetch extends parent {
     const METHOD = conf.method.toUpperCase();
     
     conf.constructedUrl = constructUrl(baseURL, URL, params, query);
-    conf.constructedData = transformData(transform(data), METHOD, headers);
+    conf.constructedData = transformData(new Super(data).$, METHOD, headers);
 
 		let promise = Promise.resolve(conf);
 
 		for (let i = 0, length = before.length; i < length; i++) {
 			const { onResolve, onReject } = before[i];
 			
-			promise = promise.then((value) => {
-				if (!isFunction(onResolve)) {
-					return value;
-				}
-
+			promise = promise.then(() => {
 				return new Promise((resolve, reject) => {
 					onResolve(conf, function (err) {
 						if (arguments.length) {
@@ -223,12 +222,10 @@ export class Fetch extends parent {
 					});
 				});
 			}, (err) => {
-				if (!isFunction(onReject)) {
-					return Promise.reject(err);
-				}
-
 				return new Promise((resolve, reject) => {
-					onReject(conf, function (err) {
+          err.config = conf;
+
+					onReject(err, function (err) {
 						if (arguments.length) {
 							return reject(err);
 						}
@@ -314,11 +311,7 @@ export class Fetch extends parent {
 					for (let i = 0, length = after.length; i < length; i++) {
 						const { onResolve, onReject } = after[i];
 						
-						promise = promise.then((value) => {
-							if (!isFunction(onResolve)) {
-								return value;
-							}
-
+						promise = promise.then(() => {
 							return new Promise((resolve, reject) => {
 								onResolve(response, function (err) {
 									if (arguments.length) {
@@ -329,12 +322,10 @@ export class Fetch extends parent {
 								});
 							});
 						}, (err) => {
-							if (!isFunction(onReject)) {
-								return Promise.reject(err);
-							}
-
 							return new Promise((resolve, reject) => {
-								onReject(response, function (err) {
+                err.response = response;
+
+								onReject(err, function (err) {
 									if (arguments.length) {
 										return reject(err);
 									}
@@ -345,7 +336,14 @@ export class Fetch extends parent {
 						});
 					}
 
-					resolve(promise);
+					resolve(promise
+            .then(() => response)
+            .catch((err) => {
+              err.response = response;
+
+              throw err;
+            })
+          );
 				};
 
 				xhr.send(conf.constructedData);
@@ -354,6 +352,10 @@ export class Fetch extends parent {
 
 		return promise;
 	}
+}
+
+if (supportSymbol) {
+  Fetch.prototype[Symbol.toStringTag] = 'Fetch';
 }
 
 classes.Fetch = Fetch;

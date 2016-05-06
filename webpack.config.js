@@ -2,7 +2,7 @@ const port = 7777;
 
 module.exports = {
 	entry: {
-		app: './index.js'
+		app: './browser.js'
 	},
 	output: {
 		path: __dirname,

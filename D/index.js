@@ -1,6 +1,4 @@
-import { assign } from './libs';
 import constructors from './constructors';
-import * as methods from './methods';
 
 function D(object) {
 	for (let i = 0, length = constructors.length; i < length; i++) {
@@ -12,7 +10,6 @@ function D(object) {
 	}
 }
 
-export default assign(
-	D,
-	methods
-);
+global.D = D;
+
+export default D;

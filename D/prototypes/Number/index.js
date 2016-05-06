@@ -1,6 +1,6 @@
 import classes from '../../classes';
 import constructors from '../../constructors';
-import { default as parent, transform } from '../Object';
+import Super from '../Super';
 import Arr from '../Array';
 import Promise from '../Promise';
 import { isNumber, defineProperties, validate } from '../../libs';
@@ -11,7 +11,7 @@ const toDegree = 180 / Math.PI;
 const ln2 = Math.LN2;
 const ln10 = Math.LN10;
 
-export class Number extends parent {
+export class Number extends Super {
 	constructor(number = 0) {
 		super((() => {
 			if (isNumber(number)) {
@@ -59,9 +59,7 @@ export class Number extends parent {
 		return Math.floor(this.$);
 	}
 	interval(f) {
-		f = transform(f);
-
-		validate([f], ['function']);
+		validate([f], ['function'], 'Number.prototype.interval');
 
 		f = f.bind({ clear });
 
@@ -79,13 +77,13 @@ export class Number extends parent {
 			}
 		})();
 
+    return clear;
+
 		function clear() {
 			cleared = true;
 
 			return clearTimeout(timeout);
 		}
-
-		return clear;
 	}
 	get ln() {
 		return Math.log(this.$);

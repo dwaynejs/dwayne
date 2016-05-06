@@ -1,5 +1,5 @@
-import cls from './';
+import HtmlElement from './';
 
 export * from './';
 
-export default cls;
+export default HtmlElement;

@@ -2,25 +2,26 @@ import Classes from '../../classes';
 import constructors from '../../constructors';
 import css from './css';
 import elements from './elements';
-import { default as parent, transform } from '../Object';
+import Super from '../Super';
 import Arr from '../Array';
 import Num from '../Number';
 import HtmlCollection from '../HtmlCollection';
 import {
-	isArrayAlike, isFunction, isNumber, isString,
+	isFunction, isNumber, isString,
 	assign, dynamicDefineProperties, defineProperties,
-	validate, toString, toCamelCase
+	validate, toStringTag, toCamelCase
 } from '../../libs';
 import applyRegexps from './applied';
+import methods from './methods';
 
-const Obj = parent;
+const nativeDocument = global.document;
 
-export class HtmlElement extends parent {
-	constructor(elem) {
+export class HtmlElement extends Super {
+	constructor(elem = null) {
 		super(elem);
 
-		if (this.$) {
-			this.$.domcData = {};
+		if (elem && !elem.domcData) {
+      elem.domcData = {};
 		}
 	}
 
@@ -42,7 +43,7 @@ export class HtmlElement extends parent {
 		return this;
 	}
 	addText(text) {
-		new HtmlElement(document.createTextNode(text)).into(this);
+		new HtmlElement(nativeDocument.createTextNode(text)).into(this);
 
 		return this;
 	}
@@ -102,9 +103,9 @@ export class HtmlElement extends parent {
 		const elem = this.$;
 
 		if (!arguments.length) {
-			const attrs = elem.attributes,
-				length = attrs.length,
-				o = {};
+			const attrs = elem.attributes;
+      const length = attrs.length;
+      const o = {};
 
 			for (let i = 0; i < length; i++) {
 				attr = attrs[i];
@@ -112,7 +113,7 @@ export class HtmlElement extends parent {
 				o[attr.name] = attr.value;
 			}
 
-			return new Obj(o);
+			return new Super(o);
 		}
 
 		if (arguments.length <= 1 && isString(attr)) {
@@ -123,7 +124,7 @@ export class HtmlElement extends parent {
 			attr = { [attr]: value };
 		}
 
-		attr = transform(attr);
+		attr = new Super(attr).$;
 
 		for (const key in attr) {
 			if (attr.hasOwnProperty(key)) {
@@ -197,9 +198,9 @@ export class HtmlElement extends parent {
 	}
 	create(type, strings) {
 		const elem = this.$;
-		const element = htmlElement(document.createElement(type));
+		const element = htmlElement(nativeDocument.createElement(type));
 
-		if (elem !== document) {
+		if (elem !== nativeDocument) {
 			element.into(this);
 		}
 
@@ -223,7 +224,7 @@ export class HtmlElement extends parent {
 				o[toCamelCase(property[0])] = property[1];
 			}
 
-			return new Obj(o);
+			return new Super(o);
 		}
 
 		if (arguments.length <= 1 && isString(property)) {
@@ -234,14 +235,14 @@ export class HtmlElement extends parent {
 			property = { [property]: value };
 		}
 
-		property = transform(property);
+		property = new Super(property).$;
 
 		assign(elem.style, property);
 
 		return this;
 	}
 	dataset() {
-		return new Obj(this.$.dataset);
+		return new Super(this.$.dataset);
 	}
 	deepClone() {
 		const elem = this.$;
@@ -503,7 +504,7 @@ export class HtmlElement extends parent {
 	replace(element) {
 		const elem = this.$;
 
-		element = find(transform(element));
+		element = find(element);
 		elem.parentNode.replaceChild(elem, element);
 
 		return this;
@@ -521,11 +522,11 @@ export class HtmlElement extends parent {
 		return this.$.scrollWidth;
 	}
 	setOf(type, iterator, applied) {
-		iterator = transform(iterator);
+		iterator = new Super(iterator).$;
 
 		if (isNumber(iterator)) {
 			try {
-				validate([null, iterator], { 1: ['int', '>=0'] });
+				validate([null, iterator], { 1: ['intLike', '>=0'] }, 'HtmlElement.prototype.setOf');
 			} catch (e) {
 				throw new Error(`
 					2nd argument must be either or non-negative integer, or object!
@@ -541,20 +542,16 @@ export class HtmlElement extends parent {
 
 		const elem = this.$;
 		const func = isFunction(applied);
-
-		for (const key in iterator) {
-			if (iterator.hasOwnProperty(key)) {
-				const value = iterator[key];
-				const array = isArrayAlike(iterator);
-				const created = elem.create(type);
-
-				if (func) {
-					applied(created, value, array ? Number(key) : key, iterator);
-				} else {
-					created.apply(applied.replace(/%key%/g, key).replace(/%value%/g, value));
-				}
-			}
-		}
+    
+    new Super(iterator).forEach((value, key) => {
+      const created = elem.create(type);
+  
+      if (func) {
+        applied(created, value, key, iterator);
+      } else {
+        created.apply(applied.replace(/%key%/g, key).replace(/%value%/g, value));
+      }
+    });
 	}
 	show() {
 		const elem = this.$;
@@ -572,7 +569,7 @@ export class HtmlElement extends parent {
 
 		if (arguments.length) {
 			elem.innerHTML = '';
-			new HtmlElement(document.createTextNode(text)).into(this);
+			new HtmlElement(nativeDocument.createTextNode(text)).into(this);
 
 			return this;
 		}
@@ -616,7 +613,7 @@ export class HtmlElement extends parent {
 		return this;
 	}
 	up(n = 1) {
-		validate([n], [['intAlike', '>=0']]);
+		validate([n], [['intLike', '>=0']], 'HtmlElement.prototype.up');
 
 		n = Number(n);
 
@@ -648,6 +645,18 @@ export class HtmlElement extends parent {
 		return elem.value;
 	}
 }
+
+dynamicDefineProperties(HtmlCollection.prototype, methods, (prop) => {
+  return function () {
+    const collection = this.$;
+    
+    for (let i = 0, length = collection.length; i < length; i++) {
+      const item = htmlElement(collection[i]);
+      
+      item[prop].apply(item, arguments);
+    }
+  };
+});
 
 dynamicDefineProperties(HtmlElement.prototype, css, (prop) => {
 	return function (value) {
@@ -695,19 +704,18 @@ defineProperties(HtmlElement.prototype, {
 const classes = {};
 const attrs = {};
 
-export function htmlElement(elem) {
-  if (elem instanceof parent) {
+function htmlElement(elem) {
+  if (elem instanceof Super) {
     return elem;
   }
 
 	return new HtmlElement(elem);
 }
-
 function find(element) {
-	element = transform(element);
+	element = new Super(element).$;
 
 	if (isString(element)) {
-		element = document.querySelector(element);
+		element = nativeDocument.querySelector(element);
 	}
 
 	return element;
@@ -715,8 +723,11 @@ function find(element) {
 
 Classes.HtmlElement = HtmlElement;
 constructors.unshift({
-	check: (elem) => /^HTML\w*Element$/.test(toString(elem)),
+	check: (elem) => /^(HTML\w*Element|Text)$/.test(toStringTag(elem)),
 	cls: HtmlElement
 });
+
+export const window = new HtmlElement(global);
+export const document = new HtmlElement(nativeDocument);
 
 export default HtmlElement;
