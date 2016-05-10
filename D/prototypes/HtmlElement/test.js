@@ -12,6 +12,7 @@ describe('it should test HtmlElement::[methods]', () => {
       const wrap = new HtmlElement(elem);
 
       wrap.absolute();
+
       assert.strictEqual(elem.style.position, 'absolute');
     });
   });
@@ -21,6 +22,7 @@ describe('it should test HtmlElement::[methods]', () => {
       const wrap = new HtmlElement(elem);
 
       wrap.addClasses('foo', 'bar', 'baz');
+
       assert.strictEqual(elem.classList.contains('foo'), true);
       assert.strictEqual(elem.classList.contains('bar'), true);
       assert.strictEqual(elem.classList.contains('baz'), true);
