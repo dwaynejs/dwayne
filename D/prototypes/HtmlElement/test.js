@@ -1234,11 +1234,24 @@ describe('it should test HtmlElement::[methods]', () => {
     });
   });
   describe('[on-event]()', () => {
+    let handlers = {};
+
+    afterEach(() => {
+      new Super(handlers)
+        .forEach((handler, onevent) => {
+          window.$[onevent] = handler;
+        });
+
+      handlers = {};
+    });
+
     it('should return <context>[on-event] without arguments', () => {
       new Super(events)
         .keys()
         .forEach((onevent) => {
           const listener = () => {};
+
+          handlers[onevent] = window.$[onevent];
 
           window.$[onevent] = listener;
 
@@ -1250,6 +1263,8 @@ describe('it should test HtmlElement::[methods]', () => {
         .keys()
         .forEach((onevent) => {
           const listener = () => {};
+
+          handlers[onevent] = window.$[onevent];
 
           window[onevent](listener);
 
