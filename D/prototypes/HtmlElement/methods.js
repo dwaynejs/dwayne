@@ -1,5 +1,4 @@
 export default [
-	'delete',
 	'hide',
 	'into',
   'on',

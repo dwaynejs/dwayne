@@ -138,6 +138,9 @@ export class Function {
 
 		return this;
 	}
+  limitArgsTo(n) {
+    return this.before((args) => args.slice(0, n), false);
+  }
 	lock(context, args) {
 		this.lockContext(context);
 		this.lockArgs(args);

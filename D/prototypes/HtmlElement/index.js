@@ -520,7 +520,9 @@ export class HtmlElement extends Super {
 		return this;
 	}
 	remove() {
-		this.$.remove();
+    if (this.$) {
+      this.$.remove();
+    }
 
 		return this;
 	}
@@ -702,6 +704,20 @@ defineProperties(Str.prototype, {
   }
 });
 
+defineProperties(HtmlCollection.prototype, {
+  remove() {
+    const collection = this.$;
+  
+    for (let i = 0, length = collection.length; i < length; i++) {
+      const item = htmlElement(collection[0]);
+    
+      item.remove.apply(item, arguments);
+    }
+    
+    return this;
+  }
+});
+
 dynamicDefineProperties(
   HtmlCollection.prototype,
   new Arr(methods).concat(new Super(events).keys()).$,
@@ -714,6 +730,8 @@ dynamicDefineProperties(
       
       item[prop].apply(item, arguments);
     }
+    
+    return this;
   };
 });
 

@@ -202,6 +202,16 @@ describe('it should test Function::[methods]', () => {
       assert.strictEqual(wrap.$.canBeCalled, toCall);
     });
   });
+  describe('limitArgsTo()', () => {
+    it('should limit arguments to n before calling function', () => {
+      const func = concat;
+      const wrap = new Function(func);
+
+      wrap.limitArgsTo(3);
+
+      assert.strictEqual(wrap.call('concat: ', 1, 2, 3, 4, 5), 'concat: 123');
+    });
+  });
   describe('lock()', () => {
     it('should lock context and arguments', () => {
       const func = concat;

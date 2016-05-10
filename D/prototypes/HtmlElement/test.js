@@ -1,4 +1,5 @@
 import HtmlElement, { window } from './module';
+import HtmlCollection from '../HtmlCollection';
 import Super from '../Super';
 import css from './css';
 import elements from './elements';
@@ -1671,11 +1672,46 @@ describe('it should test exported methods from HtmlElement', () => {
 });
 
 describe('it should test HtmlCollection::[methods]', () => {
-  // TODO: .delete()
+  let div1;
+  let div2;
+  let div3;
+  let wrap;
+
+  beforeEach(() => {
+    div1 = document.createElement('div');
+    div2 = document.createElement('div');
+    div3 = document.createElement('div');
+
+    div1.className = 'foo';
+    div2.className = 'foo';
+    div3.className = 'foo';
+
+    document.body.appendChild(div1);
+    document.body.appendChild(div2);
+    document.body.appendChild(div3);
+
+    wrap = new HtmlCollection(document.getElementsByClassName('foo'));
+  });
+
+  afterEach(() => {
+    div1.remove();
+    div2.remove();
+    div3.remove();
+  });
+
   // TODO: .hide()
   // TODO: .into()
   // TODO: .on()
   // TODO: .[on-event]()
+
+  describe('remove()', () => {
+    it('should remove elements of collection from the page', () => {
+      //wrap.remove();
+
+      assert.strictEqual(document.getElementsByClassName('foo').length, 3);
+    });
+  });
+
   // TODO: .show()
 });
 
