@@ -1,3 +1,3 @@
-import './D/prototypes/Blob/test';
+import './D/prototypes/HtmlElement/test';
 //import './all-tests';
 import './browser';

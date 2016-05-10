@@ -23,11 +23,17 @@ export function isDateLike(date) {
   
   return !isNaN(date.getTime());
 }
-export const isFinite = Number.isFinite || function isFinite(number) {
-    return isNumber(number) && !isNaN(number) && number !== Infinity && number !== -Infinity;
-  };
+export const isFinite = function isFinite(number) {
+  if (!isNumber(number)) {
+    return false;
+  }
+
+  number = Number(number);
+
+  return !isNaN(number) && number !== Infinity && number !== -Infinity;
+};
 export function isFunction(func) {
-  return toStringTag(func) === 'Function';
+  return toStringTag(func) === 'Function' || typeof func === 'function';
 }
 export const isInteger = Number.isInteger || function isInteger(integer) {
     return isNumber(integer) && integer % 1 === 0;
@@ -59,9 +65,6 @@ export function isNumberLike(number) {
 }
 export function isObject(object) {
   return !!object && (toStringTag(object) === 'Object' || typeof object === 'object' || object instanceof Object);
-}
-export function isPromise(promise) {
-  return toStringTag(promise) === 'Promise';
 }
 export function isRegExp(regexp) {
   return toStringTag(regexp) === 'RegExp';

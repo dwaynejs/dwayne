@@ -1,11 +1,12 @@
-import Class from './module';
-const assert = require('assert');
+import Fetch from './module';
+import * as assert from 'assert';
+
 const random = Math.random;
 
-describe('it should test D.Fetch.prototype.[methods]', () => {
+describe('it should test Fetch::[methods]', () => {
   describe('after()', () => {
     it('should insert "after" middleware', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const middleware1 = () => {};
       const middleware2 = () => {};
 
@@ -20,7 +21,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
   });
   describe('before()', () => {
     it('should insert "before" middleware', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const middleware1 = () => {};
       const middleware2 = () => {};
 
@@ -35,7 +36,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
   });
   describe('config()', () => {
     it('should support object argument', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const rand = random();
 
       fetch.config({ timeout: rand });
@@ -43,7 +44,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       assert.strictEqual(fetch.$.timeout, rand);
     });
     it('should support function argument', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const rand = random();
 
       fetch.config((config) => {
@@ -57,7 +58,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
   });
   describe('delete()', () => {
     it('should support call without arguments', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
 
       fetch.request = (url, config) => {
         assert.strictEqual(url, undefined);
@@ -67,7 +68,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.delete();
     });
     it('should support call with only url', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const URL = '/foo';
 
       fetch.request = (url, config) => {
@@ -78,7 +79,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.delete(URL);
     });
     it('should support call with only config', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const rand = random();
 
       fetch.request = (url, config) => {
@@ -89,7 +90,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.delete({ timeout: rand });
     });
     it('should support call with both url and config', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const URL = '/foo';
       const rand = random();
 
@@ -103,7 +104,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
   });
   describe('get()', () => {
     it('should support call without arguments', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
 
       fetch.request = (url, config) => {
         assert.strictEqual(url, undefined);
@@ -113,7 +114,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.get();
     });
     it('should support call with only url', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const URL = '/foo';
 
       fetch.request = (url, config) => {
@@ -124,7 +125,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.get(URL);
     });
     it('should support call with only config', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const rand = random();
 
       fetch.request = (url, config) => {
@@ -135,7 +136,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.get({ timeout: rand });
     });
     it('should support call with both url and config', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const URL = '/foo';
       const rand = random();
 
@@ -149,7 +150,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
   });
   describe('head()', () => {
     it('should support call without arguments', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
 
       fetch.request = (url, config) => {
         assert.strictEqual(url, undefined);
@@ -159,7 +160,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.head();
     });
     it('should support call with only url', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const URL = '/foo';
 
       fetch.request = (url, config) => {
@@ -170,7 +171,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.head(URL);
     });
     it('should support call with only config', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const rand = random();
 
       fetch.request = (url, config) => {
@@ -181,7 +182,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.head({ timeout: rand });
     });
     it('should support call with both url and config', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const URL = '/foo';
       const rand = random();
 
@@ -195,35 +196,35 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
   });
   describe('headers()', () => {
     it('should support (header, value: String) syntax', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
 
       fetch.headers('foo', 'bar');
 
       assert.deepEqual(fetch.$.headers, { foo: ['bar'] });
     });
     it('should support (header, value: Array) syntax', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
 
       fetch.headers('foo', ['bar', 'baz']);
 
       assert.deepEqual(fetch.$.headers, { foo: ['bar', 'baz'] });
     });
     it('should support { header: value: String, ... } syntax', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
 
       fetch.headers({ foo: 'bar' });
 
       assert.deepEqual(fetch.$.headers, { foo: ['bar'] });
     });
     it('should support { header: value: Array, ... } syntax', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
 
       fetch.headers({ foo: ['bar', 'baz'] });
 
       assert.deepEqual(fetch.$.headers, { foo: ['bar', 'baz'] });
     });
     it('should add header to array if it was one', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
 
       fetch.headers('foo', 'bar1');
       fetch.headers('foo', 'baz1');
@@ -245,7 +246,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
   });
   describe('instance()', () => {
     it('should create new instance without config without arguments', () => {
-      const fetch = new Class({ headers: { foo: 'bar' } });
+      const fetch = new Fetch({ headers: { foo: 'bar' } });
       const instance = fetch.instance();
       const old = fetch.config();
 
@@ -259,7 +260,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       });
     });
     it('should not modify context\'s config', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       fetch.instance({
         auth: { username: 'foo', password: 'bar' },
         baseURL: '//foo',
@@ -279,7 +280,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       });
     });
     it('should create new instance with config argument', () => {
-      const fetch = new Class({
+      const fetch = new Fetch({
         auth: { username: 'foo', password: 'bar' },
         baseURL: '//foo',
         headers: { foo: 'bar', bar: 'foo' },
@@ -306,7 +307,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
   });
   describe('patch()', () => {
     it('should support call without arguments', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
 
       fetch.request = (url, config) => {
         assert.strictEqual(url, undefined);
@@ -316,7 +317,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.patch();
     });
     it('should support call with only url', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const URL = '/foo';
 
       fetch.request = (url, config) => {
@@ -327,7 +328,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.patch(URL);
     });
     it('should support call with only data', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const data = { foo: 'bar' };
 
       fetch.request = (url, config) => {
@@ -338,7 +339,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.patch(data);
     });
     it('should support call with url and data', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const URL = '/foo';
       const data = { foo: 'bar' };
 
@@ -350,7 +351,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.patch(URL, data);
     });
     it('should support call with data and config', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const data = { foo: 'bar' };
       const rand = random();
 
@@ -362,7 +363,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.patch(data, { timeout: rand });
     });
     it('should support call with url, data and config', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const URL = '/foo';
       const data = { foo: 'bar' };
       const rand = random();
@@ -377,7 +378,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
   });
   describe('post()', () => {
     it('should support call without arguments', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
 
       fetch.request = (url, config) => {
         assert.strictEqual(url, undefined);
@@ -387,7 +388,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.post();
     });
     it('should support call with only url', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const URL = '/foo';
 
       fetch.request = (url, config) => {
@@ -398,7 +399,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.post(URL);
     });
     it('should support call with only data', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const data = { foo: 'bar' };
 
       fetch.request = (url, config) => {
@@ -409,7 +410,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.post(data);
     });
     it('should support call with url and data', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const URL = '/foo';
       const data = { foo: 'bar' };
 
@@ -421,7 +422,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.post(URL, data);
     });
     it('should support call with data and config', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const data = { foo: 'bar' };
       const rand = random();
 
@@ -433,7 +434,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.post(data, { timeout: rand });
     });
     it('should support call with url, data and config', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const URL = '/foo';
       const data = { foo: 'bar' };
       const rand = random();
@@ -448,7 +449,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
   });
   describe('put()', () => {
     it('should support call without arguments', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
 
       fetch.request = (url, config) => {
         assert.strictEqual(url, undefined);
@@ -458,7 +459,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.put();
     });
     it('should support call with only url', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const URL = '/foo';
 
       fetch.request = (url, config) => {
@@ -469,7 +470,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.put(URL);
     });
     it('should support call with only data', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const data = { foo: 'bar' };
 
       fetch.request = (url, config) => {
@@ -480,7 +481,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.put(data);
     });
     it('should support call with url and data', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const URL = '/foo';
       const data = { foo: 'bar' };
 
@@ -492,7 +493,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.put(URL, data);
     });
     it('should support call with data and config', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const data = { foo: 'bar' };
       const rand = random();
 
@@ -504,7 +505,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
       fetch.put(data, { timeout: rand });
     });
     it('should support call with url, data and config', () => {
-      const fetch = new Class();
+      const fetch = new Fetch();
       const URL = '/foo';
       const data = { foo: 'bar' };
       const rand = random();
@@ -519,7 +520,7 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
   });
   describe('request()', () => {
     it('should construct url the right way', (done) => {
-      const fetch = new Class({
+      const fetch = new Fetch({
         baseURL: '//foo/',
         url: '/bar/:baz/:baz/:foo/:bar?foo=bar'
       });
@@ -542,5 +543,9 @@ describe('it should test D.Fetch.prototype.[methods]', () => {
         query: { bar: ['foo', 'baz'], baz: 'foo' }
       }).catch(() => done());
     });
+    // TODO: test data transformation
+    // TODO: test headers transformation
+    // TODO: test middlewares
+    // TODO: test request itself
   });
 });

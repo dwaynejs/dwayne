@@ -1,18 +1,18 @@
-import Classes from '../../classes';
 import constructors from '../../constructors';
 import css from './css';
 import elements from './elements';
+import events from './events';
+import applyRegexps from './applied';
+import methods from './methods';
 import Super from '../Super';
-import Arr from '../Array';
-import Num from '../Number';
+import Arr, { array } from '../Array';
+import Str from '../String';
 import HtmlCollection from '../HtmlCollection';
 import {
 	isFunction, isNumber, isString,
 	assign, dynamicDefineProperties, defineProperties,
 	validate, toStringTag, toCamelCase
 } from '../../libs';
-import applyRegexps from './applied';
-import methods from './methods';
 
 const nativeDocument = global.document;
 
@@ -22,6 +22,7 @@ export class HtmlElement extends Super {
 
 		if (elem && !elem.domcData) {
       elem.domcData = {};
+      Object.defineProperty(elem, 'domcData', { value: {} });
 		}
 	}
 
@@ -53,8 +54,8 @@ export class HtmlElement extends Super {
 				continue;
 			}
 
-			const split = String(arguments[i]).split(/(\s+)/),
-				len = split.length;
+			const split = String(arguments[i]).split(/(\s+)/);
+      const len = split.length;
 
 			let applied;
 
@@ -154,7 +155,7 @@ export class HtmlElement extends Super {
 		return this;
 	}
 	child(element) {
-		return new HtmlElement(find(element)).into(this);
+		return new HtmlElement(toFind(element)).into(this);
 	}
 	children() {
 		return new HtmlCollection(this.$.childNodes);
@@ -192,7 +193,7 @@ export class HtmlElement extends Super {
 		return new this.constructor(elem.cloneNode(false));
 	}
 	contains(element) {
-		element = find(element);
+		element = toFind(element);
 
 		return this.$.contains(element);
 	}
@@ -266,6 +267,21 @@ export class HtmlElement extends Super {
 
 		return this.removeAttr('disabled');
 	}
+  dispatch(event, details = {}) {
+    if (!/Event$/.test(toStringTag(event))) {
+      try {
+        event = new Event(event);
+      } catch (err) {
+        event = nativeDocument.createEvent('Event');
+      } finally {
+        assign(event, details);
+      }
+    }
+
+    this.$.dispatchEvent(event);
+
+    return this;
+  }
 	draggable(cond = true) {
 		this.$.draggable = Boolean(cond);
 
@@ -342,7 +358,7 @@ export class HtmlElement extends Super {
 		return this;
 	}
 	into(element) {
-		find(element).appendChild(this.$);
+    toFind(element).appendChild(this.$);
 
 		return this;
 	}
@@ -409,8 +425,39 @@ export class HtmlElement extends Super {
 	get offsetWidth() {
 		return this.$.offsetWidth;
 	}
+  on(event, listener) {
+    const elem = this.$;
+
+    if (arguments.length >= 2) {
+      event = { [event]: listener };
+    }
+
+    event = new Super(event).$;
+
+    const listeners = {};
+
+    for (const key in event) {
+      if (event.hasOwnProperty(key)) {
+        listener = event[key];
+
+        listeners[key] = listener;
+        elem.addEventListener(key, listener, false);
+      }
+    }
+
+    return function removeEventListeners() {
+      for (const key in listeners) {
+        if (listeners.hasOwnProperty(key)) {
+          elem.removeEventListener(key, listeners[key], false);
+        }
+      }
+    };
+  }
 	get outerHtml() {
 		return this.$.outerHTML;
+	}
+	get outerText() {
+		return this.$.outerText;
 	}
 	overline() {
 		this.$.style.textDecorationLine = 'overline';
@@ -504,7 +551,7 @@ export class HtmlElement extends Super {
 	replace(element) {
 		const elem = this.$;
 
-		element = find(element);
+		element = toFind(element);
 		elem.parentNode.replaceChild(elem, element);
 
 		return this;
@@ -533,7 +580,7 @@ export class HtmlElement extends Super {
 				`);
 			}
 
-			iterator = new Num(iterator).array();
+			iterator = array(iterator);
 		}
 
 		if (arguments.length < 3) {
@@ -646,7 +693,19 @@ export class HtmlElement extends Super {
 	}
 }
 
-dynamicDefineProperties(HtmlCollection.prototype, methods, (prop) => {
+defineProperties(Str.prototype, {
+  parseHTML() {
+    return document
+      .div()
+      .html(this.$)
+      .children();
+  }
+});
+
+dynamicDefineProperties(
+  HtmlCollection.prototype,
+  new Arr(methods).concat(new Super(events).keys()).$,
+  (prop) => {
   return function () {
     const collection = this.$;
     
@@ -658,7 +717,7 @@ dynamicDefineProperties(HtmlCollection.prototype, methods, (prop) => {
   };
 });
 
-dynamicDefineProperties(HtmlElement.prototype, css, (prop) => {
+dynamicDefineProperties(HtmlElement.prototype, new Super(css).keys().$, (prop) => {
 	return function (value) {
 		if (arguments.length) {
 			this.$.style[prop] = value;
@@ -669,13 +728,28 @@ dynamicDefineProperties(HtmlElement.prototype, css, (prop) => {
 	};
 });
 
-dynamicDefineProperties(HtmlElement.prototype, elements.filter((elem) => elem !== 'html'), (elem) => {
-	return function () {
-		Array.prototype.unshift.call(arguments, elem);
+dynamicDefineProperties(HtmlElement.prototype, new Super(events).keys().$, (onevent) => {
+	return function (listener) {
+		if (arguments.length) {
+			this.$[onevent] = listener;
+			return this;
+		}
 
-		return this.create.apply(this, arguments);
+		return this.$[onevent];
 	};
 });
+
+dynamicDefineProperties(
+  HtmlElement.prototype,
+  new Super(elements).keys().filter((elem) => elem !== 'html').$,
+  (elem) => {
+    return function () {
+      Array.prototype.unshift.call(arguments, elem);
+
+      return this.create.apply(this, arguments);
+    };
+  }
+);
 
 defineProperties(HtmlElement.prototype, {
 	closest: (() => {
@@ -711,7 +785,7 @@ function htmlElement(elem) {
 
 	return new HtmlElement(elem);
 }
-function find(element) {
+function toFind(element) {
 	element = new Super(element).$;
 
 	if (isString(element)) {
@@ -721,13 +795,25 @@ function find(element) {
 	return element;
 }
 
-Classes.HtmlElement = HtmlElement;
-constructors.unshift({
+constructors[1].push({
 	check: (elem) => /^(HTML\w*Element|Text)$/.test(toStringTag(elem)),
 	cls: HtmlElement
 });
 
 export const window = new HtmlElement(global);
 export const document = new HtmlElement(nativeDocument);
+export const body = new HtmlElement(nativeDocument.body || null);
+export const head = new HtmlElement(nativeDocument.head || null);
+
+export function find(selector) {
+  const found = nativeDocument.querySelector(selector);
+
+  return htmlElement(found);
+}
+export function findAll(selector) {
+  const found = nativeDocument.querySelectorAll(selector);
+
+  return new HtmlCollection(found);
+}
 
 export default HtmlElement;

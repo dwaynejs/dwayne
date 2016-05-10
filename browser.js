@@ -6,3 +6,4 @@ assign(D, statics);
 delete D.default;
 
 global.D = D;
+global.top.D = D;

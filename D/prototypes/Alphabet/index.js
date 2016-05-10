@@ -1,6 +1,5 @@
-import classes from '../../classes';
+import D from '../../';
 import Super from '../Super';
-import Arr from '../Array';
 import { isString, validate, supportSymbol } from '../../libs';
 
 export class Alphabet extends Super {
@@ -36,15 +35,17 @@ export class Alphabet extends Super {
 		return this;
 	}
 	alphabet() {
-		return new Arr(Object.keys(this.$));
+		return D(Object.keys(this.$));
 	}
 	contains(word) {
 		word = new Super(word).$;
 
 		validate([word], ['string'], 'Alphabet.prototype.contains');
 
+    const alphabet = this.$;
+
 		for (let i = 0, length = word.length; i < length; i++) {
-			if (!this.$[word[i]]) {
+			if (!alphabet[word[i]]) {
 				return false;
 			}
 		}
@@ -83,10 +84,34 @@ if (supportSymbol) {
   Alphabet.prototype[Symbol.toStringTag] = 'Alphabet';
 }
 
-classes.Alphabet = Alphabet;
-
 function check(char) {
 	return isString(char) && char.length === 1;
+}
+
+export function alphabet(string) {
+  string = new Super(string).$;
+
+  validate([string], ['string']);
+
+  const ranges = string.match(/[\s\S]-[\s\S]/g) || [];
+  const length = ranges.length;
+  const alphabet = [];
+
+  for (let i = 0; i < length; i++) {
+    const range = ranges[i];
+    const start = range.charCodeAt(0);
+    const end = range.charCodeAt(2);
+
+    if (start > end) {
+      throw new Error('Start of the range must be before its end!');
+    }
+
+    for (let k = 0, len = end - start + 1; k < len; k++) {
+      alphabet.push(String.fromCharCode(start + k));
+    }
+  }
+
+  return new Alphabet(alphabet);
 }
 
 export default Alphabet;

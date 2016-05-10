@@ -1,8 +1,7 @@
-import classes from '../../classes';
 import constructors from '../../constructors';
 import Super from '../Super';
 import Promise from '../Promise';
-import { toStringTag } from '../../libs';
+import { isArray , defineProperties, toStringTag } from '../../libs';
 
 const methods = {
   buffer: 'ArrayBuffer',
@@ -10,6 +9,8 @@ const methods = {
   dataURL: 'DataURL',
   text: 'Text'
 };
+
+const NativeBlob = global.Blob;
 
 export class Blob extends Super {
   constructor(blob) {
@@ -54,12 +55,28 @@ export class Blob extends Super {
     
     return promise;
   }
+  saveAs(name = 'download') {
+    const anchor = document.createElement('a');
+
+    anchor.href = URL.createObjectURL(this.$);
+    anchor.setAttribute('download', name);
+    anchor.click();
+
+    return this;
+  }
 }
 
-classes.Blob = Blob;
-constructors.unshift({
+constructors[1].push({
   check: (blob) => /^(Blob|File)$/.test(toStringTag(blob)),
   cls: Blob
 });
+
+export function blob(blobParts, options) {
+  if (!isArray(blobParts)) {
+    blobParts = [blobParts];
+  }
+
+  return new Blob(new NativeBlob(blobParts, options));
+}
 
 export default Blob;

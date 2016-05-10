@@ -1,7 +1,7 @@
-import Class from './';
+import Num from './';
 import { isNaN } from '../../libs';
+import * as assert from 'assert';
 
-const assert = require('assert');
 const eps = Math.pow(2, -47);
 const max = Math.pow(2, 53) - 1;
 const pi = Math.PI;
@@ -20,7 +20,7 @@ const toFixed = (x, r) => x.toFixed(r);
 const toPrecision = (x, r) => x.toPrecision(r);
 const toString = (x, r) => x.toString(r);
 
-describe('it should test D.Number.prototype.[methods]', () => {
+describe('it should test Number::[methods]', () => {
   describe('get abs', () => {
     it('should work the same as Math.abs', () => {
       const n1 = 1;
@@ -29,12 +29,13 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n4 = -0;
       const n5 = Infinity;
       const n6 = NaN;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
-      const wrap6 = new Class(n6);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
+      const wrap6 = new Num(n6);
+
       assert.strictEqual(wrap1.abs, 1);
       assert.strictEqual(wrap2.abs, 1);
       assert.strictEqual(wrap3.abs, 0);
@@ -50,16 +51,17 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n3 = 0;
       const n4 = 1/2;
       const n5 = 1/sqrt(2);
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
       const diff1 = abs(wrap1.acos() - 0);
       const diff2 = abs(wrap2.acos() - pi);
       const diff3 = abs(wrap3.acos() - pi/2);
       const diff4 = abs(wrap4.acos() - pi/3);
       const diff5 = abs(wrap5.acos() - pi/4);
+
       assert.strictEqual(diff1 <= eps, true, `acos(1): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `acos(-1): ${ diff2 } <= ${ eps }`);
       assert.strictEqual(diff3 <= eps, true, `acos(0): ${ diff3 } <= ${ eps }`);
@@ -72,36 +74,22 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n3 = 0;
       const n4 = 1/2;
       const n5 = 1/sqrt(2);
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
       const diff1 = abs(wrap1.acos(true) - 0);
       const diff2 = abs(wrap2.acos(true) - 180);
       const diff3 = abs(wrap3.acos(true) - 90);
       const diff4 = abs(wrap4.acos(true) - 60);
       const diff5 = abs(wrap5.acos(true) - 45);
+
       assert.strictEqual(diff1 <= eps, true, `acos(1): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `acos(-1): ${ diff2 } <= ${ eps }`);
       assert.strictEqual(diff3 <= eps, true, `acos(0): ${ diff3 } <= ${ eps }`);
       assert.strictEqual(diff4 <= eps, true, `acos(0.5): ${ diff4 } <= ${ eps }`);
       assert.strictEqual(diff5 <= eps, true, `acos(1/sqrt2): ${ diff5 } <= ${ eps }`);
-    });
-  });
-  describe('array()', () => {
-    it('should return a wrap of an array from 0 to n without arguments', () => {
-      const n = 7;
-      const wrap = new Class(n);
-
-      assert.deepEqual(wrap.array().$, [0, 1, 2, 3, 4, 5, 6]);
-    });
-    it('should return a wrap of an array filled by mapFn from argument if it\'s present', () => {
-      const n = 7;
-      const wrap = new Class(n);
-      const array = wrap.array((x) => 2*x).$;
-
-      assert.deepEqual(array, [0, 2, 4, 6, 8, 10, 12]);
     });
   });
   describe('asin()', () => {
@@ -111,16 +99,17 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n3 = 0;
       const n4 = 1/2;
       const n5 = 1/sqrt(2);
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
       const diff1 = abs(wrap1.asin() - pi/2);
       const diff2 = abs(wrap2.asin() - -pi/2);
       const diff3 = abs(wrap3.asin() - 0);
       const diff4 = abs(wrap4.asin() - pi/6);
       const diff5 = abs(wrap5.asin() - pi/4);
+
       assert.strictEqual(diff1 <= eps, true, `asin(1): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `asin(-1): ${ diff2 } <= ${ eps }`);
       assert.strictEqual(diff3 <= eps, true, `asin(0): ${ diff3 } <= ${ eps }`);
@@ -133,16 +122,17 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n3 = 0;
       const n4 = 1/2;
       const n5 = 1/sqrt(2);
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
       const diff1 = abs(wrap1.asin(true) - 90);
       const diff2 = abs(wrap2.asin(true) - (-90));
       const diff3 = abs(wrap3.asin(true) - 0);
       const diff4 = abs(wrap4.asin(true) - 30);
       const diff5 = abs(wrap5.asin(true) - 45);
+
       assert.strictEqual(diff1 <= eps, true, `asin(1): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `asin(-1): ${ diff2 } <= ${ eps }`);
       assert.strictEqual(diff3 <= eps, true, `asin(0): ${ diff3 } <= ${ eps }`);
@@ -156,14 +146,15 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n2 = -1;
       const n3 = 0;
       const n4 = sqrt(3);
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
       const diff1 = abs(wrap1.atan() - pi/4);
       const diff2 = abs(wrap2.atan() - (-pi/4));
       const diff3 = abs(wrap3.atan() - 0);
       const diff4 = abs(wrap4.atan() - pi/3);
+
       assert.strictEqual(diff1 <= eps, true, `atan(1): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `atan(-1): ${ diff2 } <= ${ eps }`);
       assert.strictEqual(diff3 <= eps, true, `atan(0): ${ diff3 } <= ${ eps }`);
@@ -174,14 +165,15 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n2 = -1;
       const n3 = 0;
       const n4 = sqrt(3);
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
       const diff1 = abs(wrap1.atan(true) - 45);
       const diff2 = abs(wrap2.atan(true) - (-45));
       const diff3 = abs(wrap3.atan(true) - 0);
       const diff4 = abs(wrap4.atan(true) - 60);
+
       assert.strictEqual(diff1 <= eps, true, `atan(1): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `atan(-1): ${ diff2 } <= ${ eps }`);
       assert.strictEqual(diff3 <= eps, true, `atan(0): ${ diff3 } <= ${ eps }`);
@@ -196,16 +188,17 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n4 = 27;
       const n5 = -Infinity;
       const n6 = NaN;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
-      const wrap6 = new Class(n6);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
+      const wrap6 = new Num(n6);
       const diff1 = abs(wrap1.cbrt - 1);
       const diff2 = abs(wrap2.cbrt - (-2));
       const diff3 = abs(wrap3.cbrt - 0);
       const diff4 = abs(wrap4.cbrt - 3);
+
       assert.strictEqual(diff1 <= eps, true, `cbrt(1): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `cbrt(-8): ${ diff2 } <= ${ eps }`);
       assert.strictEqual(diff3 <= eps, true, `cbrt(0): ${ diff3 } <= ${ eps }`);
@@ -222,12 +215,13 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n4 = 7.5;
       const n5 = Infinity;
       const n6 = NaN;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
-      const wrap6 = new Class(n6);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
+      const wrap6 = new Num(n6);
+
       assert.strictEqual(wrap1.ceil, ceil(n1));
       assert.strictEqual(wrap2.ceil, ceil(n2));
       assert.strictEqual(wrap3.ceil, ceil(n3));
@@ -243,16 +237,17 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n3 = pi/2;
       const n4 = pi/3;
       const n5 = pi/4;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
       const diff1 = Math.abs(wrap1.cos() - 1);
       const diff2 = Math.abs(wrap2.cos() - (-1));
       const diff3 = Math.abs(wrap3.cos() - 0);
       const diff4 = Math.abs(wrap4.cos() - 1/2);
       const diff5 = Math.abs(wrap5.cos() - 1/Math.sqrt(2));
+
       assert.strictEqual(diff1 <= eps, true, `cos(0): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `cos(pi): ${ diff2 } <= ${ eps }`);
       assert.strictEqual(diff3 <= eps, true, `cos(pi/2): ${ diff3 } <= ${ eps }`);
@@ -265,16 +260,17 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n3 = 90;
       const n4 = 60;
       const n5 = 45;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
       const diff1 = Math.abs(wrap1.cos(true) - 1);
       const diff2 = Math.abs(wrap2.cos(true) - (-1));
       const diff3 = Math.abs(wrap3.cos(true) - 0);
       const diff4 = Math.abs(wrap4.cos(true) - 1/2);
       const diff5 = Math.abs(wrap5.cos(true) - 1/Math.sqrt(2));
+
       assert.strictEqual(diff1 <= eps, true, `cos(0): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `cos(180): ${ diff2 } <= ${ eps }`);
       assert.strictEqual(diff3 <= eps, true, `cos(90): ${ diff3 } <= ${ eps }`);
@@ -290,12 +286,13 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n4 = 7;
       const n5 = -Infinity;
       const n6 = NaN;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
-      const wrap6 = new Class(n6);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
+      const wrap6 = new Num(n6);
+
       assert.strictEqual(wrap1.cube, 1);
       assert.strictEqual(wrap2.cube, -125);
       assert.strictEqual(wrap3.cube, 0);
@@ -312,16 +309,17 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n4 = 7;
       const n5 = Infinity;
       const n6 = NaN;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
-      const wrap6 = new Class(n6);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
+      const wrap6 = new Num(n6);
       const diff1 = abs(wrap1.exp - pow(e, n1));
       const diff2 = abs(wrap2.exp - pow(e, n2));
       const diff3 = abs(wrap3.exp - pow(e, n3));
       const diff4 = abs(wrap4.exp - pow(e, n4));
+
       assert.strictEqual(diff1 <= eps, true, `exp(1): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `exp(-5): ${ diff2 } <= ${ eps }`);
       assert.strictEqual(diff3 <= eps, true, `exp(0): ${ diff3 } <= ${ eps }`);
@@ -338,12 +336,13 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n4 = 7.5;
       const n5 = Infinity;
       const n6 = NaN;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
-      const wrap6 = new Class(n6);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
+      const wrap6 = new Num(n6);
+
       assert.strictEqual(wrap1.floor, floor(n1));
       assert.strictEqual(wrap2.floor, floor(n2));
       assert.strictEqual(wrap3.floor, floor(n3));
@@ -354,9 +353,10 @@ describe('it should test D.Number.prototype.[methods]', () => {
   });
   describe('interval()', () => {
     it('should return clear-interval function', (done) => {
-      const n = 100;
-      const wrap = new Class(n);
       let number = 0;
+
+      const n = 100;
+      const wrap = new Num(n);
       const clear = wrap.interval(() => {
         if (number !== 2) {
           return number++;
@@ -373,9 +373,10 @@ describe('it should test D.Number.prototype.[methods]', () => {
       }, 150);
     });
     it('should be { clear() {} } context in repeated function', (done) => {
-      const n = 100;
-      const wrap = new Class(n);
       let number = 0;
+
+      const n = 100;
+      const wrap = new Num(n);
       wrap.interval(function () {
         if (number) {
           return done(new Error('Clear failed'));
@@ -389,9 +390,10 @@ describe('it should test D.Number.prototype.[methods]', () => {
       });
     });
     it('should actually call argument every <context> milliseconds', (done) => {
-      const n = 100;
-      const wrap = new Class(n);
       let number = 0;
+
+      const n = 100;
+      const wrap = new Num(n);
       const clear = wrap.interval(() => {
         number++;
       });
@@ -415,12 +417,13 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n4 = e;
       const n5 = Infinity;
       const n6 = NaN;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
-      const wrap6 = new Class(n6);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
+      const wrap6 = new Num(n6);
+
       assert.strictEqual(wrap1.ln, ln(n1));
       assert.strictEqual(wrap2.ln, ln(n2));
       assert.strictEqual(wrap3.ln, ln(n3));
@@ -438,17 +441,18 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n5 = 1;
       const n6 = Infinity;
       const n7 = NaN;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
-      const wrap6 = new Class(n6);
-      const wrap7 = new Class(n7);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
+      const wrap6 = new Num(n6);
+      const wrap7 = new Num(n7);
       const diff1 = abs(wrap1.log(0.5) - (-1));
       const diff2 = abs(wrap2.log(49) - 2);
       const diff3 = abs(wrap3.log(3) - 1/3);
       const diff4 = abs(wrap4.log(4) - (-2));
+
       assert.strictEqual(diff1 <= eps, true, `log(${ n1 }, 0.5): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `log(${ n2 }, 49): ${ diff2 } <= ${ eps }`);
       assert.strictEqual(diff3 <= eps, true, `log(${ n3 }, 1/3): ${ diff3 } <= ${ eps }`);
@@ -469,15 +473,16 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n4 = 2;
       const n5 = Infinity;
       const n6 = NaN;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
-      const wrap6 = new Class(n6);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
+      const wrap6 = new Num(n6);
       const diff1 = abs(wrap1.log2 - ln(n1) / ln2);
       const diff2 = abs(wrap2.log2 - ln(n2) / ln2);
       const diff4 = abs(wrap4.log2 - ln(n4) / ln2);
+
       assert.strictEqual(diff1 <= eps, true, `log2(1): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `log2(0.45): ${ diff2 } <= ${ eps }`);
       assert.strictEqual(wrap3.log2, -Infinity);
@@ -494,15 +499,16 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n4 = 10;
       const n5 = Infinity;
       const n6 = NaN;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
-      const wrap6 = new Class(n6);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
+      const wrap6 = new Num(n6);
       const diff1 = abs(wrap1.log10 - ln(n1) / ln10);
       const diff2 = abs(wrap2.log10 - ln(n2) / ln10);
       const diff4 = abs(wrap4.log10 - ln(n4) / ln10);
+
       assert.strictEqual(diff1 <= eps, true, `log10(1): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `log10(0.45): ${ diff2 } <= ${ eps }`);
       assert.strictEqual(wrap3.log10, -Infinity);
@@ -519,12 +525,13 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n4 = -11;
       const n5 = Infinity;
       const n6 = NaN;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
-      const wrap6 = new Class(n6);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
+      const wrap6 = new Num(n6);
+
       assert.strictEqual(wrap1.pow(2), pow(n1, 2));
       assert.strictEqual(wrap2.pow(-6), pow(n2, -6));
       assert.strictEqual(wrap3.pow(4), pow(n3, 4));
@@ -541,12 +548,13 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n4 = 11;
       const n5 = Infinity;
       const n6 = NaN;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
-      const wrap6 = new Class(n6);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
+      const wrap6 = new Num(n6);
+
       assert.strictEqual(wrap1.root(2), pow(n1, 1/2));
       assert.strictEqual(wrap2.root(6), pow(n2, 1/6));
       assert.strictEqual(wrap3.root(4), pow(n3, 1/4));
@@ -563,12 +571,13 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n4 = 7.5;
       const n5 = Infinity;
       const n6 = NaN;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
-      const wrap6 = new Class(n6);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
+      const wrap6 = new Num(n6);
+
       assert.strictEqual(wrap1.round, round(n1));
       assert.strictEqual(wrap2.round, round(n2));
       assert.strictEqual(wrap3.round, round(n3));
@@ -586,13 +595,14 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n5 = Infinity;
       const n6 = -Infinity;
       const n7 = NaN;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
-      const wrap6 = new Class(n6);
-      const wrap7 = new Class(n7);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
+      const wrap6 = new Num(n6);
+      const wrap7 = new Num(n7);
+
       assert.strictEqual(wrap1.sign, 1);
       assert.strictEqual(wrap2.sign, -1);
       assert.strictEqual(wrap3.sign, 0);
@@ -609,16 +619,17 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n3 = pi/2;
       const n4 = pi/3;
       const n5 = pi/4;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
       const diff1 = abs(wrap1.sin() - 0);
       const diff2 = abs(wrap2.sin() - 0);
       const diff3 = abs(wrap3.sin() - 1);
       const diff4 = abs(wrap4.sin() - sqrt(3)/2);
       const diff5 = abs(wrap5.sin() - 1/sqrt(2));
+
       assert.strictEqual(diff1 <= eps, true, `sin(0): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `sin(pi): ${ diff2 } <= ${ eps }`);
       assert.strictEqual(diff3 <= eps, true, `sin(pi/2): ${ diff3 } <= ${ eps }`);
@@ -631,16 +642,17 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n3 = 90;
       const n4 = 60;
       const n5 = 45;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
       const diff1 = abs(wrap1.sin(true) - 0);
       const diff2 = abs(wrap2.sin(true) - 0);
       const diff3 = abs(wrap3.sin(true) - 1);
       const diff4 = abs(wrap4.sin(true) - sqrt(3)/2);
       const diff5 = abs(wrap5.sin(true) - 1/sqrt(2));
+
       assert.strictEqual(diff1 <= eps, true, `sin(0): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `sin(180): ${ diff2 } <= ${ eps }`);
       assert.strictEqual(diff3 <= eps, true, `sin(90): ${ diff3 } <= ${ eps }`);
@@ -656,16 +668,17 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n4 = 9;
       const n5 = Infinity;
       const n6 = NaN;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
-      const wrap6 = new Class(n6);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
+      const wrap6 = new Num(n6);
       const diff1 = Math.abs(wrap1.sqrt - 1);
       const diff2 = Math.abs(wrap2.sqrt - 2);
       const diff3 = Math.abs(wrap3.sqrt - 0);
       const diff4 = Math.abs(wrap4.sqrt - 3);
+
       assert.strictEqual(diff1 <= eps, true, `sqrt(1): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `sqrt(4): ${ diff2 } <= ${ eps }`);
       assert.strictEqual(diff3 <= eps, true, `sqrt(0): ${ diff3 } <= ${ eps }`);
@@ -682,12 +695,13 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n4 = 7;
       const n5 = -Infinity;
       const n6 = NaN;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
-      const wrap6 = new Class(n6);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
+      const wrap6 = new Num(n6);
+
       assert.strictEqual(wrap1.square, 1);
       assert.strictEqual(wrap2.square, 25);
       assert.strictEqual(wrap3.square, 0);
@@ -703,16 +717,17 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n3 = pi/2;
       const n4 = pi/3;
       const n5 = pi/4;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
       const diff1 = Math.abs(wrap1.tan() - 0);
       const diff2 = Math.abs(wrap2.tan() - 0);
       const diff3 = Math.abs(wrap3.tan());
       const diff4 = Math.abs(wrap4.tan() - Math.sqrt(3));
       const diff5 = Math.abs(wrap5.tan() - 1);
+
       assert.strictEqual(diff1 <= eps, true, `tan(0): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `tan(pi): ${ diff2 } <= ${ eps }`);
       assert.strictEqual(diff3 >= max, true, `tan(pi/2): ${ diff3 } <= ${ eps }`);
@@ -725,16 +740,17 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n3 = 90;
       const n4 = 60;
       const n5 = 45;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
       const diff1 = Math.abs(wrap1.tan(true) - 0);
       const diff2 = Math.abs(wrap2.tan(true) - 0);
       const diff3 = Math.abs(wrap3.tan(true));
       const diff4 = Math.abs(wrap4.tan(true) - Math.sqrt(3));
       const diff5 = Math.abs(wrap5.tan(true) - 1);
+
       assert.strictEqual(diff1 <= eps, true, `tan(0): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `tan(180): ${ diff2 } <= ${ eps }`);
       assert.strictEqual(diff3 >= max, true, `tan(90): ${ diff3 } <= ${ eps }`);
@@ -745,27 +761,33 @@ describe('it should test D.Number.prototype.[methods]', () => {
   describe('timeout()', () => {
     it('should return promise with clear method', (done) => {
       const n = 150;
-      const wrap = new Class(n);
+      const wrap = new Num(n);
       const timeout = wrap.timeout();
-      timeout.then(() => done(new Error('Clear failed')), () => {});
+
+      timeout
+        .then(() => done(new Error('Clear failed')))
+        .catch((err) => {
+          assert.strictEqual(err.message, 'Timeout was aborted');
+
+          done();
+        });
 
       setTimeout(() => {
-        timeout.clear().catch(() => {});
-        done();
+        timeout.clear();
       }, 100);
     });
     it('should return promise, that will be resolved with value in argument in <context> milliseconds', (done) => {
       const n = 150;
-      const wrap = new Class(n);
+      const wrap = new Num(n);
       const random = Math.random();
-      wrap.timeout(random).then((value) => {
-        try {
+
+      wrap.timeout(random)
+        .then((value) => {
           assert.strictEqual(value, random);
+
           done();
-        } catch (err) {
-          done(err);
-        }
-      });
+        })
+        .catch(done);
     });
   });
   describe('toBase()', () => {
@@ -780,16 +802,17 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n8 = 11;
       const n9 = Infinity;
       const n10 = NaN;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
-      const wrap6 = new Class(n6);
-      const wrap7 = new Class(n7);
-      const wrap8 = new Class(n8);
-      const wrap9 = new Class(n9);
-      const wrap10 = new Class(n10);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
+      const wrap6 = new Num(n6);
+      const wrap7 = new Num(n7);
+      const wrap8 = new Num(n8);
+      const wrap9 = new Num(n9);
+      const wrap10 = new Num(n10);
+
       assert.strictEqual(wrap1.toBase(2), toString(n1, 2));
       assert.strictEqual(wrap2.toBase(3), toString(n2, 3));
       assert.strictEqual(wrap3.toBase(12), toString(n3, 12));
@@ -810,12 +833,13 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n4 = 7.5;
       const n5 = Infinity;
       const n6 = NaN;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
-      const wrap6 = new Class(n6);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
+      const wrap6 = new Num(n6);
+
       assert.strictEqual(wrap1.toExponential(), toExp(n1));
       assert.strictEqual(wrap2.toExponential(), toExp(n2));
       assert.strictEqual(wrap3.toExponential(), toExp(n3));
@@ -832,12 +856,13 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n4 = 7.51245;
       const n5 = Infinity;
       const n6 = NaN;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
-      const wrap6 = new Class(n6);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
+      const wrap6 = new Num(n6);
+
       assert.strictEqual(wrap1.toFixed(1), toFixed(n1, 1));
       assert.strictEqual(wrap2.toFixed(4), toFixed(n2, 4));
       assert.strictEqual(wrap3.toFixed(3), toFixed(n3, 3));
@@ -854,12 +879,13 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n4 = 7.51245;
       const n5 = Infinity;
       const n6 = NaN;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
-      const wrap6 = new Class(n6);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
+      const wrap6 = new Num(n6);
+
       assert.strictEqual(wrap1.toPrecision(1), toPrecision(n1, 1));
       assert.strictEqual(wrap2.toPrecision(4), toPrecision(n2, 4));
       assert.strictEqual(wrap3.toPrecision(3), toPrecision(n3, 3));
@@ -876,12 +902,13 @@ describe('it should test D.Number.prototype.[methods]', () => {
       const n4 = 7.51245;
       const n5 = Infinity;
       const n6 = NaN;
-      const wrap1 = new Class(n1);
-      const wrap2 = new Class(n2);
-      const wrap3 = new Class(n3);
-      const wrap4 = new Class(n4);
-      const wrap5 = new Class(n5);
-      const wrap6 = new Class(n6);
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
+      const wrap6 = new Num(n6);
+
       assert.strictEqual(+wrap1, n1);
       assert.strictEqual(+wrap2, n2);
       assert.strictEqual(+wrap3, n3);

@@ -1,15 +1,16 @@
-import classes from '../../classes';
-import Super from '../Super';
-import Arr from '../Array';
 import Promise from '../Promise';
 import Str from '../String';
-import { isArray, isFunction, isString, assign, supportSymbol, validate } from '../../libs';
-import constructUrl from './construct-url';
-import parseHeaders from './parse-headers';
-import transformData from './transform-data';
+import {
+  isArray, isFunction, isString,
+  assign, supportSymbol, validate, toArray
+} from '../../libs';
+import constructUrl from './constructUrl';
+import parseHeaders from './parseHeaders';
+import transformData from './transformData';
 
-import axios from 'axios';
+import * as axios from 'axios';
 
+global.axios = axios;
 global.top.axios = axios;
 
 const defaults = {
@@ -29,37 +30,38 @@ const defaults = {
 	url: '',
 	withCredentials: false
 };
-const uploadMethods = new Arr(['post', 'put']);
+const uploadMethods = {
+  post: 1,
+  put: 1
+};
 
-export class Fetch extends Super {
+export class Fetch {
 	constructor(config = {}) {
-		super();
+    function fetch() {
+      return fetch.request.apply(fetch, arguments);
+    }
 
-		function fetch() {
-			return fetch.request.apply(fetch, arguments);
-		}
-
-		const conf = assign({}, defaults, config);
+    const conf = assign({}, defaults, config);
     const headers = conf.headers = assign({}, conf.headers);
 
-		conf.after = [];
-		conf.auth = assign({}, defaults.auth, conf.auth);
-		conf.before = [];
+    conf.after = [];
+    conf.auth = assign({}, defaults.auth, conf.auth);
+    conf.before = [];
     conf.params = assign({}, conf.params);
     conf.query = assign({}, conf.query);
-    
+
     for (const header in headers) {
       if (headers.hasOwnProperty(header)) {
         const array = headers[header];
-  
-        headers[header] = isArray(array) ? new Arr(array).slice().$ : [array];
+
+        headers[header] = toArray(array);
       }
     }
 
-		Object.defineProperty(fetch, '$', { value: conf });
-		Object.setPrototypeOf(fetch, Fetch.prototype);
+    Object.defineProperty(fetch, '$', { value: conf });
+    Object.setPrototypeOf(fetch, Fetch.prototype);
 
-		return fetch;
+    return fetch;
 	}
 
 	after(middleware) {
@@ -86,7 +88,6 @@ export class Fetch extends Super {
 		if (isFunction(f)) {
 			f(config);
 		} else {
-      f = new Super(f).$;
 			assign(config, f);
 		}
 
@@ -125,7 +126,7 @@ export class Fetch extends Super {
 
 		for (const key in header) {
 			if (header.hasOwnProperty(key)) {
-        const value = header[key];
+        value = header[key];
         const array = headers[key] || [];
         const toPush = isArray(value) ? value : [value];
         
@@ -149,8 +150,8 @@ export class Fetch extends Super {
     for (const header in headers) {
       if (headers.hasOwnProperty(header)) {
         const array = headers[header];
-  
-        headers[header] = isArray(array) ? new Arr(array).slice().$ : [array];
+
+        headers[header] = toArray(array);
       }
     }
 
@@ -204,28 +205,34 @@ export class Fetch extends Super {
     const METHOD = conf.method.toUpperCase();
     
     conf.constructedUrl = constructUrl(baseURL, URL, params, query);
-    conf.constructedData = transformData(new Super(data).$, METHOD, headers);
+    conf.constructedData = transformData(data, METHOD, headers);
 
 		let promise = Promise.resolve(conf);
 
 		for (let i = 0, length = before.length; i < length; i++) {
-			const { onResolve, onReject } = before[i];
-			
+			const middleware = before[i];
+
 			promise = promise.then(() => {
-				return new Promise((resolve, reject) => {
-					onResolve(conf, function (err) {
-						if (arguments.length) {
-							return reject(err);
-						}
+        if (middleware.length >= 3) {
+          return Promise.resolve();
+        }
 
-						resolve();
-					});
-				});
+        return new Promise((resolve, reject) => {
+          middleware(conf, function (err) {
+            if (arguments.length) {
+              return reject(err);
+            }
+
+            resolve();
+          });
+        });
 			}, (err) => {
-				return new Promise((resolve, reject) => {
-          err.config = conf;
+        if (middleware.length < 3) {
+          return Promise.reject(err);
+        }
 
-					onReject(err, function (err) {
+				return new Promise((resolve, reject) => {
+          middleware(err, conf, function (err) {
 						if (arguments.length) {
 							return reject(err);
 						}
@@ -253,7 +260,7 @@ export class Fetch extends Super {
 				xhr.withCredentials = !!withCredentials;
 
 				if (onprogress) {
-					if (uploadMethods.keyOf(METHOD) !== null) {
+					if (uploadMethods[METHOD] !== null) {
 						xhr.upload.onprogress = onprogress;
 					} else {
 						xhr.onprogress = onprogress;
@@ -309,11 +316,15 @@ export class Fetch extends Super {
 					let promise = Promise.resolve(response);
 
 					for (let i = 0, length = after.length; i < length; i++) {
-						const { onResolve, onReject } = after[i];
+						const middleware = after[i];
 						
 						promise = promise.then(() => {
+              if (middleware.length >= 3) {
+                return Promise.resolve();
+              }
+
 							return new Promise((resolve, reject) => {
-								onResolve(response, function (err) {
+                middleware(response, function (err) {
 									if (arguments.length) {
 										return reject(err);
 									}
@@ -322,10 +333,12 @@ export class Fetch extends Super {
 								});
 							});
 						}, (err) => {
-							return new Promise((resolve, reject) => {
-                err.response = response;
+              if (middleware.length < 3) {
+                return Promise.reject(err);
+              }
 
-								onReject(err, function (err) {
+							return new Promise((resolve, reject) => {
+                middleware(err, response, function (err) {
 									if (arguments.length) {
 										return reject(err);
 									}
@@ -358,6 +371,6 @@ if (supportSymbol) {
   Fetch.prototype[Symbol.toStringTag] = 'Fetch';
 }
 
-classes.Fetch = Fetch;
+export const fetch = new Fetch();
 
 export default Fetch;

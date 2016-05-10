@@ -1,7 +1,5 @@
-import classes from '../../classes';
 import constructors from '../../constructors';
 import Super from '../Super';
-import Arr from '../Array';
 import Promise from '../Promise';
 import { isNumber, defineProperties, validate } from '../../libs';
 
@@ -13,13 +11,7 @@ const ln10 = Math.LN10;
 
 export class Number extends Super {
 	constructor(number = 0) {
-		super((() => {
-			if (isNumber(number)) {
-				return number;
-			}
-
-			return NativeNumber(number);
-		})());
+		super(number);
 	}
 
 	get abs() {
@@ -27,15 +19,6 @@ export class Number extends Super {
 	}
 	acos(cond) {
 		return (cond ? toDegree : 1) * Math.acos(this.$);
-	}
-	array(mapFn) {
-		const array = [];
-
-		for (let i = 0, length = this.$; i < length; i++) {
-			array.push(mapFn ? mapFn(i) : i);
-		}
-
-		return new Arr(array);
 	}
 	asin(cond) {
 		return (cond ? toDegree : 1) * Math.asin(this.$);
@@ -132,7 +115,7 @@ export class Number extends Super {
 		return promise;
 	}
 	toBase(base = 10) {
-		return NativeNumber(this.$).toString(base);
+		return this.$.toString(base);
 	}
 	toExponential() {
 		return this.$.toExponential.apply(this.$, arguments);
@@ -291,10 +274,22 @@ defineProperties(Number.prototype, {
 	})()
 });
 
-classes.Number = Number;
-constructors.unshift({
+constructors[1].push({
 	check: isNumber,
 	cls: Number
 });
+
+export function rand(a = 0, b = 1) {
+  return a + (b - a) * Math.random();
+}
+export function random(a, b) {
+  validate([a, b], ['intLike', 'intLike'], 'random');
+
+  if (b <= a) {
+    throw new Error('Second argument must be greater than first!');
+  }
+
+  return a + Math.floor((b - a + 1) * Math.random());
+}
 
 export default Number;

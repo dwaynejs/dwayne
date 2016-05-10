@@ -1,11 +1,11 @@
-import Class from './module';
-const assert = require('assert');
+import Alphabet, { alphabet } from './module';
+import * as assert from 'assert';
 
-describe('it should test D.Alphabet.prototype.[methods]', () => {
+describe('it should test Alphabet::[methods]', () => {
   describe('add()', () => {
     it('should add new chars from arguments to alphabet', () => {
       const o = ['s', '2'];
-      const wrap = new Class(o);
+      const wrap = new Alphabet(o);
       
       wrap.add('6', '7');
       
@@ -15,7 +15,7 @@ describe('it should test D.Alphabet.prototype.[methods]', () => {
   describe('alphabet()', () => {
     it('should return an array of chars of alphabet', () => {
       const o = ['1', '2', '3', '4', '5'];
-      const wrap = new Class(o);
+      const wrap = new Alphabet(o);
       
       assert.deepEqual(wrap.alphabet().$, ['1', '2', '3', '4', '5']);
     });
@@ -23,7 +23,7 @@ describe('it should test D.Alphabet.prototype.[methods]', () => {
   describe('contains()', () => {
     it('should return true with words in alphabet', () => {
       const o = ['1', 'a', '8', 'l'];
-      const wrap = new Class(o);
+      const wrap = new Alphabet(o);
       
       assert.strictEqual(wrap.contains(''), true);
       assert.strictEqual(wrap.contains('8a8l'), true);
@@ -32,7 +32,7 @@ describe('it should test D.Alphabet.prototype.[methods]', () => {
     });
     it('should return false with words not in alphabet', () => {
       const o = ['1', 'a', '8', 'l'];
-      const wrap = new Class(o);
+      const wrap = new Alphabet(o);
       
       assert.strictEqual(wrap.contains('12'), false);
       assert.strictEqual(wrap.contains('abl'), false);
@@ -42,7 +42,7 @@ describe('it should test D.Alphabet.prototype.[methods]', () => {
   describe('delete()', () => {
     it('should delete arguments chars from alphabet', () => {
       const o = ['1', '2', 's', '4', '5'];
-      const wrap = new Class(o);
+      const wrap = new Alphabet(o);
       
       wrap.delete('2', '5');
       
@@ -52,9 +52,20 @@ describe('it should test D.Alphabet.prototype.[methods]', () => {
   describe('token()', () => {
     it('should return token out of alphabet with given length', () => {
       const o = ['1', '2', '3', '4', '5'];
-      const wrap = new Class(o);
+      const wrap = new Alphabet(o);
       
       assert.strictEqual(/^[1-5]+$/.test(wrap.token(10)), true);
+    });
+  });
+});
+
+describe('it should test exported methods from Alphabet', () => {
+  describe('alphabet()', () => {
+    it('should return right alphabet', () => {
+      const s = 'a-b0-2';
+      const wrap = alphabet(s);
+
+      assert.deepEqual(wrap.$, { a: 'a', b: 'b', 0: '0', 1: '1', 2: '2' });
     });
   });
 });

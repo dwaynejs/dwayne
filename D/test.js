@@ -1,7 +1,7 @@
 import * as methods from './methods';
 const assert = require('assert');
 
-describe('it should test methods.[check-type-methods]', () => {
+describe('it should test D.[methods]', () => {
   describe('isArray()', () => {
     it('should return false with arguments argument', () => {
       assert.strictEqual(methods.isArray((function () {
@@ -50,7 +50,24 @@ describe('it should test methods.[check-type-methods]', () => {
       assert.strictEqual(methods.isDateLike(null), true);
     });
   });
-  // TODO: .isFinite()
+  describe('isFinite()', () => {
+    it('should return false with non-number argument', () => {
+      assert.strictEqual(methods.isFinite('1'), false);
+      assert.strictEqual(methods.isFinite({}), false);
+      assert.strictEqual(methods.isFinite(null), false);
+    });
+    it('should return false with NaN, Infinity, -Infinity arguments', () => {
+      assert.strictEqual(methods.isFinite(NaN), false);
+      assert.strictEqual(methods.isFinite(Infinity), false);
+      assert.strictEqual(methods.isFinite(-Infinity), false);
+    });
+    it('should return true with constructed number argument', () => {
+      assert.strictEqual(methods.isFinite(new Number()), true);
+    });
+    it('should return true with primitive number argument', () => {
+      assert.strictEqual(methods.isFinite(0), true);
+    });
+  });
   describe('isFunction()', () => {
     it('should return true with function argument', () => {
       assert.strictEqual(methods.isFunction(() => {}), true);
@@ -107,9 +124,7 @@ describe('it should test methods.[check-type-methods]', () => {
       assert.strictEqual(methods.isNumber(NaN), true);
     });
     it('should return true with constructed number argument', () => {
-      const Num = Number;
-      
-      assert.strictEqual(methods.isNumber(new Num()), true);
+      assert.strictEqual(methods.isNumber(new Number()), true);
     });
     it('should return true with primitive number argument', () => {
       assert.strictEqual(methods.isNumber(0), true);
@@ -143,9 +158,7 @@ describe('it should test methods.[check-type-methods]', () => {
   });
   describe('isString()', () => {
     it('should return true with constructed string argument', () => {
-      const Str = String;
-      
-      assert.strictEqual(methods.isString(new Str()), true);
+      assert.strictEqual(methods.isString(new String()), true);
     });
     it('should return true with primitive string argument', () => {
       assert.strictEqual(methods.isString(''), true);

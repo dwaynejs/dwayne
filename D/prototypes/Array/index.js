@@ -1,9 +1,8 @@
-import classes from '../../classes';
 import constructors from '../../constructors';
 import Super from '../Super';
 import {
   isArrayLike, isNaN, isString,
-	toArray, validate
+	toArray, validate, iterate
 } from '../../libs';
 
 const NativeArray = global.Array;
@@ -15,34 +14,32 @@ export class Array extends Super {
 
 	concat() {
 		const array = toArray(this.$);
-		const length = arguments.length;
 
-		for (let i = 0; i < length; i++) {
-			const value = arguments[i];
-			const transformed = new Super(value).$;
+    iterate(arguments, (value) => {
+      value = new Super(value).$;
 
-			if (isArrayLike(transformed) && !isString(transformed)) {
-				for (let k = 0, len = transformed.length; k < len; k++) {
-					array.push(transformed[k]);
-				}
+      if (isArrayLike(value) && !isString(value)) {
+        iterate(value, (value) => {
+          array.push(value);
+        });
 
-				continue;
-			}
+        return;
+      }
 
-			array.push(value);
-		}
+      array.push(value);
+    });
 
 		return new Array(array);
 	}
   indexOf(value) {
     const key = this.keyOf(value);
     
-    return key === null ? -1 : key;
+    return key === null ? -1 : Number(key);
   }
   indexOfStrict(value) {
     const key = this.keyOfStrict(value);
   
-    return key === null ? -1 : key;
+    return key === null ? -1 : Number(key);
   }
 	join() {
 		return NativeArray.prototype.join.apply(this.$, arguments);
@@ -66,13 +63,11 @@ export class Array extends Super {
 		return this;
 	}
 	reverse() {
-		const array = this.$;
-		const length = array.length;
 		const a = [];
 
-		for (let i = length - 1; i >= 0; i--) {
-			a.push(array[i]);
-		}
+    iterate(this.$, (value) => {
+      a.unshift(value);
+    });
 
 		return new Array(a);
 	}
@@ -86,14 +81,14 @@ export class Array extends Super {
 		const length = array.length;
 		const a = [];
 
-		for (let i = 0; i < length; i++) {
-			const k = i + Math.floor((length - i) * Math.random());
-			const change = array[i];
+    iterate(array, (value, index) => {
+      const k = index + Math.floor((length - index) * Math.random());
+      const change = value;
 
-			a.push(array[k]);
-			array[i] = array[k];
-			array[k] = change;
-		}
+      a.push(array[k]);
+      array[index] = array[k];
+      array[k] = change;
+    });
 
 		return new Array(a);
 	}
@@ -151,10 +146,21 @@ function asc(x, y) {
 	return 0;
 }
 
-classes.Array = Array;
-constructors.unshift({
-	check: (value) => isArrayLike(value) && !isString(value),
+constructors[1].push({
+	check: isArrayLike,
 	cls: Array
 });
+
+export function array(number, mapFn) {
+  validate([number, mapFn], [['intLike', '>=0'], 'function||!']);
+
+  const array = [];
+
+  for (let i = 0; i < number; i++) {
+    array.push(mapFn ? mapFn(i) : i);
+  }
+
+  return new Array(array);
+}
 
 export default Array;

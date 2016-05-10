@@ -1,13 +1,13 @@
-export const assign = Object.assign || function (target) {
-	for (let i = 1; i < arguments.length; i++) {
-		const source = arguments[i];
-    
-		for (const key in source) {
-			if (source.hasOwnProperty(key)) {
-				target[key] = source[key];
-			}
-		}
-	}
+import { iterate } from './iterate';
+
+export function assign(target) {
+  iterate(arguments, (source, index) => {
+    if (index) {
+      iterate(source, (value, key) => {
+        target[key] = value;
+      });
+    }
+  });
     
 	return target;
-};
+}

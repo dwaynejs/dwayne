@@ -1,9 +1,9 @@
-import classes from '../../classes';
 import constructors from '../../constructors';
+import formats from './formats';
 import Super from '../Super';
 import Num from '../Number';
 import Str from '../String';
-import { isDate } from '../../libs';
+import { isDate, defineProperties } from '../../libs';
 
 const NativeDate = global.Date;
 const coeffs = {
@@ -15,28 +15,6 @@ const coeffs = {
 	w: 604800000,
 	M: 2592000000,
 	y: 31536000000
-};
-const formats = {
-	ccc: (date) => round(date.get('c'), 3),
-	cc: (date) => cut(date.get('c'), 3, 2).replace(/^0\./, ''),
-	c: (date) => cut(date.get('c'), 3, 1).replace(/^0\./, ''),
-	ss: (date) => round(date.get('s'), 2),
-	s: (date) => String(date.get('s')),
-	mm: (date) => round(date.get('m'), 2),
-	m: (date) => String(date.get('m')),
-	hh: (date) => round(date.get('h'), 2),
-	h: (date) => String(date.get('h')),
-	DDD: (date) => date.get('dwa'),
-	dd: (date) => round(date.get('d'), 2),
-	d: (date) => String(date.get('d')),
-	D: (date) => date.get('dwn'),
-	MMMM: (date) => date.get('Mn'),
-	MMM: (date) => date.get('Ma'),
-	MM: (date) => round(date.get('M'), 2),
-	M: (date) => String(date.get('M')),
-	yyyy: (date) => round(date.get('y'), 4),
-	yy: (date) => String(date.get('y')).substring(2),
-	y: (date) => date.get('y')
 };
 const daysOfTheWeekNames = {
 	0: 'Sunday',
@@ -84,12 +62,15 @@ const monthsAliases = {
 	10: 'Nov',
 	11: 'Dec'
 };
-const zero = new Str('0');
 
 export class Date extends Super {
 	constructor(date = new NativeDate()) {
-		super(new NativeDate(date));
+		super(date);
 	}
+
+  static now() {
+    return now();
+  }
 
 	add(what, number) {
 		const date = this.$;
@@ -118,12 +99,9 @@ export class Date extends Super {
 			}
 		}
 
-		return new Date(date.getTime() + increment);
-	}
-	between(date) {
-		date = new NativeDate(new Super(date).$);
+		date.setTime(date.getTime() + increment);
 
-		return this.$.getTime() > date.getTime();
+    return this;
 	}
 	expires(value) {
 		return new Num(this.$ - now()).timeout(value);
@@ -134,7 +112,23 @@ export class Date extends Super {
 
 		for (const f in formats) {
 			if (formats.hasOwnProperty(f)) {
-				string = string.replaceString(prefix + f, formats[f](this));
+        const format = formats[f];
+
+        string = string.replaceString(prefix + format.format, format.match(this, 'get'));
+			}
+		}
+
+		return string.$;
+	}
+	formatUTC(string, prefix = '') {
+		string = new Str(new Super(string).$);
+		prefix = String(new Super(prefix).$);
+
+		for (const f in formats) {
+			if (formats.hasOwnProperty(f)) {
+        const format = formats[f];
+
+				string = string.replaceString(prefix + format.format, format.match(this, 'getUTC'));
 			}
 		}
 
@@ -170,17 +164,54 @@ export class Date extends Super {
 				return date.getFullYear();
 		}
 	}
-	// TODO: .isInRange(range) -> Boolean
+	getUTC(what) {
+		const date = this.$;
+
+		switch (what) {
+			case 'c':
+				return date.getUTCMilliseconds();
+			case 's':
+				return date.getUTCSeconds();
+			case 'm':
+				return date.getUTCMinutes();
+			case 'h':
+				return date.getUTCHours();
+			case 'd':
+				return date.getUTCDate();
+			case 'dw':
+				return date.getUTCDay();
+			case 'dwa':
+				return daysOfTheWeekAliases[date.getUTCDay()];
+			case 'dwn':
+				return daysOfTheWeekNames[date.getUTCDay()];
+			case 'M':
+				return date.getUTCMonth() + 1;
+			case 'Ma':
+				return monthsAliases[date.getUTCMonth()];
+			case 'Mn':
+				return monthsNames[date.getUTCMonth()];
+			case 'y':
+				return date.getUTCFullYear();
+		}
+	}
 	isAfter(date) {
 		date = new NativeDate(new Super(date).$);
 
-		return date.getTime() > this.$.getTime();
+		return date.getTime() < this.$.getTime();
 	}
 	isBefore(date) {
 		date = new NativeDate(new Super(date).$);
 
 		return date.getTime() > this.$.getTime();
 	}
+  isBetween(date1, date2) {
+    const time = this.$.getTime();
+
+    date1 = new NativeDate(new Super(date1).$);
+    date2 = new NativeDate(new Super(date2).$);
+
+    return time > date1.getTime() && time < date2.getTime();
+  }
 	isInvalid() {
 		return isInvalid(this.$);
 	}
@@ -188,17 +219,31 @@ export class Date extends Super {
 		return now() > this.$.getTime();
 	}
 	ofOne(what, secondDate) {
-		secondDate = new Date(new Super(secondDate).$);
-		const date = this.$;
-		const diff = Math.abs(date.getTime() - secondDate.getTime());
+    if (!(what in coeffs) || what === 'w') {
+      return false;
+    }
 
-		if (what in coeffs) {
-			return this.get(what) === secondDate.get(what) && diff < coeffs[what];
-		}
+		secondDate = date(secondDate);
 
-		// TODO: add "of one week"
+    let started;
 
-		return false;
+    for (const w in coeffs) {
+      if (coeffs.hasOwnProperty(w)) {
+        if (w === what) {
+          started = true;
+        }
+
+        if (!started || w === 'w') {
+          continue;
+        }
+
+        if (this.get(w) !== secondDate.get(w)) {
+          return false;
+        }
+      }
+    }
+
+		return true;
 	}
 	set(what, number) {
 		const date = this.$;
@@ -234,10 +279,54 @@ export class Date extends Super {
 						date.setDate(value);
 						continue;
 					case 'M':
-						date.setMonth(value);
+						date.setMonth(value - 1);
 						continue;
 					case 'y':
 						date.setFullYear(value);
+				}
+			}
+		}
+
+		return this;
+	}
+	setUTC(what, number) {
+		const date = this.$;
+
+		if (isInvalid(date)) {
+			return this;
+		}
+
+		if (arguments.length >= 2) {
+			what = { [what]: number };
+		}
+
+		what = new Super(what).$;
+
+		for (const key in what) {
+			if (what.hasOwnProperty(key)) {
+				const value = what[key];
+
+				switch (key) {
+					case 'c':
+						date.setUTCMilliseconds(value);
+						continue;
+					case 's':
+						date.setUTCSeconds(value);
+						continue;
+					case 'm':
+						date.setUTCMinutes(value);
+						continue;
+					case 'h':
+						date.setUTCHours(value);
+						continue;
+					case 'd':
+						date.setUTCDate(value);
+						continue;
+					case 'M':
+						date.setUTCMonth(value - 1);
+						continue;
+					case 'y':
+						date.setUTCFullYear(value);
 				}
 			}
 		}
@@ -270,24 +359,24 @@ function invalidDate() {
 function isInvalid(date) {
 	return date.toString() === 'Invalid Date';
 }
-export function now() {
-	return NativeDate.now();
-}
-function round(number, digits) {
-	const string = String(number);
-	let zeroes = digits - string.length;
-	zeroes = zeroes < 0 ? 0 : zeroes;
 
-	return zero.repeat(zeroes).$ + string;
-}
-function cut(number, max, digits) {
-	return (number / Math.pow(10, max)).toFixed(digits);
-}
-
-classes.Date = Date;
-constructors.unshift({
+constructors[1].push({
 	check: isDate,
 	cls: Date
 });
+
+export function now() {
+  return NativeDate.now();
+}
+
+export function date(date) {
+  if (!arguments.length) {
+    return new Date(new NativeDate());
+  }
+
+  date = new Super(date).$;
+
+  return new Date(new NativeDate(date));
+}
 
 export default Date;

@@ -1,9 +1,8 @@
-import classes from '../../classes';
-import { isFunction, isPromise, defineProperties, supportSymbol } from '../../libs';
+import { isFunction, defineProperties, supportSymbol } from '../../libs';
 
 const secret = {};
 
-const iterator = supportSymbol && global.Symbol.iterator ? Symbol.iterator : Math.random().toString(36);
+const iterator = supportSymbol && global.Symbol.iterator ? global.Symbol.iterator : Math.random().toString(36);
 
 export class Promise {
 	constructor(func) {
@@ -102,7 +101,7 @@ export class Promise {
 		}
 		function resolve(value) {
 			if (hiddenPromise.status === 'pending') {
-				if (isPromise(value) || value instanceof Promise) {
+				if (value && isFunction(value.then)) {
 					return value.then((value) => {
 						resolve(value);
 					}, (err) => {
@@ -130,12 +129,12 @@ export class Promise {
     if (iterable[iterator]) {
       iterable = iterable[iterator]();
 
-      return new this((resolve, reject) => {
-        let next = iterable.next();
+      return new Promise((resolve, reject) => {
+        let next;
         let i = 0;
 
-        while (!next.done) {
-          const promise = this.resolve(next.value);
+        while (!(next = iterable.next()).done) {
+          const promise = Promise.resolve(next.value);
 
           toResolve++;
 
@@ -151,11 +150,10 @@ export class Promise {
           }, reject);
 
           i++;
-          next = iterable.next();
         }
 
         if (!i) {
-          return this.resolve([]);
+          return Promise.resolve([]);
         }
       });
     }
@@ -163,14 +161,14 @@ export class Promise {
     const length = iterable.length;
 
     if (!length) {
-			return this.resolve([]);
+			return Promise.resolve([]);
 		}
 
     toResolve = length;
 
-		return new this((resolve, reject) => {
+		return new Promise((resolve, reject) => {
       for (let i = 0; i < length; i++) {
-        const promise = this.resolve(array[i]);
+        const promise = Promise.resolve(array[i]);
 
         promise.then((value) => {
           toResolve--;
@@ -189,35 +187,37 @@ export class Promise {
     if (iterable[iterator]) {
       iterable = iterable[iterator]();
 
-      return new this((resolve, reject) => {
-        for (const promise of iterable) {
-          promise.then(resolve, reject);
+      return new Promise((resolve, reject) => {
+        let next;
+
+        while (!(next = iterable.next()).done) {
+          next.value.then(resolve, reject);
         }
       });
     }
 
-		return new this((resolve, reject) => {
+		return new Promise((resolve, reject) => {
 			for (let i = 0, length = array.length; i < length; i++) {
 				array[i].then(resolve, reject);
 			}
 		});
 	}
 	static reject(value) {
-		return new this((resolve, reject) => {
+		return new Promise((resolve, reject) => {
 			reject(value);
 		});
 	}
 	static resolve(value) {
-		if (isPromise(value) || value instanceof this) {
+    if (value && isFunction(value.then)) {
 			return value;
 		}
 
-		return new this((resolve) => {
+		return new Promise((resolve) => {
 			resolve(value);
 		});
 	}
 
-	['catch'](onReject) {
+	'catch'(onReject) {
 		return resolveOrReject(this.$, null, onReject);
 	}
 	then(onResolve, onReject) {
@@ -263,11 +263,12 @@ function resolveOrReject(promise, onResolve, onReject) {
 	}
 }
 
-classes.Promise = Promise;
-
-export const all = Promise.all.bind(Promise);
-export const race = Promise.race.bind(Promise);
-export const reject = Promise.reject.bind(Promise);
-export const resolve = Promise.resolve.bind(Promise);
+export function promise(func) {
+  return new Promise(func);
+}
+export const all = Promise.all;
+export const race = Promise.race;
+export const reject = Promise.reject;
+export const resolve = Promise.resolve;
 
 export default Promise;
