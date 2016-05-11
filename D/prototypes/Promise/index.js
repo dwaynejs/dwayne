@@ -138,18 +138,18 @@ export class Promise {
 
           toResolve++;
 
-          promise.then((value) => {
-            toResolve--;
-            array[i] = value;
+          ((i) => {
+            promise.then((value) => {
+              toResolve--;
+              array[i] = value;
 
-            setTimeout(() => {
-              if (next.done && !toResolve) {
-                resolve(array);
-              }
-            }, 1);
-          }, reject);
-
-          i++;
+              setTimeout(() => {
+                if (next.done && !toResolve) {
+                  resolve(array);
+                }
+              }, 1);
+            }, reject);
+          })(i++);
         }
 
         if (!i) {
@@ -217,7 +217,7 @@ export class Promise {
 		});
 	}
 
-	'catch'(onReject) {
+	catch(onReject) {
 		return resolveOrReject(this.$, null, onReject);
 	}
 	then(onResolve, onReject) {
