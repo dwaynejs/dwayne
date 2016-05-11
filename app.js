@@ -30,19 +30,22 @@ app.use(/.*/, (req, res, next) => {
 	next();
 });
 
-app.use('/long', (req, res) => {
-	setTimeout(() => res.send('Long'), 1500);
+app.use('/timeout/:timeout', (req, res) => {
+	setTimeout(() => res.send('Long'), parseInt(req.params.timeout));
 });
 
-app.use(/\/\d+/, (req, res) => {
-	res.sendStatus(req.baseUrl.replace('/', ''));
+app.use('/status/:status', (req, res) => {
+	res.sendStatus(parseInt(req.params.status));
 });
 
 app.use(/.*/, (req, res) => {
-	const { body, params, query, headers } = req;
+	const { body, query, headers } = req;
 
-	res.header('Sync', true);
-	res.json({ body, params, query, headers });
+	res.header('Foo-Header', 'Foo');
+	res.header('Bar-Header', 'Bar');
+	res.header('Baz-Header', 'Baz');
+
+	res.json({ body, query, headers });
 });
 
 app.listen(port, (error) => {
