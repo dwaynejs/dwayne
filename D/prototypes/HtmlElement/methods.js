@@ -1,6 +1,7 @@
 export default [
+	'dispatch',
 	'hide',
 	'into',
-  'on',
+  'remove',
 	'show'
 ];

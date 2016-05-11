@@ -855,6 +855,34 @@ describe('it should test Super::[methods]', () => {
       );
     });
   });
+  describe('prop()', () => {
+    it('should get object[property] with one string argument', () => {
+      const o = { a: 1, b: 2, c: 3 };
+      const wrap = new Super(o);
+
+      assert.strictEqual(wrap.prop('a'), 1);
+    });
+    it('should support (property, value) setter syntax', () => {
+      const o = { a: 1, b: 2, c: 3 };
+      const wrap = new Super(o);
+
+      wrap.prop('a', 4);
+
+      assert.deepEqual(o, { a: 4, b: 2, c: 3 });
+    });
+    it('should support { [property]: value, ... } setter syntax', () => {
+      const o = { a: 1, b: 2, c: 3 };
+      const wrap = new Super(o);
+
+      wrap.prop({
+        a: 4,
+        b: 5,
+        d: 6
+      });
+
+      assert.deepEqual(o, { a: 4, b: 5, c: 3, d: 6 });
+    });
+  });
   describe('propertyDescriptor()', () => {
     it('should return property descriptor', () => {
       const o = { a: 1 };

@@ -46,7 +46,7 @@ export class String extends Super {
 	escapeRegExp() {
 		return this.replace(regexpSpecialsRegexp, '\\$&');
 	}
-	'in'(object) {
+	in(object) {
 		if (!isObject(object)) {
 			return false;
 		}

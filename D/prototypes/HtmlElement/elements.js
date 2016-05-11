@@ -48,7 +48,6 @@ export default {
   header() {},
   hgroup() {},
   hr() {},
-  html() {},
   i() {},
   iframe() {},
   img() {},

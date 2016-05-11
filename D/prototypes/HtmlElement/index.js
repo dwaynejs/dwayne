@@ -6,12 +6,14 @@ import applyRegexps from './applied';
 import methods from './methods';
 import Super from '../Super';
 import Arr, { array } from '../Array';
+import Function from '../Function';
+import Promise from '../Promise';
 import Str from '../String';
 import HtmlCollection from '../HtmlCollection';
 import {
-	isFunction, isNumber, isString,
+	isFunction, isNumber, isString, isInteger,
 	assign, dynamicDefineProperties, defineProperties,
-	validate, toStringTag, toCamelCase
+	validate, toStringTag, toCamelCase, iterate, toArray
 } from '../../libs';
 
 const nativeDocument = global.document;
@@ -155,12 +157,16 @@ export class HtmlElement extends Super {
 		return this;
 	}
 	child(element) {
+    if (isInteger(element) && element >= 0) {
+      return new HtmlElement(this.$.childNodes[element]);
+    }
+
 		return new HtmlElement(toFind(element)).into(this);
 	}
 	children() {
 		return new HtmlCollection(this.$.childNodes);
 	}
-	'class'(cls) {
+	class(cls) {
 		const elem = this.$;
 
 		if (!arguments.length) {
@@ -300,8 +306,8 @@ export class HtmlElement extends Super {
 	findAll(selector) {
 		return new HtmlCollection(this.$.querySelectorAll(selector));
 	}
-	firstChild() {
-		return htmlElement(this.$.firstElementChild);
+	first(bool) {
+		return htmlElement(bool ? this.$.firstElementChild : this.$.firstChild);
 	}
 	fixed() {
 		this.$.style.position = 'fixed';
@@ -345,8 +351,26 @@ export class HtmlElement extends Super {
 
 		return elem.id;
 	}
-	// TODO: .insertAfter()
-	// TODO: .insertBefore()
+  insertAfter(element) {
+    element = toFind(element);
+
+    const parent = element.parentNode;
+
+    if (parent.lastChild === element) {
+      parent.appendChild(this.$);
+    } else {
+      parent.insertBefore(this.$, element.nextSibling);
+    }
+
+    return this;
+  }
+  insertBefore(element) {
+    element = toFind(element);
+
+    element.parentNode.insertBefore(this.$, element);
+
+    return this;
+  }
 	inline() {
 		this.$.style.display = 'inline';
 
@@ -367,8 +391,8 @@ export class HtmlElement extends Super {
 
 		return this;
 	}
-	lastChild() {
-		return htmlElement(this.$.lastElementChild);
+	last(bool) {
+		return htmlElement(bool ? this.$.lastElementChild : this.$.lastChild);
 	}
 	lineThrough() {
 		this.$.style.textDecorationLine = 'line-through';
@@ -410,8 +434,8 @@ export class HtmlElement extends Super {
 	get name() {
 		return (this.$.tagName || '').toLowerCase();
 	}
-	next() {
-		return htmlElement(this.$.nextElementSibling);
+	next(bool) {
+		return htmlElement(bool ? this.$.nextElementSibling : this.$.nextSibling);
 	}
 	get offsetHeight() {
 		return this.$.offsetHeight;
@@ -483,11 +507,9 @@ export class HtmlElement extends Super {
 
 		return this;
 	}
-	prev() {
-		return htmlElement(this.$.previousElementSibling);
+	prev(bool) {
+		return htmlElement(bool ? this.$.previousElementSibling : this.$.previousSibling);
 	}
-	// TODO: .putAfter()
-	// TODO: .putBefore()
 	ref(ref) {
 		let attr;
 
@@ -589,18 +611,19 @@ export class HtmlElement extends Super {
 			throw new Error('No applied expression or map function is present!');
 		}
 
-		const elem = this.$;
 		const func = isFunction(applied);
     
     new Super(iterator).forEach((value, key) => {
-      const created = elem.create(type);
+      const created = this.create(type);
   
       if (func) {
         applied(created, value, key, iterator);
       } else {
-        created.apply(applied.replace(/%key%/g, key).replace(/%value%/g, value));
+        created.apply(applied.replace(/\{\$key}/g, key).replace(/\{\$value}/g, value));
       }
     });
+
+    return this;
 	}
 	show() {
 		const elem = this.$;
@@ -695,6 +718,54 @@ export class HtmlElement extends Super {
 	}
 }
 
+export const window = new HtmlElement(global);
+export const document = new HtmlElement(nativeDocument);
+export const body = new HtmlElement(nativeDocument.body || null);
+export const head = new HtmlElement(nativeDocument.head || null);
+
+defineProperties(HtmlElement.prototype, {
+  closest: (() => {
+    if (Element.prototype.closest) {
+      return function closest(selector) {
+        return htmlElement(this.$.closest(selector));
+      };
+    }
+
+    return function closest(selector) {
+      let elem = this.$;
+
+      while (elem) {
+        if (elem.matches(selector)) {
+          return htmlElement(elem);
+        }
+
+        elem = elem.parentNode;
+      }
+
+      return htmlElement(null);
+    };
+  })()
+});
+
+defineProperties(HtmlCollection.prototype, {
+  on() {
+    const collection = this.$;
+    const listeners = [];
+
+    for (let i = 0, length = collection.length; i < length; i++) {
+      const item = htmlElement(collection[i]);
+
+      listeners.push(item.on.apply(item, arguments));
+    }
+
+    return function removeEventListeners() {
+      iterate(listeners, (removeListener) => {
+        removeListener();
+      });
+    };
+  }
+});
+
 defineProperties(Str.prototype, {
   parseHTML() {
     return document
@@ -704,24 +775,37 @@ defineProperties(Str.prototype, {
   }
 });
 
-defineProperties(HtmlCollection.prototype, {
-  remove() {
-    const collection = this.$;
-  
-    for (let i = 0, length = collection.length; i < length; i++) {
-      const item = htmlElement(collection[0]);
-    
-      item.remove.apply(item, arguments);
+dynamicDefineProperties(HtmlElement.prototype, new Super(css).keys().$, (prop) => {
+  return function (value) {
+    if (arguments.length) {
+      this.$.style[prop] = value;
+      return this;
     }
-    
-    return this;
-  }
+
+    return this.$.style[prop];
+  };
 });
 
-dynamicDefineProperties(
-  HtmlCollection.prototype,
-  new Arr(methods).concat(new Super(events).keys()).$,
-  (prop) => {
+dynamicDefineProperties(HtmlElement.prototype, new Super(events).keys().$, (onevent) => {
+  return function (listener) {
+    if (arguments.length) {
+      this.$[onevent] = listener;
+      return this;
+    }
+
+    return this.$[onevent];
+  };
+});
+
+dynamicDefineProperties(HtmlElement.prototype, new Super(elements).keys().$, (elem) => {
+  return function () {
+    Array.prototype.unshift.call(arguments, elem);
+
+    return this.create.apply(this, arguments);
+  };
+});
+
+dynamicDefineProperties(HtmlCollection.prototype, methods, (prop) => {
   return function () {
     const collection = this.$;
     
@@ -733,64 +817,6 @@ dynamicDefineProperties(
     
     return this;
   };
-});
-
-dynamicDefineProperties(HtmlElement.prototype, new Super(css).keys().$, (prop) => {
-	return function (value) {
-		if (arguments.length) {
-			this.$.style[prop] = value;
-			return this;
-		}
-
-		return this.$.style[prop];
-	};
-});
-
-dynamicDefineProperties(HtmlElement.prototype, new Super(events).keys().$, (onevent) => {
-	return function (listener) {
-		if (arguments.length) {
-			this.$[onevent] = listener;
-			return this;
-		}
-
-		return this.$[onevent];
-	};
-});
-
-dynamicDefineProperties(
-  HtmlElement.prototype,
-  new Super(elements).keys().filter((elem) => elem !== 'html').$,
-  (elem) => {
-    return function () {
-      Array.prototype.unshift.call(arguments, elem);
-
-      return this.create.apply(this, arguments);
-    };
-  }
-);
-
-defineProperties(HtmlElement.prototype, {
-	closest: (() => {
-		if (Element.prototype.closest) {
-			return function closest(selector) {
-				return htmlElement(this.$.closest(selector));
-			};
-		}
-
-		return function closest(selector) {
-			let elem = this.$;
-
-			while (elem) {
-				if (elem.matches(selector)) {
-					return htmlElement(elem);
-				}
-
-				elem = elem.parentNode;
-			}
-
-			return htmlElement(null);
-		};
-	})()
 });
 
 const classes = {};
@@ -818,11 +844,6 @@ constructors[1].push({
 	cls: HtmlElement
 });
 
-export const window = new HtmlElement(global);
-export const document = new HtmlElement(nativeDocument);
-export const body = new HtmlElement(nativeDocument.body || null);
-export const head = new HtmlElement(nativeDocument.head || null);
-
 export function find(selector) {
   const found = nativeDocument.querySelector(selector);
 
@@ -832,6 +853,21 @@ export function findAll(selector) {
   const found = nativeDocument.querySelectorAll(selector);
 
   return new HtmlCollection(found);
+}
+export function loadImages(images) {
+  const promises = [];
+
+  images = new Super(images).$;
+
+  iterate(images, (image) => {
+    image = new Super(image).$;
+
+    promises.push(image.complete ? image : new Promise((resolve) => {
+      htmlElement(image).on('load', new Function(resolve).bindArgs([image]));
+    }));
+  });
+
+  return Promise.all(promises);
 }
 
 export default HtmlElement;

@@ -23,7 +23,7 @@ export function isDateLike(date) {
   
   return !isNaN(date.getTime());
 }
-export const isFinite = function isFinite(number) {
+export function isFinite(number) {
   if (!isNumber(number)) {
     return false;
   }
@@ -31,20 +31,26 @@ export const isFinite = function isFinite(number) {
   number = Number(number);
 
   return !isNaN(number) && number !== Infinity && number !== -Infinity;
-};
+}
 export function isFunction(func) {
   return toStringTag(func) === 'Function' || typeof func === 'function';
 }
-export const isInteger = Number.isInteger || function isInteger(integer) {
-    return isNumber(integer) && integer % 1 === 0;
-  };
+export function isInteger(integer) {
+  return isNumber(integer) && integer % 1 === 0;
+}
 export function isIntegerLike(integer) {
   integer = parseInt(Number(integer));
   return !!(integer || integer === 0);
 }
-export const isNaN = Number.isNaN || function isNaN(nan) {
-    return nan !== nan;
-  };
+export function isNaN(nan) {
+  if (!isNumber(nan)) {
+    return false;
+  }
+
+  nan = Number(nan);
+
+  return nan !== nan;
+}
 export function isNull(nul) {
   return nul === null;
 }

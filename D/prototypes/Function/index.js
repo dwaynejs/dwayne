@@ -1,5 +1,5 @@
 import constructors from '../../constructors';
-import { resolve } from '../Promise';
+import Promise from '../Promise';
 import { isFunction, assign, validate, toArray } from '../../libs';
 
 const NativeFunction = global.Function;
@@ -28,7 +28,7 @@ export class Function {
 					return ret;
 				}
 
-				let promise = resolve(args);
+				let promise = Promise.resolve(args);
 
 				for (let i = 0; i < before.length; i++) {
 					promise = promise.then((args) => {

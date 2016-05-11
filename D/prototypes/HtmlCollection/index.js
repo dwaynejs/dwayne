@@ -1,9 +1,11 @@
 import constructors from '../../constructors';
 import Arr from '../Array';
-import { toStringTag } from '../../libs';
+import { toStringTag, toArray } from '../../libs';
 
 export class HtmlCollection extends Arr {
-  
+  constructor(collection) {
+    super(toArray(collection));
+  }
 }
 
 constructors[2].push({

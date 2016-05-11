@@ -1,14 +1,14 @@
 import D from '../../';
 import constructors from '../../constructors';
 import {
-	isArrayLike, isDate, isFunction, isNaN,
-  isNull, isObject, isRegExp, isUndefined,
-	validate, toStringTag, iterate
+	isArrayLike, isDate, isFunction, isNaN, isNull,
+  isObject, isRegExp, isString, isUndefined,
+	validate, toStringTag, iterate, assign
 } from '../../libs';
 
 export class Super {
 	constructor(object = {}) {
-    while (object instanceof Super) {
+    while (object instanceof Super && '$' in object) {
       object = object.$;
     }
     
@@ -170,7 +170,7 @@ export class Super {
 
 		return this;
 	}
-	'delete'() {
+	delete() {
 		const object = this.$;
 
 		if (object) {
@@ -270,7 +270,7 @@ export class Super {
 
 		return object.hasOwnProperty(key);
 	}
-  'instanceof'(constructor) {
+  instanceof(constructor) {
     return this.$ instanceof constructor;
   }
 	isFrozen() {
@@ -361,6 +361,23 @@ export class Super {
 
     return new Super(o);
 	}
+  prop(property, value) {
+    const object = this.$;
+
+    if (arguments.length <= 1 && isString(property)) {
+      return object[property];
+    }
+
+    if (arguments.length >= 2) {
+      property = { [property]: value };
+    }
+
+    property = new Super(property).$;
+
+    assign(object, property);
+
+    return this;
+  }
 	propertyDescriptor(property) {
 		const object = this.$;
 
