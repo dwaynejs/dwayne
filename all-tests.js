@@ -11,3 +11,4 @@ import './D/prototypes/Number/test';
 import './D/prototypes/Promise/test';
 import './D/prototypes/String/test';
 import './D/prototypes/Super/test';
+import './D/prototypes/Switcher/test';
