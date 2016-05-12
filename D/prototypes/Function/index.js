@@ -127,7 +127,7 @@ export class Function {
 
 		return this;
 	}
-	call(context) {
+	call() {
     return NativeFunction.prototype.call.apply(this, arguments);
 	}
   get called() {
@@ -167,10 +167,10 @@ export class Function {
 	timing(mark) {
 		mark = !arguments.length ? this.$.originalName : String(mark);
 
-		this.before(function () {
+		this.before((args) => {
 			console.time(mark);
 
-			return arguments;
+			return args;
 		}, false);
 
 		this.after((ret) => {
@@ -217,9 +217,7 @@ export function noop() {}
 export function self(arg) {
   return arg;
 }
-export function callsMethod(method) {
-  const args = Array.prototype.slice.call(arguments);
-  
+export function callsMethod(method, args  = []) {
   return function callsMethod(x) {
     return x[method].apply(x, args);
   };

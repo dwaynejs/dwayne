@@ -1,7 +1,6 @@
-import Function from './module';
+import Function, { noop, self, callsMethod } from './module';
 import Arr from '../Array';
-import Num from '../Number';
-import { random } from '../Number';
+import Num, { rand, random } from '../Number';
 import * as assert from 'assert';
 
 function concat() {
@@ -321,7 +320,33 @@ describe('it should test Function::[methods]', () => {
 });
 
 describe('it should test exported methods from Function', () => {
-  // TODO: noop()
-  // TODO: self()
-  // TODO: callsMethod()
+  describe('noop()', () => {
+    it('should be the function always returning undefined', () => {
+      assert.strictEqual(noop(1, 2, 3), undefined);
+      assert.strictEqual(noop([]), undefined);
+      assert.strictEqual(noop(''), undefined);
+      assert.strictEqual(noop(), undefined);
+    });
+  });
+  describe('self()', () => {
+    it('should be the function always returning first argument', () => {
+      const unique = {};
+
+      assert.strictEqual(self(1, 2, 3), 1);
+      assert.strictEqual(self(unique), unique);
+      assert.strictEqual(self(), undefined);
+    });
+  });
+  describe('callsMethod()', () => {
+    it('should be the function returning <ctx>[method](args), where ctx is the first argument', () => {
+      const rnd = rand();
+      const unique = {
+        foo() { return this.x + new Arr(arguments).sum(); },
+        x: rnd
+      };
+
+      assert.strictEqual(callsMethod('foo')(unique), rnd);
+      assert.strictEqual(callsMethod('foo', [1, 2, 3])(unique), 6 + rnd);
+    });
+  });
 });
