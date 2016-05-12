@@ -640,7 +640,51 @@ describe('it should test HtmlElement::[methods]', () => {
     });
   });
   // TODO: .clone()
-  // TODO: .contains()
+  describe('contains', () => {
+    it('should return true, if element contains another, and false if not', () => {
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const wrap1 = new HtmlElement(elem1);
+      const wrap2 = new HtmlElement(elem2);
+      const wrap3 = new HtmlElement(elem3);
+      const wrap4 = new HtmlElement(elem4);
+
+      elem1.appendChild(elem2);
+      elem2.appendChild(elem3);
+      
+      assert.strictEqual(wrap1.contains(elem2), true);
+      assert.strictEqual(wrap2.contains(elem3), true);
+      assert.strictEqual(wrap1.contains(elem4), false);
+      assert.strictEqual(wrap3.contains(elem4), false);
+      assert.strictEqual(wrap4.contains(elem3), false);
+    });
+    it('should support (selector) syntax', () => {
+      const parent = nativeDocument.createElement('div');
+      const child = nativeDocument.createElement('div');
+      const wrap = new HtmlElement(parent);
+  
+      parent.appendChild(child);
+      child.id = 'foo';
+      nativeDocument.body.appendChild(parent);
+      
+      assert.strictEqual(wrap.contains('#foo'), true);
+      assert.strictEqual(wrap.contains('.foo'), false);
+      
+      parent.remove();
+    });
+    it('should support (D.HtmlElement) syntax', () => {
+      const parent = nativeDocument.createElement('div');
+      const child = nativeDocument.createElement('div');
+      const parentWrap = new HtmlElement(parent);
+      const childWrap = new HtmlElement(parent);
+  
+      parent.appendChild(child);
+      
+      assert.strictEqual(parentWrap.contains(childWrap), true);
+    });
+  });
   describe('css()', () => {
     it('should return wrap of an object of css properties with no arguments', () => {
       const elem = nativeDocument.createElement('div');
@@ -759,7 +803,7 @@ describe('it should test HtmlElement::[methods]', () => {
         });
     });
   });
-  describe('dataset()', () => {
+  describe('dataSet()', () => {
     it('should return wrap of a dataset object', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new HtmlElement(elem);
@@ -767,7 +811,7 @@ describe('it should test HtmlElement::[methods]', () => {
       elem.setAttribute('data-domc-foo', '123');
       elem.setAttribute('data-domc-bar', '456');
 
-      assert.deepEqual(wrap.dataset().$, { domcFoo: '123', domcBar: '456' });
+      assert.deepEqual(wrap.dataSet().$, { domcFoo: '123', domcBar: '456' });
     });
   });
   // TODO: .deepClone()
@@ -1274,7 +1318,19 @@ describe('it should test HtmlElement::[methods]', () => {
       assert.strictEqual(elem.style.textDecorationLine, 'line-through');
     });
   });
-  // TODO: .matches()
+  describe('matches()', () => {
+    it('should return if context matches selector', () => {
+      const elem = nativeDocument.createElement('div');
+      const wrap = new HtmlElement(elem);
+
+      elem.id = 'foo';
+      elem.className = 'bar';
+      elem.setAttribute('baz', '');
+
+      assert.strictEqual(wrap.matches('#foo.bar[baz]'), true);
+      assert.strictEqual(wrap.matches('#foo.bar[bar]'), false);
+    });
+  });
   describe('moveAttr()', () => {
     it('should add attribute and set value to "" with 1 argument', () => {
       const elem = nativeDocument.createElement('div');
@@ -2058,7 +2114,8 @@ describe('it should test exported methods from HtmlElement', () => {
     });
   });
   describe('loadImages()', () => {
-    it('return promise.all for all images', (done) => {
+    it('return promise.all for all images', function (done) {
+      this.timeout(5000);
       const source = [
         'https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png',
         'http://cdni.wired.co.uk/1920x1280/g_j/GOOGLELOGO_1.jpg',
@@ -2073,6 +2130,8 @@ describe('it should test exported methods from HtmlElement', () => {
         })
         .catch(done);
     });
+    // TODO: add tests for broken images
+    // TODO: add tests for already loaded images
   });
 });
 

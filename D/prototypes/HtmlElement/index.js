@@ -248,7 +248,7 @@ export class HtmlElement extends Super {
 
 		return this;
 	}
-	dataset() {
+	dataSet() {
 		return new Super(this.$.dataset);
 	}
 	deepClone() {
@@ -863,7 +863,11 @@ export function loadImages(images) {
     image = new Super(image).$;
 
     promises.push(image.complete ? image : new Promise((resolve) => {
-      htmlElement(image).on('load', new Function(resolve).bindArgs([image]));
+      resolve = new Function(resolve).bindArgs([image]);
+      htmlElement(image).on({
+        load: resolve,
+        error: resolve
+      });
     }));
   });
 
