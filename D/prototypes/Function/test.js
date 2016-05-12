@@ -319,3 +319,9 @@ describe('it should test Function::[methods]', () => {
     });
   });
 });
+
+describe('it should test exported methods from Function', () => {
+  // TODO: noop()
+  // TODO: self()
+  // TODO: callsMethod()
+});

@@ -213,4 +213,16 @@ constructors[1].push({
 	cls: Function
 });
 
+export function noop() {}
+export function self(arg) {
+  return arg;
+}
+export function callsMethod(method) {
+  const args = Array.prototype.slice.call(arguments);
+  
+  return function callsMethod(x) {
+    return x[method].apply(x, args);
+  };
+}
+
 export default Function;
