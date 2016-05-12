@@ -1,5 +1,5 @@
-import Promise from './';
+import String from './';
 
 export * from './';
 
-export default Promise;
+export default String;
