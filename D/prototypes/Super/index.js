@@ -734,6 +734,4 @@ constructors[0].push({
 	cls: Super
 });
 
-// TODO: .switch()
-
 export default Super;

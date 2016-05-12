@@ -64,7 +64,30 @@ describe('it should test Super::[methods]', () => {
       assert.strictEqual(wrap.count, 3);
     });
   });
-  // TODO: .create()
+  describe('create()', () => {
+    it('should return instance of context', () => {
+      const o = {};
+      const wrap = new Super(o);
+      const instance = wrap.create();
+
+      assert.strictEqual(Object.getPrototypeOf(instance), o);
+    });
+    it('should also support argument descriptors', () => {
+      const o = {};
+      const wrap = new Super(o);
+      const descriptor = {
+        value: 1,
+        enumerable: true,
+        configurable: false,
+        writable: true
+      };
+      const instance = wrap.create({
+        foo: descriptor
+      });
+
+      assert.deepEqual(Object.getOwnPropertyDescriptor(instance, 'foo'), descriptor);
+    });
+  });
   describe('deepEquals()', () => {
     it('should return true with argument, which nested values are equal to context\'s', () => {
       const o = { a: { a: 1 } };
@@ -1116,8 +1139,4 @@ describe('it should test Super::[methods]', () => {
       assert.strictEqual(wrap.word((value) => String(value) + value), '112233');
     });
   });
-});
-
-describe('it should test exported methods from Super', () => {
-  // TODO: .switch()
 });
