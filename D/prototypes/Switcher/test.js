@@ -169,9 +169,9 @@ describe('it should test Switcher::[methods]', () => {
     it('should test that mode changes', () => {
       const switcher = new Switcher();
 
-      switcher.mode('strictEquals');
+      switcher.mode('call');
 
-      assert.strictEqual(switcher.$.mode, 'strictEquals');
+      assert.strictEqual(switcher.$.mode, 'call');
     });
   });
 });
