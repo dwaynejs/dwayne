@@ -56,6 +56,9 @@ export class String extends Super {
 	indexOf() {
 		return this.$.indexOf.apply(this.$, arguments);
 	}
+  get length() {
+    return this.$.length;
+  }
 	match() {
 		const match = this.$.match.apply(this.$, arguments);
     

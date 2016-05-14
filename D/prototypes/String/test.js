@@ -70,6 +70,20 @@ describe('it should test String::[methods]', () => {
       assert.strictEqual(wrap.indexOf('s'), -1);
     });
   });
+  describe('get length', () => {
+    it('should return length of the context', () => {
+      const s1 = 'foobar';
+      const s2 = 'foo';
+      const s3 = '';
+      const wrap1 = new Str(s1);
+      const wrap2 = new Str(s2);
+      const wrap3 = new Str(s3);
+
+      assert.strictEqual(wrap1.length, 6);
+      assert.strictEqual(wrap2.length, 3);
+      assert.strictEqual(wrap3.length, 0);
+    });
+  });
   describe('match()', () => {
     it('should work the same as String.prototype.match', () => {
       const s = 'foobar';
