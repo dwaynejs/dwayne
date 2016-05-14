@@ -1,4 +1,4 @@
-import { toCamelCase } from '../../libs';
+import Str from '../String';
 
 export default [
 	{
@@ -147,7 +147,7 @@ export default [
 		regexp: /^[^:]+:(\([\s\S]+\)|"[\s\S]+"|'[\s\S]+'|`[\s\S]+`)$/,
 		match(wrap, string) {
 			const match = string.match(/^[^:]+/)[0];
-			const prop = toCamelCase(match);
+			const prop = new Str(match).toCamelCase().$;
 			
 			wrap.css(prop, string.substring(match.length + 2, string.length - 1));
 		}
@@ -156,7 +156,7 @@ export default [
 		regexp: /^[^:]+:[\s\S]+$/,
 		match(wrap, string) {
 			const match = string.match(/^[^:]+/)[0];
-			const prop = toCamelCase(match);
+			const prop = new Str(match).toCamelCase().$;
 			
 			wrap.css(prop, string.substring(match.length + 1));
 		}
