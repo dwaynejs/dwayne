@@ -586,7 +586,50 @@ describe('it should test HtmlElement::[methods]', () => {
       wrap.click();
     });
   });
-  // TODO: .closest()
+  describe('closest()', () => {
+    it('should return a wrap of null if no closest parent found', () => {
+      const parent1 = nativeDocument.createElement('div');
+      const parent2 = nativeDocument.createElement('div');
+      const parent3 = nativeDocument.createElement('div');
+      const child = nativeDocument.createElement('div');
+      const wrap = new HtmlElement(child);
+
+      parent1.appendChild(parent2);
+      parent2.appendChild(parent3);
+      parent3.appendChild(child);
+
+      assert.strictEqual(wrap.closest('.foo').$, null);
+    });
+    it('should return a wrap of itself if it matches selector', () => {
+      const parent1 = nativeDocument.createElement('div');
+      const parent2 = nativeDocument.createElement('div');
+      const parent3 = nativeDocument.createElement('div');
+      const child = nativeDocument.createElement('div');
+      const wrap = new HtmlElement(child);
+
+      child.className = 'foo';
+      parent1.appendChild(parent2);
+      parent2.appendChild(parent3);
+      parent3.appendChild(child);
+
+      assert.strictEqual(wrap.closest('.foo').$, child);
+    });
+    it('should return a wrap of closest parent, that matches selector', () => {
+      const parent1 = nativeDocument.createElement('div');
+      const parent2 = nativeDocument.createElement('div');
+      const parent3 = nativeDocument.createElement('div');
+      const child = nativeDocument.createElement('div');
+      const wrap = new HtmlElement(child);
+
+      parent3.className = 'foo';
+      parent2.className = 'foo';
+      parent1.appendChild(parent2);
+      parent2.appendChild(parent3);
+      parent3.appendChild(child);
+
+      assert.strictEqual(wrap.closest('.foo').$, parent3);
+    });
+  });
   describe('get clientHeight', () => {
     it('should return the same as element.clientHeight', () => {
       const elem = nativeDocument.createElement('div');
@@ -1872,7 +1915,24 @@ describe('it should test HtmlElement::[methods]', () => {
       assert.strictEqual('previousDisplay' in elem.domcData, false);
     });
   });
-  // TODO: .text()
+  describe('text()', () => {
+    it('should get text of the element with no arguments', () => {
+      const elem = nativeDocument.createElement('div');
+      const wrap = new HtmlElement(elem);
+
+      elem.innerHTML = '123';
+
+      assert.strictEqual(wrap.text(), '123');
+    });
+    it('should set text of the element', () => {
+      const elem = nativeDocument.createElement('div');
+      const wrap = new HtmlElement(elem);
+
+      wrap.text('123');
+
+      assert.strictEqual(elem.innerHTML, '123');
+    });
+  });
   describe('toggleAttr()', () => {
     it('should toggle attribute from argument if it is one', () => {
       const elem1 = nativeDocument.createElement('div');
