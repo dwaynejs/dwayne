@@ -20,7 +20,6 @@ export default {
   col() {},
   colgroup() {},
   content() {},
-  data() {},
   datalist() {},
   dd() {},
   del() {},
