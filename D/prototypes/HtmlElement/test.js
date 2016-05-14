@@ -803,15 +803,43 @@ describe('it should test HtmlElement::[methods]', () => {
         });
     });
   });
-  describe('dataSet()', () => {
-    it('should return wrap of a dataset object', () => {
+  describe('data()', () => {
+    it('should return wrap of a dataset object without arguments', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new HtmlElement(elem);
 
       elem.setAttribute('data-domc-foo', '123');
       elem.setAttribute('data-domc-bar', '456');
 
-      assert.deepEqual(wrap.dataSet().$, { domcFoo: '123', domcBar: '456' });
+      assert.strictEqual(wrap.data().$, elem.dataset);
+    });
+    it('should return value of dataset parameter', () => {
+      const elem = nativeDocument.createElement('div');
+      const wrap = new HtmlElement(elem);
+
+      elem.setAttribute('data-domc-foo', '123');
+      elem.setAttribute('data-domc-bar', '456');
+
+      assert.strictEqual(wrap.data('domcFoo'), '123');
+    });
+    it('should support (key, value) setter syntax', () => {
+      const elem = nativeDocument.createElement('div');
+      const wrap = new HtmlElement(elem);
+
+      wrap.data('domcFoo', '123');
+
+      assert.deepEqual(elem.dataset, { domcFoo: '123' });
+    });
+    it('should support ({ [key]: value, ... }) setter syntax', () => {
+      const elem = nativeDocument.createElement('div');
+      const wrap = new HtmlElement(elem);
+
+      wrap.data({
+        domcFoo: '123',
+        domcBar: '456'
+      });
+
+      assert.deepEqual(elem.dataset, { domcFoo: '123', domcBar: '456' });
     });
   });
   // TODO: .deepClone()
@@ -2122,7 +2150,7 @@ describe('it should test exported methods from HtmlElement', () => {
         'https://www.facebookbrand.com/img/fb-art.jpg'
       ];
 
-      loadImages(new Super(source).map((src) => document.img('->' + src)))
+      loadImages(new Super(source))
         .then((images) => {
           assert.deepEqual(new Super(images).map((img) => img.src).$, source);
 
@@ -2130,8 +2158,34 @@ describe('it should test exported methods from HtmlElement', () => {
         })
         .catch(done);
     });
-    // TODO: add tests for broken images
-    // TODO: add tests for already loaded images
+    it('return resolve already loaded images as well', function (done) {
+      const source = 'https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png';
+      const img = nativeDocument.createElement('img');
+      img.onload = load;
+      img.src = source;
+
+      function load() {
+        loadImages([img])
+          .then(([image]) => {
+            assert.strictEqual(image.src, source);
+
+            done();
+          })
+          .catch(done);
+      }
+    });
+    it('return resolve broken images as well', function (done) {
+      this.timeout(3000);
+      const source = 'http://localhost/some/broken/image';
+
+      loadImages([source])
+        .then(([image]) => {
+          assert.strictEqual(image.src, source);
+
+          done();
+        })
+        .catch(done);
+    });
   });
 });
 

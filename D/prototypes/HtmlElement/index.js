@@ -13,7 +13,7 @@ import HtmlCollection from '../HtmlCollection';
 import {
 	isFunction, isNumber, isString, isInteger,
 	assign, dynamicDefineProperties, defineProperties,
-	validate, toStringTag, toCamelCase, iterate, toArray
+	validate, toStringTag, iterate, toArray
 } from '../../libs';
 
 const nativeDocument = global.document;
@@ -228,7 +228,7 @@ export class HtmlElement extends Super {
 
 				property = css[i].split(/: /);
 
-				o[toCamelCase(property[0])] = property[1];
+				o[new Str(property[0]).toCamelCase().$] = property[1];
 			}
 
 			return new Super(o);
@@ -248,8 +248,26 @@ export class HtmlElement extends Super {
 
 		return this;
 	}
-	dataSet() {
-		return new Super(this.$.dataset);
+	data(key, value) {
+    const dataset = this.$.dataset;
+
+    if (!arguments.length) {
+      return new Super(dataset);
+    }
+
+    if (arguments.length === 1 && isString(key)) {
+      return dataset[key];
+    }
+
+    if (arguments.length >= 2) {
+      key = { [key]: value };
+    }
+
+    iterate(key, (value, key) => {
+      dataset[key] = value;
+    });
+
+    return this;
 	}
 	deepClone() {
 		const elem = this.$;
@@ -861,6 +879,10 @@ export function loadImages(images) {
 
   iterate(images, (image) => {
     image = new Super(image).$;
+
+    if (isString(image)) {
+      image = document.img().ref(image).$;
+    }
 
     promises.push(image.complete ? image : new Promise((resolve) => {
       resolve = new Function(resolve).bindArgs([image]);
