@@ -1,5 +1,5 @@
 import D, * as statics from './domc';
-import { assign } from './D/libs/assign';
+import { assign } from './lib/helpers/assign';
 
 assign(D, statics);
 

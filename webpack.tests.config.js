@@ -1,7 +1,7 @@
 const port = 2222;
 
 module.exports = {
-	entry: 'mocha!./test.js',
+	entry: 'mocha!./test/index.js',
 	output: {
 		path: __dirname,
 		filename: 'bundle.test.js'
