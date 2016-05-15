@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+import { supportSymbol } from '../lib/helpers';
 import * as methods from './../lib/D';
 
 describe('it should test D.[methods]', () => {
@@ -149,6 +150,24 @@ describe('it should test D.[methods]', () => {
     });
     it('should return true with object argument', () => {
       assert.strictEqual(methods.isObject({}), true);
+    });
+  });
+  describe('isPrimitive()', () => {
+    it('should return false with non-primitive arguments', () => {
+      assert.strictEqual(methods.isPrimitive(new String()), false);
+      assert.strictEqual(methods.isPrimitive(new Number()), false);
+      assert.strictEqual(methods.isPrimitive(new Boolean()), false);
+      assert.strictEqual(methods.isPrimitive({}), false);
+    });
+    it('should return true with primitive argument', () => {
+      assert.strictEqual(methods.isPrimitive(undefined), true);
+      assert.strictEqual(methods.isPrimitive(null), true);
+      assert.strictEqual(methods.isPrimitive(0), true);
+      assert.strictEqual(methods.isPrimitive('0'), true);
+      assert.strictEqual(methods.isPrimitive(false), true);
+      if (supportSymbol) {
+        assert.strictEqual(methods.isPrimitive(Symbol()), true);
+      }
     });
   });
   describe('isRegExp()', () => {
