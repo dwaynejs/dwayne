@@ -1,9 +1,4 @@
-import D, * as statics from './lib/D';
-import { assign } from './lib/helpers/assign';
-
-assign(D, statics);
-
-delete D.default;
+import D from './lib/D';
 
 export * from './lib/D';
 export * from './lib/Alphabet';
