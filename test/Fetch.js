@@ -543,6 +543,7 @@ describe('it should test Fetch::[methods]', () => {
         query: { bar: ['foo', 'baz'], baz: 'foo' }
       }).catch(() => done());
     });
+    // TODO: test cache
     // TODO: test data transformation
     // TODO: test headers transformation
     // TODO: test middlewares
