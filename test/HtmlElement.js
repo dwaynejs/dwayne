@@ -1604,14 +1604,14 @@ describe('it should test HtmlElement::[methods]', () => {
       setTimeout(done, 50);
     });
   });
-  describe('get outerHtml', () => {
+  describe('get outerHTML', () => {
     it('should return the same as element.outerHTML', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new HtmlElement(elem);
 
       elem.innerHTML = '<input />';
 
-      assert.strictEqual(wrap.outerHtml, elem.outerHTML);
+      assert.strictEqual(wrap.outerHTML, elem.outerHTML);
     });
   });
   describe('get outerText', () => {
