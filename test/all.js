@@ -8,6 +8,7 @@ import './Function';
 import './HtmlElement';
 import './Number';
 import './Promise';
+import './Router';
 import './String';
 import './Super';
 import './Switcher';
