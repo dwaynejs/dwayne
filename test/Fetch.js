@@ -1,7 +1,10 @@
 import * as assert from 'assert';
 import Fetch from '../lib/Fetch';
+import D from '../lib/D';
+import { isDate } from '../lib/helpers';
 
 const random = Math.random;
+const origin = 'http://localhost:8888';
 
 describe('it should test Fetch::[methods]', () => {
   describe('after()', () => {
@@ -526,27 +529,184 @@ describe('it should test Fetch::[methods]', () => {
       });
 
       fetch.before((config, next) => {
+        try {
+          assert.strictEqual(
+            config.constructedUrl,
+            '//foo/bar/foo/foo/bar/baz?foo=bar&bar%5B%5D=foo&bar%5B%5D=baz&baz=foo'
+          );
+        } catch (err) {
+          next(err);
+        }
+
+        done();
+      });
+
+      fetch({
+        params: { foo: 'bar', bar: 'baz', baz: 'foo' },
+        query: { bar: ['foo', 'baz'], baz: 'foo' }
+      }).catch(done);
+    });
+    it('should test request itself', (done) => {
+      const fetch = new Fetch({
+        baseURL: origin
+      });
+
+      fetch('/request')
+        .then(({ headers }) => {
+          assert.strictEqual(headers.fooHeader, 'Foo');
+          assert.strictEqual(headers.barHeader, 'Bar');
+          assert.strictEqual(headers.bazHeader, 'Baz');
+
+          done();
+        })
+        .catch(done);
+    });
+    it('should test cache', (done) => {
+      const fetch = new Fetch({
+        baseURL: origin
+      });
+
+      fetch('/cached', { cache: true })
+        .then((response1) => {
+          fetch('/cached', { fromCache: true })
+            .then((response2) => {
+              assert.strictEqual(response1, response2);
+
+              done();
+            })
+            .catch(done);
+        })
+        .catch(done);
+    });
+    it('should test data transformation', (done) => {
+      const data = { a: 1 };
+      const json = D(data).json();
+      const fetch = new Fetch({
+        baseURL: origin
+      });
+
+      fetch.before((config, next) => {
         assert.strictEqual(
-          config.constructedUrl,
-          '//foo/bar/foo/foo/bar/baz?foo=bar&bar[]=foo&bar[]=baz&baz=foo'
+          config.constructedData,
+          json
         );
 
         next();
       });
 
-      fetch.before(() => {
-        throw new Error();
+      fetch.post('/transformData', data)
+        .then(() => done())
+        .catch(done);
+    });
+    it('should test headers transformation', (done) => {
+      const fetch = new Fetch({
+        baseURL: origin
       });
 
-      fetch.request({
-        params: { foo: 'bar', bar: 'baz', baz: 'foo' },
-        query: { bar: ['foo', 'baz'], baz: 'foo' }
-      }).catch(() => done());
+      fetch.before((config, next) => {
+        fetch.headers({
+          fooHeader: 1,
+          barHeader: ['a', 'b'],
+          bazHeader: 'a'
+        });
+
+        next();
+      });
+
+      fetch('/headers')
+        .then(({ data }) => {
+          const headers = D(data).parseJSON().$.headers;
+
+          assert.strictEqual(headers['foo-header'], '1');
+          assert.strictEqual(headers['bar-header'], 'a, b');
+          assert.strictEqual(headers['baz-header'], 'a');
+
+          done();
+        })
+        .catch(done);
     });
-    // TODO: test cache
-    // TODO: test data transformation
-    // TODO: test headers transformation
-    // TODO: test middlewares
-    // TODO: test request itself
+    it('should test timeout', (done) => {
+      const fetch = new Fetch({
+        baseURL: origin,
+        timeout: 500
+      });
+
+      fetch('/timeout/500')
+        .then(done)
+        .catch((err) => {
+          assert.strictEqual(err.message, 'Request time exceeded');
+
+          done();
+        })
+        .catch(done);
+    });
+    it('should test middlewares', (done) => {
+      const fetch = new Fetch({
+        baseURL: origin
+      });
+      let testsDone = 0;
+
+      fetch.before((config, next) => {
+        fetch.headers('fooHeader', 1);
+
+        next();
+      });
+
+      fetch.after(({ status }, next) => {
+        if (status === 200) {
+          return next();
+        }
+
+        next(new Error(`Wrong status (${ status })`));
+      });
+
+      fetch.after((err, response, next) => {
+        console.error(err);
+
+        next(err);
+      });
+
+      fetch.after((response, next) => {
+        response.json = D(response.data).parseJSON({ dates: true });
+
+        next();
+      });
+
+      fetch('/middlewares-with-headers')
+        .then(({ data }) => {
+          const headers = D(data).parseJSON().$.headers;
+
+          assert.strictEqual(headers['foo-header'], '1');
+
+          allDone();
+        })
+        .catch(done);
+
+      fetch('/status/404')
+        .then(done)
+        .catch((err) => {
+          assert.strictEqual(err.message, 'Wrong status (404)');
+
+          allDone();
+        })
+        .catch(done);
+
+      fetch.post('/success-middleware', { date: new Date('1999-12-31T23:59:59.999Z') })
+        .then(({ json }) => {
+          const date = json.$.body.date;
+
+          assert.strictEqual(isDate(date), true);
+          assert.strictEqual(date.toJSON(), '1999-12-31T23:59:59.999Z');
+
+          allDone();
+        })
+        .catch(done);
+
+      function allDone() {
+        if (++testsDone === 3) {
+          done();
+        }
+      }
+    });
   });
 });
