@@ -1,3 +1,3 @@
-//import './D/prototypes/HtmlElement/test';
+//import './Fetch';
 import './all';
 import '../browser';
