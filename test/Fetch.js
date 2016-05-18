@@ -528,14 +528,14 @@ describe('it should test Fetch::[methods]', () => {
         url: '/bar/:baz/:baz/:foo/:bar?foo=bar'
       });
 
-      fetch.before((config, next) => {
+      fetch.before((config) => {
         try {
           assert.strictEqual(
             config.constructedUrl,
             '//foo/bar/foo/foo/bar/baz?foo=bar&bar%5B%5D=foo&bar%5B%5D=baz&baz=foo'
           );
         } catch (err) {
-          next(err);
+          done(err);
         }
 
         done();
@@ -585,13 +585,17 @@ describe('it should test Fetch::[methods]', () => {
         baseURL: origin
       });
 
-      fetch.before((config, next) => {
-        assert.strictEqual(
-          config.constructedData,
-          json
-        );
-
-        next();
+      fetch.before((config) => {
+        try {
+          assert.strictEqual(
+            config.constructedData,
+            json
+          );
+        } catch (err) {
+          done(err);
+        }
+  
+        done();
       });
 
       fetch.post('/transformData', data)
@@ -628,13 +632,28 @@ describe('it should test Fetch::[methods]', () => {
     it('should test timeout', (done) => {
       const fetch = new Fetch({
         baseURL: origin,
-        timeout: 500
+        timeout: 100
       });
 
-      fetch('/timeout/500')
+      fetch('/timeout/100')
         .then(done)
         .catch((err) => {
           assert.strictEqual(err.message, 'Request time exceeded');
+
+          done();
+        })
+        .catch(done);
+    });
+    it('should test abort', (done) => {
+      const fetch = new Fetch({
+        baseURL: origin
+      });
+
+      fetch('/abort')
+        .abort()
+        .then(done)
+        .catch((err) => {
+          assert.strictEqual(err.message, 'Request was aborted');
 
           done();
         })
