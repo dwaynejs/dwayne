@@ -1113,6 +1113,7 @@ describe('it should test HtmlElement::[methods]', () => {
       assert.strictEqual(elem.style.position, 'fixed');
     });
   });
+  // TODO: .getFormData()
   describe('hasAttr()', () => {
     it('should return true if the element has class', () => {
       const elem = nativeDocument.createElement('div');
@@ -1341,6 +1342,7 @@ describe('it should test HtmlElement::[methods]', () => {
       parent.remove();
     });
   });
+  // TODO: .isBroken()
   describe('italic()', () => {
     it('should set font-style to italic', () => {
       const elem = nativeDocument.createElement('div');
@@ -1388,6 +1390,7 @@ describe('it should test HtmlElement::[methods]', () => {
       assert.strictEqual(elem.style.textDecorationLine, 'line-through');
     });
   });
+  // TODO: .load()
   describe('matches()', () => {
     it('should return if context matches selector', () => {
       const elem = nativeDocument.createElement('div');
