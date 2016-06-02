@@ -524,57 +524,21 @@ describe('it should test Fetch::[methods]', () => {
   describe('request()', () => {
     it('should construct url the right way', (done) => {
       const fetch = new Fetch({
-        baseURL: '//foo/',
-        url: '/bar/:baz/:baz/:foo/:bar?foo=bar'
-      });
-
-      fetch.before((config) => {
-        try {
-          assert.strictEqual(
-            config.constructedUrl,
-            '//foo/bar/foo/foo/bar/baz?foo=bar&bar%5B%5D=foo&bar%5B%5D=baz&baz=foo'
-          );
-        } catch (err) {
-          done(err);
-        }
-
-        done();
+        baseURL: origin,
+        url: '/foo/bar/:baz/:baz/:foo/:bar?foo=bar'
       });
 
       fetch({
         params: { foo: 'bar', bar: 'baz', baz: 'foo' },
         query: { bar: ['foo', 'baz'], baz: 'foo' }
-      }).catch(done);
-    });
-    it('should test request itself', (done) => {
-      const fetch = new Fetch({
-        baseURL: origin
-      });
-
-      fetch('/request')
-        .then(({ headers }) => {
-          assert.strictEqual(headers.fooHeader, 'Foo');
-          assert.strictEqual(headers.barHeader, 'Bar');
-          assert.strictEqual(headers.bazHeader, 'Baz');
+      })
+        .then(({ config }) => {
+          assert.strictEqual(
+            config.constructedUrl,
+            origin + '/foo/bar/foo/foo/bar/baz?foo=bar&bar%5B%5D=foo&bar%5B%5D=baz&baz=foo'
+          );
 
           done();
-        })
-        .catch(done);
-    });
-    it('should test cache', (done) => {
-      const fetch = new Fetch({
-        baseURL: origin
-      });
-
-      fetch('/cached', { cache: true })
-        .then((response1) => {
-          fetch('/cached', { fromCache: true })
-            .then((response2) => {
-              assert.strictEqual(response1, response2);
-
-              done();
-            })
-            .catch(done);
         })
         .catch(done);
     });
@@ -585,21 +549,15 @@ describe('it should test Fetch::[methods]', () => {
         baseURL: origin
       });
 
-      fetch.before((config) => {
-        try {
+      fetch.post('/transformData', data)
+        .then(({ config }) => {
           assert.strictEqual(
             config.constructedData,
             json
           );
-        } catch (err) {
-          done(err);
-        }
-  
-        done();
-      });
 
-      fetch.post('/transformData', data)
-        .then(() => done())
+          done();
+        })
         .catch(done);
     });
     it('should test headers transformation', (done) => {
@@ -624,6 +582,21 @@ describe('it should test Fetch::[methods]', () => {
           assert.strictEqual(headers['foo-header'], '1');
           assert.strictEqual(headers['bar-header'], 'a, b');
           assert.strictEqual(headers['baz-header'], 'a');
+
+          done();
+        })
+        .catch(done);
+    });
+    it('should test request itself', (done) => {
+      const fetch = new Fetch({
+        baseURL: origin
+      });
+
+      fetch('/request')
+        .then(({ headers }) => {
+          assert.strictEqual(headers.fooHeader, 'Foo');
+          assert.strictEqual(headers.barHeader, 'Bar');
+          assert.strictEqual(headers.bazHeader, 'Baz');
 
           done();
         })
