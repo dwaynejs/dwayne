@@ -254,13 +254,13 @@ describe('it should test Date::[methods]', () => {
       const date = new NativeDate();
       const wrap = new Date(date);
 
-      wrap.set('c', 999);
-      wrap.set('s', 59);
-      wrap.set('m', 59);
-      wrap.set('h', 23);
-      wrap.set('d', 31);
-      wrap.set('M', 12);
       wrap.set('y', 1999);
+      wrap.set('M', 12);
+      wrap.set('d', 31);
+      wrap.set('h', 23);
+      wrap.set('m', 59);
+      wrap.set('s', 59);
+      wrap.set('c', 999);
 
       assert.strictEqual(date.getMilliseconds(), 999);
       assert.strictEqual(date.getSeconds(), 59);
@@ -275,13 +275,13 @@ describe('it should test Date::[methods]', () => {
       const wrap = new Date(date);
 
       wrap.set({
-        c: 999,
-        s: 59,
-        m: 59,
-        h: 23,
-        d: 31,
+        y: 1999,
         M: 12,
-        y: 1999
+        d: 31,
+        h: 23,
+        m: 59,
+        s: 59,
+        c: 999
       });
 
       assert.strictEqual(date.getMilliseconds(), 999);
@@ -298,13 +298,13 @@ describe('it should test Date::[methods]', () => {
       const date = new NativeDate();
       const wrap = new Date(date);
 
-      wrap.setUTC('c', 999);
-      wrap.setUTC('s', 59);
-      wrap.setUTC('m', 59);
-      wrap.setUTC('h', 23);
-      wrap.setUTC('d', 31);
-      wrap.setUTC('M', 12);
       wrap.setUTC('y', 1999);
+      wrap.setUTC('M', 12);
+      wrap.setUTC('d', 31);
+      wrap.setUTC('h', 23);
+      wrap.setUTC('m', 59);
+      wrap.setUTC('s', 59);
+      wrap.setUTC('c', 999);
 
       assert.strictEqual(date.toJSON(), '1999-12-31T23:59:59.999Z');
     });
@@ -313,13 +313,13 @@ describe('it should test Date::[methods]', () => {
       const wrap = new Date(date);
 
       wrap.setUTC({
-        c: 999,
-        s: 59,
-        m: 59,
-        h: 23,
-        d: 31,
+        y: 1999,
         M: 12,
-        y: 1999
+        d: 31,
+        h: 23,
+        m: 59,
+        s: 59,
+        c: 999
       });
 
       assert.strictEqual(date.toJSON(), '1999-12-31T23:59:59.999Z');
