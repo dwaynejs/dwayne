@@ -1,10 +1,10 @@
 import * as assert from 'assert';
-import HtmlElement, { window, find, findAll, loadImages, document } from '../lib/HtmlElement';
+import HtmlElement, { find, findAll, loadImages } from '../lib/HtmlElement';
 import HtmlCollection from '../lib/HtmlCollection';
 import { array } from '../lib/Array';
 import Super from '../lib/Super';
-import css from './../lib/constants/css';
-import elements from './../lib/constants/elements';
+import css from '../lib/constants/css';
+import elements from '../lib/constants/elements';
 
 const nativeDocument = global.document;
 
@@ -552,7 +552,10 @@ describe('it should test HtmlElement::[methods]', () => {
       elem.appendChild(child1);
       elem.appendChild(child2);
 
-      assert.deepEqual(wrap.children().$, [child1, child2]);
+      const children = wrap.children().$;
+
+      assert.strictEqual(children[0].$, child1);
+      assert.strictEqual(children[1].$, child2);
     });
   });
   describe('class()', () => {
@@ -1057,7 +1060,10 @@ describe('it should test HtmlElement::[methods]', () => {
       child1.className = 'foo';
       child3.className = 'foo';
 
-      assert.deepEqual(wrap.findAll('.foo').$, [child1, child3]);
+      const found = wrap.findAll('.foo').$;
+
+      assert.strictEqual(found[0].$, child1);
+      assert.strictEqual(found[1].$, child3);
     });
     it('should find a wrap of [] if not find', () => {
       const elem = nativeDocument.createElement('div');
@@ -1663,7 +1669,11 @@ describe('it should test HtmlElement::[methods]', () => {
       parent2.appendChild(parent3);
       parent3.appendChild(child);
 
-      assert.deepEqual(wrap.parentTree().$, [parent3, parent2, parent1]);
+      const tree = wrap.parentTree().$;
+
+      assert.strictEqual(tree[0].$, parent3);
+      assert.strictEqual(tree[1].$, parent2);
+      assert.strictEqual(tree[2].$, parent1);
     });
   });
   describe('pointer()', () => {
@@ -2127,7 +2137,10 @@ describe('it should test exported methods from HtmlElement', () => {
       child1.className = 'foo';
       child3.className = 'foo';
 
-      assert.deepEqual(findAll('.foo').$, [child1, child3]);
+      const found = findAll('.foo').$;
+
+      assert.strictEqual(found[0].$, child1);
+      assert.strictEqual(found[1].$, child3);
 
       elem.remove();
     });
@@ -2161,7 +2174,7 @@ describe('it should test exported methods from HtmlElement', () => {
 
       loadImages(new Super(source))
         .then((images) => {
-          assert.deepEqual(new Super(images).map((img) => img.src).$, source);
+          assert.deepEqual(images.map((img) => img.ref()).$, source);
 
           done();
         })
@@ -2175,8 +2188,8 @@ describe('it should test exported methods from HtmlElement', () => {
 
       function load() {
         loadImages([img])
-          .then(([image]) => {
-            assert.strictEqual(image.src, source);
+          .then((images) => {
+            assert.strictEqual(images.$[0].ref(), source);
 
             done();
           })
@@ -2188,8 +2201,8 @@ describe('it should test exported methods from HtmlElement', () => {
       const source = 'http://localhost/some/broken/image';
 
       loadImages([source])
-        .then(([image]) => {
-          assert.strictEqual(image.src, source);
+        .then((images) => {
+          assert.strictEqual(images.$[0].ref(), source);
 
           done();
         })
@@ -2235,21 +2248,21 @@ describe('it should test HtmlCollection::[methods]', () => {
       wrap.into(parent);
 
       wrap.forEach((elem) => {
-        assert.strictEqual(elem.parentNode, parent);
+        assert.strictEqual(elem.parent().$, parent);
       });
     });
   });
   describe('hide()', () => {
     it('should hide elements in collection', () => {
       wrap.forEach((elem) => {
-        elem.style.display = 'inline';
+        elem.css('display', 'inline');
       });
 
       wrap.hide();
 
       wrap.forEach((elem) => {
-        assert.strictEqual(elem.style.display, 'none');
-        assert.strictEqual(elem.domcData.previousDisplay, 'inline');
+        assert.strictEqual(elem.css('display'), 'none');
+        assert.strictEqual(elem.$.domcData.previousDisplay, 'inline');
       });
     });
   });
@@ -2294,15 +2307,15 @@ describe('it should test HtmlCollection::[methods]', () => {
   describe('show()', () => {
     it('should show elements in collection', () => {
       wrap.forEach((elem) => {
-        elem.style.display = 'inline';
+        elem.css('display', 'inline');
       });
 
       wrap.hide();
       wrap.show();
 
       wrap.forEach((elem) => {
-        assert.strictEqual(elem.style.display, 'inline');
-        assert.strictEqual('previousDisplay' in elem.domcData, false);
+        assert.strictEqual(elem.css('display'), 'inline');
+        assert.strictEqual('previousDisplay' in elem.$.domcData, false);
       });
     });
   });
