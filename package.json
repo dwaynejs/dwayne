@@ -3,7 +3,6 @@
   "version": "0.3.0",
   "main": "domc.js",
   "devDependencies": {
-    "axios": "^0.10.0",
     "babel-core": "^6.4.0",
     "babel-eslint": "^6.0.4",
     "babel-loader": "^6.2.1",
