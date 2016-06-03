@@ -3,7 +3,7 @@ import { switcher } from '../lib/Switcher';
 import { isArray, isString, isNumber } from '../lib/helpers';
 
 describe('it should test switcher', () => {
-  describe('constructor()', () => {
+  describe('[[Call]]', () => {
     it('should support no arguments syntax', () => {
       const sw = switcher();
 
