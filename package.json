@@ -17,6 +17,7 @@
   },
   "scripts": {
     "start": "webpack-dev-server --progress --colors --watch",
-    "test": "webpack-dev-server --config webpack.tests.config.js --progress --colors --watch"
+    "test": "webpack-dev-server --config webpack.tests.config.js --progress --colors --watch",
+    "jsdoc": "jsdoc -c conf.json"
   }
 }
