@@ -15,11 +15,11 @@ describe('it should test Fetch::[methods]', () => {
 
       fetch.after(middleware1);
 
-      assert.deepEqual(fetch.$.after, [middleware1]);
+      assert.deepEqual(fetch.$$.after, [middleware1]);
 
       fetch.after(middleware2);
 
-      assert.deepEqual(fetch.$.after, [middleware1, middleware2]);
+      assert.deepEqual(fetch.$$.after, [middleware1, middleware2]);
     });
   });
   describe('before()', () => {
@@ -30,11 +30,11 @@ describe('it should test Fetch::[methods]', () => {
 
       fetch.before(middleware1);
 
-      assert.deepEqual(fetch.$.before, [middleware1]);
+      assert.deepEqual(fetch.$$.before, [middleware1]);
 
       fetch.before(middleware2);
 
-      assert.deepEqual(fetch.$.before, [middleware1, middleware2]);
+      assert.deepEqual(fetch.$$.before, [middleware1, middleware2]);
     });
   });
   describe('config()', () => {
@@ -44,7 +44,7 @@ describe('it should test Fetch::[methods]', () => {
 
       fetch.config({ timeout: rand });
 
-      assert.strictEqual(fetch.$.timeout, rand);
+      assert.strictEqual(fetch.$$.timeout, rand);
     });
     it('should support function argument', () => {
       const fetch = new Fetch();
@@ -56,7 +56,7 @@ describe('it should test Fetch::[methods]', () => {
         }
       });
 
-      assert.strictEqual(fetch.$.timeout, rand);
+      assert.strictEqual(fetch.$$.timeout, rand);
     });
   });
   describe('delete()', () => {
@@ -203,28 +203,28 @@ describe('it should test Fetch::[methods]', () => {
 
       fetch.headers('foo', 'bar');
 
-      assert.deepEqual(fetch.$.headers, { foo: ['bar'] });
+      assert.deepEqual(fetch.$$.headers, { foo: ['bar'] });
     });
     it('should support (header, value: Array) syntax', () => {
       const fetch = new Fetch();
 
       fetch.headers('foo', ['bar', 'baz']);
 
-      assert.deepEqual(fetch.$.headers, { foo: ['bar', 'baz'] });
+      assert.deepEqual(fetch.$$.headers, { foo: ['bar', 'baz'] });
     });
     it('should support { header: value: String, ... } syntax', () => {
       const fetch = new Fetch();
 
       fetch.headers({ foo: 'bar' });
 
-      assert.deepEqual(fetch.$.headers, { foo: ['bar'] });
+      assert.deepEqual(fetch.$$.headers, { foo: ['bar'] });
     });
     it('should support { header: value: Array, ... } syntax', () => {
       const fetch = new Fetch();
 
       fetch.headers({ foo: ['bar', 'baz'] });
 
-      assert.deepEqual(fetch.$.headers, { foo: ['bar', 'baz'] });
+      assert.deepEqual(fetch.$$.headers, { foo: ['bar', 'baz'] });
     });
     it('should add header to array if it was one', () => {
       const fetch = new Fetch();
@@ -232,19 +232,19 @@ describe('it should test Fetch::[methods]', () => {
       fetch.headers('foo', 'bar1');
       fetch.headers('foo', 'baz1');
 
-      assert.deepEqual(fetch.$.headers, { foo: ['bar1', 'baz1'] });
+      assert.deepEqual(fetch.$$.headers, { foo: ['bar1', 'baz1'] });
 
       fetch.headers('foo', ['bar2']);
 
-      assert.deepEqual(fetch.$.headers, { foo: ['bar1', 'baz1', 'bar2'] });
+      assert.deepEqual(fetch.$$.headers, { foo: ['bar1', 'baz1', 'bar2'] });
 
       fetch.headers({ foo: 'baz2' });
 
-      assert.deepEqual(fetch.$.headers, { foo: ['bar1', 'baz1', 'bar2', 'baz2'] });
+      assert.deepEqual(fetch.$$.headers, { foo: ['bar1', 'baz1', 'bar2', 'baz2'] });
 
       fetch.headers({ foo: ['bar3', 'baz3'] });
 
-      assert.deepEqual(fetch.$.headers, { foo: ['bar1', 'baz1', 'bar2', 'baz2', 'bar3', 'baz3'] });
+      assert.deepEqual(fetch.$$.headers, { foo: ['bar1', 'baz1', 'bar2', 'baz2', 'bar3', 'baz3'] });
     });
   });
   describe('instance()', () => {
@@ -577,7 +577,7 @@ describe('it should test Fetch::[methods]', () => {
 
       fetch('/headers')
         .then(({ data }) => {
-          const headers = D(data).parseJSON().$.headers;
+          const headers = D(data).parseJSON().$$.headers;
 
           assert.strictEqual(headers['foo-header'], '1');
           assert.strictEqual(headers['bar-header'], 'a, b');
@@ -666,7 +666,7 @@ describe('it should test Fetch::[methods]', () => {
 
       fetch('/middlewares-with-headers')
         .then(({ data }) => {
-          const headers = D(data).parseJSON().$.headers;
+          const headers = D(data).parseJSON().$$.headers;
 
           assert.strictEqual(headers['foo-header'], '1');
 
@@ -685,7 +685,7 @@ describe('it should test Fetch::[methods]', () => {
 
       fetch.post('/success-middleware', { date: new Date('1999-12-31T23:59:59.999Z') })
         .then(({ json }) => {
-          const date = json.$.body.date;
+          const date = json.$$.body.date;
 
           assert.strictEqual(isDate(date), true);
           assert.strictEqual(date.toJSON(), '1999-12-31T23:59:59.999Z');
