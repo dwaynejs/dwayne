@@ -8,7 +8,7 @@ import elements from '../lib/constants/elements';
 
 const nativeDocument = global.document;
 
-describe('it should test HtmlElement::[methods]', () => {
+describe('it should test HtmlElement#', () => {
   describe('absolute()', () => {
     it('should set position to absolute', () => {
       const elem = nativeDocument.createElement('div');
@@ -1568,6 +1568,7 @@ describe('it should test HtmlElement::[methods]', () => {
       elem.remove();
     });
   });
+  // TODO: .off()
   describe('on()', () => {
     it('should support (event, listener) syntax', (done) => {
       const elem = nativeDocument.createElement('div');
@@ -2211,7 +2212,7 @@ describe('it should test exported methods from HtmlElement', () => {
   });
 });
 
-describe('it should test HtmlCollection::[methods]', () => {
+describe('it should test HtmlCollection#', () => {
   const count = 3;
   let wrap;
 
@@ -2321,6 +2322,6 @@ describe('it should test HtmlCollection::[methods]', () => {
   });
 });
 
-describe('it should test String::[methods]', () => {
+describe('it should test String#', () => {
   // TODO: .parseHTML()
 });
