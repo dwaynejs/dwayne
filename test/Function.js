@@ -71,7 +71,7 @@ describe('it should test Function::[[Call]]', () => {
   });
 });
 
-describe('it should test Function::[methods]', () => {
+describe('it should test Function#', () => {
   describe('after()', () => {
     it('should add middleware into the end of after array with no or truthy argument', () => {
       const func = () => {};
@@ -82,7 +82,7 @@ describe('it should test Function::[methods]', () => {
       wrap.after(after1);
       wrap.after(after2);
 
-      assert.deepEqual(wrap.$.after, [after1, after2]);
+      assert.deepEqual(wrap.$$.after, [after1, after2]);
     });
     it('should add middleware into the start of after array with falsey argument', () => {
       const func = () => {};
@@ -93,7 +93,7 @@ describe('it should test Function::[methods]', () => {
       wrap.after(after1, false);
       wrap.after(after2, false);
 
-      assert.deepEqual(wrap.$.after, [after2, after1]);
+      assert.deepEqual(wrap.$$.after, [after2, after1]);
     });
   });
   describe('apply()', () => {
@@ -111,7 +111,7 @@ describe('it should test Function::[methods]', () => {
 
       wrap.async();
 
-      assert.strictEqual(wrap.$.sync, false);
+      assert.strictEqual(wrap.$$.sync, false);
     });
   });
   describe('before()', () => {
@@ -124,7 +124,7 @@ describe('it should test Function::[methods]', () => {
       wrap.before(before1);
       wrap.before(before2);
 
-      assert.deepEqual(wrap.$.before, [before2, before1]);
+      assert.deepEqual(wrap.$$.before, [before2, before1]);
     });
     it('should add middleware into the end of before array with falsey argument', () => {
       const func = () => {};
@@ -135,7 +135,7 @@ describe('it should test Function::[methods]', () => {
       wrap.before(before1, false);
       wrap.before(before2, false);
 
-      assert.deepEqual(wrap.$.before, [before1, before2]);
+      assert.deepEqual(wrap.$$.before, [before1, before2]);
     });
   });
   describe('bind()', () => {
@@ -198,7 +198,7 @@ describe('it should test Function::[methods]', () => {
 
       wrap.canBeCalled(toCall);
 
-      assert.strictEqual(wrap.$.canBeCalled, toCall);
+      assert.strictEqual(wrap.$$.canBeCalled, toCall);
     });
   });
   describe('limitArgsTo()', () => {
@@ -276,10 +276,10 @@ describe('it should test Function::[methods]', () => {
       wrap.after(after);
       wrap.timing('mark');
 
-      assert.strictEqual(wrap.$.before[0], before);
-      assert.strictEqual(wrap.$.after.length, 2);
-      assert.strictEqual(wrap.$.after[1], after);
-      assert.strictEqual(wrap.$.after.length, 2);
+      assert.strictEqual(wrap.$$.before[0], before);
+      assert.strictEqual(wrap.$$.after.length, 2);
+      assert.strictEqual(wrap.$$.after[1], after);
+      assert.strictEqual(wrap.$$.after.length, 2);
     });
   });
   describe('unbind()', () => {
