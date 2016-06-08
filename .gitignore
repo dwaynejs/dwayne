@@ -1,5 +1,7 @@
 node_modules/
 .idea/
+docs/
+docs_public/
 
 bundle.js
 bundle.js.map
