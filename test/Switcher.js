@@ -9,7 +9,7 @@ describe('it should test switcher', () => {
 
       assert.deepEqual(sw.$, {
         cases: [],
-        mode: 'strictEquals',
+        mode: 'equals',
         default: undefined
       });
     });
@@ -18,7 +18,7 @@ describe('it should test switcher', () => {
 
       assert.deepEqual(sw.$, {
         cases: [{ case: 'foo', value: 'bar' }],
-        mode: 'strictEquals',
+        mode: 'equals',
         default: undefined
       });
     });
@@ -136,7 +136,7 @@ describe('it should test switcher', () => {
   });
 });
 
-describe('it should test Switcher::[methods]', () => {
+describe('it should test Switcher#', () => {
   describe('case()', () => {
     it('should test that case is added', () => {
       const sw = switcher();
