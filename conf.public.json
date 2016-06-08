@@ -1,0 +1,10 @@
+{
+  "source": {
+    "include": ["lib/"]
+  },
+  "opts": {
+    "access": "public",
+    "recurse": true,
+    "destination": "docs_public/"
+  }
+}
