@@ -7,7 +7,7 @@ describe('it should test switcher', () => {
     it('should support no arguments syntax', () => {
       const sw = switcher();
 
-      assert.deepEqual(sw.$, {
+      assert.deepEqual(sw.$$, {
         cases: [],
         mode: 'equals',
         default: undefined
@@ -16,7 +16,7 @@ describe('it should test switcher', () => {
     it('should support (cases) syntax', () => {
       const sw = switcher({ foo: 'bar' });
 
-      assert.deepEqual(sw.$, {
+      assert.deepEqual(sw.$$, {
         cases: [{ case: 'foo', value: 'bar' }],
         mode: 'equals',
         default: undefined
@@ -25,7 +25,7 @@ describe('it should test switcher', () => {
     it('should support (mode) syntax', () => {
       const sw = switcher('call');
 
-      assert.deepEqual(sw.$, {
+      assert.deepEqual(sw.$$, {
         cases: [],
         mode: 'call',
         default: undefined
@@ -34,7 +34,7 @@ describe('it should test switcher', () => {
     it('should support (cases, mode) syntax', () => {
       const sw = switcher({ foo: 'bar' }, 'call');
 
-      assert.deepEqual(sw.$, {
+      assert.deepEqual(sw.$$, {
         cases: [{ case: 'foo', value: 'bar' }],
         mode: 'call',
         default: undefined
@@ -43,7 +43,7 @@ describe('it should test switcher', () => {
     it('should support (mode, default) syntax', () => {
       const sw = switcher('call', 'foo');
 
-      assert.deepEqual(sw.$, {
+      assert.deepEqual(sw.$$, {
         cases: [],
         mode: 'call',
         default: 'foo'
@@ -52,7 +52,7 @@ describe('it should test switcher', () => {
     it('should support (cases, mode, default) syntax', () => {
       const sw = switcher({ foo: 'bar' }, 'call', 'foo');
 
-      assert.deepEqual(sw.$, {
+      assert.deepEqual(sw.$$, {
         cases: [{ case: 'foo', value: 'bar' }],
         mode: 'call',
         default: 'foo'
@@ -143,14 +143,14 @@ describe('it should test Switcher#', () => {
 
       sw.case('foo', 'bar');
 
-      assert.deepEqual(sw.$.cases, [{ case: 'foo', value: 'bar' }]);
+      assert.deepEqual(sw.$$.cases, [{ case: 'foo', value: 'bar' }]);
     });
     it('should test that multiple cases is added', () => {
       const sw = switcher();
 
       sw.case(['foo', 'bar'], 'baz');
 
-      assert.deepEqual(sw.$.cases, [
+      assert.deepEqual(sw.$$.cases, [
         { case: 'foo', value: 'baz' },
         { case: 'bar', value: 'baz' }
       ]);
@@ -162,7 +162,7 @@ describe('it should test Switcher#', () => {
 
       sw.default('foo');
 
-      assert.strictEqual(sw.$.default, 'foo');
+      assert.strictEqual(sw.$$.default, 'foo');
     });
   });
   describe('mode()', () => {
@@ -171,7 +171,7 @@ describe('it should test Switcher#', () => {
 
       sw.mode('call');
 
-      assert.strictEqual(sw.$.mode, 'call');
+      assert.strictEqual(sw.$$.mode, 'call');
     });
   });
 });
