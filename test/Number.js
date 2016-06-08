@@ -352,12 +352,12 @@ describe('it should test Number::[methods]', () => {
     });
   });
   describe('interval()', () => {
-    it('should return clear-interval function', (done) => {
+    it('should return abort-interval function', (done) => {
       let number = 0;
 
       const n = 100;
       const wrap = new Num(n);
-      const clear = wrap.interval(() => {
+      const abort = wrap.interval(() => {
         if (number !== 2) {
           return number++;
         }
@@ -368,7 +368,7 @@ describe('it should test Number::[methods]', () => {
       });
 
       setTimeout(() => {
-        clear();
+        abort();
         done();
       }, 150);
     });
@@ -384,7 +384,7 @@ describe('it should test Number::[methods]', () => {
 
         number++;
 
-        this.clear();
+        this.abort();
 
         done();
       });
@@ -394,14 +394,14 @@ describe('it should test Number::[methods]', () => {
 
       const n = 100;
       const wrap = new Num(n);
-      const clear = wrap.interval(() => {
+      const abort = wrap.interval(() => {
         number++;
       });
 
       setTimeout(() => {
         try {
           assert.strictEqual(number, 10);
-          clear();
+          abort();
           done();
         } catch (err) {
           done(err);
@@ -759,7 +759,7 @@ describe('it should test Number::[methods]', () => {
     });
   });
   describe('timeout()', () => {
-    it('should return promise with clear method', (done) => {
+    it('should return promise with abort method', (done) => {
       const n = 150;
       const wrap = new Num(n);
       const timeout = wrap.timeout();
@@ -773,7 +773,7 @@ describe('it should test Number::[methods]', () => {
         });
 
       setTimeout(() => {
-        timeout.clear();
+        timeout.abort();
       }, 100);
     });
     it('should return promise, that will be resolved with value in argument in <context> milliseconds', (done) => {
