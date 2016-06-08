@@ -12,12 +12,12 @@ describe('it should test Alphabet::[methods]', () => {
       assert.deepEqual(wrap.$, { s: 's', 2: '2', 6: '6', 7: '7' });
     });
   });
-  describe('alphabet()', () => {
+  describe('get()', () => {
     it('should return an array of chars of alphabet', () => {
       const o = ['1', '2', '3', '4', '5'];
       const wrap = new Alphabet(o);
       
-      assert.deepEqual(wrap.alphabet().$, ['1', '2', '3', '4', '5']);
+      assert.deepEqual(wrap.get().$, ['1', '2', '3', '4', '5']);
     });
   });
   describe('contains()', () => {
