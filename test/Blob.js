@@ -1,15 +1,12 @@
 import * as assert from 'assert';
-import Blob from '../lib/Blob';
+import { blob } from '../lib/Blob';
 import Super from '../lib/Super';
-
-const NativeBlob = global.Blob;
 
 describe('it should test Blob::[methods]', () => {
   describe('readAs', () => {
     it('should return promise, that is resolved with text with "text" argument', (done) => {
-      const blob = new NativeBlob([new Super({ foo: 'bar' }).json()], { type: 'application/json' });
       const string = '{"foo":"bar"}';
-      const wrap = new Blob(blob);
+      const wrap = blob([new Super({ foo: 'bar' }).json()], { type: 'application/json' });
 
       wrap.readAs('text')
         .then((text) => {
@@ -20,9 +17,8 @@ describe('it should test Blob::[methods]', () => {
         .catch(done);
     });
     it('should return promise, that is resolved with dataURL with "dataURL" argument', (done) => {
-      const blob = new NativeBlob([new Super({ foo: 'bar' }).json()], { type: 'application/json' });
       const string = 'data:application/json;base64,eyJmb28iOiJiYXIifQ==';
-      const wrap = new Blob(blob);
+      const wrap = blob([new Super({ foo: 'bar' }).json()], { type: 'application/json' });
 
       wrap.readAs('dataURL')
         .then((dataURL) => {
@@ -33,9 +29,8 @@ describe('it should test Blob::[methods]', () => {
         .catch(done);
     });
     it('should return promise, that is resolved with binary data with "binary" argument', (done) => {
-      const blob = new NativeBlob([new Super({ foo: 'bar' }).json()], { type: 'application/json' });
       const string = '{"foo":"bar"}';
-      const wrap = new Blob(blob);
+      const wrap = blob([new Super({ foo: 'bar' }).json()], { type: 'application/json' });
 
       wrap.readAs('binary')
         .then((binary) => {
@@ -46,9 +41,8 @@ describe('it should test Blob::[methods]', () => {
         .catch(done);
     });
     it('should return promise, that is resolved with array buffer with "buffer" argument', (done) => {
-      const blob = new NativeBlob([new Super({ foo: 'bar' }).json()], { type: 'application/json' });
       const string = '{"foo":"bar"}';
-      const wrap = new Blob(blob);
+      const wrap = blob([new Super({ foo: 'bar' }).json()], { type: 'application/json' });
 
       wrap.readAs('buffer')
         .then((buffer) => {
@@ -61,8 +55,7 @@ describe('it should test Blob::[methods]', () => {
         .catch(done);
     });
     it('should return promise, that has abort method', (done) => {
-      const blob = new NativeBlob([new Super({ foo: 'bar' }).json()], { type: 'application/json' });
-      const wrap = new Blob(blob);
+      const wrap = blob([new Super({ foo: 'bar' }).json()], { type: 'application/json' });
       
       wrap.readAs('buffer')
         .abort()
