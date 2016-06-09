@@ -1,18 +1,18 @@
 import * as assert from 'assert';
-import Array, { array } from '../lib/Array';
+import Arr, { array } from '../lib/Array';
 import { isNaN } from '../lib/helpers';
 
-describe('it should test Array::[methods]', () => {
+describe('it should test Arr#', () => {
   describe('concat()', () => {
     it('should return a wrap of a different array', () => {
       const a = [1, 2, 3, 4, 5];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
       
       assert.notEqual(wrap.concat().$, a);
     });
     it('should work the same as Array.prototype.concat', () => {
       const a = [1, 2, 3];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
       
       assert.deepEqual(wrap.concat(4).$, a.concat(4));
       assert.deepEqual(wrap.concat(4, [5]).$, a.concat(4, [5]));
@@ -22,22 +22,22 @@ describe('it should test Array::[methods]', () => {
   describe('indexOf()', () => {
     it('should return -1 if not find', () => {
       const a = [0, 1, 2];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
 
       assert.strictEqual(wrap.indexOf(3), -1);
     });
     it('should return index if find', () => {
       const a1 = [0, 1, 2];
       const a2 = [1, 2, 3];
-      const wrap1 = new Array(a1);
-      const wrap2 = new Array(a2);
+      const wrap1 = new Arr(a1);
+      const wrap2 = new Arr(a2);
 
       assert.strictEqual(wrap1.indexOf(2), 2);
       assert.strictEqual(wrap2.indexOf(2), 1);
     });
     it('should find NaN', () => {
       const a = [0, NaN, 2];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
 
       assert.strictEqual(wrap.indexOf(NaN), 1);
     });
@@ -45,22 +45,22 @@ describe('it should test Array::[methods]', () => {
   describe('indexOfStrict()', () => {
     it('should return -1 if not find', () => {
       const a = [0, 1, 2];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
 
       assert.strictEqual(wrap.indexOfStrict(3), -1);
     });
     it('should return index if find', () => {
       const a1 = [0, 1, 2];
       const a2 = [1, '2', 2];
-      const wrap1 = new Array(a1);
-      const wrap2 = new Array(a2);
+      const wrap1 = new Arr(a1);
+      const wrap2 = new Arr(a2);
 
       assert.strictEqual(wrap1.indexOfStrict(2), 2);
       assert.strictEqual(wrap2.indexOfStrict(2), 2);
     });
     it('should find NaN', () => {
       const a = [0, NaN, 2];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
 
       assert.strictEqual(wrap.indexOfStrict(NaN), 1);
     });
@@ -68,7 +68,7 @@ describe('it should test Array::[methods]', () => {
   describe('join()', () => {
     it('should return a wrap of joined string', () => {
       const a = [1, 2, 3, 4, 5];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
 
       assert.equal(wrap.join(), a.join());
       assert.equal(wrap.join('a'), a.join('a'));
@@ -77,7 +77,7 @@ describe('it should test Array::[methods]', () => {
   describe('get last', () => {
     it('should return last element of array', () => {
       const a = [1, 2, 3, 4, 5];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
 
       assert.equal(wrap.last, a[a.length - 1]);
     });
@@ -85,7 +85,7 @@ describe('it should test Array::[methods]', () => {
   describe('get length', () => {
     it('should return length of array', () => {
       const a = [1, 2, 3, 4, 5];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
 
       assert.equal(wrap.length, a.length);
     });
@@ -93,7 +93,7 @@ describe('it should test Array::[methods]', () => {
   describe('pop()', () => {
     it('should delete last element', () => {
       const a = [1, 2, 3];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
       
       wrap.pop();
       
@@ -103,7 +103,7 @@ describe('it should test Array::[methods]', () => {
   describe('push()', () => {
     it('should add elements from arguments to the end of context', () => {
       const a = [1, 2, 3];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
       
       wrap.push(4, [5], [[6]]);
       
@@ -113,7 +113,7 @@ describe('it should test Array::[methods]', () => {
   describe('reverse()', () => {
     it('should not modify original array', () => {
       const a = [1, 2, 3];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
       
       wrap.reverse();
       
@@ -121,7 +121,7 @@ describe('it should test Array::[methods]', () => {
     });
     it('should return wrap of reversed array', () => {
       const a = [1, 2, 3];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
       
       assert.deepEqual(wrap.reverse().$, [3, 2, 1]);
     });
@@ -129,7 +129,7 @@ describe('it should test Array::[methods]', () => {
   describe('shift()', () => {
     it('should delete first element', () => {
       const a = [1, 2, 3];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
       
       wrap.shift();
       
@@ -139,7 +139,7 @@ describe('it should test Array::[methods]', () => {
   describe('shuffle()', () => {
     it('should not modify original array', () => {
       const a = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
 
       wrap.shuffle();
       
@@ -147,7 +147,7 @@ describe('it should test Array::[methods]', () => {
     });
     it('should return wrap of shuffled array', () => {
       const a = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
       const shuffled = wrap.shuffle();
       assert.notDeepEqual(shuffled, a);
 
@@ -167,13 +167,13 @@ describe('it should test Array::[methods]', () => {
   describe('slice()', () => {
     it('should return a wrap of a different array', () => {
       const a = [1, 2, 3, 4, 5];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
       
       assert.notEqual(wrap.slice().$, a);
     });
     it('should work the same as Array.prototype.slice', () => {
       const a = [1, 2, 3, 4, 5];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
       
       assert.deepEqual(wrap.slice().$, a.slice());
       assert.deepEqual(wrap.slice(3).$, a.slice(3));
@@ -184,7 +184,7 @@ describe('it should test Array::[methods]', () => {
   describe('sort()', () => {
     it('should use argument function for sorting values', () => {
       const a = [8, 13, 12, 0, 5, 9, -1, 6, 7, -2];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
       
       assert.deepEqual(wrap.sort((x, y) => {
         if (y % 2 && !(x % 2)) {
@@ -202,13 +202,13 @@ describe('it should test Array::[methods]', () => {
   describe('sortAsc()', () => {
     it('should do ascending sorting', () => {
       const a = [8, 5, 10, -1, 6];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
       
       assert.deepEqual(wrap.sortAsc().$, [-1, 5, 6, 8, 10]);
     });
     it('should put NaNs to the beginning', () => {
       const a = [8, 5, NaN, 10, -1, NaN, 6];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
 
       assert.strictEqual(isNaN(wrap.sortAsc().$[0]), true);
       assert.strictEqual(isNaN(wrap.sortAsc().$[1]), true);
@@ -217,13 +217,13 @@ describe('it should test Array::[methods]', () => {
   describe('sortDesc()', () => {
     it('should do descending sorting', () => {
       const a = [8, 5, 10, -1, 6];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
 
       assert.deepEqual(wrap.sortDesc().$, [10, 8, 6, 5, -1]);
     });
     it('should put NaNs to the end', () => {
       const a = [8, 5, NaN, 10, -1, NaN, 6];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
 
       assert.strictEqual(isNaN(wrap.sortDesc().$[a.length - 1]), true);
       assert.strictEqual(isNaN(wrap.sortDesc().$[a.length - 2]), true);
@@ -235,30 +235,30 @@ describe('it should test Array::[methods]', () => {
       let wrap;
       
       a = [1, 2, 3, 4, 5];
-      wrap = new Array(a);
+      wrap = new Arr(a);
       assert.deepEqual(wrap.splice().$, [1, 2, 3, 4, 5]);
 
       a = [1, 2, 3, 4, 5];
-      wrap = new Array(a);
+      wrap = new Arr(a);
       assert.deepEqual(wrap.splice(3).$, [1, 2, 3]);
 
       a = [1, 2, 3, 4, 5];
-      wrap = new Array(a);
+      wrap = new Arr(a);
       assert.deepEqual(wrap.splice(2, 2).$, [1, 2, 5]);
 
       a = [1, 2, 3, 4, 5];
-      wrap = new Array(a);
+      wrap = new Arr(a);
       assert.deepEqual(wrap.splice(1, 1, 5).$, [1, 5, 3, 4, 5]);
 
       a = [1, 2, 3, 4, 5];
-      wrap = new Array(a);
+      wrap = new Arr(a);
       assert.deepEqual(wrap.splice(1, 1, 7, 9).$, [1, 7, 9, 3, 4, 5]);
     });
   });
   describe('string()', () => {
     it('should return concatenated into string array', () => {
       const a = [1, 2, 3];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
       
       assert.strictEqual(wrap.string(), '123');
     });
@@ -266,7 +266,7 @@ describe('it should test Array::[methods]', () => {
   describe('unshift()', () => {
     it('should add elements from arguments to the start of context', () => {
       const a = [1, 2, 3];
-      const wrap = new Array(a);
+      const wrap = new Arr(a);
       
       wrap.unshift([[-2]], [-1], 0);
       
@@ -275,7 +275,7 @@ describe('it should test Array::[methods]', () => {
   });
 });
 
-describe('it should test exported methods from Array', () => {
+describe('it should test exported methods from Arr', () => {
   describe('array()', () => {
     it('should create wrap of an array with given length', () => {
       const length = 5;
