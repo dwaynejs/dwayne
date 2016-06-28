@@ -68,4 +68,5 @@ describe('it should test exported methods from Alphabet', () => {
       assert.deepEqual(wrap.$, { a: 'a', b: 'b', 0: '0', 1: '1', 2: '2' });
     });
   });
+  // TODO: add tests for creating an alphabet from strings like '123 a-z _?()'
 });
