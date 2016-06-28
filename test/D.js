@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import { supportSymbol } from '../lib/helpers';
 import * as methods from './../lib/D';
 
-describe('it should test D.[methods]', () => {
+describe('it should test D.', () => {
   describe('isArray()', () => {
     it('should return false with arguments argument', () => {
       assert.strictEqual(methods.isArray((function () {
