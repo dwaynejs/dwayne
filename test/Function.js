@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import Function, { noop, self, callsMethod } from '../lib/Function';
+import Function, { noop, self, method } from '../lib/Function';
 import Arr from '../lib/Array';
 import Num, { rand, random } from '../lib/Number';
 
@@ -345,8 +345,8 @@ describe('it should test exported methods from Function', () => {
         x: rnd
       };
 
-      assert.strictEqual(callsMethod('foo')(unique), rnd);
-      assert.strictEqual(callsMethod('foo', [1, 2, 3])(unique), 6 + rnd);
+      assert.strictEqual(method('foo')(unique), rnd);
+      assert.strictEqual(method('foo', [1, 2, 3])(unique), 6 + rnd);
     });
   });
 });
