@@ -1,16 +1,13 @@
 import * as assert from 'assert';
 import Super from '../lib/Super';
 
-describe('it should test Super::[methods]', () => {
+describe('it should test Super#', () => {
   describe('array()', () => {
     it('should return wrap of an array using mapFn', () => {
       const o = { a: 1, b: 2, c: 3 };
       const wrap = new Super(o);
 
-      assert.deepEqual(
-        wrap.array((array, value, key) => array.push(key + value)).$,
-        ['a1', 'b2', 'c3']
-      );
+      assert.deepEqual(wrap.array((array, value, key) => array.push(key + value)).$, ['a1', 'b2', 'c3']);
     });
   });
   describe('assign()', () => {
@@ -68,7 +65,7 @@ describe('it should test Super::[methods]', () => {
     it('should return instance of context', () => {
       const o = {};
       const wrap = new Super(o);
-      const instance = wrap.create();
+      const instance = wrap.create().$;
 
       assert.strictEqual(Object.getPrototypeOf(instance), o);
     });
@@ -83,7 +80,7 @@ describe('it should test Super::[methods]', () => {
       };
       const instance = wrap.create({
         foo: descriptor
-      });
+      }).$;
 
       assert.deepEqual(Object.getOwnPropertyDescriptor(instance, 'foo'), descriptor);
     });
@@ -118,6 +115,7 @@ describe('it should test Super::[methods]', () => {
 
       assert.strictEqual(wrap.deepEvery(() => false, 2), true);
     });
+    // TODO: test default Infinity parameter
     it('should use Boolean function for checking for falsey values', () => {
       const o1 = {
         a: { a: 0, b: 1 },
@@ -212,6 +210,7 @@ describe('it should test Super::[methods]', () => {
       assert.deepEqual(newO.a, { a: 1 });
       assert.notEqual(newO, o.a);
     });
+    // TODO: test default Infinity parameter
     it('should use Boolean function for filtering values', () => {
       const o1 = { a: { a: 0, b: 1 } };
       const o2 = { a: { a: 1, b: 2 } };
@@ -259,6 +258,7 @@ describe('it should test Super::[methods]', () => {
     });
   });
   describe('deepFind()', () => {
+    // TODO: test default Infinity parameter
     it('should return null if not find', () => {
       const o = { a: {}, b: {} };
       const wrap = new Super(o);
@@ -289,6 +289,7 @@ describe('it should test Super::[methods]', () => {
       ]);
     });
   });
+  // TODO: deepForEach()
   describe('deepFreeze()', () => {
     it('should freeze context', () => {
       const o = {};
@@ -312,6 +313,7 @@ describe('it should test Super::[methods]', () => {
     });
   });
   describe('deepMap()', () => {
+    // TODO: test default Infinity parameter
     it('should return a wrap of a different object', () => {
       const o = {};
       const wrap = new Super(o);
@@ -363,6 +365,7 @@ describe('it should test Super::[methods]', () => {
     });
   });
   describe('deepReduce()', () => {
+    // TODO: test default Infinity parameter
     it('should return initial value after deep actions', () => {
       const o = {
         a: { a: 1, b: 2 },
@@ -396,6 +399,7 @@ describe('it should test Super::[methods]', () => {
 
       assert.strictEqual(wrap.deepSome(() => true, 2), false);
     });
+    // TODO: test default Infinity parameter
     it('should use Boolean function for checking for false alike values', () => {
       const o1 = { a: { a: 0 } };
       const o2 = { a: { a: 1 } };
@@ -1117,6 +1121,7 @@ describe('it should test Super::[methods]', () => {
       assert.strictEqual(wrap5.type, 'boolean');
     });
   });
+  // TODO: value()
   describe('values()', () => {
     it('should return a wrap of an array of values of context', () => {
       const o = { a: 1, b: 2, c: 3 };
