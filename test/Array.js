@@ -91,12 +91,11 @@ describe('it should test Arr#', () => {
     });
   });
   describe('pop()', () => {
-    it('should delete last element', () => {
+    it('should delete the last element and return it', () => {
       const a = [1, 2, 3];
       const wrap = new Arr(a);
       
-      wrap.pop();
-      
+      assert.strictEqual(wrap.pop(), 3);
       assert.deepEqual(a, [1, 2]);
     });
   });
@@ -127,12 +126,11 @@ describe('it should test Arr#', () => {
     });
   });
   describe('shift()', () => {
-    it('should delete first element', () => {
+    it('should delete the first element and return it', () => {
       const a = [1, 2, 3];
       const wrap = new Arr(a);
       
-      wrap.shift();
-      
+      assert.strictEqual(wrap.shift(), 1);
       assert.deepEqual(a, [2, 3]);
     });
   });
