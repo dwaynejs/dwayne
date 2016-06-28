@@ -53,6 +53,7 @@ describe('it should test HtmlElement#', () => {
       assert.strictEqual(elem.innerHTML, '123&lt;div&gt;&lt;/div&gt;');
     });
   });
+  // TODO: addRule()
   describe('apply()', () => {
     it('should set id to the value from the string', () => {
       const elem1 = nativeDocument.createElement('div');
@@ -488,6 +489,7 @@ describe('it should test HtmlElement#', () => {
       assert.strictEqual(elem.style.fontWeight, 'bold');
     });
   });
+  // TODO: calcCSS()
   describe('centerText()', () => {
     it('should set text-align to center', () => {
       const elem = nativeDocument.createElement('div');
@@ -498,6 +500,7 @@ describe('it should test HtmlElement#', () => {
       assert.strictEqual(elem.style.textAlign, 'center');
     });
   });
+  // TODO: changeRule()
   describe('child()', () => {
     it('should return wrap of n-th child if argument is non-negative integer', () => {
       const elem = nativeDocument.createElement('div');
@@ -684,7 +687,7 @@ describe('it should test HtmlElement#', () => {
       elem.remove();
     });
   });
-  // TODO: .clone()
+  // TODO: clone()
   describe('contains', () => {
     it('should return true, if element contains another, and false if not', () => {
       const elem1 = nativeDocument.createElement('div');
@@ -887,7 +890,8 @@ describe('it should test HtmlElement#', () => {
       assert.deepEqual(elem.dataset, { domcFoo: '123', domcBar: '456' });
     });
   });
-  // TODO: .deepClone()
+  // TODO: deepClone()
+  // TODO: deleteRule()
   describe('defaultValue()', () => {
     it('should return default value with no arguments', () => {
       const elem = nativeDocument.createElement('input');
@@ -1119,7 +1123,7 @@ describe('it should test HtmlElement#', () => {
       assert.strictEqual(elem.style.position, 'fixed');
     });
   });
-  // TODO: .getFormData()
+  // TODO: getFormData()
   describe('hasAttr()', () => {
     it('should return true if the element has class', () => {
       const elem = nativeDocument.createElement('div');
@@ -1348,7 +1352,7 @@ describe('it should test HtmlElement#', () => {
       parent.remove();
     });
   });
-  // TODO: .isBroken()
+  // TODO: isBroken()
   describe('italic()', () => {
     it('should set font-style to italic', () => {
       const elem = nativeDocument.createElement('div');
@@ -1396,7 +1400,7 @@ describe('it should test HtmlElement#', () => {
       assert.strictEqual(elem.style.textDecorationLine, 'line-through');
     });
   });
-  // TODO: .load()
+  // TODO: load()
   describe('matches()', () => {
     it('should return if context matches selector', () => {
       const elem = nativeDocument.createElement('div');
@@ -1568,7 +1572,7 @@ describe('it should test HtmlElement#', () => {
       elem.remove();
     });
   });
-  // TODO: .off()
+  // TODO: off()
   describe('on()', () => {
     it('should support (event, listener) syntax', (done) => {
       const elem = nativeDocument.createElement('div');
@@ -1579,7 +1583,7 @@ describe('it should test HtmlElement#', () => {
       });
       wrap.dispatch('click');
     });
-    it('should support { [event]: listener, ... } syntax', (done) => {
+    it('should support ({ [event]: listener, ... }) syntax', (done) => {
       let times = 0;
 
       const elem = nativeDocument.createElement('div');
@@ -1596,6 +1600,8 @@ describe('it should test HtmlElement#', () => {
       });
       wrap.dispatch('click').dispatch('contextmenu');
     });
+    // TODO: test (event, secector, syntax)
+    // TODO: test ({ [event]: listener }, selector) syntax
     it('should return removeEventListeners function', (done) => {
       let times = 0;
 
@@ -1613,6 +1619,7 @@ describe('it should test HtmlElement#', () => {
 
       setTimeout(done, 50);
     });
+    // TODO: test selector parameter
   });
   describe('get outerHTML', () => {
     it('should return the same as element.outerHTML', () => {
@@ -1715,7 +1722,7 @@ describe('it should test HtmlElement#', () => {
       assert.strictEqual(wrap.prev(true).$, child1);
     });
   });
-  // TODO: .ref()
+  // TODO: ref()
   describe('relative()', () => {
     it('should set position to relative', () => {
       const elem = nativeDocument.createElement('div');
@@ -1785,7 +1792,7 @@ describe('it should test HtmlElement#', () => {
       assert.strictEqual(elem.style.marginBottom, '');
     });
   });
-  // TODO: .replace()
+  // TODO: replace()
   describe('get scrollHeight', () => {
     it('should return the same as element.scrollHeight', () => {
       const elem = nativeDocument.createElement('div');
@@ -1863,7 +1870,7 @@ describe('it should test HtmlElement#', () => {
       assert.strictEqual(elem.style.display, 'inline');
       assert.strictEqual('previousDisplay' in elem.domcData, false);
     });
-    it('should set display to element.domcData.previousDisplay and delete it', () => {
+    it('should set display to element.domcData.previousDisplay', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new HtmlElement(elem);
 
@@ -1872,7 +1879,6 @@ describe('it should test HtmlElement#', () => {
       wrap.show();
 
       assert.strictEqual(elem.style.display, 'inline');
-      assert.strictEqual('previousDisplay' in elem.domcData, false);
     });
   });
   describe('text()', () => {
@@ -2210,6 +2216,7 @@ describe('it should test exported methods from HtmlElement', () => {
         .catch(done);
     });
   });
+  // TODO: px()
 });
 
 describe('it should test HtmlCollection#', () => {
@@ -2295,6 +2302,7 @@ describe('it should test HtmlCollection#', () => {
 
       setTimeout(done, 50);
     });
+    // TODO: test selector parameter
   });
   describe('remove()', () => {
     it('should remove elements in collection from the page', () => {
@@ -2316,12 +2324,11 @@ describe('it should test HtmlCollection#', () => {
 
       wrap.forEach((elem) => {
         assert.strictEqual(elem.css('display'), 'inline');
-        assert.strictEqual('previousDisplay' in elem.$.domcData, false);
       });
     });
   });
 });
 
 describe('it should test String#', () => {
-  // TODO: .parseHTML()
+  // TODO: parseHTML()
 });
