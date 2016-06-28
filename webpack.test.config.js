@@ -11,7 +11,7 @@ module.exports = {
 			{
 				test: /\.js$/,
 				loader: 'babel-loader',
-				exclude: /node_modules|bower_components/,
+				exclude: /node_modules/,
 				query: {
 					presets: ['es2015']
 				}
@@ -19,11 +19,10 @@ module.exports = {
 			{
 				test: /\.js$/,
 				loader: 'eslint-loader',
-				exclude: /node_modules|bower_components/
+				exclude: /node_modules/
 			}
 		]
 	},
-	cache: false,
-	devtool: 'source-map',
-	devServer: { port }
+  devServer: { port },
+  devtool: '#cheap-module-eval-source-map'
 };
