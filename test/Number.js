@@ -660,6 +660,29 @@ describe('it should test Number::[methods]', () => {
       assert.strictEqual(diff5 <= eps, true, `sin(45): ${ diff5 } <= ${ eps }`);
     });
   });
+  describe('get sq', () => {
+    it('should return square of the number', () => {
+      const n1 = 1;
+      const n2 = -5;
+      const n3 = 0;
+      const n4 = 7;
+      const n5 = -Infinity;
+      const n6 = NaN;
+      const wrap1 = new Num(n1);
+      const wrap2 = new Num(n2);
+      const wrap3 = new Num(n3);
+      const wrap4 = new Num(n4);
+      const wrap5 = new Num(n5);
+      const wrap6 = new Num(n6);
+
+      assert.strictEqual(wrap1.sq, 1);
+      assert.strictEqual(wrap2.sq, 25);
+      assert.strictEqual(wrap3.sq, 0);
+      assert.strictEqual(wrap4.sq, 49);
+      assert.strictEqual(wrap5.sq, Infinity);
+      assert.strictEqual(isNaN(wrap6.sq), true);
+    });
+  });
   describe('get sqrt', () => {
     it('should work the same as Math.sqrt', () => {
       const n1 = 1;
@@ -685,29 +708,6 @@ describe('it should test Number::[methods]', () => {
       assert.strictEqual(diff4 <= eps, true, `sqrt(9): ${ diff4 } <= ${ eps }`);
       assert.strictEqual(wrap5.sqrt, Infinity);
       assert.strictEqual(isNaN(wrap6.sqrt), true);
-    });
-  });
-  describe('get square', () => {
-    it('should return square of the number', () => {
-      const n1 = 1;
-      const n2 = -5;
-      const n3 = 0;
-      const n4 = 7;
-      const n5 = -Infinity;
-      const n6 = NaN;
-      const wrap1 = new Num(n1);
-      const wrap2 = new Num(n2);
-      const wrap3 = new Num(n3);
-      const wrap4 = new Num(n4);
-      const wrap5 = new Num(n5);
-      const wrap6 = new Num(n6);
-
-      assert.strictEqual(wrap1.square, 1);
-      assert.strictEqual(wrap2.square, 25);
-      assert.strictEqual(wrap3.square, 0);
-      assert.strictEqual(wrap4.square, 49);
-      assert.strictEqual(wrap5.square, Infinity);
-      assert.strictEqual(isNaN(wrap6.square), true);
     });
   });
   describe('tan()', () => {
