@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import Str from '../lib/String';
 import { isDate, isString } from '../lib/helpers';
 
-describe('it should test String::[methods]', () => {
+describe('it should test String#', () => {
   describe('capitalizeFirst()', () => {
     it('should return string with first capital symbol', () => {
       const s = 'fooBar';
@@ -32,7 +32,7 @@ describe('it should test String::[methods]', () => {
       const s = '<div>&</div>';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.escapeHtml().$, '&lt;div&gt;&amp;&lt;/div&gt;');
+      assert.strictEqual(wrap.escapeHTML().$, '&lt;div&gt;&amp;&lt;/div&gt;');
     });
   });
   describe('escapeRegExp()', () => {
@@ -201,6 +201,7 @@ describe('it should test String::[methods]', () => {
       assert.strictEqual(wrap.revert().$, 'raBoof');
     });
   });
+  // TODO: search()
   describe('slice()', () => {
     it('work the same as String.prototype.slice', () => {
       const s = 'foobar';
