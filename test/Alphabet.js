@@ -61,12 +61,17 @@ describe('it should test Alphabet::[methods]', () => {
 
 describe('it should test exported methods from Alphabet', () => {
   describe('alphabet()', () => {
-    it('should return right alphabet', () => {
+    it('should return right alphabet with ranges argument', () => {
       const s = 'a-b0-2';
       const wrap = alphabet(s);
 
       assert.deepEqual(wrap.$, { a: 'a', b: 'b', 0: '0', 1: '1', 2: '2' });
     });
+    it('should return right alphabet', () => {
+      const s = '123 a-b _?()';
+      const wrap = alphabet(s);
+
+      assert.deepEqual(wrap.$, { 1: 1, 2: 2, 3: 3, a: 'a', b: 'b', _: '_', '?': '?', '(': '(', ')': ')' });
+    });
   });
-  // TODO: add tests for creating an alphabet from strings like '123 a-z _?()'
 });
