@@ -133,11 +133,7 @@ describe('it should test Date#', () => {
       assert.strictEqual(wrap.getUTC('h'), date.getUTCHours());
       assert.strictEqual(wrap.getUTC('d'), date.getUTCDate());
       assert.strictEqual(wrap.getUTC('dw'), date.getUTCDay());
-      assert.strictEqual(wrap.getUTC('dwa'), 'Fri');
-      assert.strictEqual(wrap.getUTC('dwn'), 'Friday');
       assert.strictEqual(wrap.getUTC('M'), date.getUTCMonth() + 1);
-      assert.strictEqual(wrap.getUTC('Ma'), 'Dec');
-      assert.strictEqual(wrap.getUTC('Mn'), 'December');
       assert.strictEqual(wrap.getUTC('y'), date.getUTCFullYear());
     });
   });
