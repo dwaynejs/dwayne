@@ -26,6 +26,7 @@ describe('it should test String#', () => {
       assert.strictEqual(wrap.endsWith('oo'), true);
       assert.strictEqual(wrap.endsWith('foo'), true);
     });
+    // TODO: add position argument
   });
   describe('escapeHtml()', () => {
     it('should return escaped string for html code', () => {
@@ -69,7 +70,9 @@ describe('it should test String#', () => {
       assert.strictEqual(wrap.indexOf('o'), 1);
       assert.strictEqual(wrap.indexOf('s'), -1);
     });
+    // TODO: add fromIndex argument
   });
+  // TODO: lastIndexOf
   describe('get length', () => {
     it('should return length of the context', () => {
       const s1 = 'foobar';
@@ -112,7 +115,7 @@ describe('it should test String#', () => {
       assert.strictEqual(wrap4.parseJSON().$, 1);
       assert.strictEqual(wrap5.parseJSON().$, '1');
     });
-    it('should use mapFn for parsing if present', () => {
+    it('should use callback for parsing if present', () => {
       const s = '{ "foo": "bar", "bar": { "baz": "baz" } }';
       const wrap = new Str(s);
 
@@ -238,6 +241,7 @@ describe('it should test String#', () => {
       assert.strictEqual(wrap.startsWith('fo'), true);
       assert.strictEqual(wrap.startsWith('foo'), true);
     });
+    // TODO: add position argument
   });
   describe('substring()', () => {
     it('work the same as String.prototype.substring', () => {
