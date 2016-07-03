@@ -12,21 +12,15 @@ describe('it should test String#', () => {
     });
   });
   describe('endsWith()', () => {
-    it('should return true with empty string argument', () => {
-      const s = '';
+    it('should work the same as String#endsWith', () => {
+      const s = 'foobar';
       const wrap = new Str(s);
 
       assert.strictEqual(wrap.endsWith(''), true);
+      assert.strictEqual(wrap.endsWith('r'), true);
+      assert.strictEqual(wrap.endsWith('bar'), true);
+      assert.strictEqual(wrap.endsWith('foo', 3), true);
     });
-    it('should return true with any string, that context ends with', () => {
-      const s = 'foo';
-      const wrap = new Str(s);
-
-      assert.strictEqual(wrap.endsWith('o'), true);
-      assert.strictEqual(wrap.endsWith('oo'), true);
-      assert.strictEqual(wrap.endsWith('foo'), true);
-    });
-    // TODO: add position argument
   });
   describe('escapeHtml()', () => {
     it('should return escaped string for html code', () => {
@@ -62,17 +56,27 @@ describe('it should test String#', () => {
     });
   });
   describe('indexOf()', () => {
-    it('should work the same as String.prototype.indexOf', () => {
+    it('should work the same as String#indexOf', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
       assert.strictEqual(wrap.indexOf('f'), 0);
       assert.strictEqual(wrap.indexOf('o'), 1);
+      assert.strictEqual(wrap.indexOf('o', 2), 2);
       assert.strictEqual(wrap.indexOf('s'), -1);
     });
-    // TODO: add fromIndex argument
   });
-  // TODO: lastIndexOf
+  describe('lastIndexOf()', () => {
+    it('should work the same as String#lastIndexOf', () => {
+      const s = 'foobar';
+      const wrap = new Str(s);
+
+      assert.strictEqual(wrap.lastIndexOf('f'), 0);
+      assert.strictEqual(wrap.lastIndexOf('o'), 2);
+      assert.strictEqual(wrap.lastIndexOf('o', 1), 1);
+      assert.strictEqual(wrap.lastIndexOf('s'), -1);
+    });
+  });
   describe('get length', () => {
     it('should return length of the context', () => {
       const s1 = 'foobar';
@@ -88,7 +92,7 @@ describe('it should test String#', () => {
     });
   });
   describe('match()', () => {
-    it('should work the same as String.prototype.match', () => {
+    it('should work the same as String#match', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
@@ -167,7 +171,7 @@ describe('it should test String#', () => {
 
       assert.strictEqual(wrap.replace(/o/g).$, 'fbar');
     });
-    it('should work the same as String.prototype.replace', () => {
+    it('should work the same as String#replace', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
@@ -204,9 +208,17 @@ describe('it should test String#', () => {
       assert.strictEqual(wrap.revert().$, 'raBoof');
     });
   });
-  // TODO: search()
+  describe('search()', () => {
+    it('should work the same as String#search', () => {
+      const s = 'foobar';
+      const wrap = new Str(s);
+
+      assert.strictEqual(wrap.search(/o/), 1);
+      assert.strictEqual(wrap.search(/s/), -1);
+    });
+  });
   describe('slice()', () => {
-    it('work the same as String.prototype.slice', () => {
+    it('work the same as String#slice', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
@@ -217,7 +229,7 @@ describe('it should test String#', () => {
     });
   });
   describe('split()', () => {
-    it('should work the same as String.prototype.split', () => {
+    it('should work the same as String#split', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
@@ -227,24 +239,18 @@ describe('it should test String#', () => {
     });
   });
   describe('startsWith()', () => {
-    it('should return true with empty string argument', () => {
-      const s = '';
+    it('should work the same as String#endsWith', () => {
+      const s = 'foobar';
       const wrap = new Str(s);
 
       assert.strictEqual(wrap.startsWith(''), true);
-    });
-    it('should return true with any string, that context ends with', () => {
-      const s = 'foo';
-      const wrap = new Str(s);
-
       assert.strictEqual(wrap.startsWith('f'), true);
-      assert.strictEqual(wrap.startsWith('fo'), true);
       assert.strictEqual(wrap.startsWith('foo'), true);
+      assert.strictEqual(wrap.startsWith('bar', 3), true);
     });
-    // TODO: add position argument
   });
   describe('substring()', () => {
-    it('work the same as String.prototype.substring', () => {
+    it('work the same as String#substring', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
@@ -255,7 +261,7 @@ describe('it should test String#', () => {
     });
   });
   describe('substr()', () => {
-    it('work the same as String.prototype.substr', () => {
+    it('work the same as String#substr', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
