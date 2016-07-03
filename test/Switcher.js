@@ -133,6 +133,18 @@ describe('it should test switcher', () => {
       assert.strictEqual(sw(1), unique3);
       assert.strictEqual(sw({}), undefined);
     });
+    it('should support args argument', () => {
+      const array = [1, 2, 3, 4];
+      const sw = switcher({
+        first: (array) => array[0],
+        last: (array) => array[array.length - 1]
+      }, 'equals', (array, value) => array[value]);
+
+      assert.strictEqual(sw('first', [array]), 1);
+      assert.strictEqual(sw('last', [array]), 4);
+      assert.strictEqual(sw(1, [array]), 2);
+      assert.strictEqual(sw(2, [array]), 3);
+    });
   });
 });
 
