@@ -115,7 +115,16 @@ describe('it should test Super#', () => {
 
       assert.strictEqual(wrap.deepEvery(() => false, 2), true);
     });
-    // TODO: test default Infinity parameter
+    it('should use default Infinity parameter if the depth parameter isn\'t present', () => {
+      const o = {
+        a: 1,
+        b: { c: 2, d: 3 }
+      };
+      const wrap = new Super(o);
+
+      assert.strictEqual(wrap.deepEvery((value) => value < 4), true);
+      assert.strictEqual(wrap.deepEvery((value) => value < 3), false);
+    });
     it('should use Boolean function for checking for falsey values', () => {
       const o1 = {
         a: { a: 0, b: 1 },
@@ -146,7 +155,7 @@ describe('it should test Super#', () => {
       assert.strictEqual(wrap1.deepEvery((value) => value < 4, 2), true);
       assert.strictEqual(wrap2.deepEvery((value) => value < 4, 2), false);
     });
-    it('should check that deepEvery() does not iterate after getting false', () => {
+    it('should not iterate after getting false', () => {
       const o = {
         a: { a: 0, b: 1 },
         b: { a: 2, b: 3 }
@@ -210,7 +219,24 @@ describe('it should test Super#', () => {
       assert.deepEqual(newO.a, { a: 1 });
       assert.notEqual(newO, o.a);
     });
-    // TODO: test default Infinity parameter
+    it('should use default Infinity parameter if the depth parameter isn\'t present', () => {
+      const o = {
+        a: 1,
+        b: { c: 2, d: 3 },
+        c: { e: { f: 4, g: 5, h: 6 } }
+      };
+      const wrap = new Super(o);
+
+      assert.deepEqual(wrap.deepFilter((value) => value % 2).$, {
+        a: 1,
+        b: { d: 3 },
+        c: { e: { g: 5 } }
+      });
+      assert.deepEqual(wrap.deepFilter((value) => !(value % 2)).$, {
+        b: { c: 2 },
+        c: { e: { f: 4, h: 6 } }
+      });
+    });
     it('should use Boolean function for filtering values', () => {
       const o1 = { a: { a: 0, b: 1 } };
       const o2 = { a: { a: 1, b: 2 } };
@@ -258,12 +284,26 @@ describe('it should test Super#', () => {
     });
   });
   describe('deepFind()', () => {
-    // TODO: test default Infinity parameter
     it('should return null if not find', () => {
       const o = { a: {}, b: {} };
       const wrap = new Super(o);
 
       assert.strictEqual(wrap.deepFind(() => true, 2), null);
+    });
+    it('should use default Infinity parameter if the depth parameter isn\'t present', () => {
+      const o = {
+        a: 1,
+        b: { c: 2, d: 3 },
+        c: { e: { f: 4, g: 5, h: 6 } }
+      };
+      const wrap = new Super(o);
+
+      assert.deepEqual(wrap.deepFind((value) => value === 5), [
+        { key: 'g', value: 5 },
+        { key: 'e', value: o.c.e },
+        { key: 'c', value: o.c },
+        { key: null, value: o }
+      ]);
     });
     it('should return tree if find', () => {
       const o1 = {
@@ -289,7 +329,48 @@ describe('it should test Super#', () => {
       ]);
     });
   });
-  // TODO: deepForEach()
+  describe('deepForEach()', () => {
+    it('should use default Infinity parameter if the depth parameter isn\'t present', () => {
+      const o = {
+        a: 1,
+        b: { c: 2, d: 3 },
+        c: { e: { f: 4, g: 5, h: 6 } }
+      };
+      const wrap = new Super(o);
+
+      wrap.deepForEach((value, key, object) => object[key] = value * value);
+
+      assert.deepEqual(o, {
+        a: 1,
+        b: { c: 4, d: 9 },
+        c: { e: { f: 16, g: 25, h: 36 } }
+      });
+    });
+    it('should support 4th "tree" argument', () => {
+      const o = {
+        a: 1,
+        b: { c: 2, d: 3 },
+        c: { e: { f: 4, g: 5, h: 6 } }
+      };
+      const wrap = new Super(o);
+
+      wrap.deepForEach((value, key, object, tree) => {
+        let string = '';
+
+        for (let i = tree.length - 2; i >= 0; i--) {
+          string += tree[i].key;
+        }
+
+        object[key] = string;
+      });
+
+      assert.deepEqual(o, {
+        a: 'a',
+        b: { c: 'bc', d: 'bd' },
+        c: { e: { f: 'cef', g: 'ceg', h: 'ceh' } }
+      });
+    });
+  });
   describe('deepFreeze()', () => {
     it('should freeze context', () => {
       const o = {};
@@ -313,7 +394,6 @@ describe('it should test Super#', () => {
     });
   });
   describe('deepMap()', () => {
-    // TODO: test default Infinity parameter
     it('should return a wrap of a different object', () => {
       const o = {};
       const wrap = new Super(o);
@@ -327,6 +407,20 @@ describe('it should test Super#', () => {
 
       assert.deepEqual(newO.a, { a: 1 });
       assert.notEqual(newO, o.a);
+    });
+    it('should use default Infinity parameter if the depth parameter isn\'t present', () => {
+      const o = {
+        a: 1,
+        b: { c: 2, d: 3 },
+        c: { e: { f: 4, g: 5, h: 6 } }
+      };
+      const wrap = new Super(o);
+
+      assert.deepEqual(wrap.deepMap((value, key) => value * value).$, {
+        a: 1,
+        b: { c: 4, d: 9 },
+        c: { e: { f: 16, g: 25, h: 36 } }
+      });
     });
     it('should set values', () => {
       const o = {
@@ -365,7 +459,6 @@ describe('it should test Super#', () => {
     });
   });
   describe('deepReduce()', () => {
-    // TODO: test default Infinity parameter
     it('should return initial value after deep actions', () => {
       const o = {
         a: { a: 1, b: 2 },
@@ -374,6 +467,16 @@ describe('it should test Super#', () => {
       const wrap = new Super(o);
 
       assert.strictEqual(wrap.deepReduce((sum, value) => sum + value, 2), 10);
+    });
+    it('should handle Infinity parameter', () => {
+      const o = {
+        a: 1,
+        b: { c: 2, d: 3 },
+        c: { e: { f: 4, g: 5, h: 6 } }
+      };
+      const wrap = new Super(o);
+
+      assert.strictEqual(wrap.deepReduce((sum, value) => sum + value, Infinity, 0), 21);
     });
     it('should support 5th "tree" argument', () => {
       const o = {
@@ -399,7 +502,16 @@ describe('it should test Super#', () => {
 
       assert.strictEqual(wrap.deepSome(() => true, 2), false);
     });
-    // TODO: test default Infinity parameter
+    it('should use default Infinity parameter if the depth parameter isn\'t present', () => {
+      const o = {
+        a: 1,
+        b: { c: 2, d: 3 }
+      };
+      const wrap = new Super(o);
+
+      assert.strictEqual(wrap.deepSome((value) => value > 3), false);
+      assert.strictEqual(wrap.deepSome((value) => value > 2), true);
+    });
     it('should use Boolean function for checking for false alike values', () => {
       const o1 = { a: { a: 0 } };
       const o2 = { a: { a: 1 } };
@@ -424,7 +536,7 @@ describe('it should test Super#', () => {
       assert.strictEqual(wrap1.deepSome((value) => value < 1, 2), true);
       assert.strictEqual(wrap2.deepSome((value) => value < 1, 2), false);
     });
-    it('should check that deepEvery() does not iterate after getting false', () => {
+    it('should not iterate after getting false', () => {
       const o = {
         a: { a: 0, b: 1 },
         b: { a: 2, b: 3 }
@@ -1121,7 +1233,40 @@ describe('it should test Super#', () => {
       assert.strictEqual(wrap5.type, 'boolean');
     });
   });
-  // TODO: value()
+  describe('value()', () => {
+    it('should support (property, value) syntax', () => {
+      const o = {};
+      const wrap = new Super(o);
+
+      wrap.value('key', 1);
+
+      assert.deepEqual(Object.getOwnPropertyDescriptor(o, 'key'), {
+        value: 1,
+        writable: false,
+        enumerable: false,
+        configurable: false
+      });
+    });
+    it('should support object argument syntax', () => {
+      const o = {};
+      const wrap = new Super(o);
+
+      wrap.value({ key1: 1, key2: 2 });
+
+      assert.deepEqual(Object.getOwnPropertyDescriptor(o, 'key1'), {
+        value: 1,
+        writable: false,
+        enumerable: false,
+        configurable: false
+      });
+      assert.deepEqual(Object.getOwnPropertyDescriptor(o, 'key2'), {
+        value: 2,
+        writable: false,
+        enumerable: false,
+        configurable: false
+      });
+    });
+  });
   describe('values()', () => {
     it('should return a wrap of an array of values of context', () => {
       const o = { a: 1, b: 2, c: 3 };
