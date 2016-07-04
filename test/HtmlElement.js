@@ -31,13 +31,13 @@ describe('it should test HtmlElement#', () => {
       assert.strictEqual(elem.classList.contains('baz'), true);
     });
   });
-  describe('addHtml()', () => {
+  describe('addHTML()', () => {
     it('should add html to the end', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new HtmlElement(elem);
       
       elem.innerHTML = '123';
-      wrap.addHtml('<div></div>');
+      wrap.addHTML('<div></div>');
       
       assert.strictEqual(elem.innerHTML, '123<div></div>');
     });
@@ -635,58 +635,6 @@ describe('it should test HtmlElement#', () => {
       assert.strictEqual(wrap.closest('.foo').$, parent3);
     });
   });
-  describe('get clientHeight', () => {
-    it('should return the same as element.clientHeight', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      elem.innerHTML = '123';
-      nativeDocument.body.appendChild(elem);
-
-      assert.strictEqual(wrap.clientHeight, elem.clientHeight);
-
-      elem.remove();
-    });
-  });
-  describe('get clientLeft', () => {
-    it('should return the same as element.clientLeft', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      elem.innerHTML = '123';
-      nativeDocument.body.appendChild(elem);
-
-      assert.strictEqual(wrap.clientLeft, elem.clientLeft);
-
-      elem.remove();
-    });
-  });
-  describe('get clientTop', () => {
-    it('should return the same as element.clientTop', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      elem.innerHTML = '123';
-      nativeDocument.body.appendChild(elem);
-
-      assert.strictEqual(wrap.clientTop, elem.clientTop);
-
-      elem.remove();
-    });
-  });
-  describe('get clientWidth', () => {
-    it('should return the same as element.clientWidth', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      elem.innerHTML = '123';
-      nativeDocument.body.appendChild(elem);
-
-      assert.strictEqual(wrap.clientWidth, elem.clientWidth);
-
-      elem.remove();
-    });
-  });
   // TODO: clone()
   describe('contains', () => {
     it('should return true, if element contains another, and false if not', () => {
@@ -890,7 +838,6 @@ describe('it should test HtmlElement#', () => {
       assert.deepEqual(elem.dataset, { domcFoo: '123', domcBar: '456' });
     });
   });
-  // TODO: deepClone()
   // TODO: deleteRule()
   describe('defaultValue()', () => {
     it('should return default value with no arguments', () => {
@@ -1520,58 +1467,6 @@ describe('it should test HtmlElement#', () => {
       assert.strictEqual(wrap.next(true).$, child3);
     });
   });
-  describe('get offsetHeight', () => {
-    it('should return the same as element.offsetHeight', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      elem.innerHTML = '123';
-      nativeDocument.body.appendChild(elem);
-
-      assert.strictEqual(wrap.offsetHeight, elem.offsetHeight);
-
-      elem.remove();
-    });
-  });
-  describe('get offsetLeft', () => {
-    it('should return the same as element.offsetLeft', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      elem.innerHTML = '123';
-      nativeDocument.body.appendChild(elem);
-
-      assert.strictEqual(wrap.offsetLeft, elem.offsetLeft);
-
-      elem.remove();
-    });
-  });
-  describe('get offsetTop', () => {
-    it('should return the same as element.offsetTop', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      elem.innerHTML = '123';
-      nativeDocument.body.appendChild(elem);
-
-      assert.strictEqual(wrap.offsetTop, elem.offsetTop);
-
-      elem.remove();
-    });
-  });
-  describe('get offsetWidth', () => {
-    it('should return the same as element.offsetWidth', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      elem.innerHTML = '123';
-      nativeDocument.body.appendChild(elem);
-
-      assert.strictEqual(wrap.offsetWidth, elem.offsetWidth);
-
-      elem.remove();
-    });
-  });
   // TODO: off()
   describe('on()', () => {
     it('should support (event, listener) syntax', (done) => {
@@ -1629,16 +1524,6 @@ describe('it should test HtmlElement#', () => {
       elem.innerHTML = '<input />';
 
       assert.strictEqual(wrap.outerHTML, elem.outerHTML);
-    });
-  });
-  describe('get outerText', () => {
-    it('should return the same as element.outerText', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      elem.innerHTML = '123<input />123';
-
-      assert.strictEqual(wrap.outerText, elem.outerText);
     });
   });
   describe('overline()', () => {
@@ -1772,7 +1657,7 @@ describe('it should test HtmlElement#', () => {
       assert.strictEqual(elem.classList.contains('baz'), false);
     });
   });
-  describe('removeCss()', () => {
+  describe('removeCSS()', () => {
     it('should remove css properties from arguments', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new HtmlElement(elem);
@@ -1781,7 +1666,7 @@ describe('it should test HtmlElement#', () => {
       elem.style.cursor = 'pointer';
       elem.style.margin = '2px';
 
-      wrap.removeCss('display', 'cursor', 'margin');
+      wrap.removeCSS('display', 'cursor', 'margin');
 
       assert.strictEqual(elem.style.display, '');
       assert.strictEqual(elem.style.cursor, '');
@@ -1793,58 +1678,6 @@ describe('it should test HtmlElement#', () => {
     });
   });
   // TODO: replace()
-  describe('get scrollHeight', () => {
-    it('should return the same as element.scrollHeight', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      elem.innerHTML = '123';
-      nativeDocument.body.appendChild(elem);
-
-      assert.strictEqual(wrap.scrollHeight, elem.scrollHeight);
-
-      elem.remove();
-    });
-  });
-  describe('get scrollLeft', () => {
-    it('should return the same as element.scrollLeft', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      elem.innerHTML = '123';
-      nativeDocument.body.appendChild(elem);
-
-      assert.strictEqual(wrap.scrollLeft, elem.scrollLeft);
-
-      elem.remove();
-    });
-  });
-  describe('get scrollTop', () => {
-    it('should return the same as element.scrollTop', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      elem.innerHTML = '123';
-      nativeDocument.body.appendChild(elem);
-
-      assert.strictEqual(wrap.scrollTop, elem.scrollTop);
-
-      elem.remove();
-    });
-  });
-  describe('get scrollWidth', () => {
-    it('should return the same as element.scrollWidth', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      elem.innerHTML = '123';
-      nativeDocument.body.appendChild(elem);
-
-      assert.strictEqual(wrap.scrollWidth, elem.scrollWidth);
-
-      elem.remove();
-    });
-  });
   describe('setOf', () => {
     it('should add set of elements of specified type', () => {
       const elem = nativeDocument.createElement('div');
