@@ -2,14 +2,6 @@ import * as assert from 'assert';
 import Super from '../lib/Super';
 
 describe('it should test Super#', () => {
-  describe('array()', () => {
-    it('should return wrap of an array using mapFn', () => {
-      const o = { a: 1, b: 2, c: 3 };
-      const wrap = new Super(o);
-
-      assert.deepEqual(wrap.array((array, value, key) => array.push(key + value)).$, ['a1', 'b2', 'c3']);
-    });
-  });
   describe('assign()', () => {
     it('should rewrite original values', () => {
       const o = { a: 1, b: 2, c: 3 };
@@ -993,6 +985,7 @@ describe('it should test Super#', () => {
         { 1: 'a1', 2: 'b2', 3: 'c3' }
       );
     });
+    // TODO: test for the second argument
   });
   describe('prop()', () => {
     it('should get object[property] with one string argument', () => {
