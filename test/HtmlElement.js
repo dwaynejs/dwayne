@@ -1,6 +1,5 @@
 import * as assert from 'assert';
-import HtmlElement, { find, findAll, loadImages } from '../lib/HtmlElement';
-import HtmlCollection from '../lib/HtmlCollection';
+import HtmlElement, { find, findAll, loadImages, Elems } from '../lib/HtmlElement';
 import { array } from '../lib/Array';
 import Super from '../lib/Super';
 import css from '../lib/constants/css';
@@ -2049,10 +2048,11 @@ describe('it should test exported methods from HtmlElement', () => {
         .catch(done);
     });
   });
+  // TODO: parseHTML()
   // TODO: px()
 });
 
-describe('it should test HtmlCollection#', () => {
+describe('it should test Elems#', () => {
   const count = 3;
   let wrap;
 
@@ -2063,7 +2063,7 @@ describe('it should test HtmlCollection#', () => {
       nativeDocument.body.appendChild(elem);
     });
 
-    wrap = new HtmlCollection(nativeDocument.getElementsByClassName('foo'));
+    wrap = new Elems(nativeDocument.getElementsByClassName('foo'));
   });
 
   afterEach(() => {
@@ -2160,8 +2160,4 @@ describe('it should test HtmlCollection#', () => {
       });
     });
   });
-});
-
-describe('it should test String#', () => {
-  // TODO: parseHTML()
 });
