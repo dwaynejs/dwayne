@@ -55,28 +55,12 @@ describe('it should test HtmlElement#', () => {
   // TODO: addRule()
   describe('apply()', () => {
     it('should set id to the value from the string', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const elem5 = nativeDocument.createElement('div');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
-      const wrap3 = new HtmlElement(elem3);
-      const wrap4 = new HtmlElement(elem4);
-      const wrap5 = new HtmlElement(elem5);
+      const elem = nativeDocument.createElement('div');
+      const wrap = new HtmlElement(elem);
 
-      wrap1.apply('#(domc id1)');
-      wrap2.apply('#"domc id2"');
-      wrap3.apply('#`domc id3`');
-      wrap4.apply('#\'domc id4\'');
-      wrap5.apply('#domc');
+      wrap.apply('#domc');
 
-      assert.strictEqual(elem1.id, 'domc id1');
-      assert.strictEqual(elem2.id, 'domc id2');
-      assert.strictEqual(elem3.id, 'domc id3');
-      assert.strictEqual(elem4.id, 'domc id4');
-      assert.strictEqual(elem5.id, 'domc');
+      assert.strictEqual(elem.id, 'domc');
     });
     it('should add class from the string', () => {
       const elem = nativeDocument.createElement('div');
@@ -85,30 +69,6 @@ describe('it should test HtmlElement#', () => {
       wrap.apply('.domc');
 
       assert.strictEqual(elem.classList.contains('domc'), true);
-    });
-    it('should set float to left', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      wrap.apply('<--');
-
-      assert.strictEqual(elem.style.float, 'left');
-    });
-    it('should set float to right', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      wrap.apply('-->');
-
-      assert.strictEqual(elem.style.float, 'right');
-    });
-    it('should set ref to the value from the string', () => {
-      const elem = nativeDocument.createElement('img');
-      const wrap = new HtmlElement(elem);
-
-      wrap.apply('->/test.html');
-
-      assert.strictEqual(elem.getAttribute('src'), '/test.html');
     });
     it('should remove class from the string', () => {
       const elem = nativeDocument.createElement('div');
@@ -133,168 +93,23 @@ describe('it should test HtmlElement#', () => {
       const wrap = new HtmlElement(elem);
 
       elem.setAttribute('foo', 'bar');
-      wrap.apply('-foo');
+      wrap.apply('-$foo');
 
       assert.strictEqual(elem.hasAttribute('foo'), false);
-    });
-    it('should put element to the element presented by selector from the string', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const parent1 = nativeDocument.createElement('div');
-      const parent2 = nativeDocument.createElement('div');
-      const parent3 = nativeDocument.createElement('div');
-      const parent4 = nativeDocument.createElement('div');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
-      const wrap3 = new HtmlElement(elem3);
-      const wrap4 = new HtmlElement(elem4);
-
-      parent1.id = 'domc-parent1';
-      parent2.id = 'domc-parent2';
-      parent3.id = 'domc-parent3';
-      parent4.id = 'domc-parent4';
-
-      nativeDocument.body.appendChild(parent1);
-      nativeDocument.body.appendChild(parent2);
-      nativeDocument.body.appendChild(parent3);
-      nativeDocument.body.appendChild(parent4);
-
-      wrap1.apply('=>(body > #domc-parent1)');
-      wrap2.apply('=>"body > #domc-parent2"');
-      wrap3.apply('=>`body > #domc-parent3`');
-      wrap4.apply('=>\'body > #domc-parent4\'');
-
-      assert.strictEqual(parent1.contains(elem1), true);
-      assert.strictEqual(parent2.contains(elem2), true);
-      assert.strictEqual(parent3.contains(elem3), true);
-      assert.strictEqual(parent4.contains(elem4), true);
-
-      parent1.remove();
-      parent2.remove();
-      parent3.remove();
-      parent4.remove();
-    });
-    it('should move class from the string', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
-
-      wrap1.moveClass('domc');
-      wrap2.apply('=>.domc');
-
-      assert.strictEqual(elem1.classList.contains('domc'), false);
-      assert.strictEqual(elem2.classList.contains('domc'), true);
-    });
-    it('should move attribute from the string', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
-
-      wrap1.moveAttr('domc', 'value');
-      wrap2.apply('=>domc');
-
-      assert.strictEqual(elem1.hasAttribute('domc'), false);
-      assert.strictEqual(elem2.getAttribute('domc'), 'value');
-    });
-    it('should toggle class from the string', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
-
-      elem1.className = 'foo bar';
-      elem2.className = 'foo bar';
-      wrap1.apply('~.bar');
-      wrap2.apply('~.baz');
-
-      assert.strictEqual(elem1.classList.contains('bar'), false);
-      assert.strictEqual(elem2.classList.contains('baz'), true);
-    });
-    it('should toggle attribute from the string', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
-
-      elem1.setAttribute('foo', 'bar');
-      elem2.setAttribute('foo', 'bar');
-      wrap1.apply('~foo');
-      wrap2.apply('~bar');
-
-      assert.strictEqual(elem1.hasAttribute('foo'), false);
-      assert.strictEqual(elem2.getAttribute('bar'), '');
     });
     it('should set text to the value from the string', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new HtmlElement(elem);
 
-      wrap.apply('*domc text*');
+      wrap.apply('&(domc text)');
 
       assert.strictEqual(wrap.text(), 'domc text');
-    });
-    it('should add text from the string', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      wrap.text('some text');
-      wrap.apply('+* and another text*');
-
-      assert.strictEqual(wrap.text(), 'some text and another text');
-    });
-    it('should set html to the value from the string', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
-      const wrap3 = new HtmlElement(elem3);
-      const wrap4 = new HtmlElement(elem4);
-
-      wrap1.apply('>(<div><input id = "input1" type = "email" /></div>)<');
-      wrap2.apply('>"<div><input id = "input2" type = "email" /></div>"<');
-      wrap3.apply('>`<div><input id = "input3" type = "email" /></div>`<');
-      wrap4.apply('>\'<div><input id = "input4" type = "email" /></div>\'<');
-
-      assert.strictEqual(elem1.innerHTML, '<div><input id="input1" type="email"></div>');
-      assert.strictEqual(elem2.innerHTML, '<div><input id="input2" type="email"></div>');
-      assert.strictEqual(elem3.innerHTML, '<div><input id="input3" type="email"></div>');
-      assert.strictEqual(elem4.innerHTML, '<div><input id="input4" type="email"></div>');
-    });
-    it('should add html from the string', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
-      const wrap3 = new HtmlElement(elem3);
-      const wrap4 = new HtmlElement(elem4);
-
-      elem1.innerHTML = '<div></div>';
-      elem2.innerHTML = '<div></div>';
-      elem3.innerHTML = '<div></div>';
-      elem4.innerHTML = '<div></div>';
-
-      wrap1.apply('+>(<input id = "input1" type = "email" />)<');
-      wrap2.apply('+>"<input id = "input2" type = "email" />"<');
-      wrap3.apply('+>`<input id = "input3" type = "email" />`<');
-      wrap4.apply('+>\'<input id = "input4" type = "email" />\'<');
-
-      assert.strictEqual(elem1.innerHTML, '<div></div><input id="input1" type="email">');
-      assert.strictEqual(elem2.innerHTML, '<div></div><input id="input2" type="email">');
-      assert.strictEqual(elem3.innerHTML, '<div></div><input id="input3" type="email">');
-      assert.strictEqual(elem4.innerHTML, '<div></div><input id="input4" type="email">');
     });
     it('should set position to absolute', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new HtmlElement(elem);
 
-      wrap.apply('$a');
+      wrap.apply('-a');
 
       assert.strictEqual(elem.style.position, 'absolute');
     });
@@ -302,7 +117,7 @@ describe('it should test HtmlElement#', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new HtmlElement(elem);
 
-      wrap.apply('$b');
+      wrap.apply('-b');
 
       assert.strictEqual(elem.style.fontWeight, 'bold');
     });
@@ -310,7 +125,7 @@ describe('it should test HtmlElement#', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new HtmlElement(elem);
 
-      wrap.apply('$c');
+      wrap.apply('-c');
 
       assert.strictEqual(elem.style.textAlign, 'center');
     });
@@ -318,7 +133,7 @@ describe('it should test HtmlElement#', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new HtmlElement(elem);
 
-      wrap.apply('$f');
+      wrap.apply('-f');
 
       assert.strictEqual(elem.style.position, 'fixed');
     });
@@ -326,7 +141,7 @@ describe('it should test HtmlElement#', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new HtmlElement(elem);
 
-      wrap.apply('$h');
+      wrap.apply('-h');
 
       assert.strictEqual(elem.style.display, 'none');
     });
@@ -334,7 +149,7 @@ describe('it should test HtmlElement#', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new HtmlElement(elem);
 
-      wrap.apply('$i');
+      wrap.apply('-i');
 
       assert.strictEqual(elem.style.fontStyle, 'italic');
     });
@@ -342,7 +157,7 @@ describe('it should test HtmlElement#', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new HtmlElement(elem);
 
-      wrap.apply('$r');
+      wrap.apply('-r');
 
       assert.strictEqual(elem.style.position, 'relative');
     });
@@ -352,7 +167,7 @@ describe('it should test HtmlElement#', () => {
 
       elem.style.display = 'inline';
       wrap.hide();
-      wrap.apply('$s');
+      wrap.apply('-s');
 
       assert.strictEqual(elem.style.display, 'inline');
     });
@@ -360,7 +175,7 @@ describe('it should test HtmlElement#', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new HtmlElement(elem);
 
-      wrap.apply('$t');
+      wrap.apply('-t');
 
       assert.strictEqual(elem.style.opacity, '0');
     });
@@ -368,66 +183,32 @@ describe('it should test HtmlElement#', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new HtmlElement(elem);
 
-      wrap.apply('$u');
+      wrap.apply('-u');
 
       assert.strictEqual(elem.style.textDecorationLine, 'underline');
     });
     it('should set css property from the string to the value from the string', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const elem5 = nativeDocument.createElement('div');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
-      const wrap3 = new HtmlElement(elem3);
-      const wrap4 = new HtmlElement(elem4);
-      const wrap5 = new HtmlElement(elem5);
+      const elem = nativeDocument.createElement('div');
+      const wrap = new HtmlElement(elem);
 
-      wrap1.apply('border:(1px solid black)');
-      wrap2.apply('border:"2px solid black"');
-      wrap3.apply('border:`3px solid black`');
-      wrap4.apply('border:\'4px solid black\'');
-      wrap5.apply('margin-left:2px');
-      wrap5.apply('marginRight:4px');
+      wrap.apply('border(1px solid black)');
 
-      assert.strictEqual(elem1.style.border, '1px solid black');
-      assert.strictEqual(elem2.style.border, '2px solid black');
-      assert.strictEqual(elem3.style.border, '3px solid black');
-      assert.strictEqual(elem4.style.border, '4px solid black');
-      assert.strictEqual(elem5.style.marginLeft, '2px');
-      assert.strictEqual(elem5.style.marginRight, '4px');
+      assert.strictEqual(elem.style.border, '1px solid black');
 
     });
     it('should set attribute from the string to the value from the string', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const elem5 = nativeDocument.createElement('div');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
-      const wrap3 = new HtmlElement(elem3);
-      const wrap4 = new HtmlElement(elem4);
-      const wrap5 = new HtmlElement(elem5);
+      const elem = nativeDocument.createElement('div');
+      const wrap = new HtmlElement(elem);
 
-      wrap1.apply('domc=(foo1 bar)');
-      wrap2.apply('domc="foo2 bar"');
-      wrap3.apply('domc=`foo3 bar`');
-      wrap4.apply('domc=\'foo4 bar\'');
-      wrap5.apply('domc=foo5');
-
-      assert.strictEqual(elem1.getAttribute('domc'), 'foo1 bar');
-      assert.strictEqual(elem2.getAttribute('domc'), 'foo2 bar');
-      assert.strictEqual(elem3.getAttribute('domc'), 'foo3 bar');
-      assert.strictEqual(elem4.getAttribute('domc'), 'foo4 bar');
-      assert.strictEqual(elem5.getAttribute('domc'), 'foo5');
+      wrap.apply('$domc(foo5)');
+      
+      assert.strictEqual(elem.getAttribute('domc'), 'foo5');
     });
     it('should add attribute from the string', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new HtmlElement(elem);
 
-      wrap.apply('domc');
+      wrap.apply('$domc');
 
       assert.strictEqual(elem.hasAttribute('domc'), true);
     });
@@ -961,6 +742,7 @@ describe('it should test HtmlElement#', () => {
       assert.notStrictEqual(elem.contentEditable, 'true');
     });
   });
+  // TODO: elem()
   describe('find()', () => {
     it('should find a wrap of first element in nested children, that matches selector', () => {
       const elem = nativeDocument.createElement('div');
@@ -993,43 +775,6 @@ describe('it should test HtmlElement#', () => {
       child3.className = 'foo';
 
       assert.strictEqual(wrap.find('.bar').$, null);
-    });
-  });
-  describe('findAll()', () => {
-    it('should find a wrap of all elements in nested children, that match selector', () => {
-      const elem = nativeDocument.createElement('div');
-      const child1 = nativeDocument.createElement('div');
-      const child2 = nativeDocument.createElement('div');
-      const child3 = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      elem.appendChild(child1);
-      elem.appendChild(child2);
-      child2.appendChild(child3);
-
-      child1.className = 'foo';
-      child3.className = 'foo';
-
-      const found = wrap.findAll('.foo').$;
-
-      assert.strictEqual(found[0].$, child1);
-      assert.strictEqual(found[1].$, child3);
-    });
-    it('should find a wrap of [] if not find', () => {
-      const elem = nativeDocument.createElement('div');
-      const child1 = nativeDocument.createElement('div');
-      const child2 = nativeDocument.createElement('div');
-      const child3 = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      elem.appendChild(child1);
-      elem.appendChild(child2);
-      child2.appendChild(child3);
-
-      elem.className = 'foo';
-      child3.className = 'foo';
-
-      assert.deepEqual(wrap.findAll('.bar').$, []);
     });
   });
   describe('first()', () => {
