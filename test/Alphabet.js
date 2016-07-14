@@ -9,7 +9,7 @@ describe('it should test Alphabet::[methods]', () => {
       
       wrap.add('6', '7');
       
-      assert.deepEqual(wrap.$, { s: 's', 2: '2', 6: '6', 7: '7' });
+      assert.deepEqual(wrap.$$, { s: 's', 2: '2', 6: '6', 7: '7' });
     });
   });
   describe('get()', () => {
@@ -46,7 +46,7 @@ describe('it should test Alphabet::[methods]', () => {
       
       wrap.delete('2', '5');
       
-      assert.deepEqual(wrap.$, { 1: '1', s: 's', 4: '4' });
+      assert.deepEqual(wrap.$$, { 1: '1', s: 's', 4: '4' });
     });
   });
   describe('token()', () => {
@@ -65,13 +65,13 @@ describe('it should test exported methods from Alphabet', () => {
       const s = 'a-b0-2';
       const wrap = alphabet(s);
 
-      assert.deepEqual(wrap.$, { a: 'a', b: 'b', 0: '0', 1: '1', 2: '2' });
+      assert.deepEqual(wrap.$$, { a: 'a', b: 'b', 0: '0', 1: '1', 2: '2' });
     });
     it('should return right alphabet', () => {
       const s = '123 a-b _?()';
       const wrap = alphabet(s);
 
-      assert.deepEqual(wrap.$, { 1: 1, 2: 2, 3: 3, a: 'a', b: 'b', _: '_', '?': '?', '(': '(', ')': ')' });
+      assert.deepEqual(wrap.$$, { 1: 1, 2: 2, 3: 3, a: 'a', b: 'b', _: '_', '?': '?', '(': '(', ')': ')' });
     });
   });
 });
