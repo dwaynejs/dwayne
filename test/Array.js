@@ -110,15 +110,7 @@ describe('it should test Arr#', () => {
     });
   });
   describe('reverse()', () => {
-    it('should not modify original array', () => {
-      const a = [1, 2, 3];
-      const wrap = new Arr(a);
-      
-      wrap.reverse();
-      
-      assert.deepEqual(a, [1, 2, 3]);
-    });
-    it('should return wrap of reversed array', () => {
+    it('should reverse original array', () => {
       const a = [1, 2, 3];
       const wrap = new Arr(a);
       
@@ -135,31 +127,26 @@ describe('it should test Arr#', () => {
     });
   });
   describe('shuffle()', () => {
-    it('should not modify original array', () => {
+    it('should shuffle original array', () => {
       const a = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+      const copy = a.slice();
       const wrap = new Arr(a);
 
       wrap.shuffle();
-      
-      assert.deepEqual(a, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-    });
-    it('should return wrap of shuffled array', () => {
-      const a = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-      const wrap = new Arr(a);
-      const shuffled = wrap.shuffle();
-      assert.notDeepEqual(shuffled, a);
 
-      assert.strictEqual(shuffled.count, 10);
-      assert.notEqual(shuffled.keyOfStrict(0), null);
-      assert.notEqual(shuffled.keyOfStrict(1), null);
-      assert.notEqual(shuffled.keyOfStrict(2), null);
-      assert.notEqual(shuffled.keyOfStrict(3), null);
-      assert.notEqual(shuffled.keyOfStrict(4), null);
-      assert.notEqual(shuffled.keyOfStrict(5), null);
-      assert.notEqual(shuffled.keyOfStrict(6), null);
-      assert.notEqual(shuffled.keyOfStrict(7), null);
-      assert.notEqual(shuffled.keyOfStrict(8), null);
-      assert.notEqual(shuffled.keyOfStrict(9), null);
+      assert.notDeepEqual(a, copy);
+
+      assert.strictEqual(wrap.length, 10);
+      assert.notEqual(wrap.indexOfStrict(0), -1);
+      assert.notEqual(wrap.indexOfStrict(1), -1);
+      assert.notEqual(wrap.indexOfStrict(2), -1);
+      assert.notEqual(wrap.indexOfStrict(3), -1);
+      assert.notEqual(wrap.indexOfStrict(4), -1);
+      assert.notEqual(wrap.indexOfStrict(5), -1);
+      assert.notEqual(wrap.indexOfStrict(6), -1);
+      assert.notEqual(wrap.indexOfStrict(7), -1);
+      assert.notEqual(wrap.indexOfStrict(8), -1);
+      assert.notEqual(wrap.indexOfStrict(9), -1);
     });
   });
   describe('slice()', () => {
@@ -231,26 +218,31 @@ describe('it should test Arr#', () => {
     it('should work the same as Array.prototype.splice', () => {
       let a;
       let wrap;
-      
-      a = [1, 2, 3, 4, 5];
-      wrap = new Arr(a);
-      assert.deepEqual(wrap.splice().$, [1, 2, 3, 4, 5]);
 
       a = [1, 2, 3, 4, 5];
       wrap = new Arr(a);
-      assert.deepEqual(wrap.splice(3).$, [1, 2, 3]);
+      assert.deepEqual(wrap.splice().$, []);
+      assert.deepEqual(a, [1, 2, 3, 4, 5]);
 
       a = [1, 2, 3, 4, 5];
       wrap = new Arr(a);
-      assert.deepEqual(wrap.splice(2, 2).$, [1, 2, 5]);
+      assert.deepEqual(wrap.splice(3).$, [4, 5]);
+      assert.deepEqual(a, [1, 2, 3]);
 
       a = [1, 2, 3, 4, 5];
       wrap = new Arr(a);
-      assert.deepEqual(wrap.splice(1, 1, 5).$, [1, 5, 3, 4, 5]);
+      assert.deepEqual(wrap.splice(2, 2).$, [3, 4]);
+      assert.deepEqual(a, [1, 2, 5]);
 
       a = [1, 2, 3, 4, 5];
       wrap = new Arr(a);
-      assert.deepEqual(wrap.splice(1, 1, 7, 9).$, [1, 7, 9, 3, 4, 5]);
+      assert.deepEqual(wrap.splice(1, 1, 7).$, [2]);
+      assert.deepEqual(a, [1, 7, 3, 4, 5]);
+
+      a = [1, 2, 3, 4, 5];
+      wrap = new Arr(a);
+      assert.deepEqual(wrap.splice(1, 1, 7, 9).$, [2]);
+      assert.deepEqual(a, [1, 7, 9, 3, 4, 5]);
     });
   });
   describe('string()', () => {
