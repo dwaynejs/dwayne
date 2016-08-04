@@ -9,8 +9,8 @@ module.exports = {
   module: {
     loaders: [
       {
-       test: /\.js$/,
-       loader: 'uglify-loader'
+        test: /\.js$/,
+        loader: 'uglify-loader'
       },
       {
         test: /\.js$/,

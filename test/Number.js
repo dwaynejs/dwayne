@@ -49,8 +49,8 @@ describe('it should test Number::[methods]', () => {
       const n1 = 1;
       const n2 = -1;
       const n3 = 0;
-      const n4 = 1/2;
-      const n5 = 1/sqrt(2);
+      const n4 = 1 / 2;
+      const n5 = 1 / sqrt(2);
       const wrap1 = new Num(n1);
       const wrap2 = new Num(n2);
       const wrap3 = new Num(n3);
@@ -58,9 +58,9 @@ describe('it should test Number::[methods]', () => {
       const wrap5 = new Num(n5);
       const diff1 = abs(wrap1.acos() - 0);
       const diff2 = abs(wrap2.acos() - pi);
-      const diff3 = abs(wrap3.acos() - pi/2);
-      const diff4 = abs(wrap4.acos() - pi/3);
-      const diff5 = abs(wrap5.acos() - pi/4);
+      const diff3 = abs(wrap3.acos() - pi / 2);
+      const diff4 = abs(wrap4.acos() - pi / 3);
+      const diff5 = abs(wrap5.acos() - pi / 4);
 
       assert.strictEqual(diff1 <= eps, true, `acos(1): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `acos(-1): ${ diff2 } <= ${ eps }`);
@@ -72,8 +72,8 @@ describe('it should test Number::[methods]', () => {
       const n1 = 1;
       const n2 = -1;
       const n3 = 0;
-      const n4 = 1/2;
-      const n5 = 1/sqrt(2);
+      const n4 = 1 / 2;
+      const n5 = 1 / sqrt(2);
       const wrap1 = new Num(n1);
       const wrap2 = new Num(n2);
       const wrap3 = new Num(n3);
@@ -97,18 +97,18 @@ describe('it should test Number::[methods]', () => {
       const n1 = 1;
       const n2 = -1;
       const n3 = 0;
-      const n4 = 1/2;
-      const n5 = 1/sqrt(2);
+      const n4 = 1 / 2;
+      const n5 = 1 / sqrt(2);
       const wrap1 = new Num(n1);
       const wrap2 = new Num(n2);
       const wrap3 = new Num(n3);
       const wrap4 = new Num(n4);
       const wrap5 = new Num(n5);
-      const diff1 = abs(wrap1.asin() - pi/2);
-      const diff2 = abs(wrap2.asin() - -pi/2);
+      const diff1 = abs(wrap1.asin() - pi / 2);
+      const diff2 = abs(wrap2.asin() - -pi / 2);
       const diff3 = abs(wrap3.asin() - 0);
-      const diff4 = abs(wrap4.asin() - pi/6);
-      const diff5 = abs(wrap5.asin() - pi/4);
+      const diff4 = abs(wrap4.asin() - pi / 6);
+      const diff5 = abs(wrap5.asin() - pi / 4);
 
       assert.strictEqual(diff1 <= eps, true, `asin(1): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `asin(-1): ${ diff2 } <= ${ eps }`);
@@ -120,8 +120,8 @@ describe('it should test Number::[methods]', () => {
       const n1 = 1;
       const n2 = -1;
       const n3 = 0;
-      const n4 = 1/2;
-      const n5 = 1/sqrt(2);
+      const n4 = 1 / 2;
+      const n5 = 1 / sqrt(2);
       const wrap1 = new Num(n1);
       const wrap2 = new Num(n2);
       const wrap3 = new Num(n3);
@@ -150,10 +150,10 @@ describe('it should test Number::[methods]', () => {
       const wrap2 = new Num(n2);
       const wrap3 = new Num(n3);
       const wrap4 = new Num(n4);
-      const diff1 = abs(wrap1.atan() - pi/4);
-      const diff2 = abs(wrap2.atan() - (-pi/4));
+      const diff1 = abs(wrap1.atan() - pi / 4);
+      const diff2 = abs(wrap2.atan() - (-pi / 4));
       const diff3 = abs(wrap3.atan() - 0);
-      const diff4 = abs(wrap4.atan() - pi/3);
+      const diff4 = abs(wrap4.atan() - pi / 3);
 
       assert.strictEqual(diff1 <= eps, true, `atan(1): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `atan(-1): ${ diff2 } <= ${ eps }`);
@@ -234,9 +234,9 @@ describe('it should test Number::[methods]', () => {
     it('should work the same as Math.cos with falsey argument', () => {
       const n1 = 0;
       const n2 = pi;
-      const n3 = pi/2;
-      const n4 = pi/3;
-      const n5 = pi/4;
+      const n3 = pi / 2;
+      const n4 = pi / 3;
+      const n5 = pi / 4;
       const wrap1 = new Num(n1);
       const wrap2 = new Num(n2);
       const wrap3 = new Num(n3);
@@ -245,8 +245,8 @@ describe('it should test Number::[methods]', () => {
       const diff1 = Math.abs(wrap1.cos() - 1);
       const diff2 = Math.abs(wrap2.cos() - (-1));
       const diff3 = Math.abs(wrap3.cos() - 0);
-      const diff4 = Math.abs(wrap4.cos() - 1/2);
-      const diff5 = Math.abs(wrap5.cos() - 1/Math.sqrt(2));
+      const diff4 = Math.abs(wrap4.cos() - 1 / 2);
+      const diff5 = Math.abs(wrap5.cos() - 1 / sqrt(2));
 
       assert.strictEqual(diff1 <= eps, true, `cos(0): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `cos(pi): ${ diff2 } <= ${ eps }`);
@@ -268,8 +268,8 @@ describe('it should test Number::[methods]', () => {
       const diff1 = Math.abs(wrap1.cos(true) - 1);
       const diff2 = Math.abs(wrap2.cos(true) - (-1));
       const diff3 = Math.abs(wrap3.cos(true) - 0);
-      const diff4 = Math.abs(wrap4.cos(true) - 1/2);
-      const diff5 = Math.abs(wrap5.cos(true) - 1/Math.sqrt(2));
+      const diff4 = Math.abs(wrap4.cos(true) - 1 / 2);
+      const diff5 = Math.abs(wrap5.cos(true) - 1 / sqrt(2));
 
       assert.strictEqual(diff1 <= eps, true, `cos(0): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `cos(180): ${ diff2 } <= ${ eps }`);
@@ -377,6 +377,7 @@ describe('it should test Number::[methods]', () => {
 
       const n = 100;
       const wrap = new Num(n);
+
       wrap.interval(function () {
         if (number) {
           return done(new Error('Clear failed'));
@@ -450,7 +451,7 @@ describe('it should test Number::[methods]', () => {
       const wrap7 = new Num(n7);
       const diff1 = abs(wrap1.log(0.5) - (-1));
       const diff2 = abs(wrap2.log(49) - 2);
-      const diff3 = abs(wrap3.log(3) - 1/3);
+      const diff3 = abs(wrap3.log(3) - 1 / 3);
       const diff4 = abs(wrap4.log(4) - (-2));
 
       assert.strictEqual(diff1 <= eps, true, `log(${ n1 }, 0.5): ${ diff1 } <= ${ eps }`);
@@ -555,11 +556,11 @@ describe('it should test Number::[methods]', () => {
       const wrap5 = new Num(n5);
       const wrap6 = new Num(n6);
 
-      assert.strictEqual(wrap1.root(2), pow(n1, 1/2));
-      assert.strictEqual(wrap2.root(6), pow(n2, 1/6));
-      assert.strictEqual(wrap3.root(4), pow(n3, 1/4));
-      assert.strictEqual(wrap4.root(13), pow(n4, 1/13));
-      assert.strictEqual(wrap5.root(12), pow(n5, 1/12));
+      assert.strictEqual(wrap1.root(2), pow(n1, 1 / 2));
+      assert.strictEqual(wrap2.root(6), pow(n2, 1 / 6));
+      assert.strictEqual(wrap3.root(4), pow(n3, 1 / 4));
+      assert.strictEqual(wrap4.root(13), pow(n4, 1 / 13));
+      assert.strictEqual(wrap5.root(12), pow(n5, 1 / 12));
       assert.strictEqual(isNaN(wrap6.root(0)), true);
     });
   });
@@ -616,9 +617,9 @@ describe('it should test Number::[methods]', () => {
     it('should work the same as Math.sin with falsey argument', () => {
       const n1 = 0;
       const n2 = pi;
-      const n3 = pi/2;
-      const n4 = pi/3;
-      const n5 = pi/4;
+      const n3 = pi / 2;
+      const n4 = pi / 3;
+      const n5 = pi / 4;
       const wrap1 = new Num(n1);
       const wrap2 = new Num(n2);
       const wrap3 = new Num(n3);
@@ -627,8 +628,8 @@ describe('it should test Number::[methods]', () => {
       const diff1 = abs(wrap1.sin() - 0);
       const diff2 = abs(wrap2.sin() - 0);
       const diff3 = abs(wrap3.sin() - 1);
-      const diff4 = abs(wrap4.sin() - sqrt(3)/2);
-      const diff5 = abs(wrap5.sin() - 1/sqrt(2));
+      const diff4 = abs(wrap4.sin() - sqrt(3) / 2);
+      const diff5 = abs(wrap5.sin() - 1 / sqrt(2));
 
       assert.strictEqual(diff1 <= eps, true, `sin(0): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `sin(pi): ${ diff2 } <= ${ eps }`);
@@ -650,8 +651,8 @@ describe('it should test Number::[methods]', () => {
       const diff1 = abs(wrap1.sin(true) - 0);
       const diff2 = abs(wrap2.sin(true) - 0);
       const diff3 = abs(wrap3.sin(true) - 1);
-      const diff4 = abs(wrap4.sin(true) - sqrt(3)/2);
-      const diff5 = abs(wrap5.sin(true) - 1/sqrt(2));
+      const diff4 = abs(wrap4.sin(true) - sqrt(3) / 2);
+      const diff5 = abs(wrap5.sin(true) - 1 / sqrt(2));
 
       assert.strictEqual(diff1 <= eps, true, `sin(0): ${ diff1 } <= ${ eps }`);
       assert.strictEqual(diff2 <= eps, true, `sin(180): ${ diff2 } <= ${ eps }`);
@@ -714,9 +715,9 @@ describe('it should test Number::[methods]', () => {
     it('should work the same as Math.tan with falsey argument', () => {
       const n1 = 0;
       const n2 = pi;
-      const n3 = pi/2;
-      const n4 = pi/3;
-      const n5 = pi/4;
+      const n3 = pi / 2;
+      const n4 = pi / 3;
+      const n5 = pi / 4;
       const wrap1 = new Num(n1);
       const wrap2 = new Num(n2);
       const wrap3 = new Num(n3);
@@ -725,7 +726,7 @@ describe('it should test Number::[methods]', () => {
       const diff1 = Math.abs(wrap1.tan() - 0);
       const diff2 = Math.abs(wrap2.tan() - 0);
       const diff3 = Math.abs(wrap3.tan());
-      const diff4 = Math.abs(wrap4.tan() - Math.sqrt(3));
+      const diff4 = Math.abs(wrap4.tan() - sqrt(3));
       const diff5 = Math.abs(wrap5.tan() - 1);
 
       assert.strictEqual(diff1 <= eps, true, `tan(0): ${ diff1 } <= ${ eps }`);
@@ -748,7 +749,7 @@ describe('it should test Number::[methods]', () => {
       const diff1 = Math.abs(wrap1.tan(true) - 0);
       const diff2 = Math.abs(wrap2.tan(true) - 0);
       const diff3 = Math.abs(wrap3.tan(true));
-      const diff4 = Math.abs(wrap4.tan(true) - Math.sqrt(3));
+      const diff4 = Math.abs(wrap4.tan(true) - sqrt(3));
       const diff5 = Math.abs(wrap5.tan(true) - 1);
 
       assert.strictEqual(diff1 <= eps, true, `tan(0): ${ diff1 } <= ${ eps }`);

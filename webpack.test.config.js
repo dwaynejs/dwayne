@@ -1,28 +1,28 @@
 const port = 2222;
 
 module.exports = {
-	entry: 'mocha!./test/index.js',
-	output: {
-		path: __dirname,
-		filename: 'bundle.test.js'
-	},
-	module: {
-		loaders: [
-			{
-				test: /\.js$/,
-				loader: 'babel-loader',
-				exclude: /node_modules/,
-				query: {
-					presets: ['es2015']
-				}
-			},
-			{
-				test: /\.js$/,
-				loader: 'eslint-loader',
-				exclude: /node_modules/
-			}
-		]
-	},
+  entry: 'mocha!./test/index.js',
+  output: {
+    path: __dirname,
+    filename: 'bundle.test.js'
+  },
+  module: {
+    loaders: [
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        exclude: /node_modules/,
+        query: {
+          presets: ['es2015']
+        }
+      },
+      {
+        test: /\.js$/,
+        loader: 'eslint-loader',
+        exclude: /node_modules/
+      }
+    ]
+  },
   devServer: { port },
   devtool: '#cheap-module-eval-source-map'
 };

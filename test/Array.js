@@ -180,7 +180,11 @@ describe('it should test Arr#', () => {
           return -1;
         }
 
-        return x > y ? 1 : x < y ? -1 : 0;
+        if (x > y) {
+          return 1;
+        }
+
+        return x < y ? -1 : 0;
       }).$, [-1, 5, 7, 9, 13, -2, 0, 6, 8, 12]);
     });
   });
@@ -275,7 +279,7 @@ describe('it should test exported methods from Arr', () => {
     });
     it('should create wrap of an array with given length using mapFn', () => {
       const length = 5;
-      const wrap = array(length, (value) => value*2);
+      const wrap = array(length, (value) => value * 2);
 
       assert.deepEqual(wrap.$, [0, 2, 4, 6, 8]);
     });

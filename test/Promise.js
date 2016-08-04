@@ -111,9 +111,7 @@ describe('it should test Promise::[methods]', () => {
 
       Promise.reject(unique)
         .then(done)
-        .catch((err) => {
-          return Promise.resolve(err);
-        })
+        .catch((err) => Promise.resolve(err))
         .then((value) => {
           assert.strictEqual(value, unique);
 
@@ -132,18 +130,18 @@ describe('it should test Promise.[methods]', () => {
       const unique3 = {};
 
       Promise.all([
-          Promise.resolve(unique1),
-          Promise.resolve(unique2),
-          Promise.resolve(unique3)
-        ])
-        .then(([value1, value2, value3]) => {
-          assert.strictEqual(value1, unique1);
-          assert.strictEqual(value2, unique2);
-          assert.strictEqual(value3, unique3);
+        Promise.resolve(unique1),
+        Promise.resolve(unique2),
+        Promise.resolve(unique3)
+      ])
+      .then(([value1, value2, value3]) => {
+        assert.strictEqual(value1, unique1);
+        assert.strictEqual(value2, unique2);
+        assert.strictEqual(value3, unique3);
 
-          done();
-        })
-        .catch(done);
+        done();
+      })
+      .catch(done);
     });
     it('should return rejected promise, if one was rejected', (done) => {
       const unique1 = {};
@@ -151,17 +149,17 @@ describe('it should test Promise.[methods]', () => {
       const unique3 = {};
 
       Promise.all([
-          Promise.resolve(unique1),
-          Promise.reject(unique2),
-          Promise.resolve(unique3)
-        ])
-        .then(done)
-        .catch((err) => {
-          assert.strictEqual(err, unique2);
+        Promise.resolve(unique1),
+        Promise.reject(unique2),
+        Promise.resolve(unique3)
+      ])
+      .then(done)
+      .catch((err) => {
+        assert.strictEqual(err, unique2);
 
-          done();
-        })
-        .catch(done);
+        done();
+      })
+      .catch(done);
     });
     it('should support iterators parameters, if Symbol.iterator is supported', (done) => {
       if (Symbol && Symbol.iterator) {
@@ -176,16 +174,14 @@ describe('it should test Promise.[methods]', () => {
 
         let iterated = 0;
 
-        iterable[Symbol.iterator] = () => {
-          return {
-            next() {
-              return {
-                value: hiddenIterable[iterated++],
-                done: iterated > hiddenIterable.length
-              };
-            }
-          };
-        };
+        iterable[Symbol.iterator] = () => ({
+          next() {
+            return {
+              value: hiddenIterable[iterated++],
+              done: iterated > hiddenIterable.length
+            };
+          }
+        });
 
         Promise.all(iterable)
           .then(([value1, value2, value3]) => {
@@ -206,16 +202,16 @@ describe('it should test Promise.[methods]', () => {
       const unique3 = {};
 
       Promise.race([
-          new Promise((resolve) => setTimeout(resolve, 100, unique1)),
-          new Promise((resolve, reject) => setTimeout(reject, 101, unique2)),
-          new Promise((resolve) => setTimeout(resolve, 102, unique3))
-        ])
-        .then((value) => {
-          assert.strictEqual(value, unique1);
+        new Promise((resolve) => setTimeout(resolve, 100, unique1)),
+        new Promise((resolve, reject) => setTimeout(reject, 101, unique2)),
+        new Promise((resolve) => setTimeout(resolve, 102, unique3))
+      ])
+      .then((value) => {
+        assert.strictEqual(value, unique1);
 
-          done();
-        })
-        .catch(done);
+        done();
+      })
+      .catch(done);
     });
     it('should return rejected promise with first rejected value', (done) => {
       const unique1 = {};
@@ -223,17 +219,17 @@ describe('it should test Promise.[methods]', () => {
       const unique3 = {};
 
       Promise.race([
-          new Promise((resolve) => setTimeout(resolve, 101, unique1)),
-          new Promise((resolve, reject) => setTimeout(reject, 100, unique2)),
-          new Promise((resolve) => setTimeout(resolve, 102, unique3))
-        ])
-        .then(done)
-        .catch((err) => {
-          assert.strictEqual(err, unique2);
+        new Promise((resolve) => setTimeout(resolve, 101, unique1)),
+        new Promise((resolve, reject) => setTimeout(reject, 100, unique2)),
+        new Promise((resolve) => setTimeout(resolve, 102, unique3))
+      ])
+      .then(done)
+      .catch((err) => {
+        assert.strictEqual(err, unique2);
 
-          done();
-        })
-        .catch(done);
+        done();
+      })
+      .catch(done);
     });
     it('should support iterators parameters, if Symbol.iterator is supported', (done) => {
       if (Symbol && Symbol.iterator) {
@@ -248,16 +244,14 @@ describe('it should test Promise.[methods]', () => {
 
         let iterated = 0;
 
-        iterable[Symbol.iterator] = () => {
-          return {
-            next() {
-              return {
-                value: hiddenIterable[iterated++],
-                done: iterated > hiddenIterable.length
-              };
-            }
-          };
-        };
+        iterable[Symbol.iterator] = () => ({
+          next() {
+            return {
+              value: hiddenIterable[iterated++],
+              done: iterated > hiddenIterable.length
+            };
+          }
+        });
 
         Promise.race(iterable)
           .then((value) => {

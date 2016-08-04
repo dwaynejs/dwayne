@@ -1,6 +1,6 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import path from 'path';
+import * as express from 'express';
+import * as bodyParser from 'body-parser';
+import * as path from 'path';
 
 const app = express();
 const port = 8888;
@@ -12,46 +12,46 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(/.*/, (req, res, next) => {
   res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-	res.header(
+  res.header(
     'Access-Control-Allow-Headers',
     'Origin, X-Requested-With, Content-Type, Accept, Foo-Header, Bar-Header, Baz-Header'
   );
-	res.header(
+  res.header(
     'Access-Control-Expose-Headers',
     'Foo-Header, Bar-Header, Baz-Header'
   );
-	res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, HEAD');
-	res.header('Access-Control-Allow-Credentials', true);
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, HEAD');
+  res.header('Access-Control-Allow-Credentials', true);
 
-	if (req.method.toLowerCase() === 'options') {
-		return res.send();
-	}
+  if (req.method.toLowerCase() === 'options') {
+    return res.send();
+  }
 
-	next();
+  next();
 });
 
 app.use('/timeout/:timeout', (req, res) => {
-	setTimeout(() => res.send('Long'), parseInt(req.params.timeout));
+  setTimeout(() => res.send('Long'), parseInt(req.params.timeout));
 });
 
 app.use('/status/:status', (req, res) => {
-	res.sendStatus(parseInt(req.params.status));
+  res.sendStatus(parseInt(req.params.status));
 });
 
 app.use(/.*/, (req, res) => {
-	const { body, query, headers } = req;
+  const { body, query, headers } = req;
 
-	res.header('Foo-Header', 'Foo');
-	res.header('Bar-Header', 'Bar');
-	res.header('Baz-Header', 'Baz');
+  res.header('Foo-Header', 'Foo');
+  res.header('Bar-Header', 'Bar');
+  res.header('Baz-Header', 'Baz');
 
-	res.json({ body, query, headers });
+  res.json({ body, query, headers });
 });
 
 app.listen(port, (error) => {
-	if (error) {
-		console.error(error);
-	} else {
-		console.info('Listening on port %s...', port);
-	}
+  if (error) {
+    console.error(error);
+  } else {
+    console.info('Listening on port %s...', port);
+  }
 });

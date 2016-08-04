@@ -81,8 +81,8 @@ describe('it should test switcher', () => {
       assert.strictEqual(sw(1), unique1);
     });
     it('should return matched(value) of the first matched case if the match is a function', () => {
-      const sw = switcher({ foo: (value) => unique });
       const unique = {};
+      const sw = switcher({ foo: () => unique });
 
       assert.strictEqual(sw('foo'), unique);
     });

@@ -191,10 +191,17 @@ describe('it should test HtmlElement#', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new HtmlElement(elem);
 
-      wrap.apply('border(1px solid black)');
+      wrap.apply('@border(1px solid black)');
 
       assert.strictEqual(elem.style.border, '1px solid black');
+    });
+    it('should set css property from the string to the value from the string', () => {
+      const elem = nativeDocument.createElement('div');
+      const wrap = new HtmlElement(elem);
 
+      wrap.apply('@transform(scale(10px))');
+
+      assert.strictEqual(elem.style.transform, 'scale(10px)');
     });
     it('should set attribute from the string to the value from the string', () => {
       const elem = nativeDocument.createElement('div');
@@ -521,16 +528,18 @@ describe('it should test HtmlElement#', () => {
         });
     });
     it('should check that set methods are working', () => {
-      new Super(css).keys().forEach((value) => {
-        const elem = nativeDocument.createElement('div');
-        const wrap = new HtmlElement(elem);
+      new Super(css)
+        .keys()
+        .forEach((value) => {
+          const elem = nativeDocument.createElement('div');
+          const wrap = new HtmlElement(elem);
 
-        wrap[value]('initial');
+          wrap[value]('initial');
 
-        if (['borderImage', 'pageBreakAfter', 'pageBreakBefore', 'pageBreakInside'].indexOf(value) === -1) {
-          assert.strictEqual(elem.style[value], 'initial');
-        }
-      });
+          if (['borderImage', 'pageBreakAfter', 'pageBreakBefore', 'pageBreakInside'].indexOf(value) === -1) {
+            assert.strictEqual(elem.style[value], 'initial');
+          }
+        });
     });
   });
   describe('create()', () => {
@@ -556,7 +565,9 @@ describe('it should test HtmlElement#', () => {
   });
   describe('[html-element]()', () => {
     it('should return wrap of a new element inside context', () => {
-      new Super(elements).keys().forEach((type) => {
+      new Super(elements)
+        .keys()
+        .forEach((type) => {
           const elem = nativeDocument.createElement('div');
           const wrap = new HtmlElement(elem);
 
@@ -567,11 +578,13 @@ describe('it should test HtmlElement#', () => {
         });
     });
     it('should use first argument as applied expression', () => {
-      new Super(elements).keys().forEach((type) => {
+      new Super(elements)
+        .keys()
+        .forEach((type) => {
           const elem = nativeDocument.createElement('div');
           const wrap = new HtmlElement(elem);
 
-          const created = wrap[type]('.' + type).$;
+          const created = wrap[type](`.${ type }`).$;
 
           assert.strictEqual(created.parentNode, elem);
           assert.strictEqual(created.tagName.toLowerCase(), type);
@@ -1750,6 +1763,7 @@ describe('it should test exported methods from HtmlElement', () => {
   describe('loadImages()', () => {
     it('return promise.all for all images', function (done) {
       this.timeout(5000);
+
       const source = [
         'https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png',
         'http://cdni.wired.co.uk/1920x1280/g_j/GOOGLELOGO_1.jpg',
@@ -1764,9 +1778,10 @@ describe('it should test exported methods from HtmlElement', () => {
         })
         .catch(done);
     });
-    it('return resolve already loaded images as well', function (done) {
+    it('return resolve already loaded images as well', (done) => {
       const source = 'https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png';
       const img = nativeDocument.createElement('img');
+
       img.onload = load;
       img.src = source;
 
@@ -1804,6 +1819,7 @@ describe('it should test Elems#', () => {
   beforeEach(() => {
     array(count, () => {
       const elem = nativeDocument.createElement('div');
+
       elem.className = 'foo';
       nativeDocument.body.appendChild(elem);
     });

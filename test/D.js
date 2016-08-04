@@ -1,6 +1,7 @@
 import * as assert from 'assert';
-import { supportSymbol } from '../lib/helpers';
 import * as methods from './../lib/D';
+
+/* eslint no-new-wrappers: 0 */
 
 describe('it should test D.', () => {
   describe('isArray()', () => {
@@ -165,7 +166,8 @@ describe('it should test D.', () => {
       assert.strictEqual(methods.isPrimitive(0), true);
       assert.strictEqual(methods.isPrimitive('0'), true);
       assert.strictEqual(methods.isPrimitive(false), true);
-      if (supportSymbol) {
+
+      if (isFunction(global.Symbol)) {
         assert.strictEqual(methods.isPrimitive(Symbol()), true);
       }
     });

@@ -264,6 +264,7 @@ describe('it should test Fetch::[methods]', () => {
     });
     it('should not modify context\'s config', () => {
       const fetch = new Fetch();
+
       fetch.instance({
         auth: { username: 'foo', password: 'bar' },
         baseURL: '//foo',
@@ -535,7 +536,7 @@ describe('it should test Fetch::[methods]', () => {
         .then(({ config }) => {
           assert.strictEqual(
             config.constructedUrl,
-            origin + '/foo/bar/foo/foo/bar/baz?foo=bar&bar%5B%5D=foo&bar%5B%5D=baz&baz=foo'
+            `${ origin }/foo/bar/foo/foo/bar/baz?foo=bar&bar%5B%5D=foo&bar%5B%5D=baz&baz=foo`
           );
 
           done();

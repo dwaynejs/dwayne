@@ -179,6 +179,7 @@ describe('it should test Super#', () => {
 
         for (let i = 0; i < tree.length; i++) {
           const k = tree[i].key;
+
           sum += Number(k);
         }
 
@@ -189,6 +190,7 @@ describe('it should test Super#', () => {
 
         for (let i = 0; i < tree.length; i++) {
           const k = tree[i].key;
+
           sum += Number(k);
         }
 
@@ -258,6 +260,7 @@ describe('it should test Super#', () => {
 
         for (let i = 0; i < tree.length; i++) {
           const k = tree[i].key;
+
           sum += Number(k);
         }
 
@@ -268,6 +271,7 @@ describe('it should test Super#', () => {
 
         for (let i = 0; i < tree.length; i++) {
           const k = tree[i].key;
+
           sum += Number(k);
         }
 
@@ -330,7 +334,7 @@ describe('it should test Super#', () => {
       };
       const wrap = new Super(o);
 
-      wrap.deepForEach((value, key, object) => object[key] = value * value);
+      wrap.deepForEach((value, key, object) => (object[key] = value * value));
 
       assert.deepEqual(o, {
         a: 1,
@@ -408,7 +412,7 @@ describe('it should test Super#', () => {
       };
       const wrap = new Super(o);
 
-      assert.deepEqual(wrap.deepMap((value, key) => value * value).$, {
+      assert.deepEqual(wrap.deepMap((value) => value * value).$, {
         a: 1,
         b: { c: 4, d: 9 },
         c: { e: { f: 16, g: 25, h: 36 } }
@@ -443,7 +447,8 @@ describe('it should test Super#', () => {
 
         for (let i = 0; i < tree.length; i++) {
           const k = tree[i].key;
-          string += k !== null ? k : '';
+
+          string += k === null ? '' : k;
         }
 
         return string + value;
@@ -480,7 +485,8 @@ describe('it should test Super#', () => {
       assert.strictEqual(wrap.deepReduce((IV, value, key, object, tree) => {
         for (let i = 0; i < tree.length; i++) {
           const k = tree[i].key;
-          IV += k !== null ? k : '';
+
+          IV += k === null ? '' : k;
         }
 
         return IV + value;
@@ -560,6 +566,7 @@ describe('it should test Super#', () => {
 
         for (let i = 0; i < tree.length; i++) {
           const k = tree[i].key;
+
           sum += Number(k);
         }
 
@@ -570,6 +577,7 @@ describe('it should test Super#', () => {
 
         for (let i = 0; i < tree.length; i++) {
           const k = tree[i].key;
+
           sum += Number(k);
         }
 
@@ -885,7 +893,7 @@ describe('it should test Super#', () => {
     });
     it('should return key if find', () => {
       const o1 = { a: 0, b: 1, c: 2 };
-      const o2 = {a: 1, b: 2, c: 3};
+      const o2 = { a: 1, b: 2, c: 3 };
       const wrap1 = new Super(o1);
       const wrap2 = new Super(o2);
 
@@ -902,7 +910,7 @@ describe('it should test Super#', () => {
     });
     it('should return key if find', () => {
       const o1 = { a: 0, b: 1, c: '1' };
-      const o2 = {a: 1, b: '1', c: 3};
+      const o2 = { a: 1, b: '1', c: 3 };
       const wrap1 = new Super(o1);
       const wrap2 = new Super(o2);
 
@@ -981,7 +989,7 @@ describe('it should test Super#', () => {
       const wrap = new Super(o);
 
       assert.deepEqual(
-        wrap.object((object, value, key) => object[value] = key + value).$,
+        wrap.object((object, value, key) => (object[value] = key + value)).$,
         { 1: 'a1', 2: 'b2', 3: 'c3' }
       );
     });
@@ -1036,7 +1044,7 @@ describe('it should test Super#', () => {
       if (Symbol && Symbol.for) {
         const symbol = Symbol('D');
         const symbolFor = Symbol.for('D');
-        const o = {[symbol]: 1, [symbolFor]: 2};
+        const o = { [symbol]: 1, [symbolFor]: 2 };
         const wrap = new Super(o);
 
         assert.deepEqual(wrap.propertySymbols().$, [symbol, symbolFor]);
@@ -1130,7 +1138,7 @@ describe('it should test Super#', () => {
     });
     it('should use argument function for checking for values', () => {
       const o1 = { a: 0, b: 1 };
-      const o2 = {a: 1, b: 2};
+      const o2 = { a: 1, b: 2 };
       const wrap1 = new Super(o1);
       const wrap2 = new Super(o2);
 

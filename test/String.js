@@ -125,7 +125,7 @@ describe('it should test String#', () => {
 
       const parsed = wrap.parseJSON((key, value) => {
         if (isString(value)) {
-          return 'concat: ' + value;
+          return `concat: ${ value }`;
         }
 
         return value;
@@ -332,7 +332,7 @@ describe('it should test String#', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
-      assert.strictEqual('' + wrap, 'foobar');
+      assert.strictEqual(String(wrap), 'foobar');
     });
   });
   describe('toUpperCase()', () => {

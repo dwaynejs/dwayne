@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import Function, { noop, self, method } from '../lib/Function';
+import Func, { noop, self, method } from '../lib/Function';
 import Arr from '../lib/Array';
 import Num, { rand, random } from '../lib/Number';
 
@@ -11,15 +11,15 @@ function concatWithContext() {
   return this.a + new Arr(arguments).string();
 }
 
-describe('it should test Function::[[Call]]', () => {
+describe('it should test Func::[[Call]]', () => {
   describe('it should test middlewares', () => {
     it('should test synchronous middlewares', () => {
       const func = concat;
-      const wrap = new Function(func);
+      const wrap = new Func(func);
 
       wrap
-        .before((args) =>  new Arr(args).map((x) => 2*x).$)
-        .after((ret) => 'D is awesome! ' + ret);
+        .before((args) =>  new Arr(args).map((x) => 2 * x).$)
+        .after((ret) => `D is awesome! ${ ret }`);
 
       assert.strictEqual(wrap.call('concat: ', 1, 2, 3), 'D is awesome! concat: 246');
     });
@@ -27,12 +27,12 @@ describe('it should test Function::[[Call]]', () => {
       const func = function () {
         return new Num(50).timeout(concat.apply(this, arguments));
       };
-      const wrap = new Function(func);
+      const wrap = new Func(func);
 
       wrap
         .async()
-        .before((args) => new Num(50).timeout(new Arr(args).map((x) => 2*x).$))
-        .after((ret) => new Num(50).timeout('D is awesome! ' + ret))
+        .before((args) => new Num(50).timeout(new Arr(args).map((x) => 2 * x).$))
+        .after((ret) => new Num(50).timeout(`D is awesome! ${ ret }`))
         .call('concat: ', 1, 2, 3)
         .then((ret) => {
           assert.strictEqual(ret, 'D is awesome! concat: 246');
@@ -52,7 +52,7 @@ describe('it should test Function::[[Call]]', () => {
           done(new Error(`Called more than ${ toCall } times`));
         }
       };
-      const wrap = new Function(func);
+      const wrap = new Func(func);
 
       wrap.canBeCalled(toCall);
 
@@ -75,7 +75,7 @@ describe('it should test Function#', () => {
   describe('after()', () => {
     it('should add middleware into the end of after array with no or truthy argument', () => {
       const func = () => {};
-      const wrap = new Function(func);
+      const wrap = new Func(func);
       const after1 = () => {};
       const after2 = () => {};
 
@@ -86,7 +86,7 @@ describe('it should test Function#', () => {
     });
     it('should add middleware into the start of after array with falsey argument', () => {
       const func = () => {};
-      const wrap = new Function(func);
+      const wrap = new Func(func);
       const after1 = () => {};
       const after2 = () => {};
 
@@ -99,7 +99,7 @@ describe('it should test Function#', () => {
   describe('apply()', () => {
     it('should work the same as Function.prototype.apply', () => {
       const func = concat;
-      const wrap = new Function(func);
+      const wrap = new Func(func);
 
       assert.strictEqual(wrap.apply('concat: ', [1, 2, 3, 4, 5]), 'concat: 12345');
     });
@@ -107,7 +107,7 @@ describe('it should test Function#', () => {
   describe('async()', () => {
     it('should became async with no or truthy argument', () => {
       const func = () => {};
-      const wrap = new Function(func);
+      const wrap = new Func(func);
 
       wrap.async();
 
@@ -117,7 +117,7 @@ describe('it should test Function#', () => {
   describe('before()', () => {
     it('should add middleware into the start of before array with no or truthy argument', () => {
       const func = () => {};
-      const wrap = new Function(func);
+      const wrap = new Func(func);
       const before1 = () => {};
       const before2 = () => {};
 
@@ -128,7 +128,7 @@ describe('it should test Function#', () => {
     });
     it('should add middleware into the end of before array with falsey argument', () => {
       const func = () => {};
-      const wrap = new Function(func);
+      const wrap = new Func(func);
       const before1 = () => {};
       const before2 = () => {};
 
@@ -141,7 +141,7 @@ describe('it should test Function#', () => {
   describe('bind()', () => {
     it('should bind context and arguments', () => {
       const func = concat;
-      const wrap = new Function(func);
+      const wrap = new Func(func);
 
       wrap.bind('concat: ', [1, 2, 3]);
 
@@ -151,7 +151,7 @@ describe('it should test Function#', () => {
   describe('bindArgs()', () => {
     it('should bind arguments', () => {
       const func = concat;
-      const wrap = new Function(func);
+      const wrap = new Func(func);
 
       wrap.bindArgs([1, 2]);
       wrap.bindArgs([3]);
@@ -162,7 +162,7 @@ describe('it should test Function#', () => {
   describe('bindContext()', () => {
     it('should bind context', () => {
       const func = concat;
-      const wrap = new Function(func);
+      const wrap = new Func(func);
 
       wrap.bindContext('concat: ');
 
@@ -172,7 +172,7 @@ describe('it should test Function#', () => {
   describe('call()', () => {
     it('should work the same as Function.prototype.call', () => {
       const func = concat;
-      const wrap = new Function(func);
+      const wrap = new Func(func);
 
       assert.strictEqual(wrap.call('concat: ', 1, 2, 3, 4, 5), 'concat: 12345');
     });
@@ -180,7 +180,7 @@ describe('it should test Function#', () => {
   describe('get called', () => {
     it('should return number of calls', () => {
       const func = () => {};
-      const wrap = new Function(func);
+      const wrap = new Func(func);
       const toCall = random(0, 100);
 
       for (let i = 0; i < toCall; i++) {
@@ -194,7 +194,7 @@ describe('it should test Function#', () => {
     it('should not call function after n calls', () => {
       const toCall = random(10, 50);
       const func = () => {};
-      const wrap = new Function(func);
+      const wrap = new Func(func);
 
       wrap.canBeCalled(toCall);
 
@@ -204,7 +204,7 @@ describe('it should test Function#', () => {
   describe('limitArgsTo()', () => {
     it('should limit arguments to n before calling function', () => {
       const func = concat;
-      const wrap = new Function(func);
+      const wrap = new Func(func);
 
       wrap.limitArgsTo(3);
 
@@ -214,7 +214,7 @@ describe('it should test Function#', () => {
   describe('lock()', () => {
     it('should lock context and arguments', () => {
       const func = concat;
-      const wrap = new Function(func);
+      const wrap = new Func(func);
 
       wrap.lock('concat: ', [1, 2]);
 
@@ -228,7 +228,7 @@ describe('it should test Function#', () => {
   describe('lockArgs()', () => {
     it('should lock arguments', () => {
       const func = concat;
-      const wrap = new Function(func);
+      const wrap = new Func(func);
 
       wrap.lockArgs([1, 2]);
 
@@ -250,7 +250,7 @@ describe('it should test Function#', () => {
   describe('lockContext()', () => {
     it('should lock context', () => {
       const func = concat;
-      const wrap = new Function(func);
+      const wrap = new Func(func);
 
       wrap.lockContext('concat: ');
 
@@ -268,13 +268,14 @@ describe('it should test Function#', () => {
   describe('timing()', () => {
     it('should add timing middlewares into the start of after array and to the end of before array', () => {
       const func = () => {};
-      const wrap = new Function(func);
+      const wrap = new Func(func);
       const before = () => {};
       const after = () => {};
 
-      wrap.before(before);
-      wrap.after(after);
-      wrap.timing('mark');
+      wrap
+        .before(before)
+        .after(after)
+        .timing('mark');
 
       assert.strictEqual(wrap.$$.before[0], before);
       assert.strictEqual(wrap.$$.after.length, 2);
@@ -285,11 +286,12 @@ describe('it should test Function#', () => {
   describe('unbind()', () => {
     it('should unbind context and arguments', () => {
       const func = concatWithContext;
-      const wrap = new Function(func);
+      const wrap = new Func(func);
 
-      wrap.bind({ a: 'concat: ' }, [1, 2, 3]);
-      wrap.unbind();
-      wrap.bindContext({ a: 'no: ' });
+      wrap
+        .bind({ a: 'concat: ' }, [1, 2, 3])
+        .unbind()
+        .bindContext({ a: 'no: ' });
 
       assert.strictEqual(wrap(1, 2, 3), 'no: 123');
     });
@@ -297,10 +299,11 @@ describe('it should test Function#', () => {
   describe('unbindArgs()', () => {
     it('should unbind arguments', () => {
       const func = concat;
-      const wrap = new Function(func);
+      const wrap = new Func(func);
 
-      wrap.bindArgs([1, 2, 3]);
-      wrap.unbindArgs();
+      wrap
+        .bindArgs([1, 2, 3])
+        .unbindArgs();
 
       assert.strictEqual(wrap.call('concat: ', 1, 2, 3), 'concat: 123');
     });
@@ -308,11 +311,12 @@ describe('it should test Function#', () => {
   describe('unbindContext()', () => {
     it('should unbind context', () => {
       const func = concatWithContext;
-      const wrap = new Function(func);
+      const wrap = new Func(func);
 
-      wrap.bindContext({ a: 'concat: ' });
-      wrap.unbindContext();
-      wrap.bindContext({ a: 'no: ' });
+      wrap
+        .bindContext({ a: 'concat: ' })
+        .unbindContext()
+        .bindContext({ a: 'no: ' });
 
       assert.strictEqual(wrap(1, 2, 3), 'no: 123');
     });
@@ -341,7 +345,9 @@ describe('it should test exported methods from Function', () => {
     it('should be the function returning <ctx>[method](args), where ctx is the first argument', () => {
       const rnd = rand();
       const unique = {
-        foo() { return this.x + new Arr(arguments).sum(); },
+        foo() {
+          return this.x + new Arr(arguments).sum();
+        },
         x: rnd
       };
 
