@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import Promise from '../lib/Promise';
 
-describe('it should test new Promise', () => {
+describe('it should test Promise#', () => {
   describe('constructor()', () => {
     it('should return new Promise, that is instantly resolved', (done) => {
       const unique = {};
@@ -64,9 +64,6 @@ describe('it should test new Promise', () => {
         .catch(done);
     });
   });
-});
-
-describe('it should test Promise::[methods]', () => {
   describe('catch()', () => {
     it('should return new promise with rejected value', (done) => {
       const unique = new Error();
@@ -134,14 +131,14 @@ describe('it should test Promise.[methods]', () => {
         Promise.resolve(unique2),
         Promise.resolve(unique3)
       ])
-      .then(([value1, value2, value3]) => {
-        assert.strictEqual(value1, unique1);
-        assert.strictEqual(value2, unique2);
-        assert.strictEqual(value3, unique3);
+        .then(([value1, value2, value3]) => {
+          assert.strictEqual(value1, unique1);
+          assert.strictEqual(value2, unique2);
+          assert.strictEqual(value3, unique3);
 
-        done();
-      })
-      .catch(done);
+          done();
+        })
+        .catch(done);
     });
     it('should return rejected promise, if one was rejected', (done) => {
       const unique1 = {};
@@ -153,13 +150,13 @@ describe('it should test Promise.[methods]', () => {
         Promise.reject(unique2),
         Promise.resolve(unique3)
       ])
-      .then(done)
-      .catch((err) => {
-        assert.strictEqual(err, unique2);
+        .then(done)
+        .catch((err) => {
+          assert.strictEqual(err, unique2);
 
-        done();
-      })
-      .catch(done);
+          done();
+        })
+        .catch(done);
     });
     it('should support iterators parameters, if Symbol.iterator is supported', (done) => {
       if (Symbol && Symbol.iterator) {
@@ -206,12 +203,12 @@ describe('it should test Promise.[methods]', () => {
         new Promise((resolve, reject) => setTimeout(reject, 101, unique2)),
         new Promise((resolve) => setTimeout(resolve, 102, unique3))
       ])
-      .then((value) => {
-        assert.strictEqual(value, unique1);
+        .then((value) => {
+          assert.strictEqual(value, unique1);
 
-        done();
-      })
-      .catch(done);
+          done();
+        })
+        .catch(done);
     });
     it('should return rejected promise with first rejected value', (done) => {
       const unique1 = {};
@@ -223,13 +220,13 @@ describe('it should test Promise.[methods]', () => {
         new Promise((resolve, reject) => setTimeout(reject, 100, unique2)),
         new Promise((resolve) => setTimeout(resolve, 102, unique3))
       ])
-      .then(done)
-      .catch((err) => {
-        assert.strictEqual(err, unique2);
+        .then(done)
+        .catch((err) => {
+          assert.strictEqual(err, unique2);
 
-        done();
-      })
-      .catch(done);
+          done();
+        })
+        .catch(done);
     });
     it('should support iterators parameters, if Symbol.iterator is supported', (done) => {
       if (Symbol && Symbol.iterator) {

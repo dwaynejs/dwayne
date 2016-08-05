@@ -3,8 +3,8 @@
     "include": ["lib/"]
   },
   "opts": {
-    "access": "all",
+    "access": "public",
     "recurse": true,
-    "destination": "docs/"
+    "destination": "docs_public/"
   }
 }

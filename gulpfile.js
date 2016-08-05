@@ -2,9 +2,17 @@ const gulp = require('gulp');
 const _ = require('lodash');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
+const jsdoc = require('gulp-jsdoc3');
 
 const server = require('./server');
-const config = require('./webpack.config');
+
+const webpackConfig = require('./webpack.config');
+const jsdocPublicConfig = require('./conf.json');
+
+const jsdocConfig = _.cloneDeep(jsdocPublicConfig);
+
+jsdocConfig.opts.access = 'all';
+jsdocConfig.opts.destination = 'docs/';
 
 const modules = [
   '',
@@ -22,8 +30,8 @@ const modules = [
   'Switcher'
 ];
 
-gulp.task('dev-server', (callback) => {
-  new WebpackDevServer(webpack(config), {
+gulp.task('default', (callback) => {
+  new WebpackDevServer(webpack(webpackConfig), {
     stats: {
       colors: true
     }
@@ -33,28 +41,32 @@ gulp.task('dev-server', (callback) => {
 });
 
 gulp.task('build', (callback) => {
-  const conf = _.cloneDeep(config);
+  const config = _.cloneDeep(webpackConfig);
   
-  delete conf.devtool;
+  delete config.devtool;
 
-  conf.output.filename = 'domc.js';
+  config.output.filename = 'domc.js';
   
-  webpack(conf, () => {
-    conf.output.filename = 'domc.min.js';
-    conf.module.loaders.unshift({
+  webpack(config, () => {
+    config.output.filename = 'domc.min.js';
+    config.module.loaders.unshift({
       test: /\.js$/,
       loader: 'uglify-loader'
     });
 
-    webpack(conf, () => {
+    webpack(config, () => {
       callback();
     });
   });
 });
 
-gulp.task('test-server', (callback) => {
-  server().then(callback, callback);
-});
+gulp.task('jsdoc', ['test-server', 'jsdoc:compile'], () => (
+  gulp.watch(['./lib/**/*.js'], ['jsdoc:compile'])
+));
+
+gulp.task('jsdoc:public', ['test-server', 'jsdoc:public:compile'], () => (
+  gulp.watch(['./lib/**/*.js'], ['jsdoc:public:compile'])
+));
 
 modules.forEach((module) => {
   const taskName = `test${ module ? `:${ module }` : '' }`;
@@ -62,11 +74,14 @@ modules.forEach((module) => {
   
   gulp.task(taskName, deps, (callback) => {
     const fileName = module || 'all';
-    const conf = _.cloneDeep(config);
+    const config = _.cloneDeep(webpackConfig);
 
-    conf.entry = `mocha!./test/${ fileName }.js`;
+    config.entry = [
+      `mocha!./test/${ fileName }.js`,
+      './browser.js'
+    ];
 
-    new WebpackDevServer(webpack(conf), {
+    new WebpackDevServer(webpack(config), {
       stats: {
         colors: true
       }
@@ -75,3 +90,21 @@ modules.forEach((module) => {
     });
   });
 });
+
+gulp.task('test-server', (callback) => {
+  server()
+    .then(callback)
+    .catch(() => {
+      callback();
+    });
+});
+
+gulp.task('jsdoc:compile', (callback) => (
+  gulp.src('./lib')
+    .pipe(jsdoc(jsdocConfig, callback))
+));
+
+gulp.task('jsdoc:public:compile', (callback) => (
+  gulp.src('./lib')
+    .pipe(jsdoc(jsdocPublicConfig, callback))
+));
