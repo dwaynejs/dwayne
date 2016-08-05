@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import Arr, { array } from '../lib/Array';
+import Arr, { array } from '../lib/Arr';
 import { isNaN } from '../lib/helpers';
 
 describe('it should test Arr#', () => {

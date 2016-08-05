@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { blob } from '../lib/Blob';
+import { blob } from '../lib/BlobObject';
 import Super from '../lib/Super';
 
 describe('it should test Blob::[methods]', () => {

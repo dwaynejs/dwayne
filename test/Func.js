@@ -1,7 +1,7 @@
 import * as assert from 'assert';
-import Func, { noop, self, method } from '../lib/Function';
-import Arr from '../lib/Array';
-import Num, { rand, random } from '../lib/Number';
+import Func, { noop, self, method } from '../lib/Func';
+import Arr from '../lib/Arr';
+import Num, { rand, random } from '../lib/Num';
 
 function concat() {
   return this + new Arr(arguments).string();

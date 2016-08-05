@@ -1,6 +1,6 @@
-import * as express from 'express';
-import * as bodyParser from 'body-parser';
-import * as path from 'path';
+import express from 'express';
+import bodyParser from 'body-parser';
+import path from 'path';
 
 const app = express();
 const port = 8888;
@@ -48,10 +48,14 @@ app.use(/.*/, (req, res) => {
   res.json({ body, query, headers });
 });
 
-app.listen(port, (error) => {
-  if (error) {
-    console.error(error);
-  } else {
-    console.info('Listening on port %s...', port);
-  }
+export default () => new Promise((resolve, reject) => {
+  app.listen(port, (error) => {
+    if (error) {
+      console.error(error);
+      reject(error);
+    } else {
+      console.info('Listening on port %s...', port);
+      resolve();
+    }
+  });
 });

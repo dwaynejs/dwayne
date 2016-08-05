@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import Num from '../lib/Number';
+import Num from '../lib/Num';
 import { isNaN } from '../lib/helpers';
 
 const eps = Math.pow(2, -47);

@@ -2,4 +2,4 @@ require('babel-register')({
   presets: ['es2015']
 });
 
-require('./app');
+module.exports = require('./app').default;

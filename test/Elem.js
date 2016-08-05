@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import HtmlElement, { find, findAll, loadImages, Elems } from '../lib/HtmlElement';
-import { array } from '../lib/Array';
+import HtmlElement, { find, findAll, loadImages, Elems } from '../lib/Elem';
+import { array } from '../lib/Arr';
 import Super from '../lib/Super';
 import css from '../lib/constants/css';
 import elements from '../lib/constants/elements';

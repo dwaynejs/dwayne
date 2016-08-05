@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import Dat, { now } from '../lib/Date';
-import { random } from '../lib/Number';
+import Dat, { now } from '../lib/Dat';
+import { random } from '../lib/Num';
 
 describe('it should test Date#', () => {
   describe('add()', () => {

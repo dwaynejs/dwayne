@@ -1,7 +1,11 @@
 node_modules/
 .idea/
-docs/
-docs_public/
+/docs/
+/docs_public/
 
-bundle.js
-bundle.js.map
+/bundle.js
+/bundle.js.map
+/domc.js
+/domc.js.map
+/domc.min.js
+/domc.min.js.map

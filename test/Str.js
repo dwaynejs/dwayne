@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import Str from '../lib/String';
+import Str from '../lib/Str';
 import { isDate, isString } from '../lib/helpers';
 
 describe('it should test String#', () => {

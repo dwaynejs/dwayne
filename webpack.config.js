@@ -1,5 +1,3 @@
-const port = 7777;
-
 module.exports = {
   entry: {
     app: './browser.js'
@@ -15,14 +13,14 @@ module.exports = {
         loader: 'babel-loader',
         query: {
           presets: ['es2015']
-        }
+        },
+        exclude: /node_modules/
       },
       {
         test: /\.js$/,
-        loader: 'eslint-loader'
+        loader: 'eslint-loader',
+        exclude: /node_modules/
       }
     ]
-  },
-  devServer: { port },
-  devtool: '#cheap-module-eval-source-map'
+  }
 };
