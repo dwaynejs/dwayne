@@ -3,7 +3,6 @@ import bodyParser from 'body-parser';
 import path from 'path';
 
 const app = express();
-const port = 8888;
 
 app.use(express.static(path.resolve('./')));
 
@@ -48,7 +47,9 @@ app.use(/.*/, (req, res) => {
   res.json({ body, query, headers });
 });
 
-export default () => new Promise((resolve, reject) => {
+export default (port) => new Promise((resolve, reject) => {
+  port = port || 8888;
+
   app.listen(port, (error) => {
     if (error) {
       console.error(error);

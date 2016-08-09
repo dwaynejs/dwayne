@@ -8,6 +8,7 @@ const server = require('./server');
 
 const webpackConfig = require('./webpack.config');
 const jsdocPublicConfig = require('./conf.json');
+const serverConfig = require('./config.json');
 
 const jsdocConfig = _.cloneDeep(jsdocPublicConfig);
 
@@ -35,9 +36,7 @@ gulp.task('default', (callback) => {
     stats: {
       colors: true
     }
-  }).listen(7777, 'localhost', () => {
-    callback();
-  });
+  }).listen(serverConfig.webpackDevServer.port, 'localhost', callback);
 });
 
 gulp.task('build', (callback) => {
@@ -47,16 +46,18 @@ gulp.task('build', (callback) => {
 
   config.output.filename = 'domc.js';
   
-  webpack(config, () => {
+  webpack(config, (err) => {
+    if (err) {
+      return callback(err);
+    }
+
     config.output.filename = 'domc.min.js';
     config.module.loaders.unshift({
       test: /\.js$/,
       loader: 'uglify-loader'
     });
 
-    webpack(config, () => {
-      callback();
-    });
+    webpack(config, callback);
   });
 });
 
@@ -85,19 +86,13 @@ modules.forEach((module) => {
       stats: {
         colors: true
       }
-    }).listen(2222, 'localhost', () => {
-      callback();
-    });
+    }).listen(serverConfig.webpackTestServer.port, 'localhost', callback);
   });
 });
 
-gulp.task('test-server', (callback) => {
-  server()
-    .then(callback)
-    .catch(() => {
-      callback();
-    });
-});
+gulp.task('test-server', () =>
+  server(serverConfig.testServer.port)
+);
 
 gulp.task('jsdoc:compile', (callback) => (
   gulp.src('./lib')

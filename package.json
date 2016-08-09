@@ -1,7 +1,7 @@
 {
   "name": "domc",
   "version": "0.3.0",
-  "main": "domc.js",
+  "main": "D.js",
   "devDependencies": {
     "babel-core": "^6.4.0",
     "babel-loader": "^6.2.1",
