@@ -1,24 +1,20 @@
 const gulp = require('gulp');
 const _ = require('lodash');
 const webpack = require('webpack');
+const webpackStream = require('webpack-stream');
 const WebpackDevServer = require('webpack-dev-server');
-const jsdoc = require('gulp-jsdoc3');
+const run = require('gulp-run');
 
 const server = require('./server');
 
 const webpackConfig = require('./webpack.config');
-const jsdocPublicConfig = require('./conf.json');
 const serverConfig = require('./config.json');
-
-const jsdocConfig = _.cloneDeep(jsdocPublicConfig);
-
-jsdocConfig.opts.access = 'all';
-jsdocConfig.opts.destination = 'docs/';
 
 const modules = [
   '',
   'Alphabet',
   'Arr',
+  'BlobObject',
   'Dat',
   'Elem',
   'Fetch',
@@ -39,27 +35,7 @@ gulp.task('default', (callback) => {
   }).listen(serverConfig.webpackDevServer.port, 'localhost', callback);
 });
 
-gulp.task('build', (callback) => {
-  const config = _.cloneDeep(webpackConfig);
-  
-  delete config.devtool;
-
-  config.output.filename = 'domc.js';
-  
-  webpack(config, (err) => {
-    if (err) {
-      return callback(err);
-    }
-
-    config.output.filename = 'domc.min.js';
-    config.module.loaders.unshift({
-      test: /\.js$/,
-      loader: 'uglify-loader'
-    });
-
-    webpack(config, callback);
-  });
-});
+gulp.task('build', ['build:default', 'build:min']);
 
 gulp.task('jsdoc', ['test-server', 'jsdoc:compile'], () => (
   gulp.watch(['./lib/**/*.js'], ['jsdoc:compile'])
@@ -94,12 +70,32 @@ gulp.task('test-server', () =>
   server(serverConfig.testServer.port)
 );
 
-gulp.task('jsdoc:compile', (callback) => (
-  gulp.src('./lib')
-    .pipe(jsdoc(jsdocConfig, callback))
+gulp.task('build:default', () => {
+  const config = _.cloneDeep(webpackConfig);
+
+  delete config.devtool;
+
+  return gulp.src('./browser.js')
+    .pipe(webpackStream(config))
+    .pipe(gulp.dest('./'));
+});
+
+gulp.task('build:min', () => {
+  const config = _.cloneDeep(webpackConfig);
+
+  delete config.devtool;
+
+  config.plugins.push(new webpack.optimize.UglifyJsPlugin());
+
+  return gulp.src('./browser.js')
+    .pipe(webpackStream(config))
+    .pipe(gulp.dest('./'));
+});
+
+gulp.task('jsdoc:compile', () => (
+  run('./node_modules/jsdoc/jsdoc.js -c conf.json').exec()
 ));
 
-gulp.task('jsdoc:public:compile', (callback) => (
-  gulp.src('./lib')
-    .pipe(jsdoc(jsdocPublicConfig, callback))
+gulp.task('jsdoc:public:compile', () => (
+  run('./node_modules/jsdoc/jsdoc.js -c conf.public.json').exec()
 ));
