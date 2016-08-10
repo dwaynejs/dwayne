@@ -18,7 +18,7 @@ describe('it should test Func::[[Call]]', () => {
       const wrap = new Func(func);
 
       wrap
-        .before((args) =>  new Arr(args).map((x) => 2 * x).$)
+        .before((args) => new Arr(args).map((x) => 2 * x).$)
         .after((ret) => `D is awesome! ${ ret }`);
 
       assert.strictEqual(wrap.call('concat: ', 1, 2, 3), 'D is awesome! concat: 246');
@@ -71,7 +71,7 @@ describe('it should test Func::[[Call]]', () => {
   });
 });
 
-describe('it should test Function#', () => {
+describe('it should test Func#', () => {
   describe('after()', () => {
     it('should add middleware into the end of after array with no or truthy argument', () => {
       const func = () => {};
@@ -324,6 +324,20 @@ describe('it should test Function#', () => {
 });
 
 describe('it should test exported methods from Function', () => {
+  describe('method()', () => {
+    it('should be the function returning <ctx>[method](...args), where ctx is the first argument', () => {
+      const rnd = rand();
+      const unique = {
+        foo() {
+          return this.x + new Arr(arguments).sum();
+        },
+        x: rnd
+      };
+
+      assert.strictEqual(method('foo')(unique), rnd);
+      assert.strictEqual(method('foo', [1, 2, 3])(unique), 6 + rnd);
+    });
+  });
   describe('noop()', () => {
     it('should be the function always returning undefined', () => {
       assert.strictEqual(noop(1, 2, 3), undefined);
@@ -339,20 +353,6 @@ describe('it should test exported methods from Function', () => {
       assert.strictEqual(self(1, 2, 3), 1);
       assert.strictEqual(self(unique), unique);
       assert.strictEqual(self(), undefined);
-    });
-  });
-  describe('callsMethod()', () => {
-    it('should be the function returning <ctx>[method](args), where ctx is the first argument', () => {
-      const rnd = rand();
-      const unique = {
-        foo() {
-          return this.x + new Arr(arguments).sum();
-        },
-        x: rnd
-      };
-
-      assert.strictEqual(method('foo')(unique), rnd);
-      assert.strictEqual(method('foo', [1, 2, 3])(unique), 6 + rnd);
     });
   });
 });

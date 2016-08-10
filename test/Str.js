@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import Str from '../lib/Str';
 import { isDate, isString } from '../lib/helpers';
 
-describe('it should test String#', () => {
+describe('it should test Str#', () => {
   describe('capitalizeFirst()', () => {
     it('should return string with first capital symbol', () => {
       const s = 'fooBar';
@@ -77,7 +77,7 @@ describe('it should test String#', () => {
       assert.strictEqual(wrap.lastIndexOf('s'), -1);
     });
   });
-  describe('get length', () => {
+  describe('length', () => {
     it('should return length of the context', () => {
       const s1 = 'foobar';
       const s2 = 'foo';

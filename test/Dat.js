@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import Dat, { now } from '../lib/Dat';
 import { random } from '../lib/Num';
 
-describe('it should test Date#', () => {
+describe('it should test Dat#', () => {
   describe('add()', () => {
     it('should support (what, number) syntax', () => {
       const date = new Date('1999-12-08T00:00:00.00Z');

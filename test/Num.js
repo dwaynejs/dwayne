@@ -20,8 +20,8 @@ const toFixed = (x, r) => x.toFixed(r);
 const toPrecision = (x, r) => x.toPrecision(r);
 const toString = (x, r) => x.toString(r);
 
-describe('it should test Number::[methods]', () => {
-  describe('get abs', () => {
+describe('it should test Num#', () => {
+  describe('abs', () => {
     it('should work the same as Math.abs', () => {
       const n1 = 1;
       const n2 = -1;
@@ -180,7 +180,7 @@ describe('it should test Number::[methods]', () => {
       assert.strictEqual(diff4 <= eps, true, `atan(0.5): ${ diff4 } <= ${ eps }`);
     });
   });
-  describe('get cbrt', () => {
+  describe('cbrt', () => {
     it('should work the same as Math.cbrt', () => {
       const n1 = 1;
       const n2 = -8;
@@ -207,7 +207,7 @@ describe('it should test Number::[methods]', () => {
       assert.strictEqual(isNaN(wrap6.cbrt), true);
     });
   });
-  describe('get ceil', () => {
+  describe('ceil', () => {
     it('should work the same as Math.ceil', () => {
       const n1 = 1;
       const n2 = -5.5;
@@ -278,7 +278,7 @@ describe('it should test Number::[methods]', () => {
       assert.strictEqual(diff5 <= eps, true, `cos(45): ${ diff5 } <= ${ eps }`);
     });
   });
-  describe('get cube', () => {
+  describe('cube', () => {
     it('should return cube of the number', () => {
       const n1 = 1;
       const n2 = -5;
@@ -301,7 +301,7 @@ describe('it should test Number::[methods]', () => {
       assert.strictEqual(isNaN(wrap6.cube), true);
     });
   });
-  describe('get exp', () => {
+  describe('exp', () => {
     it('should work the same as Math.exp', () => {
       const n1 = 1;
       const n2 = -5;
@@ -328,7 +328,7 @@ describe('it should test Number::[methods]', () => {
       assert.strictEqual(isNaN(wrap6.exp), true);
     });
   });
-  describe('get floor', () => {
+  describe('floor', () => {
     it('should work the same as Math.floor', () => {
       const n1 = 1;
       const n2 = -5.5;
@@ -410,7 +410,7 @@ describe('it should test Number::[methods]', () => {
       }, 999);
     });
   });
-  describe('get ln', () => {
+  describe('ln', () => {
     it('should work the same as Math.log', () => {
       const n1 = 1;
       const n2 = 0.45;
@@ -466,7 +466,7 @@ describe('it should test Number::[methods]', () => {
       assert.strictEqual(isNaN(wrap7.log(0)), true);
     });
   });
-  describe('get log2', () => {
+  describe('log2', () => {
     it('should work the same as Math.log2', () => {
       const n1 = 1;
       const n2 = 0.45;
@@ -492,7 +492,7 @@ describe('it should test Number::[methods]', () => {
       assert.strictEqual(isNaN(wrap6.log2), true);
     });
   });
-  describe('get log10', () => {
+  describe('log10', () => {
     it('should work the same as Math.log10', () => {
       const n1 = 1;
       const n2 = 0.45;
@@ -564,7 +564,7 @@ describe('it should test Number::[methods]', () => {
       assert.strictEqual(isNaN(wrap6.root(0)), true);
     });
   });
-  describe('get round', () => {
+  describe('round', () => {
     it('should work the same as Math.round', () => {
       const n1 = 1;
       const n2 = -5.5;
@@ -587,7 +587,7 @@ describe('it should test Number::[methods]', () => {
       assert.strictEqual(isNaN(wrap6.round), true);
     });
   });
-  describe('get sign', () => {
+  describe('sign', () => {
     it('should work the same as Math.sign', () => {
       const n1 = 2;
       const n2 = -2;
@@ -661,7 +661,7 @@ describe('it should test Number::[methods]', () => {
       assert.strictEqual(diff5 <= eps, true, `sin(45): ${ diff5 } <= ${ eps }`);
     });
   });
-  describe('get sq', () => {
+  describe('sq', () => {
     it('should return square of the number', () => {
       const n1 = 1;
       const n2 = -5;
@@ -684,7 +684,7 @@ describe('it should test Number::[methods]', () => {
       assert.strictEqual(isNaN(wrap6.sq), true);
     });
   });
-  describe('get sqrt', () => {
+  describe('sqrt', () => {
     it('should work the same as Math.sqrt', () => {
       const n1 = 1;
       const n2 = 4;
