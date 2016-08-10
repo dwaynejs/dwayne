@@ -45,7 +45,7 @@ describe('it should test Super#', () => {
       assert.strictEqual(wrap.call(f, 2, 3, 4), 10);
     });
   });
-  describe('get count', () => {
+  describe('count', () => {
     it('should return count of own properties context', () => {
       const o = { a: 1, b: 2, c: 3 };
       const wrap = new Super(o);
@@ -1194,7 +1194,7 @@ describe('it should test Super#', () => {
       assert.strictEqual(wrap.json(), '{"a":{"a":1}}');
     });
   });
-  describe('get toStringTag', () => {
+  describe('toStringTag', () => {
     it('should return Object.prototype.toString.call(<context>)', () => {
       const o1 = { a: 1 };
       const o2 = () => {};
@@ -1214,7 +1214,7 @@ describe('it should test Super#', () => {
       assert.strictEqual(wrap5.toStringTag, 'Boolean');
     });
   });
-  describe('get type', () => {
+  describe('type', () => {
     it('should return "typeof <context>"', () => {
       const o1 = { a: 1 };
       const o2 = () => {};

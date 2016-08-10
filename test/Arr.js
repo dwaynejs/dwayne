@@ -82,7 +82,7 @@ describe('it should test Arr#', () => {
       assert.equal(wrap.last, a[a.length - 1]);
     });
   });
-  describe('get length', () => {
+  describe('length', () => {
     it('should return length of array', () => {
       const a = [1, 2, 3, 4, 5];
       const wrap = new Arr(a);
