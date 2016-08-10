@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import { blob } from '../lib/BlobObject';
 import Super from '../lib/Super';
 
-describe('it should test Blob::[methods]', () => {
+describe('it should test BlobObject#', () => {
   describe('readAs', () => {
     it('should return promise, that is resolved with text with "text" argument', (done) => {
       const string = '{"foo":"bar"}';

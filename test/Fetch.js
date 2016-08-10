@@ -6,7 +6,7 @@ import { isDate } from '../lib/helpers';
 const random = Math.random;
 const origin = 'http://localhost:8888';
 
-describe('it should test Fetch::[methods]', () => {
+describe('it should test Fetch#', () => {
   describe('after()', () => {
     it('should insert "after" middleware', () => {
       const fetch = new Fetch();

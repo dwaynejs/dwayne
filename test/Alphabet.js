@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import Alphabet, { alphabet } from '../lib/Alphabet';
 
-describe('it should test Alphabet::[methods]', () => {
+describe('it should test Alphabet#', () => {
   describe('add()', () => {
     it('should add new chars from arguments to alphabet', () => {
       const o = ['s', '2'];
