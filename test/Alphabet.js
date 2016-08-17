@@ -1,4 +1,4 @@
-import * as assert from 'assert';
+import { deepEqual, strictEqual } from 'assert';
 import Alphabet, { alphabet } from '../lib/Alphabet';
 
 describe('it should test Alphabet#', () => {
@@ -9,7 +9,7 @@ describe('it should test Alphabet#', () => {
       
       wrap.add('6', '7');
       
-      assert.deepEqual(wrap.$$, { s: 's', 2: '2', 6: '6', 7: '7' });
+      deepEqual(wrap.$$, { s: 's', 2: '2', 6: '6', 7: '7' });
     });
   });
   describe('get()', () => {
@@ -17,7 +17,7 @@ describe('it should test Alphabet#', () => {
       const o = ['1', '2', '3', '4', '5'];
       const wrap = new Alphabet(o);
       
-      assert.deepEqual(wrap.get().$, ['1', '2', '3', '4', '5']);
+      deepEqual(wrap.get().$, ['1', '2', '3', '4', '5']);
     });
   });
   describe('contains()', () => {
@@ -25,18 +25,18 @@ describe('it should test Alphabet#', () => {
       const o = ['1', 'a', '8', 'l'];
       const wrap = new Alphabet(o);
       
-      assert.strictEqual(wrap.contains(''), true);
-      assert.strictEqual(wrap.contains('8a8l'), true);
-      assert.strictEqual(wrap.contains('lal'), true);
-      assert.strictEqual(wrap.contains('81la18al'), true);
+      strictEqual(wrap.contains(''), true);
+      strictEqual(wrap.contains('8a8l'), true);
+      strictEqual(wrap.contains('lal'), true);
+      strictEqual(wrap.contains('81la18al'), true);
     });
     it('should return false with words not in alphabet', () => {
       const o = ['1', 'a', '8', 'l'];
       const wrap = new Alphabet(o);
       
-      assert.strictEqual(wrap.contains('12'), false);
-      assert.strictEqual(wrap.contains('abl'), false);
-      assert.strictEqual(wrap.contains('1al80'), false);
+      strictEqual(wrap.contains('12'), false);
+      strictEqual(wrap.contains('abl'), false);
+      strictEqual(wrap.contains('1al80'), false);
     });
   });
   describe('delete()', () => {
@@ -46,7 +46,7 @@ describe('it should test Alphabet#', () => {
       
       wrap.delete('2', '5');
       
-      assert.deepEqual(wrap.$$, { 1: '1', s: 's', 4: '4' });
+      deepEqual(wrap.$$, { 1: '1', s: 's', 4: '4' });
     });
   });
   describe('token()', () => {
@@ -54,7 +54,7 @@ describe('it should test Alphabet#', () => {
       const o = ['1', '2', '3', '4', '5'];
       const wrap = new Alphabet(o);
       
-      assert.strictEqual(/^[1-5]+$/.test(wrap.token(10)), true);
+      strictEqual(/^[1-5]+$/.test(wrap.token(10)), true);
     });
   });
 });
@@ -65,13 +65,13 @@ describe('it should test exported methods from Alphabet', () => {
       const s = 'a-b0-2';
       const wrap = alphabet(s);
 
-      assert.deepEqual(wrap.$$, { a: 'a', b: 'b', 0: '0', 1: '1', 2: '2' });
+      deepEqual(wrap.$$, { a: 'a', b: 'b', 0: '0', 1: '1', 2: '2' });
     });
     it('should return right alphabet', () => {
       const s = '123 a-b _?()';
       const wrap = alphabet(s);
 
-      assert.deepEqual(wrap.$$, { 1: 1, 2: 2, 3: 3, a: 'a', b: 'b', _: '_', '?': '?', '(': '(', ')': ')' });
+      deepEqual(wrap.$$, { 1: 1, 2: 2, 3: 3, a: 'a', b: 'b', _: '_', '?': '?', '(': '(', ')': ')' });
     });
   });
 });
