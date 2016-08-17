@@ -12,6 +12,7 @@ const serverConfig = require('./config.json');
 
 const modules = [
   '',
+  'D',
   'Alphabet',
   'Arr',
   'BlobObject',
