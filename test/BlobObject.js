@@ -1,4 +1,4 @@
-import * as assert from 'assert';
+import { deepEqual, strictEqual } from 'assert';
 import { blob } from '../lib/BlobObject';
 import Super from '../lib/Super';
 
@@ -10,7 +10,7 @@ describe('it should test BlobObject#', () => {
 
       wrap.readAs('text')
         .then((text) => {
-          assert.strictEqual(text, string);
+          strictEqual(text, string);
 
           done();
         })
@@ -22,7 +22,7 @@ describe('it should test BlobObject#', () => {
 
       wrap.readAs('dataURL')
         .then((dataURL) => {
-          assert.strictEqual(dataURL, string);
+          strictEqual(dataURL, string);
 
           done();
         })
@@ -34,7 +34,7 @@ describe('it should test BlobObject#', () => {
 
       wrap.readAs('binary')
         .then((binary) => {
-          assert.strictEqual(binary, string);
+          strictEqual(binary, string);
 
           done();
         })
@@ -48,7 +48,7 @@ describe('it should test BlobObject#', () => {
         .then((buffer) => {
           const charCodes = new Super(string).map((symbol) => symbol.charCodeAt(0)).$;
 
-          assert.deepEqual(new Int8Array(buffer), charCodes);
+          deepEqual(new Int8Array(buffer), charCodes);
 
           done();
         })
@@ -61,7 +61,7 @@ describe('it should test BlobObject#', () => {
         .abort()
         .then(done)
         .catch((err) => {
-          assert.strictEqual(err.message, 'Reading was aborted');
+          strictEqual(err.message, 'Reading was aborted');
 
           done();
         })
