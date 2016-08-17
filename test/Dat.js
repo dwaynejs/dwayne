@@ -1,4 +1,4 @@
-import * as assert from 'assert';
+import { strictEqual } from 'assert';
 import Dat, { now } from '../lib/Dat';
 import { random } from '../lib/Num';
 
@@ -15,7 +15,7 @@ describe('it should test Dat#', () => {
       wrap.add('d', 2);
       wrap.add('w', 3);
 
-      assert.strictEqual(date.toJSON(), '1999-12-31T23:59:59.999Z');
+      strictEqual(date.toJSON(), '1999-12-31T23:59:59.999Z');
     });
     it('should support { [what]: number, ... } syntax', () => {
       const date = new Date('1999-12-08T00:00:00.00Z');
@@ -30,7 +30,7 @@ describe('it should test Dat#', () => {
         w: 3
       });
 
-      assert.strictEqual(date.toJSON(), '1999-12-31T23:59:59.999Z');
+      strictEqual(date.toJSON(), '1999-12-31T23:59:59.999Z');
     });
   });
   describe('expires()', () => {
@@ -41,7 +41,7 @@ describe('it should test Dat#', () => {
 
       wrap.expires(unique)
         .then((value) => {
-          assert.strictEqual(value, unique);
+          strictEqual(value, unique);
 
           done();
         })
@@ -53,13 +53,13 @@ describe('it should test Dat#', () => {
       const date = new Date('1999-12-31T23:59:59.999Z');
       const wrap = new Dat(date);
 
-      assert.strictEqual(wrap.format('ss.ccc'), '59.999');
+      strictEqual(wrap.format('ss.ccc'), '59.999');
     });
     it('should support second argument', () => {
       const date = new Date('1999-12-31T23:59:59.999Z');
       const wrap = new Dat(date);
 
-      assert.strictEqual(wrap.format('ss: $ss. ccc: $ccc.', '$'), 'ss: 59. ccc: 999.');
+      strictEqual(wrap.format('ss: $ss. ccc: $ccc.', '$'), 'ss: 59. ccc: 999.');
     });
   });
   describe('formatUTC()', () => {
@@ -67,41 +67,41 @@ describe('it should test Dat#', () => {
       const date = new Date('1999-12-31T23:59:59.999Z');
       const wrap = new Dat(date);
 
-      assert.strictEqual(wrap.formatUTC('yyyy-MM-ddThh:mm:ss.cccZ'), date.toISOString());
+      strictEqual(wrap.formatUTC('yyyy-MM-ddThh:mm:ss.cccZ'), date.toISOString());
     });
     it('should support second argument', () => {
       const date = new Date('1999-12-31T23:59:59.999Z');
       const wrap = new Dat(date);
 
-      assert.strictEqual(
+      strictEqual(
         wrap.formatUTC('Year is $yyyy.', '$'),
         'Year is 1999.'
       );
-      assert.strictEqual(
+      strictEqual(
         wrap.formatUTC('Month name is $MMMM.', '$'),
         'Month name is December.'
       );
-      assert.strictEqual(
+      strictEqual(
         wrap.formatUTC('Month alias is $MMM.', '$'),
         'Month alias is Dec.'
       );
-      assert.strictEqual(
+      strictEqual(
         wrap.formatUTC('Month number is $M.', '$'),
         'Month number is 12.'
       );
-      assert.strictEqual(
+      strictEqual(
         wrap.formatUTC('Day of the week name is $dddd.', '$'),
         'Day of the week name is Friday.'
       );
-      assert.strictEqual(
+      strictEqual(
         wrap.formatUTC('Day of the week alias is $ddd.', '$'),
         'Day of the week alias is Fri.'
       );
-      assert.strictEqual(
+      strictEqual(
         wrap.formatUTC('Date is $yyyy-$MM-$dd.', '$'),
         'Date is 1999-12-31.'
       );
-      assert.strictEqual(
+      strictEqual(
         wrap.formatUTC('Time is $hh:$mm:$ss.$ccc.', '$'),
         'Time is 23:59:59.999.'
       );
@@ -112,14 +112,14 @@ describe('it should test Dat#', () => {
       const date = new Date('1999-12-31T23:59:59.999Z');
       const wrap = new Dat(date);
 
-      assert.strictEqual(wrap.get('c'), date.getMilliseconds());
-      assert.strictEqual(wrap.get('s'), date.getSeconds());
-      assert.strictEqual(wrap.get('m'), date.getMinutes());
-      assert.strictEqual(wrap.get('h'), date.getHours());
-      assert.strictEqual(wrap.get('d'), date.getDate());
-      assert.strictEqual(wrap.get('dw'), date.getDay());
-      assert.strictEqual(wrap.get('M'), date.getMonth() + 1);
-      assert.strictEqual(wrap.get('y'), date.getFullYear());
+      strictEqual(wrap.get('c'), date.getMilliseconds());
+      strictEqual(wrap.get('s'), date.getSeconds());
+      strictEqual(wrap.get('m'), date.getMinutes());
+      strictEqual(wrap.get('h'), date.getHours());
+      strictEqual(wrap.get('d'), date.getDate());
+      strictEqual(wrap.get('dw'), date.getDay());
+      strictEqual(wrap.get('M'), date.getMonth() + 1);
+      strictEqual(wrap.get('y'), date.getFullYear());
     });
   });
   describe('getUTC()', () => {
@@ -127,14 +127,14 @@ describe('it should test Dat#', () => {
       const date = new Date('1999-12-31T23:59:59.999Z');
       const wrap = new Dat(date);
 
-      assert.strictEqual(wrap.getUTC('c'), date.getUTCMilliseconds());
-      assert.strictEqual(wrap.getUTC('s'), date.getUTCSeconds());
-      assert.strictEqual(wrap.getUTC('m'), date.getUTCMinutes());
-      assert.strictEqual(wrap.getUTC('h'), date.getUTCHours());
-      assert.strictEqual(wrap.getUTC('d'), date.getUTCDate());
-      assert.strictEqual(wrap.getUTC('dw'), date.getUTCDay());
-      assert.strictEqual(wrap.getUTC('M'), date.getUTCMonth() + 1);
-      assert.strictEqual(wrap.getUTC('y'), date.getUTCFullYear());
+      strictEqual(wrap.getUTC('c'), date.getUTCMilliseconds());
+      strictEqual(wrap.getUTC('s'), date.getUTCSeconds());
+      strictEqual(wrap.getUTC('m'), date.getUTCMinutes());
+      strictEqual(wrap.getUTC('h'), date.getUTCHours());
+      strictEqual(wrap.getUTC('d'), date.getUTCDate());
+      strictEqual(wrap.getUTC('dw'), date.getUTCDay());
+      strictEqual(wrap.getUTC('M'), date.getUTCMonth() + 1);
+      strictEqual(wrap.getUTC('y'), date.getUTCFullYear());
     });
   });
   describe('isAfter()', () => {
@@ -143,14 +143,14 @@ describe('it should test Dat#', () => {
       const wrap = new Dat(date);
       const before = new Date(now() - 100);
 
-      assert.strictEqual(wrap.isAfter(before), true);
+      strictEqual(wrap.isAfter(before), true);
     });
     it('should return false with argument after context', () => {
       const date = new Date();
       const wrap = new Dat(date);
       const after = new Date(now() + 100);
 
-      assert.strictEqual(wrap.isAfter(after), false);
+      strictEqual(wrap.isAfter(after), false);
     });
   });
   describe('isBefore()', () => {
@@ -159,14 +159,14 @@ describe('it should test Dat#', () => {
       const wrap = new Dat(date);
       const after = new Date(now() + 100);
 
-      assert.strictEqual(wrap.isBefore(after), true);
+      strictEqual(wrap.isBefore(after), true);
     });
     it('should return false with argument before context', () => {
       const date = new Date();
       const wrap = new Dat(date);
       const before = new Date(now() - 100);
 
-      assert.strictEqual(wrap.isBefore(before), false);
+      strictEqual(wrap.isBefore(before), false);
     });
   });
   describe('isBetween()', () => {
@@ -176,7 +176,7 @@ describe('it should test Dat#', () => {
       const before = new Date(now() - 100);
       const after = new Date(now() + 100);
 
-      assert.strictEqual(wrap.isBetween(before, after), true);
+      strictEqual(wrap.isBetween(before, after), true);
     });
     it('should return true with first argument after context or second before', () => {
       const date = new Date();
@@ -184,9 +184,9 @@ describe('it should test Dat#', () => {
       const before = new Date(now() - 100);
       const after = new Date(now() + 100);
 
-      assert.strictEqual(wrap.isBetween(before, before), false);
-      assert.strictEqual(wrap.isBetween(after, after), false);
-      assert.strictEqual(wrap.isBetween(after, before), false);
+      strictEqual(wrap.isBetween(before, before), false);
+      strictEqual(wrap.isBetween(after, after), false);
+      strictEqual(wrap.isBetween(after, before), false);
     });
   });
   describe('isInvalid()', () => {
@@ -194,13 +194,13 @@ describe('it should test Dat#', () => {
       const date = new Date('a');
       const wrap = new Dat(date);
 
-      assert.strictEqual(wrap.isInvalid(), true);
+      strictEqual(wrap.isInvalid(), true);
     });
     it('should return false with not invalid context', () => {
       const date = new Date();
       const wrap = new Dat(date);
 
-      assert.strictEqual(wrap.isInvalid(), false);
+      strictEqual(wrap.isInvalid(), false);
     });
   });
   describe('isPassed()', () => {
@@ -208,13 +208,13 @@ describe('it should test Dat#', () => {
       const date = new Date(now() - 100);
       const wrap = new Dat(date);
 
-      assert.strictEqual(wrap.isPassed(), true);
+      strictEqual(wrap.isPassed(), true);
     });
     it('should return false with context after now', () => {
       const date = new Date(now() + 100);
       const wrap = new Dat(date);
 
-      assert.strictEqual(wrap.isPassed(), false);
+      strictEqual(wrap.isPassed(), false);
     });
   });
   describe('ofOne()', () => {
@@ -223,24 +223,24 @@ describe('it should test Dat#', () => {
       const date2 = new Date('1999-12-31T23:59:59.998Z');
       const wrap = new Dat(date1);
 
-      assert.strictEqual(wrap.ofOne('s', date2), true);
-      assert.strictEqual(wrap.ofOne('m', date2), true);
-      assert.strictEqual(wrap.ofOne('h', date2), true);
-      assert.strictEqual(wrap.ofOne('d', date2), true);
-      assert.strictEqual(wrap.ofOne('M', date2), true);
-      assert.strictEqual(wrap.ofOne('y', date2), true);
+      strictEqual(wrap.ofOne('s', date2), true);
+      strictEqual(wrap.ofOne('m', date2), true);
+      strictEqual(wrap.ofOne('h', date2), true);
+      strictEqual(wrap.ofOne('d', date2), true);
+      strictEqual(wrap.ofOne('M', date2), true);
+      strictEqual(wrap.ofOne('y', date2), true);
     });
     it('should return true with second argument not of one <first argument>', () => {
       const date1 = new Date('1999-12-31T23:59:59.999Z');
       const date2 = new Date('1998-12-31T23:59:59.998Z');
       const wrap = new Dat(date1);
 
-      assert.strictEqual(wrap.ofOne('s', date2), false);
-      assert.strictEqual(wrap.ofOne('m', date2), false);
-      assert.strictEqual(wrap.ofOne('h', date2), false);
-      assert.strictEqual(wrap.ofOne('d', date2), false);
-      assert.strictEqual(wrap.ofOne('M', date2), false);
-      assert.strictEqual(wrap.ofOne('y', date2), false);
+      strictEqual(wrap.ofOne('s', date2), false);
+      strictEqual(wrap.ofOne('m', date2), false);
+      strictEqual(wrap.ofOne('h', date2), false);
+      strictEqual(wrap.ofOne('d', date2), false);
+      strictEqual(wrap.ofOne('M', date2), false);
+      strictEqual(wrap.ofOne('y', date2), false);
     });
   });
   describe('set()', () => {
@@ -256,13 +256,13 @@ describe('it should test Dat#', () => {
       wrap.set('s', 59);
       wrap.set('c', 999);
 
-      assert.strictEqual(date.getMilliseconds(), 999);
-      assert.strictEqual(date.getSeconds(), 59);
-      assert.strictEqual(date.getMinutes(), 59);
-      assert.strictEqual(date.getHours(), 23);
-      assert.strictEqual(date.getDate(), 31);
-      assert.strictEqual(date.getMonth(), 11);
-      assert.strictEqual(date.getFullYear(), 1999);
+      strictEqual(date.getMilliseconds(), 999);
+      strictEqual(date.getSeconds(), 59);
+      strictEqual(date.getMinutes(), 59);
+      strictEqual(date.getHours(), 23);
+      strictEqual(date.getDate(), 31);
+      strictEqual(date.getMonth(), 11);
+      strictEqual(date.getFullYear(), 1999);
     });
     it('should support { [what]: number, ... } syntax', () => {
       const date = new Date();
@@ -278,13 +278,13 @@ describe('it should test Dat#', () => {
         c: 999
       });
 
-      assert.strictEqual(date.getMilliseconds(), 999);
-      assert.strictEqual(date.getSeconds(), 59);
-      assert.strictEqual(date.getMinutes(), 59);
-      assert.strictEqual(date.getHours(), 23);
-      assert.strictEqual(date.getDate(), 31);
-      assert.strictEqual(date.getMonth(), 11);
-      assert.strictEqual(date.getFullYear(), 1999);
+      strictEqual(date.getMilliseconds(), 999);
+      strictEqual(date.getSeconds(), 59);
+      strictEqual(date.getMinutes(), 59);
+      strictEqual(date.getHours(), 23);
+      strictEqual(date.getDate(), 31);
+      strictEqual(date.getMonth(), 11);
+      strictEqual(date.getFullYear(), 1999);
     });
   });
   describe('setUTC()', () => {
@@ -300,7 +300,7 @@ describe('it should test Dat#', () => {
       wrap.setUTC('s', 59);
       wrap.setUTC('c', 999);
 
-      assert.strictEqual(date.toJSON(), '1999-12-31T23:59:59.999Z');
+      strictEqual(date.toJSON(), '1999-12-31T23:59:59.999Z');
     });
     it('should support { [what]: number, ... } syntax', () => {
       const date = new Date();
@@ -316,7 +316,7 @@ describe('it should test Dat#', () => {
         c: 999
       });
 
-      assert.strictEqual(date.toJSON(), '1999-12-31T23:59:59.999Z');
+      strictEqual(date.toJSON(), '1999-12-31T23:59:59.999Z');
     });
   });
   describe('time()', () => {
@@ -325,7 +325,7 @@ describe('it should test Dat#', () => {
       const date = new Date(time);
       const wrap = new Dat(date);
 
-      assert.strictEqual(wrap.time(), date.getTime());
+      strictEqual(wrap.time(), date.getTime());
     });
     it('should set time of argument', () => {
       const time = now() - random(50, 100);
@@ -334,7 +334,7 @@ describe('it should test Dat#', () => {
 
       wrap.time(time);
 
-      assert.strictEqual(date.getTime(), time);
+      strictEqual(date.getTime(), time);
     });
   });
   describe('toLocaleString()', () => {
@@ -342,7 +342,7 @@ describe('it should test Dat#', () => {
       const date = new Date();
       const wrap = new Dat(date);
 
-      assert.strictEqual(wrap.toLocaleString(), date.toLocaleString());
+      strictEqual(wrap.toLocaleString(), date.toLocaleString());
     });
   });
   describe('toString()', () => {
@@ -350,7 +350,7 @@ describe('it should test Dat#', () => {
       const date = new Date();
       const wrap = new Dat(date);
 
-      assert.strictEqual(wrap.toString(), date.toString());
+      strictEqual(wrap.toString(), date.toString());
     });
   });
   describe('valueOf()', () => {
@@ -358,7 +358,7 @@ describe('it should test Dat#', () => {
       const date = new Date();
       const wrap = new Dat(date);
 
-      assert.strictEqual(wrap.valueOf(), date.valueOf());
+      strictEqual(wrap.valueOf(), date.valueOf());
     });
   });
 });
