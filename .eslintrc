@@ -238,9 +238,6 @@
       "error",
       "never"
     ],
-    "valid-jsdoc": [
-      "error"
-    ],
     "wrap-iife": [
       "error",
       "inside"
