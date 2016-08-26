@@ -1,4 +1,4 @@
-import * as assert from 'assert';
+import { strictEqual } from 'assert';
 import Promise from '../lib/Promise';
 
 describe('it should test Promise#', () => {
@@ -8,7 +8,7 @@ describe('it should test Promise#', () => {
 
       new Promise((resolve) => resolve(unique))
         .then((value) => {
-          assert.strictEqual(value, unique);
+          strictEqual(value, unique);
 
           done();
         })
@@ -20,7 +20,7 @@ describe('it should test Promise#', () => {
       new Promise((resolve, reject) => reject(unique))
         .then(done)
         .catch((err) => {
-          assert.strictEqual(err, unique);
+          strictEqual(err, unique);
 
           done();
         });
@@ -32,7 +32,7 @@ describe('it should test Promise#', () => {
         setTimeout(resolve, 50, unique);
       })
         .then((value) => {
-          assert.strictEqual(value, unique);
+          strictEqual(value, unique);
 
           done();
         })
@@ -46,7 +46,7 @@ describe('it should test Promise#', () => {
         setTimeout(reject, 100, new Error());
       })
         .then((value) => {
-          assert.strictEqual(value, unique);
+          strictEqual(value, unique);
 
           done();
         })
@@ -57,7 +57,7 @@ describe('it should test Promise#', () => {
 
       new Promise((resolve) => resolve(Promise.resolve(unique)))
         .then((value) => {
-          assert.strictEqual(value, unique);
+          strictEqual(value, unique);
 
           done();
         })
@@ -71,7 +71,7 @@ describe('it should test Promise#', () => {
       Promise.reject(unique)
         .then(done)
         .catch((err) => {
-          assert.strictEqual(err, unique);
+          strictEqual(err, unique);
 
           done();
         });
@@ -85,7 +85,7 @@ describe('it should test Promise#', () => {
         })
         .then(done)
         .catch((err) => {
-          assert.strictEqual(err, unique);
+          strictEqual(err, unique);
 
           done();
         });
@@ -97,7 +97,7 @@ describe('it should test Promise#', () => {
 
       Promise.resolve(unique)
         .then((value) => {
-          assert.strictEqual(value, unique);
+          strictEqual(value, unique);
 
           done();
         })
@@ -110,7 +110,7 @@ describe('it should test Promise#', () => {
         .then(done)
         .catch((err) => Promise.resolve(err))
         .then((value) => {
-          assert.strictEqual(value, unique);
+          strictEqual(value, unique);
 
           done();
         })
@@ -132,9 +132,9 @@ describe('it should test Promise.[methods]', () => {
         Promise.resolve(unique3)
       ])
         .then(([value1, value2, value3]) => {
-          assert.strictEqual(value1, unique1);
-          assert.strictEqual(value2, unique2);
-          assert.strictEqual(value3, unique3);
+          strictEqual(value1, unique1);
+          strictEqual(value2, unique2);
+          strictEqual(value3, unique3);
 
           done();
         })
@@ -152,7 +152,7 @@ describe('it should test Promise.[methods]', () => {
       ])
         .then(done)
         .catch((err) => {
-          assert.strictEqual(err, unique2);
+          strictEqual(err, unique2);
 
           done();
         })
@@ -182,9 +182,9 @@ describe('it should test Promise.[methods]', () => {
 
         Promise.all(iterable)
           .then(([value1, value2, value3]) => {
-            assert.strictEqual(value1, unique1);
-            assert.strictEqual(value2, unique2);
-            assert.strictEqual(value3, unique3);
+            strictEqual(value1, unique1);
+            strictEqual(value2, unique2);
+            strictEqual(value3, unique3);
 
             done();
           })
@@ -204,7 +204,7 @@ describe('it should test Promise.[methods]', () => {
         new Promise((resolve) => setTimeout(resolve, 102, unique3))
       ])
         .then((value) => {
-          assert.strictEqual(value, unique1);
+          strictEqual(value, unique1);
 
           done();
         })
@@ -222,7 +222,7 @@ describe('it should test Promise.[methods]', () => {
       ])
         .then(done)
         .catch((err) => {
-          assert.strictEqual(err, unique2);
+          strictEqual(err, unique2);
 
           done();
         })
@@ -252,7 +252,7 @@ describe('it should test Promise.[methods]', () => {
 
         Promise.race(iterable)
           .then((value) => {
-            assert.strictEqual(value, unique1);
+            strictEqual(value, unique1);
 
             done();
           })
@@ -266,7 +266,7 @@ describe('it should test Promise.[methods]', () => {
 
       Promise.resolve(unique)
         .then((value) => {
-          assert.strictEqual(value, unique);
+          strictEqual(value, unique);
 
           done();
         })
@@ -278,7 +278,7 @@ describe('it should test Promise.[methods]', () => {
       Promise.resolve(Promise.reject(unique))
         .then(done)
         .catch((err) => {
-          assert.strictEqual(err, unique);
+          strictEqual(err, unique);
 
           done();
         });
@@ -291,7 +291,7 @@ describe('it should test Promise.[methods]', () => {
       Promise.reject(unique)
         .then(done)
         .catch((err) => {
-          assert.strictEqual(err, unique);
+          strictEqual(err, unique);
 
           done();
         });
