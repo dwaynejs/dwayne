@@ -1,4 +1,4 @@
-import * as assert from 'assert';
+import { deepStrictEqual, strictEqual } from 'assert';
 import Func, { noop, self, method } from '../lib/Func';
 import Arr from '../lib/Arr';
 import Num, { rand, random } from '../lib/Num';
@@ -21,7 +21,7 @@ describe('it should test Func::[[Call]]', () => {
         .before((args) => new Arr(args).map((x) => 2 * x).$)
         .after((ret) => `D is awesome! ${ ret }`);
 
-      assert.strictEqual(wrap.call('concat: ', 1, 2, 3), 'D is awesome! concat: 246');
+      strictEqual(wrap.call('concat: ', 1, 2, 3), 'D is awesome! concat: 246');
     });
     it('should test asynchronous middlewares', (done) => {
       const func = function () {
@@ -35,7 +35,7 @@ describe('it should test Func::[[Call]]', () => {
         .after((ret) => new Num(50).timeout(`D is awesome! ${ ret }`))
         .call('concat: ', 1, 2, 3)
         .then((ret) => {
-          assert.strictEqual(ret, 'D is awesome! concat: 246');
+          strictEqual(ret, 'D is awesome! concat: 246');
 
           done();
         })
@@ -61,7 +61,7 @@ describe('it should test Func::[[Call]]', () => {
           wrap();
         }
 
-        assert.strictEqual(wrap.called, toCall + 1);
+        strictEqual(wrap.called, toCall + 1);
 
         done();
       } catch (err) {
@@ -82,7 +82,7 @@ describe('it should test Func#', () => {
       wrap.after(after1);
       wrap.after(after2);
 
-      assert.deepEqual(wrap.$$.after, [after1, after2]);
+      deepStrictEqual(wrap.$$.after, [after1, after2]);
     });
     it('should add middleware into the start of after array with falsey argument', () => {
       const func = () => {};
@@ -93,7 +93,7 @@ describe('it should test Func#', () => {
       wrap.after(after1, false);
       wrap.after(after2, false);
 
-      assert.deepEqual(wrap.$$.after, [after2, after1]);
+      deepStrictEqual(wrap.$$.after, [after2, after1]);
     });
   });
   describe('apply()', () => {
@@ -101,7 +101,7 @@ describe('it should test Func#', () => {
       const func = concat;
       const wrap = new Func(func);
 
-      assert.strictEqual(wrap.apply('concat: ', [1, 2, 3, 4, 5]), 'concat: 12345');
+      strictEqual(wrap.apply('concat: ', [1, 2, 3, 4, 5]), 'concat: 12345');
     });
   });
   describe('async()', () => {
@@ -111,7 +111,7 @@ describe('it should test Func#', () => {
 
       wrap.async();
 
-      assert.strictEqual(wrap.$$.sync, false);
+      strictEqual(wrap.$$.sync, false);
     });
   });
   describe('before()', () => {
@@ -124,7 +124,7 @@ describe('it should test Func#', () => {
       wrap.before(before1);
       wrap.before(before2);
 
-      assert.deepEqual(wrap.$$.before, [before2, before1]);
+      deepStrictEqual(wrap.$$.before, [before2, before1]);
     });
     it('should add middleware into the end of before array with falsey argument', () => {
       const func = () => {};
@@ -135,7 +135,7 @@ describe('it should test Func#', () => {
       wrap.before(before1, false);
       wrap.before(before2, false);
 
-      assert.deepEqual(wrap.$$.before, [before1, before2]);
+      deepStrictEqual(wrap.$$.before, [before1, before2]);
     });
   });
   describe('bind()', () => {
@@ -145,7 +145,7 @@ describe('it should test Func#', () => {
 
       wrap.bind('concat: ', [1, 2, 3]);
 
-      assert.strictEqual(wrap(4, 5), 'concat: 12345');
+      strictEqual(wrap(4, 5), 'concat: 12345');
     });
   });
   describe('bindArgs()', () => {
@@ -156,7 +156,7 @@ describe('it should test Func#', () => {
       wrap.bindArgs([1, 2]);
       wrap.bindArgs([3]);
 
-      assert.strictEqual(wrap.call('concat: ', 4, 5), 'concat: 12345');
+      strictEqual(wrap.call('concat: ', 4, 5), 'concat: 12345');
     });
   });
   describe('bindContext()', () => {
@@ -166,7 +166,7 @@ describe('it should test Func#', () => {
 
       wrap.bindContext('concat: ');
 
-      assert.strictEqual(wrap(1, 2, 3, 4, 5), 'concat: 12345');
+      strictEqual(wrap(1, 2, 3, 4, 5), 'concat: 12345');
     });
   });
   describe('call()', () => {
@@ -174,7 +174,7 @@ describe('it should test Func#', () => {
       const func = concat;
       const wrap = new Func(func);
 
-      assert.strictEqual(wrap.call('concat: ', 1, 2, 3, 4, 5), 'concat: 12345');
+      strictEqual(wrap.call('concat: ', 1, 2, 3, 4, 5), 'concat: 12345');
     });
   });
   describe('get called', () => {
@@ -187,7 +187,7 @@ describe('it should test Func#', () => {
         wrap();
       }
 
-      assert.strictEqual(wrap.called, toCall);
+      strictEqual(wrap.called, toCall);
     });
   });
   describe('canBeCalled()', () => {
@@ -198,7 +198,7 @@ describe('it should test Func#', () => {
 
       wrap.canBeCalled(toCall);
 
-      assert.strictEqual(wrap.$$.canBeCalled, toCall);
+      strictEqual(wrap.$$.canBeCalled, toCall);
     });
   });
   describe('limitArgsTo()', () => {
@@ -208,7 +208,7 @@ describe('it should test Func#', () => {
 
       wrap.limitArgsTo(3);
 
-      assert.strictEqual(wrap.call('concat: ', 1, 2, 3, 4, 5), 'concat: 123');
+      strictEqual(wrap.call('concat: ', 1, 2, 3, 4, 5), 'concat: 123');
     });
   });
   describe('lock()', () => {
@@ -218,11 +218,11 @@ describe('it should test Func#', () => {
 
       wrap.lock('concat: ', [1, 2]);
 
-      assert.strictEqual(wrap.call('no', 3, 4, 5), 'concat: 12345');
+      strictEqual(wrap.call('no', 3, 4, 5), 'concat: 12345');
 
       wrap.unbind();
 
-      assert.strictEqual(wrap.call('no', 3, 4, 5), 'concat: 12345');
+      strictEqual(wrap.call('no', 3, 4, 5), 'concat: 12345');
     });
   });
   describe('lockArgs()', () => {
@@ -232,19 +232,19 @@ describe('it should test Func#', () => {
 
       wrap.lockArgs([1, 2]);
 
-      assert.strictEqual(wrap.call('concat: ', 3, 4, 5), 'concat: 12345');
+      strictEqual(wrap.call('concat: ', 3, 4, 5), 'concat: 12345');
 
       wrap.bindArgs([3, 4]);
 
-      assert.strictEqual(wrap.call('concat: ', 5), 'concat: 12345');
+      strictEqual(wrap.call('concat: ', 5), 'concat: 12345');
 
       wrap.unbindArgs();
 
-      assert.strictEqual(wrap.call('concat: ', 3, 4, 5), 'concat: 12345');
+      strictEqual(wrap.call('concat: ', 3, 4, 5), 'concat: 12345');
 
       wrap.lockArgs([3]);
 
-      assert.strictEqual(wrap.call('concat: ', 4, 5), 'concat: 12345');
+      strictEqual(wrap.call('concat: ', 4, 5), 'concat: 12345');
     });
   });
   describe('lockContext()', () => {
@@ -254,15 +254,15 @@ describe('it should test Func#', () => {
 
       wrap.lockContext('concat: ');
 
-      assert.strictEqual(wrap.call('no', 1, 2, 3), 'concat: 123');
+      strictEqual(wrap.call('no', 1, 2, 3), 'concat: 123');
 
       wrap.bindContext('no');
 
-      assert.strictEqual(wrap(1, 2, 3), 'concat: 123');
+      strictEqual(wrap(1, 2, 3), 'concat: 123');
 
       wrap.unbindContext();
 
-      assert.strictEqual(wrap(1, 2, 3), 'concat: 123');
+      strictEqual(wrap(1, 2, 3), 'concat: 123');
     });
   });
   describe('timing()', () => {
@@ -277,10 +277,10 @@ describe('it should test Func#', () => {
         .after(after)
         .timing('mark');
 
-      assert.strictEqual(wrap.$$.before[0], before);
-      assert.strictEqual(wrap.$$.after.length, 2);
-      assert.strictEqual(wrap.$$.after[1], after);
-      assert.strictEqual(wrap.$$.after.length, 2);
+      strictEqual(wrap.$$.before[0], before);
+      strictEqual(wrap.$$.after.length, 2);
+      strictEqual(wrap.$$.after[1], after);
+      strictEqual(wrap.$$.after.length, 2);
     });
   });
   describe('unbind()', () => {
@@ -293,7 +293,7 @@ describe('it should test Func#', () => {
         .unbind()
         .bindContext({ a: 'no: ' });
 
-      assert.strictEqual(wrap(1, 2, 3), 'no: 123');
+      strictEqual(wrap(1, 2, 3), 'no: 123');
     });
   });
   describe('unbindArgs()', () => {
@@ -305,7 +305,7 @@ describe('it should test Func#', () => {
         .bindArgs([1, 2, 3])
         .unbindArgs();
 
-      assert.strictEqual(wrap.call('concat: ', 1, 2, 3), 'concat: 123');
+      strictEqual(wrap.call('concat: ', 1, 2, 3), 'concat: 123');
     });
   });
   describe('unbindContext()', () => {
@@ -318,7 +318,7 @@ describe('it should test Func#', () => {
         .unbindContext()
         .bindContext({ a: 'no: ' });
 
-      assert.strictEqual(wrap(1, 2, 3), 'no: 123');
+      strictEqual(wrap(1, 2, 3), 'no: 123');
     });
   });
 });
@@ -334,25 +334,25 @@ describe('it should test exported methods from Function', () => {
         x: rnd
       };
 
-      assert.strictEqual(method('foo')(unique), rnd);
-      assert.strictEqual(method('foo', [1, 2, 3])(unique), 6 + rnd);
+      strictEqual(method('foo')(unique), rnd);
+      strictEqual(method('foo', [1, 2, 3])(unique), 6 + rnd);
     });
   });
   describe('noop()', () => {
     it('should be the function always returning undefined', () => {
-      assert.strictEqual(noop(1, 2, 3), undefined);
-      assert.strictEqual(noop([]), undefined);
-      assert.strictEqual(noop(''), undefined);
-      assert.strictEqual(noop(), undefined);
+      strictEqual(noop(1, 2, 3), undefined);
+      strictEqual(noop([]), undefined);
+      strictEqual(noop(''), undefined);
+      strictEqual(noop(), undefined);
     });
   });
   describe('self()', () => {
     it('should be the function always returning first argument', () => {
       const unique = {};
 
-      assert.strictEqual(self(1, 2, 3), 1);
-      assert.strictEqual(self(unique), unique);
-      assert.strictEqual(self(), undefined);
+      strictEqual(self(1, 2, 3), 1);
+      strictEqual(self(unique), unique);
+      strictEqual(self(), undefined);
     });
   });
 });
