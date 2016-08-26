@@ -1,4 +1,4 @@
-import { deepEqual, notDeepEqual, notEqual, strictEqual } from 'assert';
+import { deepStrictEqual, notDeepEqual, notEqual, strictEqual } from 'assert';
 import Arr, { array } from '../lib/Arr';
 import { isNaN } from '../lib/helpers';
 
@@ -14,9 +14,9 @@ describe('it should test Arr#', () => {
       const a = [1, 2, 3];
       const wrap = new Arr(a);
       
-      deepEqual(wrap.concat(4).$, a.concat(4));
-      deepEqual(wrap.concat(4, [5]).$, a.concat(4, [5]));
-      deepEqual(wrap.concat(4, [5], [[6]]).$, a.concat(4, [5], [[6]]));
+      deepStrictEqual(wrap.concat(4).$, a.concat(4));
+      deepStrictEqual(wrap.concat(4, [5]).$, a.concat(4, [5]));
+      deepStrictEqual(wrap.concat(4, [5], [[6]]).$, a.concat(4, [5], [[6]]));
     });
   });
   describe('indexOf()', () => {
@@ -96,7 +96,7 @@ describe('it should test Arr#', () => {
       const wrap = new Arr(a);
       
       strictEqual(wrap.pop(), 3);
-      deepEqual(a, [1, 2]);
+      deepStrictEqual(a, [1, 2]);
     });
   });
   describe('push()', () => {
@@ -106,7 +106,7 @@ describe('it should test Arr#', () => {
       
       wrap.push(4, [5], [[6]]);
       
-      deepEqual(a, [1, 2, 3, 4, [5], [[6]]]);
+      deepStrictEqual(a, [1, 2, 3, 4, [5], [[6]]]);
     });
   });
   describe('reverse()', () => {
@@ -114,7 +114,7 @@ describe('it should test Arr#', () => {
       const a = [1, 2, 3];
       const wrap = new Arr(a);
       
-      deepEqual(wrap.reverse().$, [3, 2, 1]);
+      deepStrictEqual(wrap.reverse().$, [3, 2, 1]);
     });
   });
   describe('shift()', () => {
@@ -123,7 +123,7 @@ describe('it should test Arr#', () => {
       const wrap = new Arr(a);
       
       strictEqual(wrap.shift(), 1);
-      deepEqual(a, [2, 3]);
+      deepStrictEqual(a, [2, 3]);
     });
   });
   describe('shuffle()', () => {
@@ -160,10 +160,10 @@ describe('it should test Arr#', () => {
       const a = [1, 2, 3, 4, 5];
       const wrap = new Arr(a);
       
-      deepEqual(wrap.slice().$, a.slice());
-      deepEqual(wrap.slice(3).$, a.slice(3));
-      deepEqual(wrap.slice(2, -1).$, a.slice(2, -1));
-      deepEqual(wrap.slice(2, 4).$, a.slice(2, 4));
+      deepStrictEqual(wrap.slice().$, a.slice());
+      deepStrictEqual(wrap.slice(3).$, a.slice(3));
+      deepStrictEqual(wrap.slice(2, -1).$, a.slice(2, -1));
+      deepStrictEqual(wrap.slice(2, 4).$, a.slice(2, 4));
     });
   });
   describe('sort()', () => {
@@ -171,7 +171,7 @@ describe('it should test Arr#', () => {
       const a = [8, 13, 12, 0, 5, 9, -1, 6, 7, -2];
       const wrap = new Arr(a);
       
-      deepEqual(wrap.sort((x, y) => {
+      deepStrictEqual(wrap.sort((x, y) => {
         if (y % 2 && !(x % 2)) {
           return 1;
         }
@@ -193,7 +193,7 @@ describe('it should test Arr#', () => {
       const a = [8, 5, 10, -1, 6];
       const wrap = new Arr(a);
       
-      deepEqual(wrap.sortAsc().$, [-1, 5, 6, 8, 10]);
+      deepStrictEqual(wrap.sortAsc().$, [-1, 5, 6, 8, 10]);
     });
     it('should put NaNs to the beginning', () => {
       const a = [8, 5, NaN, 10, -1, NaN, 6];
@@ -208,7 +208,7 @@ describe('it should test Arr#', () => {
       const a = [8, 5, 10, -1, 6];
       const wrap = new Arr(a);
 
-      deepEqual(wrap.sortDesc().$, [10, 8, 6, 5, -1]);
+      deepStrictEqual(wrap.sortDesc().$, [10, 8, 6, 5, -1]);
     });
     it('should put NaNs to the end', () => {
       const a = [8, 5, NaN, 10, -1, NaN, 6];
@@ -225,28 +225,28 @@ describe('it should test Arr#', () => {
 
       a = [1, 2, 3, 4, 5];
       wrap = new Arr(a);
-      deepEqual(wrap.splice().$, []);
-      deepEqual(a, [1, 2, 3, 4, 5]);
+      deepStrictEqual(wrap.splice().$, []);
+      deepStrictEqual(a, [1, 2, 3, 4, 5]);
 
       a = [1, 2, 3, 4, 5];
       wrap = new Arr(a);
-      deepEqual(wrap.splice(3).$, [4, 5]);
-      deepEqual(a, [1, 2, 3]);
+      deepStrictEqual(wrap.splice(3).$, [4, 5]);
+      deepStrictEqual(a, [1, 2, 3]);
 
       a = [1, 2, 3, 4, 5];
       wrap = new Arr(a);
-      deepEqual(wrap.splice(2, 2).$, [3, 4]);
-      deepEqual(a, [1, 2, 5]);
+      deepStrictEqual(wrap.splice(2, 2).$, [3, 4]);
+      deepStrictEqual(a, [1, 2, 5]);
 
       a = [1, 2, 3, 4, 5];
       wrap = new Arr(a);
-      deepEqual(wrap.splice(1, 1, 7).$, [2]);
-      deepEqual(a, [1, 7, 3, 4, 5]);
+      deepStrictEqual(wrap.splice(1, 1, 7).$, [2]);
+      deepStrictEqual(a, [1, 7, 3, 4, 5]);
 
       a = [1, 2, 3, 4, 5];
       wrap = new Arr(a);
-      deepEqual(wrap.splice(1, 1, 7, 9).$, [2]);
-      deepEqual(a, [1, 7, 9, 3, 4, 5]);
+      deepStrictEqual(wrap.splice(1, 1, 7, 9).$, [2]);
+      deepStrictEqual(a, [1, 7, 9, 3, 4, 5]);
     });
   });
   describe('string()', () => {
@@ -264,7 +264,7 @@ describe('it should test Arr#', () => {
       
       wrap.unshift([[-2]], [-1], 0);
       
-      deepEqual(a, [[[-2]], [-1], 0, 1, 2, 3]);
+      deepStrictEqual(a, [[[-2]], [-1], 0, 1, 2, 3]);
     });
   });
 });
@@ -275,13 +275,13 @@ describe('it should test exported methods from Arr', () => {
       const length = 5;
       const wrap = array(length);
 
-      deepEqual(wrap.$, [0, 1, 2, 3, 4]);
+      deepStrictEqual(wrap.$, [0, 1, 2, 3, 4]);
     });
     it('should create wrap of an array with given length using mapFn', () => {
       const length = 5;
       const wrap = array(length, (value) => value * 2);
 
-      deepEqual(wrap.$, [0, 2, 4, 6, 8]);
+      deepStrictEqual(wrap.$, [0, 2, 4, 6, 8]);
     });
   });
 });
