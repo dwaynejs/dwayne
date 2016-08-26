@@ -1,4 +1,4 @@
-import { deepEqual, notEqual, strictEqual } from 'assert';
+import { deepStrictEqual, notEqual, strictEqual } from 'assert';
 import Fetch from '../lib/Fetch';
 import D from '../lib/D';
 import { isDate } from '../lib/helpers';
@@ -15,11 +15,11 @@ describe('it should test Fetch#', () => {
 
       fetch.after(middleware1);
 
-      deepEqual(fetch.$$.after, [middleware1]);
+      deepStrictEqual(fetch.$$.after, [middleware1]);
 
       fetch.after(middleware2);
 
-      deepEqual(fetch.$$.after, [middleware1, middleware2]);
+      deepStrictEqual(fetch.$$.after, [middleware1, middleware2]);
     });
   });
   describe('before()', () => {
@@ -30,11 +30,11 @@ describe('it should test Fetch#', () => {
 
       fetch.before(middleware1);
 
-      deepEqual(fetch.$$.before, [middleware1]);
+      deepStrictEqual(fetch.$$.before, [middleware1]);
 
       fetch.before(middleware2);
 
-      deepEqual(fetch.$$.before, [middleware1, middleware2]);
+      deepStrictEqual(fetch.$$.before, [middleware1, middleware2]);
     });
   });
   describe('config()', () => {
@@ -65,7 +65,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, undefined);
-        deepEqual(config, { method: 'delete' });
+        deepStrictEqual(config, { method: 'delete' });
       };
 
       fetch.delete();
@@ -76,7 +76,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, URL);
-        deepEqual(config, { method: 'delete' });
+        deepStrictEqual(config, { method: 'delete' });
       };
 
       fetch.delete(URL);
@@ -87,7 +87,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, undefined);
-        deepEqual(config, { method: 'delete', timeout: rand });
+        deepStrictEqual(config, { method: 'delete', timeout: rand });
       };
 
       fetch.delete({ timeout: rand });
@@ -99,7 +99,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, URL);
-        deepEqual(config, { method: 'delete', timeout: rand });
+        deepStrictEqual(config, { method: 'delete', timeout: rand });
       };
 
       fetch.delete(URL, { timeout: rand });
@@ -111,7 +111,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, undefined);
-        deepEqual(config, { method: 'get' });
+        deepStrictEqual(config, { method: 'get' });
       };
 
       fetch.get();
@@ -122,7 +122,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, URL);
-        deepEqual(config, { method: 'get' });
+        deepStrictEqual(config, { method: 'get' });
       };
 
       fetch.get(URL);
@@ -133,7 +133,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, undefined);
-        deepEqual(config, { method: 'get', timeout: rand });
+        deepStrictEqual(config, { method: 'get', timeout: rand });
       };
 
       fetch.get({ timeout: rand });
@@ -145,7 +145,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, URL);
-        deepEqual(config, { method: 'get', timeout: rand });
+        deepStrictEqual(config, { method: 'get', timeout: rand });
       };
 
       fetch.get(URL, { timeout: rand });
@@ -157,7 +157,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, undefined);
-        deepEqual(config, { method: 'head' });
+        deepStrictEqual(config, { method: 'head' });
       };
 
       fetch.head();
@@ -168,7 +168,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, URL);
-        deepEqual(config, { method: 'head' });
+        deepStrictEqual(config, { method: 'head' });
       };
 
       fetch.head(URL);
@@ -179,7 +179,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, undefined);
-        deepEqual(config, { method: 'head', timeout: rand });
+        deepStrictEqual(config, { method: 'head', timeout: rand });
       };
 
       fetch.head({ timeout: rand });
@@ -191,7 +191,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, URL);
-        deepEqual(config, { method: 'head', timeout: rand });
+        deepStrictEqual(config, { method: 'head', timeout: rand });
       };
 
       fetch.head(URL, { timeout: rand });
@@ -203,28 +203,28 @@ describe('it should test Fetch#', () => {
 
       fetch.headers('foo', 'bar');
 
-      deepEqual(fetch.$$.headers, { foo: ['bar'] });
+      deepStrictEqual(fetch.$$.headers, { foo: ['bar'] });
     });
     it('should support (header, value: Array) syntax', () => {
       const fetch = new Fetch();
 
       fetch.headers('foo', ['bar', 'baz']);
 
-      deepEqual(fetch.$$.headers, { foo: ['bar', 'baz'] });
+      deepStrictEqual(fetch.$$.headers, { foo: ['bar', 'baz'] });
     });
     it('should support { header: value: String, ... } syntax', () => {
       const fetch = new Fetch();
 
       fetch.headers({ foo: 'bar' });
 
-      deepEqual(fetch.$$.headers, { foo: ['bar'] });
+      deepStrictEqual(fetch.$$.headers, { foo: ['bar'] });
     });
     it('should support { header: value: Array, ... } syntax', () => {
       const fetch = new Fetch();
 
       fetch.headers({ foo: ['bar', 'baz'] });
 
-      deepEqual(fetch.$$.headers, { foo: ['bar', 'baz'] });
+      deepStrictEqual(fetch.$$.headers, { foo: ['bar', 'baz'] });
     });
     it('should add header to array if it was one', () => {
       const fetch = new Fetch();
@@ -232,19 +232,19 @@ describe('it should test Fetch#', () => {
       fetch.headers('foo', 'bar1');
       fetch.headers('foo', 'baz1');
 
-      deepEqual(fetch.$$.headers, { foo: ['bar1', 'baz1'] });
+      deepStrictEqual(fetch.$$.headers, { foo: ['bar1', 'baz1'] });
 
       fetch.headers('foo', ['bar2']);
 
-      deepEqual(fetch.$$.headers, { foo: ['bar1', 'baz1', 'bar2'] });
+      deepStrictEqual(fetch.$$.headers, { foo: ['bar1', 'baz1', 'bar2'] });
 
       fetch.headers({ foo: 'baz2' });
 
-      deepEqual(fetch.$$.headers, { foo: ['bar1', 'baz1', 'bar2', 'baz2'] });
+      deepStrictEqual(fetch.$$.headers, { foo: ['bar1', 'baz1', 'bar2', 'baz2'] });
 
       fetch.headers({ foo: ['bar3', 'baz3'] });
 
-      deepEqual(fetch.$$.headers, { foo: ['bar1', 'baz1', 'bar2', 'baz2', 'bar3', 'baz3'] });
+      deepStrictEqual(fetch.$$.headers, { foo: ['bar1', 'baz1', 'bar2', 'baz2', 'bar3', 'baz3'] });
     });
   });
   describe('instance()', () => {
@@ -257,7 +257,7 @@ describe('it should test Fetch#', () => {
         notEqual(old.auth, config.auth);
         notEqual(old.headers, config.headers);
         notEqual(old.headers.foo, config.headers.foo);
-        deepEqual(old.headers.foo, config.headers.foo);
+        deepStrictEqual(old.headers.foo, config.headers.foo);
         notEqual(old.query, config.query);
         notEqual(old.params, config.params);
       });
@@ -275,11 +275,11 @@ describe('it should test Fetch#', () => {
       });
 
       fetch.config((config) => {
-        deepEqual(config.auth, { username: '', password: '' });
+        deepStrictEqual(config.auth, { username: '', password: '' });
         strictEqual(config.baseURL, global.location.origin);
-        deepEqual(config.headers, {});
-        deepEqual(config.params, {});
-        deepEqual(config.query, {});
+        deepStrictEqual(config.headers, {});
+        deepStrictEqual(config.params, {});
+        deepStrictEqual(config.query, {});
         strictEqual(config.timeout, 0);
       });
     });
@@ -300,11 +300,11 @@ describe('it should test Fetch#', () => {
       });
 
       instance.config((config) => {
-        deepEqual(config.auth, { username: 'baz', password: 'bar' });
+        deepStrictEqual(config.auth, { username: 'baz', password: 'bar' });
         strictEqual(config.baseURL, '//foo');
-        deepEqual(config.headers, { foo: ['baz'], bar: ['foo'], baz: ['foo'] });
-        deepEqual(config.params, { foo: 'baz', bar: 'foo', baz: 'foo' });
-        deepEqual(config.query, { foo: 'baz', bar: 'foo', baz: 'foo' });
+        deepStrictEqual(config.headers, { foo: ['baz'], bar: ['foo'], baz: ['foo'] });
+        deepStrictEqual(config.params, { foo: 'baz', bar: 'foo', baz: 'foo' });
+        deepStrictEqual(config.query, { foo: 'baz', bar: 'foo', baz: 'foo' });
         strictEqual(config.timeout, 5000);
       });
     });
@@ -315,7 +315,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, undefined);
-        deepEqual(config, { method: 'patch', data: {} });
+        deepStrictEqual(config, { method: 'patch', data: {} });
       };
 
       fetch.patch();
@@ -326,7 +326,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, URL);
-        deepEqual(config, { method: 'patch', data: {} });
+        deepStrictEqual(config, { method: 'patch', data: {} });
       };
 
       fetch.patch(URL);
@@ -337,7 +337,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, undefined);
-        deepEqual(config, { method: 'patch', data });
+        deepStrictEqual(config, { method: 'patch', data });
       };
 
       fetch.patch(data);
@@ -349,7 +349,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, URL);
-        deepEqual(config, { method: 'patch', data });
+        deepStrictEqual(config, { method: 'patch', data });
       };
 
       fetch.patch(URL, data);
@@ -361,7 +361,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, undefined);
-        deepEqual(config, { method: 'patch', data, timeout: rand });
+        deepStrictEqual(config, { method: 'patch', data, timeout: rand });
       };
 
       fetch.patch(data, { timeout: rand });
@@ -374,7 +374,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, URL);
-        deepEqual(config, { method: 'patch', data, timeout: rand });
+        deepStrictEqual(config, { method: 'patch', data, timeout: rand });
       };
 
       fetch.patch(URL, data, { timeout: rand });
@@ -386,7 +386,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, undefined);
-        deepEqual(config, { method: 'post', data: {} });
+        deepStrictEqual(config, { method: 'post', data: {} });
       };
 
       fetch.post();
@@ -397,7 +397,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, URL);
-        deepEqual(config, { method: 'post', data: {} });
+        deepStrictEqual(config, { method: 'post', data: {} });
       };
 
       fetch.post(URL);
@@ -408,7 +408,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, undefined);
-        deepEqual(config, { method: 'post', data });
+        deepStrictEqual(config, { method: 'post', data });
       };
 
       fetch.post(data);
@@ -420,7 +420,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, URL);
-        deepEqual(config, { method: 'post', data });
+        deepStrictEqual(config, { method: 'post', data });
       };
 
       fetch.post(URL, data);
@@ -432,7 +432,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, undefined);
-        deepEqual(config, { method: 'post', data, timeout: rand });
+        deepStrictEqual(config, { method: 'post', data, timeout: rand });
       };
 
       fetch.post(data, { timeout: rand });
@@ -445,7 +445,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, URL);
-        deepEqual(config, { method: 'post', data, timeout: rand });
+        deepStrictEqual(config, { method: 'post', data, timeout: rand });
       };
 
       fetch.post(URL, data, { timeout: rand });
@@ -457,7 +457,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, undefined);
-        deepEqual(config, { method: 'put', data: {} });
+        deepStrictEqual(config, { method: 'put', data: {} });
       };
 
       fetch.put();
@@ -468,7 +468,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, URL);
-        deepEqual(config, { method: 'put', data: {} });
+        deepStrictEqual(config, { method: 'put', data: {} });
       };
 
       fetch.put(URL);
@@ -479,7 +479,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, undefined);
-        deepEqual(config, { method: 'put', data });
+        deepStrictEqual(config, { method: 'put', data });
       };
 
       fetch.put(data);
@@ -491,7 +491,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, URL);
-        deepEqual(config, { method: 'put', data });
+        deepStrictEqual(config, { method: 'put', data });
       };
 
       fetch.put(URL, data);
@@ -503,7 +503,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, undefined);
-        deepEqual(config, { method: 'put', data, timeout: rand });
+        deepStrictEqual(config, { method: 'put', data, timeout: rand });
       };
 
       fetch.put(data, { timeout: rand });
@@ -516,7 +516,7 @@ describe('it should test Fetch#', () => {
 
       fetch.request = (url, config) => {
         strictEqual(url, URL);
-        deepEqual(config, { method: 'put', data, timeout: rand });
+        deepStrictEqual(config, { method: 'put', data, timeout: rand });
       };
 
       fetch.put(URL, data, { timeout: rand });
