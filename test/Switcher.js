@@ -1,4 +1,4 @@
-import * as assert from 'assert';
+import { deepStrictEqual, strictEqual } from 'assert';
 import { switcher } from '../lib/Switcher';
 import { isArray, isString, isNumber } from '../lib/helpers';
 
@@ -7,7 +7,7 @@ describe('it should test switcher', () => {
     it('should support no arguments syntax', () => {
       const sw = switcher();
 
-      assert.deepEqual(sw.$$, {
+      deepStrictEqual(sw.$$, {
         cases: [],
         mode: 'equals',
         default: undefined
@@ -16,7 +16,7 @@ describe('it should test switcher', () => {
     it('should support (cases) syntax', () => {
       const sw = switcher({ foo: 'bar' });
 
-      assert.deepEqual(sw.$$, {
+      deepStrictEqual(sw.$$, {
         cases: [{ case: 'foo', value: 'bar' }],
         mode: 'equals',
         default: undefined
@@ -25,7 +25,7 @@ describe('it should test switcher', () => {
     it('should support (mode) syntax', () => {
       const sw = switcher('call');
 
-      assert.deepEqual(sw.$$, {
+      deepStrictEqual(sw.$$, {
         cases: [],
         mode: 'call',
         default: undefined
@@ -34,7 +34,7 @@ describe('it should test switcher', () => {
     it('should support (cases, mode) syntax', () => {
       const sw = switcher({ foo: 'bar' }, 'call');
 
-      assert.deepEqual(sw.$$, {
+      deepStrictEqual(sw.$$, {
         cases: [{ case: 'foo', value: 'bar' }],
         mode: 'call',
         default: undefined
@@ -43,7 +43,7 @@ describe('it should test switcher', () => {
     it('should support (mode, default) syntax', () => {
       const sw = switcher('call', 'foo');
 
-      assert.deepEqual(sw.$$, {
+      deepStrictEqual(sw.$$, {
         cases: [],
         mode: 'call',
         default: 'foo'
@@ -52,7 +52,7 @@ describe('it should test switcher', () => {
     it('should support (cases, mode, default) syntax', () => {
       const sw = switcher({ foo: 'bar' }, 'call', 'foo');
 
-      assert.deepEqual(sw.$$, {
+      deepStrictEqual(sw.$$, {
         cases: [{ case: 'foo', value: 'bar' }],
         mode: 'call',
         default: 'foo'
@@ -61,7 +61,7 @@ describe('it should test switcher', () => {
     it('should return undefined if no option has matched and default isn\'t set', () => {
       const sw = switcher();
 
-      assert.strictEqual(sw(true), undefined);
+      strictEqual(sw(true), undefined);
     });
     it('should return default if no option has matched', () => {
       const sw = switcher();
@@ -69,7 +69,7 @@ describe('it should test switcher', () => {
 
       sw.default(unique);
 
-      assert.strictEqual(sw(true), unique);
+      strictEqual(sw(true), unique);
     });
     it('should return value of the first matched case', () => {
       const unique1 = {};
@@ -78,13 +78,13 @@ describe('it should test switcher', () => {
         .case(1, unique1)
         .case(1, unique2);
 
-      assert.strictEqual(sw(1), unique1);
+      strictEqual(sw(1), unique1);
     });
     it('should return matched(value) of the first matched case if the match is a function', () => {
       const unique = {};
       const sw = switcher({ foo: () => unique });
 
-      assert.strictEqual(sw('foo'), unique);
+      strictEqual(sw('foo'), unique);
     });
     it('should support equals mode', () => {
       const unique1 = {};
@@ -96,9 +96,9 @@ describe('it should test switcher', () => {
         baz: unique3
       });
 
-      assert.strictEqual(sw('foo'), unique1);
-      assert.strictEqual(sw('bar'), unique2);
-      assert.strictEqual(sw('baz'), unique3);
+      strictEqual(sw('foo'), unique1);
+      strictEqual(sw('bar'), unique2);
+      strictEqual(sw('baz'), unique3);
     });
     it('should support strictEquals mode', () => {
       const unique1 = {};
@@ -107,8 +107,8 @@ describe('it should test switcher', () => {
         .case(1, unique1)
         .case('1', unique2);
 
-      assert.strictEqual(sw(1), unique1);
-      assert.strictEqual(sw('1'), unique2);
+      strictEqual(sw(1), unique1);
+      strictEqual(sw('1'), unique2);
     });
     it('should support boolean mode', () => {
       const unique1 = {};
@@ -117,7 +117,7 @@ describe('it should test switcher', () => {
         .case(false, unique1)
         .case(true, unique2);
 
-      assert.strictEqual(sw(false), unique2);
+      strictEqual(sw(false), unique2);
     });
     it('should support call mode', () => {
       const unique1 = {};
@@ -128,10 +128,10 @@ describe('it should test switcher', () => {
         .case(isString, unique2)
         .case(isNumber, unique3);
 
-      assert.strictEqual(sw([]), unique1);
-      assert.strictEqual(sw('1'), unique2);
-      assert.strictEqual(sw(1), unique3);
-      assert.strictEqual(sw({}), undefined);
+      strictEqual(sw([]), unique1);
+      strictEqual(sw('1'), unique2);
+      strictEqual(sw(1), unique3);
+      strictEqual(sw({}), undefined);
     });
     it('should support args argument', () => {
       const array = [1, 2, 3, 4];
@@ -140,10 +140,10 @@ describe('it should test switcher', () => {
         last: (array) => array[array.length - 1]
       }, 'equals', (array, value) => array[value]);
 
-      assert.strictEqual(sw('first', [array]), 1);
-      assert.strictEqual(sw('last', [array]), 4);
-      assert.strictEqual(sw(1, [array]), 2);
-      assert.strictEqual(sw(2, [array]), 3);
+      strictEqual(sw('first', [array]), 1);
+      strictEqual(sw('last', [array]), 4);
+      strictEqual(sw(1, [array]), 2);
+      strictEqual(sw(2, [array]), 3);
     });
   });
 });
@@ -155,14 +155,14 @@ describe('it should test Switcher#', () => {
 
       sw.case('foo', 'bar');
 
-      assert.deepEqual(sw.$$.cases, [{ case: 'foo', value: 'bar' }]);
+      deepStrictEqual(sw.$$.cases, [{ case: 'foo', value: 'bar' }]);
     });
     it('should test that multiple cases is added', () => {
       const sw = switcher();
 
       sw.case(['foo', 'bar'], 'baz');
 
-      assert.deepEqual(sw.$$.cases, [
+      deepStrictEqual(sw.$$.cases, [
         { case: 'foo', value: 'baz' },
         { case: 'bar', value: 'baz' }
       ]);
@@ -174,7 +174,7 @@ describe('it should test Switcher#', () => {
 
       sw.default('foo');
 
-      assert.strictEqual(sw.$$.default, 'foo');
+      strictEqual(sw.$$.default, 'foo');
     });
   });
   describe('mode()', () => {
@@ -183,7 +183,7 @@ describe('it should test Switcher#', () => {
 
       sw.mode('call');
 
-      assert.strictEqual(sw.$$.mode, 'call');
+      strictEqual(sw.$$.mode, 'call');
     });
   });
 });
