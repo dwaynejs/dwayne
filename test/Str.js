@@ -1,4 +1,4 @@
-import * as assert from 'assert';
+import { deepEqual, deepStrictEqual, strictEqual } from 'assert';
 import Str from '../lib/Str';
 import { isDate, isString } from '../lib/helpers';
 
@@ -8,7 +8,7 @@ describe('it should test Str#', () => {
       const s = 'fooBar';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.capitalizeFirst().$, 'FooBar');
+      strictEqual(wrap.capitalizeFirst().$, 'FooBar');
     });
   });
   describe('endsWith()', () => {
@@ -16,10 +16,10 @@ describe('it should test Str#', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.endsWith(''), true);
-      assert.strictEqual(wrap.endsWith('r'), true);
-      assert.strictEqual(wrap.endsWith('bar'), true);
-      assert.strictEqual(wrap.endsWith('foo', 3), true);
+      strictEqual(wrap.endsWith(''), true);
+      strictEqual(wrap.endsWith('r'), true);
+      strictEqual(wrap.endsWith('bar'), true);
+      strictEqual(wrap.endsWith('foo', 3), true);
     });
   });
   describe('escapeHtml()', () => {
@@ -27,7 +27,7 @@ describe('it should test Str#', () => {
       const s = '<div>&</div>';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.escapeHTML().$, '&lt;div&gt;&amp;&lt;/div&gt;');
+      strictEqual(wrap.escapeHTML().$, '&lt;div&gt;&amp;&lt;/div&gt;');
     });
   });
   describe('escapeRegExp()', () => {
@@ -35,7 +35,7 @@ describe('it should test Str#', () => {
       const s = '.+*?(a)[]{b}<>^$!=:-|,\\n';
       const wrap = new Str(s);
 
-      assert.strictEqual(
+      strictEqual(
         wrap.escapeRegExp().$,
         '\\.\\+\\*\\?\\(a\\)\\[\\]\\{b\\}\\<\\>\\^\\$\\!\\=\\:\\-\\|\\,\\\\n'
       );
@@ -46,13 +46,13 @@ describe('it should test Str#', () => {
       const s = 'a';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.in({ a: 1 }), true);
+      strictEqual(wrap.in({ a: 1 }), true);
     });
     it('should return false with context not in argument as property', () => {
       const s = 'a';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.in({ b: 1 }), false);
+      strictEqual(wrap.in({ b: 1 }), false);
     });
   });
   describe('indexOf()', () => {
@@ -60,10 +60,10 @@ describe('it should test Str#', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.indexOf('f'), 0);
-      assert.strictEqual(wrap.indexOf('o'), 1);
-      assert.strictEqual(wrap.indexOf('o', 2), 2);
-      assert.strictEqual(wrap.indexOf('s'), -1);
+      strictEqual(wrap.indexOf('f'), 0);
+      strictEqual(wrap.indexOf('o'), 1);
+      strictEqual(wrap.indexOf('o', 2), 2);
+      strictEqual(wrap.indexOf('s'), -1);
     });
   });
   describe('lastIndexOf()', () => {
@@ -71,10 +71,10 @@ describe('it should test Str#', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.lastIndexOf('f'), 0);
-      assert.strictEqual(wrap.lastIndexOf('o'), 2);
-      assert.strictEqual(wrap.lastIndexOf('o', 1), 1);
-      assert.strictEqual(wrap.lastIndexOf('s'), -1);
+      strictEqual(wrap.lastIndexOf('f'), 0);
+      strictEqual(wrap.lastIndexOf('o'), 2);
+      strictEqual(wrap.lastIndexOf('o', 1), 1);
+      strictEqual(wrap.lastIndexOf('s'), -1);
     });
   });
   describe('length', () => {
@@ -86,9 +86,9 @@ describe('it should test Str#', () => {
       const wrap2 = new Str(s2);
       const wrap3 = new Str(s3);
 
-      assert.strictEqual(wrap1.length, 6);
-      assert.strictEqual(wrap2.length, 3);
-      assert.strictEqual(wrap3.length, 0);
+      strictEqual(wrap1.length, 6);
+      strictEqual(wrap2.length, 3);
+      strictEqual(wrap3.length, 0);
     });
   });
   describe('match()', () => {
@@ -96,8 +96,8 @@ describe('it should test Str#', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
-      assert.deepEqual(wrap.match(/o/).$, { 0: 'o', index: 1, input: s });
-      assert.deepEqual(wrap.match(/o/g).$, ['o', 'o']);
+      deepEqual(wrap.match(/o/).$, { 0: 'o', index: 1, input: s });
+      deepStrictEqual(wrap.match(/o/g).$, ['o', 'o']);
     });
   });
   describe('parseJSON()', () => {
@@ -113,11 +113,11 @@ describe('it should test Str#', () => {
       const wrap4 = new Str(s4);
       const wrap5 = new Str(s5);
 
-      assert.deepEqual(wrap1.parseJSON().$, { foo: 'bar' });
-      assert.deepEqual(wrap2.parseJSON().$, ['foo', 'bar']);
-      assert.strictEqual(wrap3.parseJSON().$, null);
-      assert.strictEqual(wrap4.parseJSON().$, 1);
-      assert.strictEqual(wrap5.parseJSON().$, '1');
+      deepStrictEqual(wrap1.parseJSON().$, { foo: 'bar' });
+      deepStrictEqual(wrap2.parseJSON().$, ['foo', 'bar']);
+      strictEqual(wrap3.parseJSON().$, null);
+      strictEqual(wrap4.parseJSON().$, 1);
+      strictEqual(wrap5.parseJSON().$, '1');
     });
     it('should use callback for parsing if present', () => {
       const s = '{ "foo": "bar", "bar": { "baz": "baz" } }';
@@ -131,7 +131,7 @@ describe('it should test Str#', () => {
         return value;
       });
 
-      assert.deepEqual(parsed.$, {
+      deepStrictEqual(parsed.$, {
         foo: 'concat: bar',
         bar: {
           baz: 'concat: baz'
@@ -144,8 +144,8 @@ describe('it should test Str#', () => {
 
       const parsed = wrap.parseJSON({ dates: true, numbers: true });
 
-      assert.strictEqual(isDate(parsed.$.foo), true);
-      assert.strictEqual(parsed.$.bar, 1);
+      strictEqual(isDate(parsed.$.foo), true);
+      strictEqual(parsed.$.bar, 1);
     });
   });
   describe('repeat()', () => {
@@ -153,15 +153,15 @@ describe('it should test Str#', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.repeat(0).$, '');
+      strictEqual(wrap.repeat(0).$, '');
     });
     it('should return string repeated n times (n from argument)', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.repeat(1).$, 'foobar');
-      assert.strictEqual(wrap.repeat(2).$, 'foobarfoobar');
-      assert.strictEqual(wrap.repeat(4).$, 'foobarfoobarfoobarfoobar');
+      strictEqual(wrap.repeat(1).$, 'foobar');
+      strictEqual(wrap.repeat(2).$, 'foobarfoobar');
+      strictEqual(wrap.repeat(4).$, 'foobarfoobarfoobarfoobar');
     });
   });
   describe('replace()', () => {
@@ -169,14 +169,14 @@ describe('it should test Str#', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.replace(/o/g).$, 'fbar');
+      strictEqual(wrap.replace(/o/g).$, 'fbar');
     });
     it('should work the same as String#replace', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.replace(/o/g, '12').$, 'f1212bar');
-      assert.strictEqual(wrap.replace(/s/g, '12').$, 'foobar');
+      strictEqual(wrap.replace(/o/g, '12').$, 'f1212bar');
+      strictEqual(wrap.replace(/s/g, '12').$, 'foobar');
     });
   });
   describe('replaceString()', () => {
@@ -184,20 +184,20 @@ describe('it should test Str#', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.replaceString('o').$, 'fbar');
+      strictEqual(wrap.replaceString('o').$, 'fbar');
     });
     it('should replace every match with second argument given', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.replaceString('f', '12').$, '12oobar');
-      assert.strictEqual(wrap.replaceString('o', '12').$, 'f1212bar');
+      strictEqual(wrap.replaceString('f', '12').$, '12oobar');
+      strictEqual(wrap.replaceString('o', '12').$, 'f1212bar');
     });
     it('should return wrap of the same string if didn\'t match', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.replaceString('s', '12').$, 'foobar');
+      strictEqual(wrap.replaceString('s', '12').$, 'foobar');
     });
   });
   describe('revert()', () => {
@@ -205,7 +205,7 @@ describe('it should test Str#', () => {
       const s = 'fooBar';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.revert().$, 'raBoof');
+      strictEqual(wrap.revert().$, 'raBoof');
     });
   });
   describe('search()', () => {
@@ -213,8 +213,8 @@ describe('it should test Str#', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.search(/o/), 1);
-      assert.strictEqual(wrap.search(/s/), -1);
+      strictEqual(wrap.search(/o/), 1);
+      strictEqual(wrap.search(/s/), -1);
     });
   });
   describe('slice()', () => {
@@ -222,10 +222,10 @@ describe('it should test Str#', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.slice(1).$, s.slice(1));
-      assert.strictEqual(wrap.slice(1, 5).$, s.slice(1, 5));
-      assert.strictEqual(wrap.slice(3, -1).$, s.slice(3, -1));
-      assert.strictEqual(wrap.slice(-1).$, s.slice(-1));
+      strictEqual(wrap.slice(1).$, s.slice(1));
+      strictEqual(wrap.slice(1, 5).$, s.slice(1, 5));
+      strictEqual(wrap.slice(3, -1).$, s.slice(3, -1));
+      strictEqual(wrap.slice(-1).$, s.slice(-1));
     });
   });
   describe('split()', () => {
@@ -233,9 +233,9 @@ describe('it should test Str#', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
-      assert.deepEqual(wrap.split(/o/).$, ['f', '', 'bar']);
-      assert.deepEqual(wrap.split('').$, ['f', 'o', 'o', 'b', 'a', 'r']);
-      assert.deepEqual(wrap.split().$, ['foobar']);
+      deepStrictEqual(wrap.split(/o/).$, ['f', '', 'bar']);
+      deepStrictEqual(wrap.split('').$, ['f', 'o', 'o', 'b', 'a', 'r']);
+      deepStrictEqual(wrap.split().$, ['foobar']);
     });
   });
   describe('startsWith()', () => {
@@ -243,10 +243,10 @@ describe('it should test Str#', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.startsWith(''), true);
-      assert.strictEqual(wrap.startsWith('f'), true);
-      assert.strictEqual(wrap.startsWith('foo'), true);
-      assert.strictEqual(wrap.startsWith('bar', 3), true);
+      strictEqual(wrap.startsWith(''), true);
+      strictEqual(wrap.startsWith('f'), true);
+      strictEqual(wrap.startsWith('foo'), true);
+      strictEqual(wrap.startsWith('bar', 3), true);
     });
   });
   describe('substring()', () => {
@@ -254,10 +254,10 @@ describe('it should test Str#', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.substring(1).$, s.substring(1));
-      assert.strictEqual(wrap.substring(1, 5).$, s.substring(1, 5));
-      assert.strictEqual(wrap.substring(3, -1).$, s.substring(3, -1));
-      assert.strictEqual(wrap.substring(-1).$, s.substring(-1));
+      strictEqual(wrap.substring(1).$, s.substring(1));
+      strictEqual(wrap.substring(1, 5).$, s.substring(1, 5));
+      strictEqual(wrap.substring(3, -1).$, s.substring(3, -1));
+      strictEqual(wrap.substring(-1).$, s.substring(-1));
     });
   });
   describe('substr()', () => {
@@ -265,10 +265,10 @@ describe('it should test Str#', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.substr(1).$, s.substr(1));
-      assert.strictEqual(wrap.substr(1, 5).$, s.substr(1, 5));
-      assert.strictEqual(wrap.substr(3, -1).$, s.substr(3, -1));
-      assert.strictEqual(wrap.substr(-1).$, s.substr(-1));
+      strictEqual(wrap.substr(1).$, s.substr(1));
+      strictEqual(wrap.substr(1, 5).$, s.substr(1, 5));
+      strictEqual(wrap.substr(3, -1).$, s.substr(3, -1));
+      strictEqual(wrap.substr(-1).$, s.substr(-1));
     });
   });
   describe('toCamelCase()', () => {
@@ -276,7 +276,7 @@ describe('it should test Str#', () => {
       const s = '-_ . foo . Bar -- _.baz .__ ';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.toCamelCase().$, 'fooBarBaz');
+      strictEqual(wrap.toCamelCase().$, 'fooBarBaz');
     });
   });
   describe('toCapitalCase()', () => {
@@ -284,7 +284,7 @@ describe('it should test Str#', () => {
       const s = '-_ . foo . Bar -- _.baz .__ ';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.toCapitalCase().$, 'Foo Bar Baz');
+      strictEqual(wrap.toCapitalCase().$, 'Foo Bar Baz');
     });
   });
   describe('toDotCase()', () => {
@@ -292,7 +292,7 @@ describe('it should test Str#', () => {
       const s = '-_ . foo . Bar -- _.baz .__ ';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.toDotCase().$, 'foo.bar.baz');
+      strictEqual(wrap.toDotCase().$, 'foo.bar.baz');
     });
   });
   describe('toLowerCase()', () => {
@@ -300,7 +300,7 @@ describe('it should test Str#', () => {
       const s = 'Foo Bar';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.toLowerCase().$, 'foo bar');
+      strictEqual(wrap.toLowerCase().$, 'foo bar');
     });
   });
   describe('toSnakeCase()', () => {
@@ -308,7 +308,7 @@ describe('it should test Str#', () => {
       const s = '-_ . foo . Bar -- _.baz .__ ';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.toSnakeCase().$, 'foo_bar_baz');
+      strictEqual(wrap.toSnakeCase().$, 'foo_bar_baz');
     });
   });
   describe('toSpaceCase()', () => {
@@ -316,7 +316,7 @@ describe('it should test Str#', () => {
       const s = '-_ . foo . Bar -- _.baz .__ ';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.toSpaceCase().$, 'foo bar baz');
+      strictEqual(wrap.toSpaceCase().$, 'foo bar baz');
     });
   });
   describe('toSpinalCase()', () => {
@@ -324,7 +324,7 @@ describe('it should test Str#', () => {
       const s = '-_ . foo . Bar -- _.baz .__ ';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.toSpinalCase().$, 'foo-bar-baz');
+      strictEqual(wrap.toSpinalCase().$, 'foo-bar-baz');
     });
   });
   describe('toString()', () => {
@@ -332,7 +332,7 @@ describe('it should test Str#', () => {
       const s = 'foobar';
       const wrap = new Str(s);
 
-      assert.strictEqual(String(wrap), 'foobar');
+      strictEqual(String(wrap), 'foobar');
     });
   });
   describe('toUpperCase()', () => {
@@ -340,7 +340,7 @@ describe('it should test Str#', () => {
       const s = 'Foo Bar';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.toUpperCase().$, 'FOO BAR');
+      strictEqual(wrap.toUpperCase().$, 'FOO BAR');
     });
   });
   describe('trim()', () => {
@@ -348,7 +348,7 @@ describe('it should test Str#', () => {
       const s = '   foobar   ';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.trim().$, 'foobar');
+      strictEqual(wrap.trim().$, 'foobar');
     });
   });
   describe('trimLeft()', () => {
@@ -356,7 +356,7 @@ describe('it should test Str#', () => {
       const s = '   foobar   ';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.trimLeft().$, 'foobar   ');
+      strictEqual(wrap.trimLeft().$, 'foobar   ');
     });
   });
   describe('trimRight()', () => {
@@ -364,7 +364,7 @@ describe('it should test Str#', () => {
       const s = '   foobar   ';
       const wrap = new Str(s);
 
-      assert.strictEqual(wrap.trimRight().$, '   foobar');
+      strictEqual(wrap.trimRight().$, '   foobar');
     });
   });
 });
