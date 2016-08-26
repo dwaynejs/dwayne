@@ -1,4 +1,4 @@
-import * as assert from 'assert';
+import { deepStrictEqual, notEqual, strictEqual } from 'assert';
 import Super from '../lib/Super';
 
 describe('it should test Super#', () => {
@@ -7,7 +7,7 @@ describe('it should test Super#', () => {
       const o = { a: 1, b: 2, c: 3 };
       const wrap = new Super(o);
 
-      assert.deepEqual(wrap.assign({ a: 5, b: 4 }).$, { a: 5, b: 4, c: 3 });
+      deepStrictEqual(wrap.assign({ a: 5, b: 4 }).$, { a: 5, b: 4, c: 3 });
     });
     it('should rewrite rewritten values from left to right', () => {
       const o = { a: 1, b: 2, c: 3, d: 4 };
@@ -16,7 +16,7 @@ describe('it should test Super#', () => {
       const re3 = { a: -1, b: -2 };
       const wrap = new Super(o);
 
-      assert.deepEqual(wrap.assign(re1, re2, re3).$, { a: -1, b: -2, c: 9, d: 4 });
+      deepStrictEqual(wrap.assign(re1, re2, re3).$, { a: -1, b: -2, c: 9, d: 4 });
     });
   });
   describe('average()', () => {
@@ -24,13 +24,13 @@ describe('it should test Super#', () => {
       const o = { a: 1, b: 2, c: 3 };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.average(), 2);
+      strictEqual(wrap.average(), 2);
     });
     it('should return average value of calculated expressions with function argument', () => {
       const o = { a: 1, b: 2, c: 3 };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.average((value) => value * 2), 4);
+      strictEqual(wrap.average((value) => value * 2), 4);
     });
   });
   describe('call()', () => {
@@ -42,7 +42,19 @@ describe('it should test Super#', () => {
       };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.call(f, 2, 3, 4), 10);
+      strictEqual(wrap.call(f, 2, 3, 4), 10);
+    });
+  });
+  describe('clone()', () => {
+    it('should assign properties of the object to an empty one and return the new one', () => {
+      const random = Math.random();
+      const o = { [random]: 1 };
+      const f = function (...args) {
+        return this.$[random] + new Super(args).sum();
+      };
+      const wrap = new Super(o);
+
+      strictEqual(wrap.call(f, 2, 3, 4), 10);
     });
   });
   describe('count', () => {
@@ -50,7 +62,7 @@ describe('it should test Super#', () => {
       const o = { a: 1, b: 2, c: 3 };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.count, 3);
+      strictEqual(wrap.count, 3);
     });
   });
   describe('create()', () => {
@@ -59,7 +71,7 @@ describe('it should test Super#', () => {
       const wrap = new Super(o);
       const instance = wrap.create().$;
 
-      assert.strictEqual(Object.getPrototypeOf(instance), o);
+      strictEqual(Object.getPrototypeOf(instance), o);
     });
     it('should also support argument descriptors', () => {
       const o = {};
@@ -74,7 +86,7 @@ describe('it should test Super#', () => {
         foo: descriptor
       }).$;
 
-      assert.deepEqual(Object.getOwnPropertyDescriptor(instance, 'foo'), descriptor);
+      deepStrictEqual(Object.getOwnPropertyDescriptor(instance, 'foo'), descriptor);
     });
   });
   describe('deepEquals()', () => {
@@ -83,21 +95,21 @@ describe('it should test Super#', () => {
       const copy = { a: { a: '1' } };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.deepEquals(copy), true);
+      strictEqual(wrap.deepEquals(copy), true);
     });
     it('should return false with argument, which keys are not equal to context\'s, but values are', () => {
       const o = { a: undefined };
       const copy = { b: undefined };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.deepEquals(copy), false);
+      strictEqual(wrap.deepEquals(copy), false);
     });
     it('should return false with instance of initial non-empty object', () => {
       const o = { a: 1 };
       const copy = Object.create(o);
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.deepEquals(copy), false);
+      strictEqual(wrap.deepEquals(copy), false);
     });
   });
   describe('deepEvery()', () => {
@@ -105,7 +117,7 @@ describe('it should test Super#', () => {
       const o = { a: {}, b: {} };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.deepEvery(() => false, 2), true);
+      strictEqual(wrap.deepEvery(() => false, 2), true);
     });
     it('should use default Infinity parameter if the depth parameter isn\'t present', () => {
       const o = {
@@ -114,8 +126,8 @@ describe('it should test Super#', () => {
       };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.deepEvery((value) => value < 4), true);
-      assert.strictEqual(wrap.deepEvery((value) => value < 3), false);
+      strictEqual(wrap.deepEvery((value) => value < 4), true);
+      strictEqual(wrap.deepEvery((value) => value < 3), false);
     });
     it('should use Boolean function for checking for falsey values', () => {
       const o1 = {
@@ -129,8 +141,8 @@ describe('it should test Super#', () => {
       const wrap1 = new Super(o1);
       const wrap2 = new Super(o2);
 
-      assert.strictEqual(wrap1.deepEvery(2), false);
-      assert.strictEqual(wrap2.deepEvery(2), true);
+      strictEqual(wrap1.deepEvery(2), false);
+      strictEqual(wrap2.deepEvery(2), true);
     });
     it('should use argument function for checking for falsey values', () => {
       const o1 = {
@@ -144,8 +156,8 @@ describe('it should test Super#', () => {
       const wrap1 = new Super(o1);
       const wrap2 = new Super(o2);
 
-      assert.strictEqual(wrap1.deepEvery((value) => value < 4, 2), true);
-      assert.strictEqual(wrap2.deepEvery((value) => value < 4, 2), false);
+      strictEqual(wrap1.deepEvery((value) => value < 4, 2), true);
+      strictEqual(wrap2.deepEvery((value) => value < 4, 2), false);
     });
     it('should not iterate after getting false', () => {
       const o = {
@@ -154,7 +166,7 @@ describe('it should test Super#', () => {
       };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.deepEvery((value) => {
+      strictEqual(wrap.deepEvery((value) => {
         if (!value) {
           return false;
         }
@@ -174,7 +186,7 @@ describe('it should test Super#', () => {
       const wrap1 = new Super(o1);
       const wrap2 = new Super(o2);
 
-      assert.strictEqual(wrap1.deepEvery((value, key, object, tree) => {
+      strictEqual(wrap1.deepEvery((value, key, object, tree) => {
         let sum = 0;
 
         for (let i = 0; i < tree.length; i++) {
@@ -185,7 +197,7 @@ describe('it should test Super#', () => {
 
         return sum < 5;
       }, 2), true);
-      assert.strictEqual(wrap2.deepEvery((value, key, object, tree) => {
+      strictEqual(wrap2.deepEvery((value, key, object, tree) => {
         let sum = 0;
 
         for (let i = 0; i < tree.length; i++) {
@@ -203,15 +215,15 @@ describe('it should test Super#', () => {
       const o = {};
       const wrap = new Super(o);
 
-      assert.notEqual(wrap.deepFilter(2).$, o);
+      notEqual(wrap.deepFilter(2).$, o);
     });
     it('should return a wrap of an object also with different objects inside it', () => {
       const o = { a: { a: 1 } };
       const wrap = new Super(o);
       const newO = wrap.deepFilter(2).$;
 
-      assert.deepEqual(newO.a, { a: 1 });
-      assert.notEqual(newO, o.a);
+      deepStrictEqual(newO.a, { a: 1 });
+      notEqual(newO, o.a);
     });
     it('should use default Infinity parameter if the depth parameter isn\'t present', () => {
       const o = {
@@ -221,12 +233,12 @@ describe('it should test Super#', () => {
       };
       const wrap = new Super(o);
 
-      assert.deepEqual(wrap.deepFilter((value) => value % 2).$, {
+      deepStrictEqual(wrap.deepFilter((value) => value % 2).$, {
         a: 1,
         b: { d: 3 },
         c: { e: { g: 5 } }
       });
-      assert.deepEqual(wrap.deepFilter((value) => !(value % 2)).$, {
+      deepStrictEqual(wrap.deepFilter((value) => !(value % 2)).$, {
         b: { c: 2 },
         c: { e: { f: 4, h: 6 } }
       });
@@ -237,8 +249,8 @@ describe('it should test Super#', () => {
       const wrap1 = new Super(o1);
       const wrap2 = new Super(o2);
 
-      assert.deepEqual(wrap1.deepFilter(2).$, { a: { b: 1 } });
-      assert.deepEqual(wrap2.deepFilter(2).$, { a: { a: 1, b: 2 } });
+      deepStrictEqual(wrap1.deepFilter(2).$, { a: { b: 1 } });
+      deepStrictEqual(wrap2.deepFilter(2).$, { a: { a: 1, b: 2 } });
     });
     it('should use argument function for filtering values', () => {
       const o1 = { a: { a: 0, b: 1 } };
@@ -246,8 +258,8 @@ describe('it should test Super#', () => {
       const wrap1 = new Super(o1);
       const wrap2 = new Super(o2);
 
-      assert.deepEqual(wrap1.deepFilter((value) => value < 2, 2).$, { a: { a: 0, b: 1 } });
-      assert.deepEqual(wrap2.deepFilter((value) => value < 2, 2).$, { a: { a: 1 } });
+      deepStrictEqual(wrap1.deepFilter((value) => value < 2, 2).$, { a: { a: 0, b: 1 } });
+      deepStrictEqual(wrap2.deepFilter((value) => value < 2, 2).$, { a: { a: 1 } });
     });
     it('should support 4th "tree" argument', () => {
       const o1 = { 0: { 0: 0, 1: 1, 2: 2 } };
@@ -255,7 +267,7 @@ describe('it should test Super#', () => {
       const wrap1 = new Super(o1);
       const wrap2 = new Super(o2);
 
-      assert.deepEqual(wrap1.deepFilter((value, key, object, tree) => {
+      deepStrictEqual(wrap1.deepFilter((value, key, object, tree) => {
         let sum = 0;
 
         for (let i = 0; i < tree.length; i++) {
@@ -266,7 +278,7 @@ describe('it should test Super#', () => {
 
         return sum !== 1;
       }, 2).$, { 0: { 0: 0, 2: 2 } });
-      assert.deepEqual(wrap2.deepFilter((value, key, object, tree) => {
+      deepStrictEqual(wrap2.deepFilter((value, key, object, tree) => {
         let sum = 0;
 
         for (let i = 0; i < tree.length; i++) {
@@ -284,7 +296,7 @@ describe('it should test Super#', () => {
       const o = { a: {}, b: {} };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.deepFind(() => true, 2), null);
+      strictEqual(wrap.deepFind(() => true, 2), null);
     });
     it('should use default Infinity parameter if the depth parameter isn\'t present', () => {
       const o = {
@@ -294,7 +306,7 @@ describe('it should test Super#', () => {
       };
       const wrap = new Super(o);
 
-      assert.deepEqual(wrap.deepFind((value) => value === 5), [
+      deepStrictEqual(wrap.deepFind((value) => value === 5), [
         { key: 'g', value: 5 },
         { key: 'e', value: o.c.e },
         { key: 'c', value: o.c },
@@ -313,12 +325,12 @@ describe('it should test Super#', () => {
       const wrap1 = new Super(o1);
       const wrap2 = new Super(o2);
 
-      assert.deepEqual(wrap1.deepFind((value) => value > 1, 2), [
+      deepStrictEqual(wrap1.deepFind((value) => value > 1, 2), [
         { key: 'a', value: 2 },
         { key: 'b', value: o1.b },
         { key: null, value: o1 }
       ]);
-      assert.deepEqual(wrap2.deepFind((value) => value > 1, 2), [
+      deepStrictEqual(wrap2.deepFind((value) => value > 1, 2), [
         { key: 'b', value: 2 },
         { key: 'a', value: o2.a },
         { key: null, value: o2 }
@@ -336,7 +348,7 @@ describe('it should test Super#', () => {
 
       wrap.deepForEach((value, key, object) => (object[key] = value * value));
 
-      assert.deepEqual(o, {
+      deepStrictEqual(o, {
         a: 1,
         b: { c: 4, d: 9 },
         c: { e: { f: 16, g: 25, h: 36 } }
@@ -360,7 +372,7 @@ describe('it should test Super#', () => {
         object[key] = string;
       });
 
-      assert.deepEqual(o, {
+      deepStrictEqual(o, {
         a: 'a',
         b: { c: 'bc', d: 'bd' },
         c: { e: { f: 'cef', g: 'ceg', h: 'ceh' } }
@@ -374,7 +386,7 @@ describe('it should test Super#', () => {
 
       wrap.deepFreeze();
 
-      assert.strictEqual(Object.isFrozen(o), true);
+      strictEqual(Object.isFrozen(o), true);
     });
     it('should freeze all inner objects', () => {
       const a = {};
@@ -384,9 +396,9 @@ describe('it should test Super#', () => {
 
       wrap.deepFreeze();
 
-      assert.strictEqual(Object.isFrozen(a), true);
-      assert.strictEqual(Object.isFrozen(b), true);
-      assert.strictEqual(Object.isFrozen(o), true);
+      strictEqual(Object.isFrozen(a), true);
+      strictEqual(Object.isFrozen(b), true);
+      strictEqual(Object.isFrozen(o), true);
     });
   });
   describe('deepMap()', () => {
@@ -394,15 +406,15 @@ describe('it should test Super#', () => {
       const o = {};
       const wrap = new Super(o);
 
-      assert.notEqual(wrap.deepMap(() => {}).$, o);
+      notEqual(wrap.deepMap(() => {}).$, o);
     });
     it('should return a wrap of an object also with different objects inside it', () => {
       const o = { a: { a: 1 } };
       const wrap = new Super(o);
       const newO = wrap.deepMap((value) => value, 2).$;
 
-      assert.deepEqual(newO.a, { a: 1 });
-      assert.notEqual(newO, o.a);
+      deepStrictEqual(newO.a, { a: 1 });
+      notEqual(newO, o.a);
     });
     it('should use default Infinity parameter if the depth parameter isn\'t present', () => {
       const o = {
@@ -412,7 +424,7 @@ describe('it should test Super#', () => {
       };
       const wrap = new Super(o);
 
-      assert.deepEqual(wrap.deepMap((value) => value * value).$, {
+      deepStrictEqual(wrap.deepMap((value) => value * value).$, {
         a: 1,
         b: { c: 4, d: 9 },
         c: { e: { f: 16, g: 25, h: 36 } }
@@ -429,7 +441,7 @@ describe('it should test Super#', () => {
       };
       const wrap = new Super(o);
 
-      assert.deepEqual(wrap.deepMap((value) => value * value, 2).$, sq);
+      deepStrictEqual(wrap.deepMap((value) => value * value, 2).$, sq);
     });
     it('should support 4th "tree" argument', () => {
       const o = {
@@ -442,7 +454,7 @@ describe('it should test Super#', () => {
       };
       const wrap = new Super(o);
 
-      assert.deepEqual(wrap.deepMap((value, key, object, tree) => {
+      deepStrictEqual(wrap.deepMap((value, key, object, tree) => {
         let string = '';
 
         for (let i = 0; i < tree.length; i++) {
@@ -463,7 +475,7 @@ describe('it should test Super#', () => {
       };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.deepReduce((sum, value) => sum + value, 2), 10);
+      strictEqual(wrap.deepReduce((sum, value) => sum + value, 2), 10);
     });
     it('should handle Infinity parameter', () => {
       const o = {
@@ -473,7 +485,7 @@ describe('it should test Super#', () => {
       };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.deepReduce((sum, value) => sum + value, Infinity, 0), 21);
+      strictEqual(wrap.deepReduce((sum, value) => sum + value, Infinity, 0), 21);
     });
     it('should support 5th "tree" argument', () => {
       const o = {
@@ -482,7 +494,7 @@ describe('it should test Super#', () => {
       };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.deepReduce((IV, value, key, object, tree) => {
+      strictEqual(wrap.deepReduce((IV, value, key, object, tree) => {
         for (let i = 0; i < tree.length; i++) {
           const k = tree[i].key;
 
@@ -498,7 +510,7 @@ describe('it should test Super#', () => {
       const o = { a: {}, b: {} };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.deepSome(() => true, 2), false);
+      strictEqual(wrap.deepSome(() => true, 2), false);
     });
     it('should use default Infinity parameter if the depth parameter isn\'t present', () => {
       const o = {
@@ -507,8 +519,8 @@ describe('it should test Super#', () => {
       };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.deepSome((value) => value > 3), false);
-      assert.strictEqual(wrap.deepSome((value) => value > 2), true);
+      strictEqual(wrap.deepSome((value) => value > 3), false);
+      strictEqual(wrap.deepSome((value) => value > 2), true);
     });
     it('should use Boolean function for checking for false alike values', () => {
       const o1 = { a: { a: 0 } };
@@ -516,8 +528,8 @@ describe('it should test Super#', () => {
       const wrap1 = new Super(o1);
       const wrap2 = new Super(o2);
 
-      assert.strictEqual(wrap1.deepSome(2), false);
-      assert.strictEqual(wrap2.deepSome(2), true);
+      strictEqual(wrap1.deepSome(2), false);
+      strictEqual(wrap2.deepSome(2), true);
     });
     it('should use argument function for checking for false alike values', () => {
       const o1 = {
@@ -531,8 +543,8 @@ describe('it should test Super#', () => {
       const wrap1 = new Super(o1);
       const wrap2 = new Super(o2);
 
-      assert.strictEqual(wrap1.deepSome((value) => value < 1, 2), true);
-      assert.strictEqual(wrap2.deepSome((value) => value < 1, 2), false);
+      strictEqual(wrap1.deepSome((value) => value < 1, 2), true);
+      strictEqual(wrap2.deepSome((value) => value < 1, 2), false);
     });
     it('should not iterate after getting false', () => {
       const o = {
@@ -541,7 +553,7 @@ describe('it should test Super#', () => {
       };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.deepSome((value) => {
+      strictEqual(wrap.deepSome((value) => {
         if (!value) {
           return true;
         }
@@ -561,7 +573,7 @@ describe('it should test Super#', () => {
       const wrap1 = new Super(o1);
       const wrap2 = new Super(o2);
 
-      assert.strictEqual(wrap1.deepSome((value, key, object, tree) => {
+      strictEqual(wrap1.deepSome((value, key, object, tree) => {
         let sum = 0;
 
         for (let i = 0; i < tree.length; i++) {
@@ -572,7 +584,7 @@ describe('it should test Super#', () => {
 
         return !sum;
       }, 2), true);
-      assert.strictEqual(wrap2.deepSome((value, key, object, tree) => {
+      strictEqual(wrap2.deepSome((value, key, object, tree) => {
         let sum = 0;
 
         for (let i = 0; i < tree.length; i++) {
@@ -591,14 +603,14 @@ describe('it should test Super#', () => {
       const copy = { a: { a: 1 } };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.deepStrictEquals(copy), true);
+      strictEqual(wrap.deepStrictEquals(copy), true);
     });
     it('should return false with argument, which nested values are not strict equal to context\'s', () => {
       const o = { a: { a: 1 } };
       const copy = { a: { a: '1' } };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.deepStrictEquals(copy), false);
+      strictEqual(wrap.deepStrictEquals(copy), false);
     });
   });
   describe('define()', () => {
@@ -609,7 +621,7 @@ describe('it should test Super#', () => {
 
       wrap.define('key', descriptor);
 
-      assert.deepEqual(Object.getOwnPropertyDescriptor(o, 'key'), {
+      deepStrictEqual(Object.getOwnPropertyDescriptor(o, 'key'), {
         value: 1,
         writable: false,
         enumerable: false,
@@ -625,13 +637,13 @@ describe('it should test Super#', () => {
 
       wrap.define({ key1: descriptor1, key2: descriptor2 });
 
-      assert.deepEqual(Object.getOwnPropertyDescriptor(o, 'key1'), {
+      deepStrictEqual(Object.getOwnPropertyDescriptor(o, 'key1'), {
         value: 1,
         writable: false,
         enumerable: false,
         configurable: false
       });
-      assert.deepEqual(Object.getOwnPropertyDescriptor(o, 'key2'), {
+      deepStrictEqual(Object.getOwnPropertyDescriptor(o, 'key2'), {
         get: getter,
         set: undefined,
         enumerable: false,
@@ -646,7 +658,7 @@ describe('it should test Super#', () => {
 
       wrap.delete('c', 'a');
 
-      assert.deepEqual(o, { b: 2 });
+      deepStrictEqual(o, { b: 2 });
     });
   });
   describe('equals()', () => {
@@ -654,7 +666,7 @@ describe('it should test Super#', () => {
       const o = {};
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.equals(o), true);
+      strictEqual(wrap.equals(o), true);
     });
   });
   describe('every()', () => {
@@ -662,7 +674,7 @@ describe('it should test Super#', () => {
       const o = {};
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.every(() => false), true);
+      strictEqual(wrap.every(() => false), true);
     });
     it('should use Boolean function for checking for false alike values with no argument', () => {
       const o1 = { a: 0, b: 1 };
@@ -670,8 +682,8 @@ describe('it should test Super#', () => {
       const wrap1 = new Super(o1);
       const wrap2 = new Super(o2);
 
-      assert.strictEqual(wrap1.every(), false);
-      assert.strictEqual(wrap2.every(), true);
+      strictEqual(wrap1.every(), false);
+      strictEqual(wrap2.every(), true);
     });
     it('should use argument function for checking for values', () => {
       const o1 = { a: 0, b: 1 };
@@ -679,14 +691,14 @@ describe('it should test Super#', () => {
       const wrap1 = new Super(o1);
       const wrap2 = new Super(o2);
 
-      assert.strictEqual(wrap1.every((value) => value < 2), true);
-      assert.strictEqual(wrap2.every((value) => value < 2), false);
+      strictEqual(wrap1.every((value) => value < 2), true);
+      strictEqual(wrap2.every((value) => value < 2), false);
     });
     it('should check that every() does not iterate after getting false', () => {
       const o = { a: 0, b: 1 };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.every((value) => {
+      strictEqual(wrap.every((value) => {
         if (!value) {
           return false;
         }
@@ -703,7 +715,7 @@ describe('it should test Super#', () => {
 
       wrap.get('key', getter);
 
-      assert.deepEqual(Object.getOwnPropertyDescriptor(o, 'key'), {
+      deepStrictEqual(Object.getOwnPropertyDescriptor(o, 'key'), {
         get: getter,
         set: undefined,
         enumerable: false,
@@ -718,13 +730,13 @@ describe('it should test Super#', () => {
 
       wrap.get({ key1: getter1, key2: getter2 });
 
-      assert.deepEqual(Object.getOwnPropertyDescriptor(o, 'key1'), {
+      deepStrictEqual(Object.getOwnPropertyDescriptor(o, 'key1'), {
         get: getter1,
         set: undefined,
         enumerable: false,
         configurable: false
       });
-      assert.deepEqual(Object.getOwnPropertyDescriptor(o, 'key2'), {
+      deepStrictEqual(Object.getOwnPropertyDescriptor(o, 'key2'), {
         get: getter2,
         set: undefined,
         enumerable: false,
@@ -737,7 +749,7 @@ describe('it should test Super#', () => {
       const o = {};
       const wrap = new Super(o);
 
-      assert.notEqual(wrap.filter().$, o);
+      notEqual(wrap.filter().$, o);
     });
     it('should use Boolean function for filtering values with no argument', () => {
       const o1 = { a: 0, b: 1 };
@@ -745,8 +757,8 @@ describe('it should test Super#', () => {
       const wrap1 = new Super(o1);
       const wrap2 = new Super(o2);
 
-      assert.deepEqual(wrap1.filter().$, { b: 1 });
-      assert.deepEqual(wrap2.filter().$, { a: 1, b: 2 });
+      deepStrictEqual(wrap1.filter().$, { b: 1 });
+      deepStrictEqual(wrap2.filter().$, { a: 1, b: 2 });
     });
     it('should use argument function for filtering values', () => {
       const o1 = { a: 0, b: 1 };
@@ -754,8 +766,8 @@ describe('it should test Super#', () => {
       const wrap1 = new Super(o1);
       const wrap2 = new Super(o2);
 
-      assert.deepEqual(wrap1.filter((value) => value < 2).$, { a: 0, b: 1 });
-      assert.deepEqual(wrap2.filter((value) => value < 2).$, { a: 1 });
+      deepStrictEqual(wrap1.filter((value) => value < 2).$, { a: 0, b: 1 });
+      deepStrictEqual(wrap2.filter((value) => value < 2).$, { a: 1 });
     });
   });
   describe('find()', () => {
@@ -763,7 +775,7 @@ describe('it should test Super#', () => {
       const o = { a: 0, b: 1, c: 2 };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.find((value) => value > 2), null);
+      strictEqual(wrap.find((value) => value > 2), null);
     });
     it('should return { key, value } if find', () => {
       const o1 = { a: 0, b: 1, c: 2 };
@@ -771,14 +783,14 @@ describe('it should test Super#', () => {
       const wrap1 = new Super(o1);
       const wrap2 = new Super(o2);
 
-      assert.deepEqual(wrap1.find((value) => value > 1), { key: 'c', value: 2 });
-      assert.deepEqual(wrap2.find((value) => value > 1), { key: 'b', value: 2 });
+      deepStrictEqual(wrap1.find((value) => value > 1), { key: 'c', value: 2 });
+      deepStrictEqual(wrap2.find((value) => value > 1), { key: 'b', value: 2 });
     });
     it('should check that find() does not iterate after finding value', () => {
       const o = { a: 0, b: 1 };
       const wrap = new Super(o);
 
-      assert.deepEqual(wrap.find((value) => {
+      deepStrictEqual(wrap.find((value) => {
         if (!value) {
           return true;
         }
@@ -792,7 +804,7 @@ describe('it should test Super#', () => {
       const o = { a: { a: 1 }, b: { a: 2 } };
       const wrap = new Super(o);
 
-      assert.deepEqual(wrap.forEach((value) => value.a++).$, { a: { a: 2 }, b: { a: 3 } });
+      deepStrictEqual(wrap.forEach((value) => value.a++).$, { a: { a: 2 }, b: { a: 3 } });
     });
   });
   describe('freeze()', () => {
@@ -802,7 +814,7 @@ describe('it should test Super#', () => {
 
       wrap.freeze();
 
-      assert.strictEqual(Object.isFrozen(o), true);
+      strictEqual(Object.isFrozen(o), true);
     });
   });
   describe('has()', () => {
@@ -810,19 +822,19 @@ describe('it should test Super#', () => {
       const o = { a: 1 };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.has('a'), true);
+      strictEqual(wrap.has('a'), true);
     });
     it('should return true with argument in context as property, but not own property', () => {
       const o = Object.create({ a: 1 });
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.has('a'), true);
+      strictEqual(wrap.has('a'), true);
     });
     it('should return false with argument not in context as property', () => {
       const o = { a: 1 };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.has('b'), false);
+      strictEqual(wrap.has('b'), false);
     });
   });
   describe('hasOwn()', () => {
@@ -830,13 +842,13 @@ describe('it should test Super#', () => {
       const o = { a: 1 };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.hasOwn('a'), true);
+      strictEqual(wrap.hasOwn('a'), true);
     });
     it('should return false with argument not in context as own property', () => {
       const o = Object.create({ a: 1 });
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.hasOwn('a'), false);
+      strictEqual(wrap.hasOwn('a'), false);
     });
   });
   describe('instanceof()', () => {
@@ -844,8 +856,8 @@ describe('it should test Super#', () => {
       const o = { a: 1 };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.instanceof(Object), true);
-      assert.strictEqual(wrap.instanceof(Date), false);
+      strictEqual(wrap.instanceof(Object), true);
+      strictEqual(wrap.instanceof(Date), false);
     });
   });
   describe('isFrozen()', () => {
@@ -855,7 +867,7 @@ describe('it should test Super#', () => {
 
       Object.freeze(o);
 
-      assert.strictEqual(wrap.isFrozen(), Object.isFrozen(o));
+      strictEqual(wrap.isFrozen(), Object.isFrozen(o));
     });
   });
   describe('json()', () => {
@@ -863,7 +875,7 @@ describe('it should test Super#', () => {
       const o = { a: 1 };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.json((key, value) => {
+      strictEqual(wrap.json((key, value) => {
         if (Number(value) || Number(value) === 0) {
           return value + 1;
         }
@@ -875,13 +887,13 @@ describe('it should test Super#', () => {
       const o = { a: 1 };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.json(null, '\t'), '{\n\t"a": 1\n}');
+      strictEqual(wrap.json(null, '\t'), '{\n\t"a": 1\n}');
     });
     it('should support indent argument only', () => {
       const o = { a: 1 };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.json('\t'), '{\n\t"a": 1\n}');
+      strictEqual(wrap.json('\t'), '{\n\t"a": 1\n}');
     });
   });
   describe('keyOf()', () => {
@@ -889,7 +901,7 @@ describe('it should test Super#', () => {
       const o = { a: 0, b: 1, c: 2 };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.keyOf(3), null);
+      strictEqual(wrap.keyOf(3), null);
     });
     it('should return key if find', () => {
       const o1 = { a: 0, b: 1, c: 2 };
@@ -897,8 +909,8 @@ describe('it should test Super#', () => {
       const wrap1 = new Super(o1);
       const wrap2 = new Super(o2);
 
-      assert.strictEqual(wrap1.keyOf(2), 'c');
-      assert.strictEqual(wrap2.keyOf(2), 'b');
+      strictEqual(wrap1.keyOf(2), 'c');
+      strictEqual(wrap2.keyOf(2), 'b');
     });
   });
   describe('keyOfStrict()', () => {
@@ -906,7 +918,7 @@ describe('it should test Super#', () => {
       const o = { a: 0, b: 1, c: 2 };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.keyOfStrict('0'), null);
+      strictEqual(wrap.keyOfStrict('0'), null);
     });
     it('should return key if find', () => {
       const o1 = { a: 0, b: 1, c: '1' };
@@ -914,8 +926,8 @@ describe('it should test Super#', () => {
       const wrap1 = new Super(o1);
       const wrap2 = new Super(o2);
 
-      assert.strictEqual(wrap1.keyOfStrict('1'), 'c');
-      assert.strictEqual(wrap2.keyOfStrict('1'), 'b');
+      strictEqual(wrap1.keyOfStrict('1'), 'c');
+      strictEqual(wrap2.keyOfStrict('1'), 'b');
     });
   });
   describe('keys()', () => {
@@ -923,7 +935,7 @@ describe('it should test Super#', () => {
       const o = { a: 1 };
       const wrap = new Super(o);
 
-      assert.deepEqual(wrap.keys().$, Object.keys(o));
+      deepStrictEqual(wrap.keys().$, Object.keys(o));
     });
   });
   describe('map()', () => {
@@ -931,14 +943,14 @@ describe('it should test Super#', () => {
       const o = {};
       const wrap = new Super(o);
 
-      assert.notEqual(wrap.map(() => {}).$, o);
+      notEqual(wrap.map(() => {}).$, o);
     });
     it('should set values', () => {
       const o = { a: 1, b: 2, c: 3 };
       const sq = { a: 1, b: 4, c: 9 };
       const wrap = new Super(o);
 
-      assert.deepEqual(wrap.map((value) => value * value).$, sq);
+      deepStrictEqual(wrap.map((value) => value * value).$, sq);
     });
   });
   describe('max()', () => {
@@ -946,20 +958,20 @@ describe('it should test Super#', () => {
       const o = { a: 'a' };
       const wrap = new Super(o);
 
-      assert.deepEqual(wrap.max(), { key: null, value: -Infinity });
+      deepStrictEqual(wrap.max(), { key: null, value: -Infinity });
     });
     it('should return { key, value: max }, where max is first maximum value of context', () => {
       const o = { a: 1, b: 2, c: 3 };
       const wrap = new Super(o);
 
-      assert.deepEqual(wrap.max(), { key: 'c', value: 3 });
+      deepStrictEqual(wrap.max(), { key: 'c', value: 3 });
     });
     it('should return { key, value: max } using mapFn', () => {
       const o = { a: 1, b: 2, c: 3 };
       const wrap = new Super(o);
       const max = wrap.max((value) => 4 - value);
 
-      assert.deepEqual(max, { key: 'a', value: 3 });
+      deepStrictEqual(max, { key: 'a', value: 3 });
     });
   });
   describe('min()', () => {
@@ -967,20 +979,20 @@ describe('it should test Super#', () => {
       const o = { a: 'a' };
       const wrap = new Super(o);
 
-      assert.deepEqual(wrap.min(), { key: null, value: Infinity });
+      deepStrictEqual(wrap.min(), { key: null, value: Infinity });
     });
     it('should return { key, value: min }, where min is first maximum value of context', () => {
       const o = { a: 1, b: 2, c: 3 };
       const wrap = new Super(o);
 
-      assert.deepEqual(wrap.min(), { key: 'a', value: 1 });
+      deepStrictEqual(wrap.min(), { key: 'a', value: 1 });
     });
     it('should return { key, value: min } using mapFn', () => {
       const o = { a: 1, b: 2, c: 3 };
       const wrap = new Super(o);
       const min = wrap.min((value) => 4 - value);
 
-      assert.deepEqual(min, { key: 'c', value: 1 });
+      deepStrictEqual(min, { key: 'c', value: 1 });
     });
   });
   describe('object()', () => {
@@ -988,7 +1000,7 @@ describe('it should test Super#', () => {
       const o = { a: 1, b: 2, c: 3 };
       const wrap = new Super(o);
 
-      assert.deepEqual(
+      deepStrictEqual(
         wrap.object((object, value, key) => (object[value] = key + value)).$,
         { 1: 'a1', 2: 'b2', 3: 'c3' }
       );
@@ -1000,7 +1012,7 @@ describe('it should test Super#', () => {
       const o = { a: 1, b: 2, c: 3 };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.prop('a'), 1);
+      strictEqual(wrap.prop('a'), 1);
     });
     it('should support (property, value) setter syntax', () => {
       const o = { a: 1, b: 2, c: 3 };
@@ -1008,7 +1020,7 @@ describe('it should test Super#', () => {
 
       wrap.prop('a', 4);
 
-      assert.deepEqual(o, { a: 4, b: 2, c: 3 });
+      deepStrictEqual(o, { a: 4, b: 2, c: 3 });
     });
     it('should support { [property]: value, ... } setter syntax', () => {
       const o = { a: 1, b: 2, c: 3 };
@@ -1020,7 +1032,7 @@ describe('it should test Super#', () => {
         d: 6
       });
 
-      assert.deepEqual(o, { a: 4, b: 5, c: 3, d: 6 });
+      deepStrictEqual(o, { a: 4, b: 5, c: 3, d: 6 });
     });
   });
   describe('propertyDescriptor()', () => {
@@ -1028,7 +1040,7 @@ describe('it should test Super#', () => {
       const o = { a: 1 };
       const wrap = new Super(o);
 
-      assert.deepEqual(wrap.propertyDescriptor('a'), Object.getOwnPropertyDescriptor(o, 'a'));
+      deepStrictEqual(wrap.propertyDescriptor('a'), Object.getOwnPropertyDescriptor(o, 'a'));
     });
   });
   describe('propertyNames()', () => {
@@ -1036,7 +1048,7 @@ describe('it should test Super#', () => {
       const o = { a: 1, b: 1 };
       const wrap = new Super(o);
 
-      assert.deepEqual(wrap.propertyNames().$, ['a', 'b']);
+      deepStrictEqual(wrap.propertyNames().$, ['a', 'b']);
     });
   });
   describe('propertySymbols()', () => {
@@ -1047,7 +1059,7 @@ describe('it should test Super#', () => {
         const o = { [symbol]: 1, [symbolFor]: 2 };
         const wrap = new Super(o);
 
-        assert.deepEqual(wrap.propertySymbols().$, [symbol, symbolFor]);
+        deepStrictEqual(wrap.propertySymbols().$, [symbol, symbolFor]);
       }
     });
   });
@@ -1057,7 +1069,7 @@ describe('it should test Super#', () => {
       const o = Object.create(proto);
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.proto(), Object.getPrototypeOf(o));
+      strictEqual(wrap.proto(), Object.getPrototypeOf(o));
     });
     it('should set prototype of context to argument, if its present', () => {
       const o = {};
@@ -1066,7 +1078,7 @@ describe('it should test Super#', () => {
 
       wrap.proto(proto);
 
-      assert.strictEqual(Object.getPrototypeOf(o), proto);
+      strictEqual(Object.getPrototypeOf(o), proto);
     });
   });
   describe('reduce()', () => {
@@ -1074,13 +1086,13 @@ describe('it should test Super#', () => {
       const o = { a: 1, b: 2, c: 3 };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.reduce((sum, value) => sum + value), 6);
+      strictEqual(wrap.reduce((sum, value) => sum + value), 6);
     });
     it('should return initial value after actions', () => {
       const o = { a: 1, b: 2, c: 3 };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.reduce((sum, value) => sum + value, ''), '123');
+      strictEqual(wrap.reduce((sum, value) => sum + value, ''), '123');
     });
   });
   describe('set()', () => {
@@ -1091,7 +1103,7 @@ describe('it should test Super#', () => {
 
       wrap.set('key', setter);
 
-      assert.deepEqual(Object.getOwnPropertyDescriptor(o, 'key'), {
+      deepStrictEqual(Object.getOwnPropertyDescriptor(o, 'key'), {
         get: undefined,
         set: setter,
         enumerable: false,
@@ -1106,13 +1118,13 @@ describe('it should test Super#', () => {
 
       wrap.set({ key1: setter1, key2: setter2 });
 
-      assert.deepEqual(Object.getOwnPropertyDescriptor(o, 'key1'), {
+      deepStrictEqual(Object.getOwnPropertyDescriptor(o, 'key1'), {
         get: undefined,
         set: setter1,
         enumerable: false,
         configurable: false
       });
-      assert.deepEqual(Object.getOwnPropertyDescriptor(o, 'key2'), {
+      deepStrictEqual(Object.getOwnPropertyDescriptor(o, 'key2'), {
         get: undefined,
         set: setter2,
         enumerable: false,
@@ -1125,7 +1137,7 @@ describe('it should test Super#', () => {
       const o = {};
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.some(() => true), false);
+      strictEqual(wrap.some(() => true), false);
     });
     it('should use Boolean function for checking for false alike values with no argument', () => {
       const o1 = { a: 0 };
@@ -1133,8 +1145,8 @@ describe('it should test Super#', () => {
       const wrap1 = new Super(o1);
       const wrap2 = new Super(o2);
 
-      assert.strictEqual(wrap1.some(), false);
-      assert.strictEqual(wrap2.some(), true);
+      strictEqual(wrap1.some(), false);
+      strictEqual(wrap2.some(), true);
     });
     it('should use argument function for checking for values', () => {
       const o1 = { a: 0, b: 1 };
@@ -1142,14 +1154,14 @@ describe('it should test Super#', () => {
       const wrap1 = new Super(o1);
       const wrap2 = new Super(o2);
 
-      assert.strictEqual(wrap1.some((value) => value < 1), true);
-      assert.strictEqual(wrap2.some((value) => value < 1), false);
+      strictEqual(wrap1.some((value) => value < 1), true);
+      strictEqual(wrap2.some((value) => value < 1), false);
     });
     it('should check that some() does not iterate after getting false', () => {
       const o = { a: 0, b: 1 };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.some((value) => {
+      strictEqual(wrap.some((value) => {
         if (!value) {
           return true;
         }
@@ -1163,13 +1175,13 @@ describe('it should test Super#', () => {
       const o = 1;
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.strictEquals(1), true);
+      strictEqual(wrap.strictEquals(1), true);
     });
     it('should return false with equal, but not strict equal argument', () => {
       const o = 1;
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.strictEquals('1'), false);
+      strictEqual(wrap.strictEquals('1'), false);
     });
   });
   describe('sum()', () => {
@@ -1177,13 +1189,13 @@ describe('it should test Super#', () => {
       const o = { a: 1, b: 2, c: 3 };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.sum(), 6);
+      strictEqual(wrap.sum(), 6);
     });
     it('should return sum of calculated expressions with function argument', () => {
       const o = { a: 1, b: 2, c: 3 };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.sum((value) => value * 2), 12);
+      strictEqual(wrap.sum((value) => value * 2), 12);
     });
   });
   describe('toJSON()', () => {
@@ -1191,7 +1203,7 @@ describe('it should test Super#', () => {
       const o = { a: new Super({ a: 1 }) };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.json(), '{"a":{"a":1}}');
+      strictEqual(wrap.json(), '{"a":{"a":1}}');
     });
   });
   describe('toStringTag', () => {
@@ -1207,11 +1219,11 @@ describe('it should test Super#', () => {
       const wrap4 = new Super(o4);
       const wrap5 = new Super(o5);
 
-      assert.strictEqual(wrap1.toStringTag, 'Object');
-      assert.strictEqual(wrap2.toStringTag, 'Function');
-      assert.strictEqual(wrap3.toStringTag, 'Number');
-      assert.strictEqual(wrap4.toStringTag, 'String');
-      assert.strictEqual(wrap5.toStringTag, 'Boolean');
+      strictEqual(wrap1.toStringTag, 'Object');
+      strictEqual(wrap2.toStringTag, 'Function');
+      strictEqual(wrap3.toStringTag, 'Number');
+      strictEqual(wrap4.toStringTag, 'String');
+      strictEqual(wrap5.toStringTag, 'Boolean');
     });
   });
   describe('type', () => {
@@ -1227,11 +1239,11 @@ describe('it should test Super#', () => {
       const wrap4 = new Super(o4);
       const wrap5 = new Super(o5);
 
-      assert.strictEqual(wrap1.type, 'object');
-      assert.strictEqual(wrap2.type, 'function');
-      assert.strictEqual(wrap3.type, 'number');
-      assert.strictEqual(wrap4.type, 'string');
-      assert.strictEqual(wrap5.type, 'boolean');
+      strictEqual(wrap1.type, 'object');
+      strictEqual(wrap2.type, 'function');
+      strictEqual(wrap3.type, 'number');
+      strictEqual(wrap4.type, 'string');
+      strictEqual(wrap5.type, 'boolean');
     });
   });
   describe('value()', () => {
@@ -1241,7 +1253,7 @@ describe('it should test Super#', () => {
 
       wrap.value('key', 1);
 
-      assert.deepEqual(Object.getOwnPropertyDescriptor(o, 'key'), {
+      deepStrictEqual(Object.getOwnPropertyDescriptor(o, 'key'), {
         value: 1,
         writable: false,
         enumerable: false,
@@ -1254,13 +1266,13 @@ describe('it should test Super#', () => {
 
       wrap.value({ key1: 1, key2: 2 });
 
-      assert.deepEqual(Object.getOwnPropertyDescriptor(o, 'key1'), {
+      deepStrictEqual(Object.getOwnPropertyDescriptor(o, 'key1'), {
         value: 1,
         writable: false,
         enumerable: false,
         configurable: false
       });
-      assert.deepEqual(Object.getOwnPropertyDescriptor(o, 'key2'), {
+      deepStrictEqual(Object.getOwnPropertyDescriptor(o, 'key2'), {
         value: 2,
         writable: false,
         enumerable: false,
@@ -1273,7 +1285,7 @@ describe('it should test Super#', () => {
       const o = { a: 1, b: 2, c: 3 };
       const wrap = new Super(o);
 
-      assert.deepEqual(wrap.values().$, [1, 2, 3]);
+      deepStrictEqual(wrap.values().$, [1, 2, 3]);
     });
   });
   describe('word()', () => {
@@ -1281,13 +1293,13 @@ describe('it should test Super#', () => {
       const o = { a: 1, b: 2, c: 3 };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.word(), '123');
+      strictEqual(wrap.word(), '123');
     });
     it('should return sum of calculated expressions with function argument', () => {
       const o = { a: 1, b: 2, c: 3 };
       const wrap = new Super(o);
 
-      assert.strictEqual(wrap.word((value) => String(value) + value), '112233');
+      strictEqual(wrap.word((value) => String(value) + value), '112233');
     });
   });
 });
