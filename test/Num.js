@@ -1,4 +1,4 @@
-import * as assert from 'assert';
+import { strictEqual } from 'assert';
 import Num from '../lib/Num';
 import { isNaN } from '../lib/helpers';
 
@@ -36,12 +36,12 @@ describe('it should test Num#', () => {
       const wrap5 = new Num(n5);
       const wrap6 = new Num(n6);
 
-      assert.strictEqual(wrap1.abs, 1);
-      assert.strictEqual(wrap2.abs, 1);
-      assert.strictEqual(wrap3.abs, 0);
-      assert.strictEqual(wrap4.abs, 0);
-      assert.strictEqual(wrap5.abs, Infinity);
-      assert.strictEqual(isNaN(wrap6.abs), true);
+      strictEqual(wrap1.abs, 1);
+      strictEqual(wrap2.abs, 1);
+      strictEqual(wrap3.abs, 0);
+      strictEqual(wrap4.abs, 0);
+      strictEqual(wrap5.abs, Infinity);
+      strictEqual(isNaN(wrap6.abs), true);
     });
   });
   describe('acos()', () => {
@@ -62,11 +62,11 @@ describe('it should test Num#', () => {
       const diff4 = abs(wrap4.acos() - pi / 3);
       const diff5 = abs(wrap5.acos() - pi / 4);
 
-      assert.strictEqual(diff1 <= eps, true, `acos(1): ${ diff1 } <= ${ eps }`);
-      assert.strictEqual(diff2 <= eps, true, `acos(-1): ${ diff2 } <= ${ eps }`);
-      assert.strictEqual(diff3 <= eps, true, `acos(0): ${ diff3 } <= ${ eps }`);
-      assert.strictEqual(diff4 <= eps, true, `acos(0.5): ${ diff4 } <= ${ eps }`);
-      assert.strictEqual(diff5 <= eps, true, `acos(1/sqrt2): ${ diff5 } <= ${ eps }`);
+      strictEqual(diff1 <= eps, true, `acos(1): ${ diff1 } <= ${ eps }`);
+      strictEqual(diff2 <= eps, true, `acos(-1): ${ diff2 } <= ${ eps }`);
+      strictEqual(diff3 <= eps, true, `acos(0): ${ diff3 } <= ${ eps }`);
+      strictEqual(diff4 <= eps, true, `acos(0.5): ${ diff4 } <= ${ eps }`);
+      strictEqual(diff5 <= eps, true, `acos(1/sqrt2): ${ diff5 } <= ${ eps }`);
     });
     it('should return acos(x) in degrees with truthy argument', () => {
       const n1 = 1;
@@ -85,11 +85,11 @@ describe('it should test Num#', () => {
       const diff4 = abs(wrap4.acos(true) - 60);
       const diff5 = abs(wrap5.acos(true) - 45);
 
-      assert.strictEqual(diff1 <= eps, true, `acos(1): ${ diff1 } <= ${ eps }`);
-      assert.strictEqual(diff2 <= eps, true, `acos(-1): ${ diff2 } <= ${ eps }`);
-      assert.strictEqual(diff3 <= eps, true, `acos(0): ${ diff3 } <= ${ eps }`);
-      assert.strictEqual(diff4 <= eps, true, `acos(0.5): ${ diff4 } <= ${ eps }`);
-      assert.strictEqual(diff5 <= eps, true, `acos(1/sqrt2): ${ diff5 } <= ${ eps }`);
+      strictEqual(diff1 <= eps, true, `acos(1): ${ diff1 } <= ${ eps }`);
+      strictEqual(diff2 <= eps, true, `acos(-1): ${ diff2 } <= ${ eps }`);
+      strictEqual(diff3 <= eps, true, `acos(0): ${ diff3 } <= ${ eps }`);
+      strictEqual(diff4 <= eps, true, `acos(0.5): ${ diff4 } <= ${ eps }`);
+      strictEqual(diff5 <= eps, true, `acos(1/sqrt2): ${ diff5 } <= ${ eps }`);
     });
   });
   describe('asin()', () => {
@@ -110,11 +110,11 @@ describe('it should test Num#', () => {
       const diff4 = abs(wrap4.asin() - pi / 6);
       const diff5 = abs(wrap5.asin() - pi / 4);
 
-      assert.strictEqual(diff1 <= eps, true, `asin(1): ${ diff1 } <= ${ eps }`);
-      assert.strictEqual(diff2 <= eps, true, `asin(-1): ${ diff2 } <= ${ eps }`);
-      assert.strictEqual(diff3 <= eps, true, `asin(0): ${ diff3 } <= ${ eps }`);
-      assert.strictEqual(diff4 <= eps, true, `asin(0.5): ${ diff4 } <= ${ eps }`);
-      assert.strictEqual(diff5 <= eps, true, `asin(1/sqrt2): ${ diff5 } <= ${ eps }`);
+      strictEqual(diff1 <= eps, true, `asin(1): ${ diff1 } <= ${ eps }`);
+      strictEqual(diff2 <= eps, true, `asin(-1): ${ diff2 } <= ${ eps }`);
+      strictEqual(diff3 <= eps, true, `asin(0): ${ diff3 } <= ${ eps }`);
+      strictEqual(diff4 <= eps, true, `asin(0.5): ${ diff4 } <= ${ eps }`);
+      strictEqual(diff5 <= eps, true, `asin(1/sqrt2): ${ diff5 } <= ${ eps }`);
     });
     it('should return asin(x) in degrees with truthy argument', () => {
       const n1 = 1;
@@ -133,11 +133,11 @@ describe('it should test Num#', () => {
       const diff4 = abs(wrap4.asin(true) - 30);
       const diff5 = abs(wrap5.asin(true) - 45);
 
-      assert.strictEqual(diff1 <= eps, true, `asin(1): ${ diff1 } <= ${ eps }`);
-      assert.strictEqual(diff2 <= eps, true, `asin(-1): ${ diff2 } <= ${ eps }`);
-      assert.strictEqual(diff3 <= eps, true, `asin(0): ${ diff3 } <= ${ eps }`);
-      assert.strictEqual(diff4 <= eps, true, `asin(0.5): ${ diff4 } <= ${ eps }`);
-      assert.strictEqual(diff5 <= eps, true, `asin(1/sqrt2): ${ diff5 } <= ${ eps }`);
+      strictEqual(diff1 <= eps, true, `asin(1): ${ diff1 } <= ${ eps }`);
+      strictEqual(diff2 <= eps, true, `asin(-1): ${ diff2 } <= ${ eps }`);
+      strictEqual(diff3 <= eps, true, `asin(0): ${ diff3 } <= ${ eps }`);
+      strictEqual(diff4 <= eps, true, `asin(0.5): ${ diff4 } <= ${ eps }`);
+      strictEqual(diff5 <= eps, true, `asin(1/sqrt2): ${ diff5 } <= ${ eps }`);
     });
   });
   describe('atan()', () => {
@@ -155,10 +155,10 @@ describe('it should test Num#', () => {
       const diff3 = abs(wrap3.atan() - 0);
       const diff4 = abs(wrap4.atan() - pi / 3);
 
-      assert.strictEqual(diff1 <= eps, true, `atan(1): ${ diff1 } <= ${ eps }`);
-      assert.strictEqual(diff2 <= eps, true, `atan(-1): ${ diff2 } <= ${ eps }`);
-      assert.strictEqual(diff3 <= eps, true, `atan(0): ${ diff3 } <= ${ eps }`);
-      assert.strictEqual(diff4 <= eps, true, `atan(0.5): ${ diff4 } <= ${ eps }`);
+      strictEqual(diff1 <= eps, true, `atan(1): ${ diff1 } <= ${ eps }`);
+      strictEqual(diff2 <= eps, true, `atan(-1): ${ diff2 } <= ${ eps }`);
+      strictEqual(diff3 <= eps, true, `atan(0): ${ diff3 } <= ${ eps }`);
+      strictEqual(diff4 <= eps, true, `atan(0.5): ${ diff4 } <= ${ eps }`);
     });
     it('should return atan(x) in degrees with truthy argument', () => {
       const n1 = 1;
@@ -174,10 +174,10 @@ describe('it should test Num#', () => {
       const diff3 = abs(wrap3.atan(true) - 0);
       const diff4 = abs(wrap4.atan(true) - 60);
 
-      assert.strictEqual(diff1 <= eps, true, `atan(1): ${ diff1 } <= ${ eps }`);
-      assert.strictEqual(diff2 <= eps, true, `atan(-1): ${ diff2 } <= ${ eps }`);
-      assert.strictEqual(diff3 <= eps, true, `atan(0): ${ diff3 } <= ${ eps }`);
-      assert.strictEqual(diff4 <= eps, true, `atan(0.5): ${ diff4 } <= ${ eps }`);
+      strictEqual(diff1 <= eps, true, `atan(1): ${ diff1 } <= ${ eps }`);
+      strictEqual(diff2 <= eps, true, `atan(-1): ${ diff2 } <= ${ eps }`);
+      strictEqual(diff3 <= eps, true, `atan(0): ${ diff3 } <= ${ eps }`);
+      strictEqual(diff4 <= eps, true, `atan(0.5): ${ diff4 } <= ${ eps }`);
     });
   });
   describe('cbrt', () => {
@@ -199,12 +199,12 @@ describe('it should test Num#', () => {
       const diff3 = abs(wrap3.cbrt - 0);
       const diff4 = abs(wrap4.cbrt - 3);
 
-      assert.strictEqual(diff1 <= eps, true, `cbrt(1): ${ diff1 } <= ${ eps }`);
-      assert.strictEqual(diff2 <= eps, true, `cbrt(-8): ${ diff2 } <= ${ eps }`);
-      assert.strictEqual(diff3 <= eps, true, `cbrt(0): ${ diff3 } <= ${ eps }`);
-      assert.strictEqual(diff4 <= eps, true, `cbrt(27): ${ diff4 } <= ${ eps }`);
-      assert.strictEqual(wrap5.cbrt, -Infinity);
-      assert.strictEqual(isNaN(wrap6.cbrt), true);
+      strictEqual(diff1 <= eps, true, `cbrt(1): ${ diff1 } <= ${ eps }`);
+      strictEqual(diff2 <= eps, true, `cbrt(-8): ${ diff2 } <= ${ eps }`);
+      strictEqual(diff3 <= eps, true, `cbrt(0): ${ diff3 } <= ${ eps }`);
+      strictEqual(diff4 <= eps, true, `cbrt(27): ${ diff4 } <= ${ eps }`);
+      strictEqual(wrap5.cbrt, -Infinity);
+      strictEqual(isNaN(wrap6.cbrt), true);
     });
   });
   describe('ceil', () => {
@@ -222,12 +222,12 @@ describe('it should test Num#', () => {
       const wrap5 = new Num(n5);
       const wrap6 = new Num(n6);
 
-      assert.strictEqual(wrap1.ceil, ceil(n1));
-      assert.strictEqual(wrap2.ceil, ceil(n2));
-      assert.strictEqual(wrap3.ceil, ceil(n3));
-      assert.strictEqual(wrap4.ceil, ceil(n4));
-      assert.strictEqual(wrap5.ceil, ceil(n5));
-      assert.strictEqual(isNaN(wrap6.ceil), true);
+      strictEqual(wrap1.ceil, ceil(n1));
+      strictEqual(wrap2.ceil, ceil(n2));
+      strictEqual(wrap3.ceil, ceil(n3));
+      strictEqual(wrap4.ceil, ceil(n4));
+      strictEqual(wrap5.ceil, ceil(n5));
+      strictEqual(isNaN(wrap6.ceil), true);
     });
   });
   describe('cos()', () => {
@@ -248,11 +248,11 @@ describe('it should test Num#', () => {
       const diff4 = Math.abs(wrap4.cos() - 1 / 2);
       const diff5 = Math.abs(wrap5.cos() - 1 / sqrt(2));
 
-      assert.strictEqual(diff1 <= eps, true, `cos(0): ${ diff1 } <= ${ eps }`);
-      assert.strictEqual(diff2 <= eps, true, `cos(pi): ${ diff2 } <= ${ eps }`);
-      assert.strictEqual(diff3 <= eps, true, `cos(pi/2): ${ diff3 } <= ${ eps }`);
-      assert.strictEqual(diff4 <= eps, true, `cos(pi/3): ${ diff4 } <= ${ eps }`);
-      assert.strictEqual(diff5 <= eps, true, `cos(pi/4): ${ diff5 } <= ${ eps }`);
+      strictEqual(diff1 <= eps, true, `cos(0): ${ diff1 } <= ${ eps }`);
+      strictEqual(diff2 <= eps, true, `cos(pi): ${ diff2 } <= ${ eps }`);
+      strictEqual(diff3 <= eps, true, `cos(pi/2): ${ diff3 } <= ${ eps }`);
+      strictEqual(diff4 <= eps, true, `cos(pi/3): ${ diff4 } <= ${ eps }`);
+      strictEqual(diff5 <= eps, true, `cos(pi/4): ${ diff5 } <= ${ eps }`);
     });
     it('should use context as number of degrees with truthy argument', () => {
       const n1 = 0;
@@ -271,11 +271,11 @@ describe('it should test Num#', () => {
       const diff4 = Math.abs(wrap4.cos(true) - 1 / 2);
       const diff5 = Math.abs(wrap5.cos(true) - 1 / sqrt(2));
 
-      assert.strictEqual(diff1 <= eps, true, `cos(0): ${ diff1 } <= ${ eps }`);
-      assert.strictEqual(diff2 <= eps, true, `cos(180): ${ diff2 } <= ${ eps }`);
-      assert.strictEqual(diff3 <= eps, true, `cos(90): ${ diff3 } <= ${ eps }`);
-      assert.strictEqual(diff4 <= eps, true, `cos(60): ${ diff4 } <= ${ eps }`);
-      assert.strictEqual(diff5 <= eps, true, `cos(45): ${ diff5 } <= ${ eps }`);
+      strictEqual(diff1 <= eps, true, `cos(0): ${ diff1 } <= ${ eps }`);
+      strictEqual(diff2 <= eps, true, `cos(180): ${ diff2 } <= ${ eps }`);
+      strictEqual(diff3 <= eps, true, `cos(90): ${ diff3 } <= ${ eps }`);
+      strictEqual(diff4 <= eps, true, `cos(60): ${ diff4 } <= ${ eps }`);
+      strictEqual(diff5 <= eps, true, `cos(45): ${ diff5 } <= ${ eps }`);
     });
   });
   describe('cube', () => {
@@ -293,12 +293,12 @@ describe('it should test Num#', () => {
       const wrap5 = new Num(n5);
       const wrap6 = new Num(n6);
 
-      assert.strictEqual(wrap1.cube, 1);
-      assert.strictEqual(wrap2.cube, -125);
-      assert.strictEqual(wrap3.cube, 0);
-      assert.strictEqual(wrap4.cube, 343);
-      assert.strictEqual(wrap5.cube, -Infinity);
-      assert.strictEqual(isNaN(wrap6.cube), true);
+      strictEqual(wrap1.cube, 1);
+      strictEqual(wrap2.cube, -125);
+      strictEqual(wrap3.cube, 0);
+      strictEqual(wrap4.cube, 343);
+      strictEqual(wrap5.cube, -Infinity);
+      strictEqual(isNaN(wrap6.cube), true);
     });
   });
   describe('exp', () => {
@@ -320,12 +320,12 @@ describe('it should test Num#', () => {
       const diff3 = abs(wrap3.exp - pow(e, n3));
       const diff4 = abs(wrap4.exp - pow(e, n4));
 
-      assert.strictEqual(diff1 <= eps, true, `exp(1): ${ diff1 } <= ${ eps }`);
-      assert.strictEqual(diff2 <= eps, true, `exp(-5): ${ diff2 } <= ${ eps }`);
-      assert.strictEqual(diff3 <= eps, true, `exp(0): ${ diff3 } <= ${ eps }`);
-      assert.strictEqual(diff4 <= eps, true, `exp(7): ${ diff4 } <= ${ eps }`);
-      assert.strictEqual(wrap5.exp, Infinity);
-      assert.strictEqual(isNaN(wrap6.exp), true);
+      strictEqual(diff1 <= eps, true, `exp(1): ${ diff1 } <= ${ eps }`);
+      strictEqual(diff2 <= eps, true, `exp(-5): ${ diff2 } <= ${ eps }`);
+      strictEqual(diff3 <= eps, true, `exp(0): ${ diff3 } <= ${ eps }`);
+      strictEqual(diff4 <= eps, true, `exp(7): ${ diff4 } <= ${ eps }`);
+      strictEqual(wrap5.exp, Infinity);
+      strictEqual(isNaN(wrap6.exp), true);
     });
   });
   describe('floor', () => {
@@ -343,12 +343,12 @@ describe('it should test Num#', () => {
       const wrap5 = new Num(n5);
       const wrap6 = new Num(n6);
 
-      assert.strictEqual(wrap1.floor, floor(n1));
-      assert.strictEqual(wrap2.floor, floor(n2));
-      assert.strictEqual(wrap3.floor, floor(n3));
-      assert.strictEqual(wrap4.floor, floor(n4));
-      assert.strictEqual(wrap5.floor, floor(n5));
-      assert.strictEqual(isNaN(wrap6.floor), true);
+      strictEqual(wrap1.floor, floor(n1));
+      strictEqual(wrap2.floor, floor(n2));
+      strictEqual(wrap3.floor, floor(n3));
+      strictEqual(wrap4.floor, floor(n4));
+      strictEqual(wrap5.floor, floor(n5));
+      strictEqual(isNaN(wrap6.floor), true);
     });
   });
   describe('interval()', () => {
@@ -401,7 +401,7 @@ describe('it should test Num#', () => {
 
       setTimeout(() => {
         try {
-          assert.strictEqual(number, 10);
+          strictEqual(number, 10);
           abort();
           done();
         } catch (err) {
@@ -425,12 +425,12 @@ describe('it should test Num#', () => {
       const wrap5 = new Num(n5);
       const wrap6 = new Num(n6);
 
-      assert.strictEqual(wrap1.ln, ln(n1));
-      assert.strictEqual(wrap2.ln, ln(n2));
-      assert.strictEqual(wrap3.ln, ln(n3));
-      assert.strictEqual(wrap4.ln, ln(n4));
-      assert.strictEqual(wrap5.ln, ln(n5));
-      assert.strictEqual(isNaN(wrap6.ln), true);
+      strictEqual(wrap1.ln, ln(n1));
+      strictEqual(wrap2.ln, ln(n2));
+      strictEqual(wrap3.ln, ln(n3));
+      strictEqual(wrap4.ln, ln(n4));
+      strictEqual(wrap5.ln, ln(n5));
+      strictEqual(isNaN(wrap6.ln), true);
     });
   });
   describe('log()', () => {
@@ -454,16 +454,16 @@ describe('it should test Num#', () => {
       const diff3 = abs(wrap3.log(3) - 1 / 3);
       const diff4 = abs(wrap4.log(4) - (-2));
 
-      assert.strictEqual(diff1 <= eps, true, `log(${ n1 }, 0.5): ${ diff1 } <= ${ eps }`);
-      assert.strictEqual(diff2 <= eps, true, `log(${ n2 }, 49): ${ diff2 } <= ${ eps }`);
-      assert.strictEqual(diff3 <= eps, true, `log(${ n3 }, 1/3): ${ diff3 } <= ${ eps }`);
-      assert.strictEqual(diff4 <= eps, true, `log(${ n4 }, 4): ${ diff4 } <= ${ eps }`);
-      assert.strictEqual(isNaN(wrap5.log(1)), true);
-      assert.strictEqual(wrap5.log(2), Infinity);
-      assert.strictEqual(wrap5.log(0.5), -Infinity);
-      assert.strictEqual(wrap6.log(1), 0);
-      assert.strictEqual(wrap6.log(0.5), -0);
-      assert.strictEqual(isNaN(wrap7.log(0)), true);
+      strictEqual(diff1 <= eps, true, `log(${ n1 }, 0.5): ${ diff1 } <= ${ eps }`);
+      strictEqual(diff2 <= eps, true, `log(${ n2 }, 49): ${ diff2 } <= ${ eps }`);
+      strictEqual(diff3 <= eps, true, `log(${ n3 }, 1/3): ${ diff3 } <= ${ eps }`);
+      strictEqual(diff4 <= eps, true, `log(${ n4 }, 4): ${ diff4 } <= ${ eps }`);
+      strictEqual(isNaN(wrap5.log(1)), true);
+      strictEqual(wrap5.log(2), Infinity);
+      strictEqual(wrap5.log(0.5), -Infinity);
+      strictEqual(wrap6.log(1), 0);
+      strictEqual(wrap6.log(0.5), -0);
+      strictEqual(isNaN(wrap7.log(0)), true);
     });
   });
   describe('log2', () => {
@@ -484,12 +484,12 @@ describe('it should test Num#', () => {
       const diff2 = abs(wrap2.log2 - ln(n2) / ln2);
       const diff4 = abs(wrap4.log2 - ln(n4) / ln2);
 
-      assert.strictEqual(diff1 <= eps, true, `log2(1): ${ diff1 } <= ${ eps }`);
-      assert.strictEqual(diff2 <= eps, true, `log2(0.45): ${ diff2 } <= ${ eps }`);
-      assert.strictEqual(wrap3.log2, -Infinity);
-      assert.strictEqual(diff4 <= eps, true, `log2(2): ${ diff4 } <= ${ eps }`);
-      assert.strictEqual(wrap5.log2, Infinity);
-      assert.strictEqual(isNaN(wrap6.log2), true);
+      strictEqual(diff1 <= eps, true, `log2(1): ${ diff1 } <= ${ eps }`);
+      strictEqual(diff2 <= eps, true, `log2(0.45): ${ diff2 } <= ${ eps }`);
+      strictEqual(wrap3.log2, -Infinity);
+      strictEqual(diff4 <= eps, true, `log2(2): ${ diff4 } <= ${ eps }`);
+      strictEqual(wrap5.log2, Infinity);
+      strictEqual(isNaN(wrap6.log2), true);
     });
   });
   describe('log10', () => {
@@ -510,12 +510,12 @@ describe('it should test Num#', () => {
       const diff2 = abs(wrap2.log10 - ln(n2) / ln10);
       const diff4 = abs(wrap4.log10 - ln(n4) / ln10);
 
-      assert.strictEqual(diff1 <= eps, true, `log10(1): ${ diff1 } <= ${ eps }`);
-      assert.strictEqual(diff2 <= eps, true, `log10(0.45): ${ diff2 } <= ${ eps }`);
-      assert.strictEqual(wrap3.log10, -Infinity);
-      assert.strictEqual(diff4 <= eps, true, `log10(2): ${ diff4 } <= ${ eps }`);
-      assert.strictEqual(wrap5.log10, Infinity);
-      assert.strictEqual(isNaN(wrap6.log10), true);
+      strictEqual(diff1 <= eps, true, `log10(1): ${ diff1 } <= ${ eps }`);
+      strictEqual(diff2 <= eps, true, `log10(0.45): ${ diff2 } <= ${ eps }`);
+      strictEqual(wrap3.log10, -Infinity);
+      strictEqual(diff4 <= eps, true, `log10(2): ${ diff4 } <= ${ eps }`);
+      strictEqual(wrap5.log10, Infinity);
+      strictEqual(isNaN(wrap6.log10), true);
     });
   });
   describe('pow()', () => {
@@ -533,12 +533,12 @@ describe('it should test Num#', () => {
       const wrap5 = new Num(n5);
       const wrap6 = new Num(n6);
 
-      assert.strictEqual(wrap1.pow(2), pow(n1, 2));
-      assert.strictEqual(wrap2.pow(-6), pow(n2, -6));
-      assert.strictEqual(wrap3.pow(4), pow(n3, 4));
-      assert.strictEqual(wrap4.pow(13), pow(n4, 13));
-      assert.strictEqual(wrap5.pow(-12), pow(n5, -12));
-      assert.strictEqual(isNaN(wrap6.pow(1)), true);
+      strictEqual(wrap1.pow(2), pow(n1, 2));
+      strictEqual(wrap2.pow(-6), pow(n2, -6));
+      strictEqual(wrap3.pow(4), pow(n3, 4));
+      strictEqual(wrap4.pow(13), pow(n4, 13));
+      strictEqual(wrap5.pow(-12), pow(n5, -12));
+      strictEqual(isNaN(wrap6.pow(1)), true);
     });
   });
   describe('root()', () => {
@@ -556,12 +556,12 @@ describe('it should test Num#', () => {
       const wrap5 = new Num(n5);
       const wrap6 = new Num(n6);
 
-      assert.strictEqual(wrap1.root(2), pow(n1, 1 / 2));
-      assert.strictEqual(wrap2.root(6), pow(n2, 1 / 6));
-      assert.strictEqual(wrap3.root(4), pow(n3, 1 / 4));
-      assert.strictEqual(wrap4.root(13), pow(n4, 1 / 13));
-      assert.strictEqual(wrap5.root(12), pow(n5, 1 / 12));
-      assert.strictEqual(isNaN(wrap6.root(0)), true);
+      strictEqual(wrap1.root(2), pow(n1, 1 / 2));
+      strictEqual(wrap2.root(6), pow(n2, 1 / 6));
+      strictEqual(wrap3.root(4), pow(n3, 1 / 4));
+      strictEqual(wrap4.root(13), pow(n4, 1 / 13));
+      strictEqual(wrap5.root(12), pow(n5, 1 / 12));
+      strictEqual(isNaN(wrap6.root(0)), true);
     });
   });
   describe('round', () => {
@@ -579,12 +579,12 @@ describe('it should test Num#', () => {
       const wrap5 = new Num(n5);
       const wrap6 = new Num(n6);
 
-      assert.strictEqual(wrap1.round, round(n1));
-      assert.strictEqual(wrap2.round, round(n2));
-      assert.strictEqual(wrap3.round, round(n3));
-      assert.strictEqual(wrap4.round, round(n4));
-      assert.strictEqual(wrap5.round, round(n5));
-      assert.strictEqual(isNaN(wrap6.round), true);
+      strictEqual(wrap1.round, round(n1));
+      strictEqual(wrap2.round, round(n2));
+      strictEqual(wrap3.round, round(n3));
+      strictEqual(wrap4.round, round(n4));
+      strictEqual(wrap5.round, round(n5));
+      strictEqual(isNaN(wrap6.round), true);
     });
   });
   describe('sign', () => {
@@ -604,13 +604,13 @@ describe('it should test Num#', () => {
       const wrap6 = new Num(n6);
       const wrap7 = new Num(n7);
 
-      assert.strictEqual(wrap1.sign, 1);
-      assert.strictEqual(wrap2.sign, -1);
-      assert.strictEqual(wrap3.sign, 0);
-      assert.strictEqual(wrap4.sign, -0);
-      assert.strictEqual(wrap5.sign, 1);
-      assert.strictEqual(wrap6.sign, -1);
-      assert.strictEqual(isNaN(wrap7.sign), true);
+      strictEqual(wrap1.sign, 1);
+      strictEqual(wrap2.sign, -1);
+      strictEqual(wrap3.sign, 0);
+      strictEqual(wrap4.sign, -0);
+      strictEqual(wrap5.sign, 1);
+      strictEqual(wrap6.sign, -1);
+      strictEqual(isNaN(wrap7.sign), true);
     });
   });
   describe('sin()', () => {
@@ -631,11 +631,11 @@ describe('it should test Num#', () => {
       const diff4 = abs(wrap4.sin() - sqrt(3) / 2);
       const diff5 = abs(wrap5.sin() - 1 / sqrt(2));
 
-      assert.strictEqual(diff1 <= eps, true, `sin(0): ${ diff1 } <= ${ eps }`);
-      assert.strictEqual(diff2 <= eps, true, `sin(pi): ${ diff2 } <= ${ eps }`);
-      assert.strictEqual(diff3 <= eps, true, `sin(pi/2): ${ diff3 } <= ${ eps }`);
-      assert.strictEqual(diff4 <= eps, true, `sin(pi/3): ${ diff4 } <= ${ eps }`);
-      assert.strictEqual(diff5 <= eps, true, `sin(pi/4): ${ diff5 } <= ${ eps }`);
+      strictEqual(diff1 <= eps, true, `sin(0): ${ diff1 } <= ${ eps }`);
+      strictEqual(diff2 <= eps, true, `sin(pi): ${ diff2 } <= ${ eps }`);
+      strictEqual(diff3 <= eps, true, `sin(pi/2): ${ diff3 } <= ${ eps }`);
+      strictEqual(diff4 <= eps, true, `sin(pi/3): ${ diff4 } <= ${ eps }`);
+      strictEqual(diff5 <= eps, true, `sin(pi/4): ${ diff5 } <= ${ eps }`);
     });
     it('should use context as number of degrees with truthy argument', () => {
       const n1 = 0;
@@ -654,11 +654,11 @@ describe('it should test Num#', () => {
       const diff4 = abs(wrap4.sin(true) - sqrt(3) / 2);
       const diff5 = abs(wrap5.sin(true) - 1 / sqrt(2));
 
-      assert.strictEqual(diff1 <= eps, true, `sin(0): ${ diff1 } <= ${ eps }`);
-      assert.strictEqual(diff2 <= eps, true, `sin(180): ${ diff2 } <= ${ eps }`);
-      assert.strictEqual(diff3 <= eps, true, `sin(90): ${ diff3 } <= ${ eps }`);
-      assert.strictEqual(diff4 <= eps, true, `sin(60): ${ diff4 } <= ${ eps }`);
-      assert.strictEqual(diff5 <= eps, true, `sin(45): ${ diff5 } <= ${ eps }`);
+      strictEqual(diff1 <= eps, true, `sin(0): ${ diff1 } <= ${ eps }`);
+      strictEqual(diff2 <= eps, true, `sin(180): ${ diff2 } <= ${ eps }`);
+      strictEqual(diff3 <= eps, true, `sin(90): ${ diff3 } <= ${ eps }`);
+      strictEqual(diff4 <= eps, true, `sin(60): ${ diff4 } <= ${ eps }`);
+      strictEqual(diff5 <= eps, true, `sin(45): ${ diff5 } <= ${ eps }`);
     });
   });
   describe('sq', () => {
@@ -676,12 +676,12 @@ describe('it should test Num#', () => {
       const wrap5 = new Num(n5);
       const wrap6 = new Num(n6);
 
-      assert.strictEqual(wrap1.sq, 1);
-      assert.strictEqual(wrap2.sq, 25);
-      assert.strictEqual(wrap3.sq, 0);
-      assert.strictEqual(wrap4.sq, 49);
-      assert.strictEqual(wrap5.sq, Infinity);
-      assert.strictEqual(isNaN(wrap6.sq), true);
+      strictEqual(wrap1.sq, 1);
+      strictEqual(wrap2.sq, 25);
+      strictEqual(wrap3.sq, 0);
+      strictEqual(wrap4.sq, 49);
+      strictEqual(wrap5.sq, Infinity);
+      strictEqual(isNaN(wrap6.sq), true);
     });
   });
   describe('sqrt', () => {
@@ -703,12 +703,12 @@ describe('it should test Num#', () => {
       const diff3 = Math.abs(wrap3.sqrt - 0);
       const diff4 = Math.abs(wrap4.sqrt - 3);
 
-      assert.strictEqual(diff1 <= eps, true, `sqrt(1): ${ diff1 } <= ${ eps }`);
-      assert.strictEqual(diff2 <= eps, true, `sqrt(4): ${ diff2 } <= ${ eps }`);
-      assert.strictEqual(diff3 <= eps, true, `sqrt(0): ${ diff3 } <= ${ eps }`);
-      assert.strictEqual(diff4 <= eps, true, `sqrt(9): ${ diff4 } <= ${ eps }`);
-      assert.strictEqual(wrap5.sqrt, Infinity);
-      assert.strictEqual(isNaN(wrap6.sqrt), true);
+      strictEqual(diff1 <= eps, true, `sqrt(1): ${ diff1 } <= ${ eps }`);
+      strictEqual(diff2 <= eps, true, `sqrt(4): ${ diff2 } <= ${ eps }`);
+      strictEqual(diff3 <= eps, true, `sqrt(0): ${ diff3 } <= ${ eps }`);
+      strictEqual(diff4 <= eps, true, `sqrt(9): ${ diff4 } <= ${ eps }`);
+      strictEqual(wrap5.sqrt, Infinity);
+      strictEqual(isNaN(wrap6.sqrt), true);
     });
   });
   describe('tan()', () => {
@@ -729,11 +729,11 @@ describe('it should test Num#', () => {
       const diff4 = Math.abs(wrap4.tan() - sqrt(3));
       const diff5 = Math.abs(wrap5.tan() - 1);
 
-      assert.strictEqual(diff1 <= eps, true, `tan(0): ${ diff1 } <= ${ eps }`);
-      assert.strictEqual(diff2 <= eps, true, `tan(pi): ${ diff2 } <= ${ eps }`);
-      assert.strictEqual(diff3 >= max, true, `tan(pi/2): ${ diff3 } <= ${ eps }`);
-      assert.strictEqual(diff4 <= eps, true, `tan(pi/3): ${ diff4 } <= ${ eps }`);
-      assert.strictEqual(diff5 <= eps, true, `tan(pi/4): ${ diff5 } <= ${ eps }`);
+      strictEqual(diff1 <= eps, true, `tan(0): ${ diff1 } <= ${ eps }`);
+      strictEqual(diff2 <= eps, true, `tan(pi): ${ diff2 } <= ${ eps }`);
+      strictEqual(diff3 >= max, true, `tan(pi/2): ${ diff3 } <= ${ eps }`);
+      strictEqual(diff4 <= eps, true, `tan(pi/3): ${ diff4 } <= ${ eps }`);
+      strictEqual(diff5 <= eps, true, `tan(pi/4): ${ diff5 } <= ${ eps }`);
     });
     it('should use context as number of degrees with truthy argument', () => {
       const n1 = 0;
@@ -752,11 +752,11 @@ describe('it should test Num#', () => {
       const diff4 = Math.abs(wrap4.tan(true) - sqrt(3));
       const diff5 = Math.abs(wrap5.tan(true) - 1);
 
-      assert.strictEqual(diff1 <= eps, true, `tan(0): ${ diff1 } <= ${ eps }`);
-      assert.strictEqual(diff2 <= eps, true, `tan(180): ${ diff2 } <= ${ eps }`);
-      assert.strictEqual(diff3 >= max, true, `tan(90): ${ diff3 } <= ${ eps }`);
-      assert.strictEqual(diff4 <= eps, true, `tan(60): ${ diff4 } <= ${ eps }`);
-      assert.strictEqual(diff5 <= eps, true, `tan(45): ${ diff5 } <= ${ eps }`);
+      strictEqual(diff1 <= eps, true, `tan(0): ${ diff1 } <= ${ eps }`);
+      strictEqual(diff2 <= eps, true, `tan(180): ${ diff2 } <= ${ eps }`);
+      strictEqual(diff3 >= max, true, `tan(90): ${ diff3 } <= ${ eps }`);
+      strictEqual(diff4 <= eps, true, `tan(60): ${ diff4 } <= ${ eps }`);
+      strictEqual(diff5 <= eps, true, `tan(45): ${ diff5 } <= ${ eps }`);
     });
   });
   describe('timeout()', () => {
@@ -768,7 +768,7 @@ describe('it should test Num#', () => {
       timeout
         .then(() => done(new Error('Clear failed')))
         .catch((err) => {
-          assert.strictEqual(err.message, 'Timeout was aborted');
+          strictEqual(err.message, 'Timeout was aborted');
 
           done();
         });
@@ -784,7 +784,7 @@ describe('it should test Num#', () => {
 
       wrap.timeout(random)
         .then((value) => {
-          assert.strictEqual(value, random);
+          strictEqual(value, random);
 
           done();
         })
@@ -814,16 +814,16 @@ describe('it should test Num#', () => {
       const wrap9 = new Num(n9);
       const wrap10 = new Num(n10);
 
-      assert.strictEqual(wrap1.toBase(2), toString(n1, 2));
-      assert.strictEqual(wrap2.toBase(3), toString(n2, 3));
-      assert.strictEqual(wrap3.toBase(12), toString(n3, 12));
-      assert.strictEqual(wrap4.toBase(3), toString(n4, 3));
-      assert.strictEqual(wrap5.toBase(16), toString(n5, 16));
-      assert.strictEqual(wrap6.toBase(26), toString(n6, 26));
-      assert.strictEqual(wrap7.toBase(11), toString(n7, 11));
-      assert.strictEqual(wrap8.toBase(8), toString(n8, 8));
-      assert.strictEqual(wrap9.toBase(36), toString(n9, 36));
-      assert.strictEqual(wrap10.toBase(4), toString(n10, 4));
+      strictEqual(wrap1.toBase(2), toString(n1, 2));
+      strictEqual(wrap2.toBase(3), toString(n2, 3));
+      strictEqual(wrap3.toBase(12), toString(n3, 12));
+      strictEqual(wrap4.toBase(3), toString(n4, 3));
+      strictEqual(wrap5.toBase(16), toString(n5, 16));
+      strictEqual(wrap6.toBase(26), toString(n6, 26));
+      strictEqual(wrap7.toBase(11), toString(n7, 11));
+      strictEqual(wrap8.toBase(8), toString(n8, 8));
+      strictEqual(wrap9.toBase(36), toString(n9, 36));
+      strictEqual(wrap10.toBase(4), toString(n10, 4));
     });
   });
   describe('toExponential()', () => {
@@ -841,12 +841,12 @@ describe('it should test Num#', () => {
       const wrap5 = new Num(n5);
       const wrap6 = new Num(n6);
 
-      assert.strictEqual(wrap1.toExponential(), toExp(n1));
-      assert.strictEqual(wrap2.toExponential(), toExp(n2));
-      assert.strictEqual(wrap3.toExponential(), toExp(n3));
-      assert.strictEqual(wrap4.toExponential(), toExp(n4));
-      assert.strictEqual(wrap5.toExponential(), toExp(n5));
-      assert.strictEqual(wrap6.toExponential(), toExp(n6));
+      strictEqual(wrap1.toExponential(), toExp(n1));
+      strictEqual(wrap2.toExponential(), toExp(n2));
+      strictEqual(wrap3.toExponential(), toExp(n3));
+      strictEqual(wrap4.toExponential(), toExp(n4));
+      strictEqual(wrap5.toExponential(), toExp(n5));
+      strictEqual(wrap6.toExponential(), toExp(n6));
     });
   });
   describe('toFixed()', () => {
@@ -864,12 +864,12 @@ describe('it should test Num#', () => {
       const wrap5 = new Num(n5);
       const wrap6 = new Num(n6);
 
-      assert.strictEqual(wrap1.toFixed(1), toFixed(n1, 1));
-      assert.strictEqual(wrap2.toFixed(4), toFixed(n2, 4));
-      assert.strictEqual(wrap3.toFixed(3), toFixed(n3, 3));
-      assert.strictEqual(wrap4.toFixed(2), toFixed(n4, 2));
-      assert.strictEqual(wrap5.toFixed(7), toFixed(n5, 7));
-      assert.strictEqual(wrap6.toFixed(9), toFixed(n6, 9));
+      strictEqual(wrap1.toFixed(1), toFixed(n1, 1));
+      strictEqual(wrap2.toFixed(4), toFixed(n2, 4));
+      strictEqual(wrap3.toFixed(3), toFixed(n3, 3));
+      strictEqual(wrap4.toFixed(2), toFixed(n4, 2));
+      strictEqual(wrap5.toFixed(7), toFixed(n5, 7));
+      strictEqual(wrap6.toFixed(9), toFixed(n6, 9));
     });
   });
   describe('toPrecision()', () => {
@@ -887,12 +887,12 @@ describe('it should test Num#', () => {
       const wrap5 = new Num(n5);
       const wrap6 = new Num(n6);
 
-      assert.strictEqual(wrap1.toPrecision(1), toPrecision(n1, 1));
-      assert.strictEqual(wrap2.toPrecision(4), toPrecision(n2, 4));
-      assert.strictEqual(wrap3.toPrecision(3), toPrecision(n3, 3));
-      assert.strictEqual(wrap4.toPrecision(2), toPrecision(n4, 2));
-      assert.strictEqual(wrap5.toPrecision(7), toPrecision(n5, 7));
-      assert.strictEqual(wrap6.toPrecision(9), toPrecision(n6, 9));
+      strictEqual(wrap1.toPrecision(1), toPrecision(n1, 1));
+      strictEqual(wrap2.toPrecision(4), toPrecision(n2, 4));
+      strictEqual(wrap3.toPrecision(3), toPrecision(n3, 3));
+      strictEqual(wrap4.toPrecision(2), toPrecision(n4, 2));
+      strictEqual(wrap5.toPrecision(7), toPrecision(n5, 7));
+      strictEqual(wrap6.toPrecision(9), toPrecision(n6, 9));
     });
   });
   describe('valueOf()', () => {
@@ -910,12 +910,12 @@ describe('it should test Num#', () => {
       const wrap5 = new Num(n5);
       const wrap6 = new Num(n6);
 
-      assert.strictEqual(+wrap1, n1);
-      assert.strictEqual(+wrap2, n2);
-      assert.strictEqual(+wrap3, n3);
-      assert.strictEqual(+wrap4, n4);
-      assert.strictEqual(+wrap5, n5);
-      assert.strictEqual(isNaN(+wrap6), true);
+      strictEqual(+wrap1, n1);
+      strictEqual(+wrap2, n2);
+      strictEqual(+wrap3, n3);
+      strictEqual(+wrap4, n4);
+      strictEqual(+wrap5, n5);
+      strictEqual(isNaN(+wrap6), true);
     });
   });
 });
