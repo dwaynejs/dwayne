@@ -89,6 +89,8 @@ describe('it should test Super#', () => {
       deepStrictEqual(Object.getOwnPropertyDescriptor(instance, 'foo'), descriptor);
     });
   });
+  // TODO: #deepAssign
+  // TODO: #deepClone
   describe('deepEquals()', () => {
     it('should return true with argument, which nested values are equal to context\'s', () => {
       const o = { a: { a: 1 } };
