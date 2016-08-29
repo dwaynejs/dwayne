@@ -566,14 +566,12 @@ describe('it should test Fetch#', () => {
         baseURL: origin
       });
 
-      fetch.before((config, next) => {
+      fetch.before(() => {
         fetch.headers({
           fooHeader: 1,
           barHeader: ['a', 'b'],
           bazHeader: 'a'
         });
-
-        next();
       });
 
       fetch('/headers')
@@ -639,30 +637,26 @@ describe('it should test Fetch#', () => {
       });
       let testsDone = 0;
 
-      fetch.before((config, next) => {
+      fetch.before(() => {
         fetch.headers('fooHeader', 1);
-
-        next();
       });
 
-      fetch.after(({ status }, next) => {
+      fetch.after(({ status }) => {
         if (status === 200) {
-          return next();
+          return;
         }
 
-        next(new Error(`Wrong status (${ status })`));
+        throw new Error(`Wrong status (${ status })`);
       });
 
-      fetch.after((err, response, next) => {
-        console.error(err);
+      fetch.after((err, response) => {
+        console.error(err, response);
 
-        next(err);
+        throw err;
       });
 
-      fetch.after((response, next) => {
+      fetch.after((response) => {
         response.json = D(response.data).parseJSON({ dates: true });
-
-        next();
       });
 
       fetch('/middlewares-with-headers')
