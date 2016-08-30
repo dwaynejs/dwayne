@@ -30,11 +30,11 @@ describe('it should test Fetch#', () => {
 
       fetch.before(middleware1);
 
-      deepStrictEqual(fetch.$$.before, [middleware1]);
+      deepStrictEqual(fetch.$$.before.slice(0, -1), [middleware1]);
 
       fetch.before(middleware2);
 
-      deepStrictEqual(fetch.$$.before, [middleware1, middleware2]);
+      deepStrictEqual(fetch.$$.before.slice(0, -1), [middleware2, middleware1]);
     });
   });
   describe('config()', () => {
@@ -256,8 +256,7 @@ describe('it should test Fetch#', () => {
       instance.config((config) => {
         notEqual(old.auth, config.auth);
         notEqual(old.headers, config.headers);
-        notEqual(old.headers.foo, config.headers.foo);
-        deepStrictEqual(old.headers.foo, config.headers.foo);
+        strictEqual(old.headers.foo, config.headers.foo);
         notEqual(old.query, config.query);
         notEqual(old.params, config.params);
       });
@@ -287,13 +286,13 @@ describe('it should test Fetch#', () => {
       const fetch = new Fetch({
         auth: { username: 'foo', password: 'bar' },
         baseURL: '//foo',
-        headers: { foo: 'bar', bar: 'foo' },
+        headers: { foo: ['bar'], bar: ['foo'] },
         params: { foo: 'bar', bar: 'foo' },
         query: { foo: 'bar', bar: 'foo' }
       });
       const instance = fetch.instance({
         auth: { username: 'baz' },
-        headers: { foo: 'baz', baz: 'foo' },
+        headers: { foo: ['baz'], baz: ['foo'] },
         params: { foo: 'baz', baz: 'foo' },
         query: { foo: 'baz', baz: 'foo' },
         timeout: 5000
@@ -529,18 +528,18 @@ describe('it should test Fetch#', () => {
         url: '/foo/bar/:baz/:baz/:foo/:bar?foo=bar'
       });
 
-      fetch({
-        params: { foo: 'bar', bar: 'baz', baz: 'foo' },
-        query: { bar: ['foo', 'baz'], baz: 'foo' }
-      })
-        .then(({ config }) => {
+      fetch
+        .before((req) => {
           strictEqual(
-            config.constructedUrl,
+            req.url,
             `${ origin }/foo/bar/foo/foo/bar/baz?foo=bar&bar%5B%5D=foo&bar%5B%5D=baz&baz=foo`
           );
-
-          done();
+        }, false)
+        .request({
+          params: { foo: 'bar', bar: 'baz', baz: 'foo' },
+          query: { bar: ['foo', 'baz'], baz: 'foo' }
         })
+        .then(() => done())
         .catch(done);
     });
     it('should test data transformation', (done) => {
@@ -550,15 +549,12 @@ describe('it should test Fetch#', () => {
         baseURL: origin
       });
 
-      fetch.post('/transformData', data)
-        .then(({ config }) => {
-          strictEqual(
-            config.constructedData,
-            json
-          );
-
-          done();
-        })
+      fetch
+        .before((req) => {
+          strictEqual(req.data, json);
+        }, false)
+        .post('/transformData', data)
+        .then(() => done())
         .catch(done);
     });
     it('should test headers transformation', (done) => {
@@ -566,24 +562,23 @@ describe('it should test Fetch#', () => {
         baseURL: origin
       });
 
-      fetch.before(() => {
-        fetch.headers({
-          fooHeader: 1,
-          barHeader: ['a', 'b'],
-          bazHeader: 'a'
-        });
-      });
-
-      fetch('/headers')
-        .then(({ data }) => {
-          const { headers } = D(data).parseJSON().$;
-
-          strictEqual(headers['foo-header'], '1');
-          strictEqual(headers['bar-header'], 'a, b');
-          strictEqual(headers['baz-header'], 'a');
-
-          done();
+      fetch
+        .before(() => {
+          fetch.headers({
+            fooHeader: 1,
+            barHeader: ['a', 'b'],
+            bazHeader: 'a'
+          });
         })
+        .before((req) => {
+          const { headers } = req;
+
+          strictEqual(headers['Foo-Header'], '1');
+          strictEqual(headers['Bar-Header'], 'a, b');
+          strictEqual(headers['Baz-Header'], 'a');
+        }, false)
+        .request('/headers')
+        .then(() => done())
         .catch(done);
     });
     it('should test request itself', (done) => {
