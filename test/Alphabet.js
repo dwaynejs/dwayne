@@ -17,7 +17,7 @@ describe('it should test Alphabet#', () => {
       const o = ['1', '2', '3', '4', '5'];
       const wrap = new Alphabet(o);
       
-      deepStrictEqual(wrap.get().$, ['1', '2', '3', '4', '5']);
+      deepStrictEqual(wrap.get(), ['1', '2', '3', '4', '5']);
     });
   });
   describe('contains()', () => {
