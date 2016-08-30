@@ -89,8 +89,64 @@ describe('it should test Super#', () => {
       deepStrictEqual(Object.getOwnPropertyDescriptor(instance, 'foo'), descriptor);
     });
   });
-  // TODO: #deepAssign
-  // TODO: #deepClone
+  describe('deepAssign()', () => {
+    it('should do deep assigning and reassigning', () => {
+      const o = { a: 1 };
+      const wrap = new Super(o);
+      const o1 = {
+        a: 2,
+        b: {
+          c: 3,
+          d: { e: 4 }
+        }
+      };
+      const o2 = {
+        a: { b: 5 },
+        b: {
+          d: { f: 6 },
+          g: 7
+        }
+      };
+      const o3 = null;
+
+      wrap.deepAssign(o1, o2, o3);
+
+      deepStrictEqual(o, {
+        a: { b: 5 },
+        b: {
+          c: 3,
+          d: {
+            e: 4,
+            f: 6
+          },
+          g: 7
+        }
+      });
+      notEqual(o.b, o1.b);
+      notEqual(o.b, o2.b);
+      notEqual(o.b.d, o1.b.d);
+      notEqual(o.b.d, o2.b.d);
+    });
+  });
+  describe('deepClone()', () => {
+    it('should do deep cloning', () => {
+      const o = {
+        a: 1,
+        b: {
+          c: 2,
+          d: 3
+        },
+        e: [4, 5],
+        f: /678gh/ig
+      };
+      const wrap = new Super(o);
+      const clone = wrap.deepClone().$;
+
+      deepStrictEqual(o, clone);
+      notEqual(o.b, clone.b);
+      notEqual(o.e, clone.e);
+    });
+  });
   describe('deepEquals()', () => {
     it('should return true with argument, which nested values are equal to context\'s', () => {
       const o = { a: { a: 1 } };
