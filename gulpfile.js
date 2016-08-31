@@ -76,6 +76,8 @@ gulp.task('build:default', () => {
 
   delete config.devtool;
 
+  config.output.filename = 'domc.js';
+
   return gulp.src('./browser.js')
     .pipe(webpackStream(config))
     .pipe(gulp.dest('./'));
@@ -86,6 +88,7 @@ gulp.task('build:min', () => {
 
   delete config.devtool;
 
+  config.output.filename = 'domc.min.js';
   config.plugins.push(new webpack.optimize.UglifyJsPlugin());
 
   return gulp.src('./browser.js')
