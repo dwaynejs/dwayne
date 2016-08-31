@@ -1,290 +1,260 @@
-import * as assert from 'assert';
-import HtmlElement, { find, findAll, loadImages, Elems } from '../lib/Elem';
+import { deepStrictEqual, strictEqual } from 'assert';
+import Elem, { find } from '../lib/Elem';
 import { array } from '../lib/Arr';
 import Super from '../lib/Super';
-import css from '../lib/constants/css';
 import elements from '../lib/constants/elements';
 
 const nativeDocument = global.document;
 
-describe('it should test HtmlElement#', () => {
-  describe('absolute()', () => {
-    it('should set position to absolute', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      wrap.absolute();
-
-      assert.strictEqual(elem.style.position, 'absolute');
-    });
-  });
+describe('it should test Elem#', () => {
+  // TODO: add()
   describe('addClasses()', () => {
     it('should add classes from arguments', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.addClasses('foo', 'bar', 'baz');
 
-      assert.strictEqual(elem.classList.contains('foo'), true);
-      assert.strictEqual(elem.classList.contains('bar'), true);
-      assert.strictEqual(elem.classList.contains('baz'), true);
+      strictEqual(elem.classList.contains('foo'), true);
+      strictEqual(elem.classList.contains('bar'), true);
+      strictEqual(elem.classList.contains('baz'), true);
     });
   });
   describe('addHTML()', () => {
     it('should add html to the end', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
       
       elem.innerHTML = '123';
       wrap.addHTML('<div></div>');
       
-      assert.strictEqual(elem.innerHTML, '123<div></div>');
+      strictEqual(elem.innerHTML, '123<div></div>');
     });
   });
   describe('addText()', () => {
     it('should add text to the end', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
       
       elem.innerHTML = '123';
       wrap.addText('<div></div>');
       
-      assert.strictEqual(elem.innerHTML, '123&lt;div&gt;&lt;/div&gt;');
+      strictEqual(elem.innerHTML, '123&lt;div&gt;&lt;/div&gt;');
     });
   });
   // TODO: addRule()
   describe('apply()', () => {
     it('should set id to the value from the string', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.apply('#domc');
 
-      assert.strictEqual(elem.id, 'domc');
+      strictEqual(elem.id, 'domc');
     });
     it('should add class from the string', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.apply('.domc');
 
-      assert.strictEqual(elem.classList.contains('domc'), true);
+      strictEqual(elem.classList.contains('domc'), true);
     });
     it('should remove class from the string', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.className = 'foo bar baz';
       wrap.apply('-.bar');
 
-      assert.strictEqual(elem.classList.contains('bar'), false);
+      strictEqual(elem.classList.contains('bar'), false);
     });
     it('should remove css property from the string', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.style.display = 'inline';
       wrap.apply('-@display');
 
-      assert.strictEqual(elem.style.display, '');
+      strictEqual(elem.style.display, '');
     });
     it('should remove attribute from the string', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.setAttribute('foo', 'bar');
       wrap.apply('-$foo');
 
-      assert.strictEqual(elem.hasAttribute('foo'), false);
+      strictEqual(elem.hasAttribute('foo'), false);
     });
     it('should set text to the value from the string', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.apply('&(domc text)');
 
-      assert.strictEqual(wrap.text(), 'domc text');
+      strictEqual(wrap.text(), 'domc text');
     });
     it('should set position to absolute', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.apply('-a');
 
-      assert.strictEqual(elem.style.position, 'absolute');
+      strictEqual(elem.style.position, 'absolute');
     });
     it('should set font-weight to bold', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.apply('-b');
 
-      assert.strictEqual(elem.style.fontWeight, 'bold');
+      strictEqual(elem.style.fontWeight, 'bold');
     });
     it('should set text-align to center', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.apply('-c');
 
-      assert.strictEqual(elem.style.textAlign, 'center');
+      strictEqual(elem.style.textAlign, 'center');
     });
     it('should set position to fixed', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.apply('-f');
 
-      assert.strictEqual(elem.style.position, 'fixed');
+      strictEqual(elem.style.position, 'fixed');
     });
     it('should hide the element', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.apply('-h');
 
-      assert.strictEqual(elem.style.display, 'none');
+      strictEqual(elem.style.display, 'none');
     });
     it('should set font-style to italic', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.apply('-i');
 
-      assert.strictEqual(elem.style.fontStyle, 'italic');
+      strictEqual(elem.style.fontStyle, 'italic');
     });
     it('should set position to relative', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.apply('-r');
 
-      assert.strictEqual(elem.style.position, 'relative');
+      strictEqual(elem.style.position, 'relative');
     });
     it('should show the element', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.style.display = 'inline';
       wrap.hide();
       wrap.apply('-s');
 
-      assert.strictEqual(elem.style.display, 'inline');
+      strictEqual(elem.style.display, 'inline');
     });
     it('should set opacity to 0', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.apply('-t');
 
-      assert.strictEqual(elem.style.opacity, '0');
+      strictEqual(elem.style.opacity, '0');
     });
     it('should set text-decoration-line to underline', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.apply('-u');
 
-      assert.strictEqual(elem.style.textDecorationLine, 'underline');
+      strictEqual(elem.style.textDecorationLine, 'underline');
     });
     it('should set css property from the string to the value from the string', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.apply('@border(1px solid black)');
 
-      assert.strictEqual(elem.style.border, '1px solid black');
+      strictEqual(elem.style.border, '1px solid black');
     });
     it('should set css property from the string to the value from the string', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.apply('@transform(scale(10px))');
 
-      assert.strictEqual(elem.style.transform, 'scale(10px)');
+      strictEqual(elem.style.transform, 'scale(10px)');
     });
     it('should set attribute from the string to the value from the string', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.apply('$domc(foo5)');
       
-      assert.strictEqual(elem.getAttribute('domc'), 'foo5');
+      strictEqual(elem.getAttribute('domc'), 'foo5');
     });
     it('should add attribute from the string', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.apply('$domc');
 
-      assert.strictEqual(elem.hasAttribute('domc'), true);
+      strictEqual(elem.hasAttribute('domc'), true);
     });
   });
   describe('attr()', () => {
     it('should return wrap of an object of attributes with no arguments', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.setAttribute('data', '123');
       elem.setAttribute('contentEditable', '');
 
-      assert.deepEqual(wrap.attr().$, { data: '123', contenteditable: '' });
+      deepStrictEqual(wrap.attr().$, { data: '123', contenteditable: '' });
     });
     it('should return value of an attribute with first string argument', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.setAttribute('data', '123');
 
-      assert.strictEqual(wrap.attr('data'), '123');
+      strictEqual(wrap.attr('data'), '123');
     });
     it('should support (attr, value) syntax', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.attr('data', '123');
 
-      assert.strictEqual(elem.getAttribute('data'), '123');
+      strictEqual(elem.getAttribute('data'), '123');
     });
     it('should support object property syntax', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.attr({ data: '123', contentEditable: '' });
 
-      assert.strictEqual(elem.getAttribute('data'), '123');
-      assert.strictEqual(elem.getAttribute('contentEditable'), '');
-    });
-  });
-  describe('block()', () => {
-    it('should set display to block', () => {
-      const elem = nativeDocument.createElement('span');
-      const wrap = new HtmlElement(elem);
-
-      wrap.block();
-
-      assert.strictEqual(elem.style.display, 'block');
-    });
-  });
-  describe('bold()', () => {
-    it('should set font-weight to bold', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      wrap.bold();
-
-      assert.strictEqual(elem.style.fontWeight, 'bold');
+      strictEqual(elem.getAttribute('data'), '123');
+      strictEqual(elem.getAttribute('contentEditable'), '');
     });
   });
   // TODO: calcCSS()
   describe('centerText()', () => {
     it('should set text-align to center', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.centerText();
 
-      assert.strictEqual(elem.style.textAlign, 'center');
+      strictEqual(elem.style.textAlign, 'center');
     });
   });
   // TODO: changeRule()
@@ -293,43 +263,43 @@ describe('it should test HtmlElement#', () => {
       const elem = nativeDocument.createElement('div');
       const child1 = nativeDocument.createElement('div');
       const child2 = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.appendChild(child1);
       elem.appendChild(child2);
 
-      assert.strictEqual(wrap.child(0).$, child1);
-      assert.strictEqual(wrap.child(1).$, child2);
+      strictEqual(wrap.child(0).$, child1);
+      strictEqual(wrap.child(1).$, child2);
     });
     it('should support (element) syntax', () => {
       const elem = nativeDocument.createElement('div');
       const child = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.child(child);
 
-      assert.strictEqual(elem.contains(child), true);
+      strictEqual(elem.contains(child), true);
     });
-    it('should support (D.HtmlElement) syntax', () => {
+    it('should support (Elem) syntax', () => {
       const elem = nativeDocument.createElement('div');
       const child = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-      const childWrap = new HtmlElement(child);
+      const wrap = new Elem(elem);
+      const childWrap = new Elem(child);
 
       wrap.child(childWrap);
 
-      assert.strictEqual(elem.contains(child), true);
+      strictEqual(elem.contains(child), true);
     });
     it('should support (selector) syntax', () => {
       const elem = nativeDocument.createElement('div');
       const child = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       child.id = 'domc-child';
       nativeDocument.body.appendChild(child);
       wrap.child('body #domc-child');
 
-      assert.strictEqual(elem.contains(child), true);
+      strictEqual(elem.contains(child), true);
     });
   });
   describe('children()', () => {
@@ -337,39 +307,39 @@ describe('it should test HtmlElement#', () => {
       const elem = nativeDocument.createElement('div');
       const child1 = nativeDocument.createElement('div');
       const child2 = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.appendChild(child1);
       elem.appendChild(child2);
 
       const children = wrap.children().$;
 
-      assert.strictEqual(children[0].$, child1);
-      assert.strictEqual(children[1].$, child2);
+      strictEqual(children[0].$, child1);
+      strictEqual(children[1].$, child2);
     });
   });
   describe('class()', () => {
     it('should return wrap of an array of classes with no arguments', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.className = 'foo bar baz';
 
-      assert.deepEqual(wrap.class().$, ['foo', 'bar', 'baz']);
+      deepStrictEqual(wrap.class().$, ['foo', 'bar', 'baz']);
     });
     it('should set className with more arguments', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.class('foo bar baz');
 
-      assert.strictEqual(elem.className, 'foo bar baz');
+      strictEqual(elem.className, 'foo bar baz');
     });
   });
   describe('click()', () => {
     it('should click the element', (done) => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.on('click', () => {
         done();
@@ -384,34 +354,34 @@ describe('it should test HtmlElement#', () => {
       const parent2 = nativeDocument.createElement('div');
       const parent3 = nativeDocument.createElement('div');
       const child = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(child);
+      const wrap = new Elem(child);
 
       parent1.appendChild(parent2);
       parent2.appendChild(parent3);
       parent3.appendChild(child);
 
-      assert.strictEqual(wrap.closest('.foo').$, null);
+      strictEqual(wrap.closest('.foo').$, null);
     });
     it('should return a wrap of itself if it matches selector', () => {
       const parent1 = nativeDocument.createElement('div');
       const parent2 = nativeDocument.createElement('div');
       const parent3 = nativeDocument.createElement('div');
       const child = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(child);
+      const wrap = new Elem(child);
 
       child.className = 'foo';
       parent1.appendChild(parent2);
       parent2.appendChild(parent3);
       parent3.appendChild(child);
 
-      assert.strictEqual(wrap.closest('.foo').$, child);
+      strictEqual(wrap.closest('.foo').$, child);
     });
     it('should return a wrap of closest parent, that matches selector', () => {
       const parent1 = nativeDocument.createElement('div');
       const parent2 = nativeDocument.createElement('div');
       const parent3 = nativeDocument.createElement('div');
       const child = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(child);
+      const wrap = new Elem(child);
 
       parent3.className = 'foo';
       parent2.className = 'foo';
@@ -419,7 +389,7 @@ describe('it should test HtmlElement#', () => {
       parent2.appendChild(parent3);
       parent3.appendChild(child);
 
-      assert.strictEqual(wrap.closest('.foo').$, parent3);
+      strictEqual(wrap.closest('.foo').$, parent3);
     });
   });
   // TODO: clone()
@@ -429,138 +399,104 @@ describe('it should test HtmlElement#', () => {
       const elem2 = nativeDocument.createElement('div');
       const elem3 = nativeDocument.createElement('div');
       const elem4 = nativeDocument.createElement('div');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
-      const wrap3 = new HtmlElement(elem3);
-      const wrap4 = new HtmlElement(elem4);
+      const wrap1 = new Elem(elem1);
+      const wrap2 = new Elem(elem2);
+      const wrap3 = new Elem(elem3);
+      const wrap4 = new Elem(elem4);
 
       elem1.appendChild(elem2);
       elem2.appendChild(elem3);
       
-      assert.strictEqual(wrap1.contains(elem2), true);
-      assert.strictEqual(wrap2.contains(elem3), true);
-      assert.strictEqual(wrap1.contains(elem4), false);
-      assert.strictEqual(wrap3.contains(elem4), false);
-      assert.strictEqual(wrap4.contains(elem3), false);
+      strictEqual(wrap1.contains(elem2), true);
+      strictEqual(wrap2.contains(elem3), true);
+      strictEqual(wrap1.contains(elem4), false);
+      strictEqual(wrap3.contains(elem4), false);
+      strictEqual(wrap4.contains(elem3), false);
     });
     it('should support (selector) syntax', () => {
       const parent = nativeDocument.createElement('div');
       const child = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(parent);
+      const wrap = new Elem(parent);
   
       parent.appendChild(child);
       child.id = 'foo';
       nativeDocument.body.appendChild(parent);
       
-      assert.strictEqual(wrap.contains('#foo'), true);
-      assert.strictEqual(wrap.contains('.foo'), false);
+      strictEqual(wrap.contains('#foo'), true);
+      strictEqual(wrap.contains('.foo'), false);
       
       parent.remove();
     });
-    it('should support (D.HtmlElement) syntax', () => {
+    it('should support (Elem) syntax', () => {
       const parent = nativeDocument.createElement('div');
       const child = nativeDocument.createElement('div');
-      const parentWrap = new HtmlElement(parent);
-      const childWrap = new HtmlElement(parent);
+      const parentWrap = new Elem(parent);
+      const childWrap = new Elem(parent);
   
       parent.appendChild(child);
       
-      assert.strictEqual(parentWrap.contains(childWrap), true);
+      strictEqual(parentWrap.contains(childWrap), true);
     });
   });
   describe('css()', () => {
     it('should return wrap of an object of css properties with no arguments', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.style.display = 'inline';
       elem.style.textAlign = 'center';
       elem.style.border = '1px solid black';
 
-      assert.deepEqual(wrap.css().$, { display: 'inline', textAlign: 'center', border: '1px solid black' });
+      deepStrictEqual(wrap.css().$, { display: 'inline', textAlign: 'center', border: '1px solid black' });
     });
     it('should return value of css property with first string argument', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.style.display = 'inline';
 
-      assert.strictEqual(wrap.css('display'), 'inline');
+      strictEqual(wrap.css('display'), 'inline');
     });
     it('should support (attr, value) syntax', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.css('display', 'inline');
 
-      assert.strictEqual(elem.style.display, 'inline');
+      strictEqual(elem.style.display, 'inline');
     });
     it('should support object property syntax', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.css({
         display: 'inline',
         cursor: 'pointer'
       });
 
-      assert.strictEqual(elem.style.display, 'inline');
-      assert.strictEqual(elem.style.cursor, 'pointer');
-    });
-  });
-  describe('[css-property]()', () => {
-    it('should check that get methods are working', () => {
-      new Super(css)
-        .keys()
-        .filter((css) => [
-          'borderImage',
-          'pageBreakAfter',
-          'pageBreakBefore',
-          'pageBreakInside'
-        ].indexOf(css) === -1)
-        .forEach((css) => {
-          const elem = nativeDocument.createElement('div');
-          const wrap = new HtmlElement(elem);
-
-          elem.style[css] = 'initial';
-
-          assert.strictEqual(wrap[css](), 'initial');
-        });
-    });
-    it('should check that set methods are working', () => {
-      new Super(css)
-        .keys()
-        .forEach((value) => {
-          const elem = nativeDocument.createElement('div');
-          const wrap = new HtmlElement(elem);
-
-          wrap[value]('initial');
-
-          if (['borderImage', 'pageBreakAfter', 'pageBreakBefore', 'pageBreakInside'].indexOf(value) === -1) {
-            assert.strictEqual(elem.style[value], 'initial');
-          }
-        });
+      strictEqual(elem.style.display, 'inline');
+      strictEqual(elem.style.cursor, 'pointer');
     });
   });
   describe('create()', () => {
     it('should return wrap of a new element inside context of type of first argument', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       const input = wrap.create('input').$;
 
-      assert.strictEqual(input.parentNode, elem);
-      assert.strictEqual(input.tagName.toLowerCase(), 'input');
+      strictEqual(input.parentNode, elem);
+      strictEqual(input.tagName.toLowerCase(), 'input');
     });
     it('should use second argument as applied expression', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       const input = wrap.create('input', '#123').$;
 
-      assert.strictEqual(input.parentNode, elem);
-      assert.strictEqual(input.tagName.toLowerCase(), 'input');
-      assert.strictEqual(input.id, '123');
+      strictEqual(input.parentNode, elem);
+      strictEqual(input.tagName.toLowerCase(), 'input');
+      strictEqual(input.id, '123');
     });
   });
   describe('[html-element]()', () => {
@@ -569,12 +505,12 @@ describe('it should test HtmlElement#', () => {
         .keys()
         .forEach((type) => {
           const elem = nativeDocument.createElement('div');
-          const wrap = new HtmlElement(elem);
+          const wrap = new Elem(elem);
 
           const created = wrap[type]().$;
 
-          assert.strictEqual(created.parentNode, elem);
-          assert.strictEqual(created.tagName.toLowerCase(), type);
+          strictEqual(created.parentNode, elem);
+          strictEqual(created.tagName.toLowerCase(), type);
         });
     });
     it('should use first argument as applied expression', () => {
@@ -582,96 +518,96 @@ describe('it should test HtmlElement#', () => {
         .keys()
         .forEach((type) => {
           const elem = nativeDocument.createElement('div');
-          const wrap = new HtmlElement(elem);
+          const wrap = new Elem(elem);
 
           const created = wrap[type](`.${ type }`).$;
 
-          assert.strictEqual(created.parentNode, elem);
-          assert.strictEqual(created.tagName.toLowerCase(), type);
-          assert.strictEqual(created.className, type);
+          strictEqual(created.parentNode, elem);
+          strictEqual(created.tagName.toLowerCase(), type);
+          strictEqual(created.className, type);
         });
     });
   });
   describe('data()', () => {
     it('should return wrap of a dataset object without arguments', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.setAttribute('data-domc-foo', '123');
       elem.setAttribute('data-domc-bar', '456');
 
-      assert.strictEqual(wrap.data().$, elem.dataset);
+      strictEqual(wrap.data().$, elem.dataset);
     });
     it('should return value of dataset parameter', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.setAttribute('data-domc-foo', '123');
       elem.setAttribute('data-domc-bar', '456');
 
-      assert.strictEqual(wrap.data('domcFoo'), '123');
+      strictEqual(wrap.data('domcFoo'), '123');
     });
     it('should support (key, value) setter syntax', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.data('domcFoo', '123');
 
-      assert.deepEqual(elem.dataset, { domcFoo: '123' });
+      deepStrictEqual(elem.dataset, { domcFoo: '123' });
     });
     it('should support ({ [key]: value, ... }) setter syntax', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.data({
         domcFoo: '123',
         domcBar: '456'
       });
 
-      assert.deepEqual(elem.dataset, { domcFoo: '123', domcBar: '456' });
+      deepStrictEqual(elem.dataset, { domcFoo: '123', domcBar: '456' });
     });
   });
   // TODO: deleteRule()
   describe('defaultValue()', () => {
     it('should return default value with no arguments', () => {
       const elem = nativeDocument.createElement('input');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.defaultValue = '123';
 
-      assert.strictEqual(wrap.defaultValue(), '123');
+      strictEqual(wrap.defaultValue(), '123');
     });
     it('should set default value with more arguments', () => {
       const elem = nativeDocument.createElement('input');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.defaultValue('123');
 
-      assert.strictEqual(elem.defaultValue, '123');
+      strictEqual(elem.defaultValue, '123');
     });
   });
   describe('disabled()', () => {
     it('should set disabled state to true with no arguments', () => {
       const elem = nativeDocument.createElement('button');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.disabled();
 
-      assert.strictEqual(elem.disabled, true);
+      strictEqual(elem.disabled, true);
     });
     it('should set disabled state to Boolean(argument)', () => {
       const elem = nativeDocument.createElement('button');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.disabled(null);
 
-      assert.strictEqual(elem.disabled, false);
+      strictEqual(elem.disabled, false);
     });
   });
   describe('dispatch()', () => {
     it('should dispatch event on element', (done) => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.on('click', () => {
         done();
@@ -680,7 +616,7 @@ describe('it should test HtmlElement#', () => {
     });
     it('should dispatch already constructed event', (done) => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       let event;
 
@@ -692,7 +628,7 @@ describe('it should test HtmlElement#', () => {
 
       wrap.on('click', (e) => {
         try {
-          assert.strictEqual(e, event);
+          strictEqual(e, event);
 
           done();
         } catch (err) {
@@ -703,13 +639,13 @@ describe('it should test HtmlElement#', () => {
     });
     it('should add details to event', (done) => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
       const unique = {};
 
       wrap.on('click', (e) => {
         try {
-          assert.deepEqual(e.detail, unique);
-          assert.deepEqual(e.data, unique);
+          deepStrictEqual(e.detail, unique);
+          deepStrictEqual(e.data, unique);
 
           done();
         } catch (err) {
@@ -722,37 +658,37 @@ describe('it should test HtmlElement#', () => {
   describe('draggable()', () => {
     it('should set draggable state to true with no arguments', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.draggable();
 
-      assert.strictEqual(elem.draggable, true);
+      strictEqual(elem.draggable, true);
     });
     it('should set draggable state to Boolean(argument)', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.draggable(null);
 
-      assert.strictEqual(elem.draggable, false);
+      strictEqual(elem.draggable, false);
     });
   });
   describe('editable()', () => {
     it('should set contentEditable state to true with no arguments', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.editable();
 
-      assert.strictEqual(elem.contentEditable, 'true');
+      strictEqual(elem.contentEditable, 'true');
     });
     it('should set contentEditable state to Boolean(argument)', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.editable(null);
 
-      assert.notStrictEqual(elem.contentEditable, 'true');
+      notEqual(elem.contentEditable, 'true');
     });
   });
   // TODO: elem()
@@ -762,7 +698,7 @@ describe('it should test HtmlElement#', () => {
       const child1 = nativeDocument.createElement('div');
       const child2 = nativeDocument.createElement('div');
       const child3 = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.appendChild(child1);
       elem.appendChild(child2);
@@ -771,14 +707,14 @@ describe('it should test HtmlElement#', () => {
       child1.className = 'foo';
       child3.className = 'foo';
 
-      assert.strictEqual(wrap.find('.foo').$, child1);
+      strictEqual(wrap.find('.foo').$, child1);
     });
     it('should find a wrap of null if not find', () => {
       const elem = nativeDocument.createElement('div');
       const child1 = nativeDocument.createElement('div');
       const child2 = nativeDocument.createElement('div');
       const child3 = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.appendChild(child1);
       elem.appendChild(child2);
@@ -787,153 +723,124 @@ describe('it should test HtmlElement#', () => {
       elem.className = 'foo';
       child3.className = 'foo';
 
-      assert.strictEqual(wrap.find('.bar').$, null);
+      strictEqual(wrap.find('.bar').$, null);
     });
   });
+  // TODO: filter()
   describe('first()', () => {
     it('should return wrap of the first child', () => {
       const elem1 = nativeDocument.createElement('div');
       const elem2 = nativeDocument.createElement('div');
       const child1 = nativeDocument.createElement('div');
       const child2 = nativeDocument.createElement('div');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
+      const wrap1 = new Elem(elem1);
+      const wrap2 = new Elem(elem2);
 
       elem1.appendChild(child1);
       elem1.appendChild(child2);
 
-      assert.strictEqual(wrap1.first().$, child1);
-      assert.strictEqual(wrap2.first().$, null);
+      strictEqual(wrap1.first().$, child1);
+      strictEqual(wrap2.first().$, null);
     });
     it('should return wrap of the first element child', () => {
       const elem = nativeDocument.createElement('div');
       const child1 = nativeDocument.createTextNode('div');
       const child2 = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.appendChild(child1);
       elem.appendChild(child2);
 
-      assert.strictEqual(wrap.first(true).$, child2);
-    });
-  });
-  describe('fixed()', () => {
-    it('should set position to fixed', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      wrap.fixed();
-
-      assert.strictEqual(elem.style.position, 'fixed');
+      strictEqual(wrap.first(true).$, child2);
     });
   });
   // TODO: getFormData()
   describe('hasAttr()', () => {
     it('should return true if the element has class', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.setAttribute('foo', 'bar');
       elem.setAttribute('bar', 'baz');
       elem.setAttribute('baz', 'foo');
 
-      assert.strictEqual(wrap.hasAttr('bar'), true);
+      strictEqual(wrap.hasAttr('bar'), true);
     });
     it('should return false if the element does not have class', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.setAttribute('foo', 'bar');
       elem.setAttribute('bar', 'baz');
       elem.setAttribute('baz', 'foo');
 
-      assert.strictEqual(wrap.hasAttr('a'), false);
+      strictEqual(wrap.hasAttr('a'), false);
     });
   });
   describe('hasClass()', () => {
     it('should return true if the element has class', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.className = 'foo bar baz';
 
-      assert.strictEqual(wrap.hasClass('bar'), true);
+      strictEqual(wrap.hasClass('bar'), true);
     });
     it('should return false if the element does not have class', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.className = 'foo bar baz';
 
-      assert.strictEqual(wrap.hasClass('a'), false);
+      strictEqual(wrap.hasClass('a'), false);
     });
   });
   describe('hide', () => {
     it('should set display to none and set element.domcData.previousDisplay to previous display', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.style.display = 'inline';
       wrap.hide();
 
-      assert.strictEqual(elem.style.display, 'none');
-      assert.strictEqual(elem.domcData.previousDisplay, 'inline');
+      strictEqual(elem.style.display, 'none');
+      strictEqual(elem.domcData.previousDisplay, 'inline');
     });
   });
   describe('html()', () => {
     it('should return innerHTML with no arguments', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.innerHTML = '<div></div>';
 
-      assert.strictEqual(wrap.html(), '<div></div>');
+      strictEqual(wrap.html(), '<div></div>');
     });
     it('should set innerHTML with more arguments', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.html('<div></div>');
 
-      assert.strictEqual(elem.innerHTML, '<div></div>');
+      strictEqual(elem.innerHTML, '<div></div>');
     });
   });
   describe('id()', () => {
     it('should return id with no arguments', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.id = 'domc';
 
-      assert.strictEqual(wrap.id(), 'domc');
+      strictEqual(wrap.id(), 'domc');
     });
     it('should set id with more arguments', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.id('domc');
 
-      assert.strictEqual(elem.id, 'domc');
-    });
-  });
-  describe('inline()', () => {
-    it('should set display to inline', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      wrap.inline();
-
-      assert.strictEqual(elem.style.display, 'inline');
-    });
-  });
-  describe('inlineBlock()', () => {
-    it('should set display to inline-block', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      wrap.inlineBlock();
-
-      assert.strictEqual(elem.style.display, 'inline-block');
+      strictEqual(elem.id, 'domc');
     });
   });
   describe('insertAfter()', () => {
@@ -941,32 +848,32 @@ describe('it should test HtmlElement#', () => {
       const elem = nativeDocument.createElement('div');
       const child1 = nativeDocument.createElement('div');
       const child2 = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(child2);
+      const wrap = new Elem(child2);
 
       elem.appendChild(child1);
       wrap.insertAfter(child1);
 
-      assert.deepEqual(elem.childNodes, [child1, child2]);
+      deepStrictEqual(elem.childNodes, [child1, child2]);
     });
     it('should insert context after argument', () => {
       const elem = nativeDocument.createElement('div');
       const child1 = nativeDocument.createElement('div');
       const child2 = nativeDocument.createElement('div');
       const child3 = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(child3);
+      const wrap = new Elem(child3);
 
       elem.appendChild(child1);
       elem.appendChild(child2);
       wrap.insertAfter(child1);
 
-      assert.deepEqual(elem.childNodes, [child1, child3, child2]);
+      deepStrictEqual(elem.childNodes, [child1, child3, child2]);
     });
     it('should support selector syntax', () => {
       const elem = nativeDocument.createElement('div');
       const child1 = nativeDocument.createElement('div');
       const child2 = nativeDocument.createElement('div');
       const child3 = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(child3);
+      const wrap = new Elem(child3);
 
       nativeDocument.body.appendChild(elem);
       child1.id = 'domc';
@@ -974,7 +881,7 @@ describe('it should test HtmlElement#', () => {
       elem.appendChild(child2);
       wrap.insertAfter('#domc');
 
-      assert.deepEqual(elem.childNodes, [child1, child3, child2]);
+      deepStrictEqual(elem.childNodes, [child1, child3, child2]);
 
       elem.remove();
     });
@@ -984,32 +891,32 @@ describe('it should test HtmlElement#', () => {
       const elem = nativeDocument.createElement('div');
       const child1 = nativeDocument.createElement('div');
       const child2 = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(child2);
+      const wrap = new Elem(child2);
 
       elem.appendChild(child1);
       wrap.insertBefore(child1);
 
-      assert.deepEqual(elem.childNodes, [child2, child1]);
+      deepStrictEqual(elem.childNodes, [child2, child1]);
     });
     it('should insert context before argument', () => {
       const elem = nativeDocument.createElement('div');
       const child1 = nativeDocument.createElement('div');
       const child2 = nativeDocument.createElement('div');
       const child3 = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(child3);
+      const wrap = new Elem(child3);
 
       elem.appendChild(child1);
       elem.appendChild(child2);
       wrap.insertBefore(child2);
 
-      assert.deepEqual(elem.childNodes, [child1, child3, child2]);
+      deepStrictEqual(elem.childNodes, [child1, child3, child2]);
     });
     it('should support selector syntax', () => {
       const elem = nativeDocument.createElement('div');
       const child1 = nativeDocument.createElement('div');
       const child2 = nativeDocument.createElement('div');
       const child3 = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(child3);
+      const wrap = new Elem(child3);
 
       nativeDocument.body.appendChild(elem);
       child2.id = 'domc';
@@ -1017,7 +924,7 @@ describe('it should test HtmlElement#', () => {
       elem.appendChild(child2);
       wrap.insertBefore('#domc');
 
-      assert.deepEqual(elem.childNodes, [child1, child3, child2]);
+      deepStrictEqual(elem.childNodes, [child1, child3, child2]);
 
       elem.remove();
     });
@@ -1026,160 +933,140 @@ describe('it should test HtmlElement#', () => {
     it('should support (element) syntax', () => {
       const elem = nativeDocument.createElement('div');
       const parent = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.into(parent);
 
-      assert.strictEqual(parent.contains(elem), true);
+      strictEqual(parent.contains(elem), true);
     });
-    it('should support (D.HtmlElement) syntax', () => {
+    it('should support (Elem) syntax', () => {
       const elem = nativeDocument.createElement('div');
       const parent = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-      const parentWrap = new HtmlElement(parent);
+      const wrap = new Elem(elem);
+      const parentWrap = new Elem(parent);
 
       wrap.into(parentWrap);
 
-      assert.strictEqual(parent.contains(elem), true);
+      strictEqual(parent.contains(elem), true);
     });
     it('should support (selector) syntax', () => {
       const elem = nativeDocument.createElement('div');
       const parent = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       parent.id = 'domc-parent';
       nativeDocument.body.appendChild(parent);
       wrap.into('body #domc-parent');
 
-      assert.strictEqual(parent.contains(elem), true);
+      strictEqual(parent.contains(elem), true);
 
       parent.remove();
     });
   });
   // TODO: isBroken()
-  describe('italic()', () => {
-    it('should set font-style to italic', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      wrap.italic();
-
-      assert.strictEqual(elem.style.fontStyle, 'italic');
-    });
-  });
   describe('last()', () => {
     it('should return wrap of the last child', () => {
       const elem1 = nativeDocument.createElement('div');
       const elem2 = nativeDocument.createElement('div');
       const child1 = nativeDocument.createElement('div');
       const child2 = nativeDocument.createElement('div');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
+      const wrap1 = new Elem(elem1);
+      const wrap2 = new Elem(elem2);
 
       elem1.appendChild(child1);
       elem1.appendChild(child2);
 
-      assert.strictEqual(wrap1.last().$, child2);
-      assert.strictEqual(wrap2.last().$, null);
+      strictEqual(wrap1.last().$, child2);
+      strictEqual(wrap2.last().$, null);
     });
     it('should return wrap of the last element child', () => {
       const elem = nativeDocument.createElement('div');
       const child1 = nativeDocument.createElement('div');
       const child2 = nativeDocument.createTextNode('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.appendChild(child1);
       elem.appendChild(child2);
 
-      assert.strictEqual(wrap.last(true).$, child1);
-    });
-  });
-  describe('lineThrough()', () => {
-    it('should set text-decoration-line to line-through', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      wrap.lineThrough();
-
-      assert.strictEqual(elem.style.textDecorationLine, 'line-through');
+      strictEqual(wrap.last(true).$, child1);
     });
   });
   // TODO: load()
   describe('matches()', () => {
     it('should return if context matches selector', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.id = 'foo';
       elem.className = 'bar';
       elem.setAttribute('baz', '');
 
-      assert.strictEqual(wrap.matches('#foo.bar[baz]'), true);
-      assert.strictEqual(wrap.matches('#foo.bar[bar]'), false);
+      strictEqual(wrap.matches('#foo.bar[baz]'), true);
+      strictEqual(wrap.matches('#foo.bar[bar]'), false);
     });
   });
   describe('moveAttr()', () => {
     it('should add attribute and set value to "" with 1 argument', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.moveAttr('domc1');
 
-      assert.strictEqual(elem.getAttribute('domc1'), '');
+      strictEqual(elem.getAttribute('domc1'), '');
     });
     it('should add attribute and set value to the second argument with 2 arguments', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.moveAttr('domc2', 'value');
 
-      assert.strictEqual(elem.getAttribute('domc2'), 'value');
+      strictEqual(elem.getAttribute('domc2'), 'value');
     });
     it('should move attribute and set value to previous with 1 argument', () => {
       const elem1 = nativeDocument.createElement('div');
       const elem2 = nativeDocument.createElement('div');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
+      const wrap1 = new Elem(elem1);
+      const wrap2 = new Elem(elem2);
 
       wrap1.moveAttr('domc3', 'value');
       wrap2.moveAttr('domc3');
 
-      assert.strictEqual(elem1.hasAttribute('domc3'), false);
-      assert.strictEqual(elem2.getAttribute('domc3'), 'value');
+      strictEqual(elem1.hasAttribute('domc3'), false);
+      strictEqual(elem2.getAttribute('domc3'), 'value');
     });
     it('should move attribute and set value to the second argument with 2 arguments', () => {
       const elem1 = nativeDocument.createElement('div');
       const elem2 = nativeDocument.createElement('div');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
+      const wrap1 = new Elem(elem1);
+      const wrap2 = new Elem(elem2);
 
       wrap1.moveAttr('domc4', 'oldValue');
       wrap2.moveAttr('domc4', 'newValue');
 
-      assert.strictEqual(elem1.hasAttribute('domc4'), false);
-      assert.strictEqual(elem2.getAttribute('domc4'), 'newValue');
+      strictEqual(elem1.hasAttribute('domc4'), false);
+      strictEqual(elem2.getAttribute('domc4'), 'newValue');
     });
   });
   describe('moveClass()', () => {
     it('should add class if there was no last element', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.moveClass('domc1');
 
-      assert.strictEqual(elem.classList.contains('domc1'), true);
+      strictEqual(elem.classList.contains('domc1'), true);
     });
     it('should move class if there was last element', () => {
       const elem1 = nativeDocument.createElement('div');
       const elem2 = nativeDocument.createElement('div');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
+      const wrap1 = new Elem(elem1);
+      const wrap2 = new Elem(elem2);
 
       wrap1.moveClass('domc3');
       wrap2.moveClass('domc3');
 
-      assert.strictEqual(elem1.classList.contains('domc3'), false);
-      assert.strictEqual(elem2.classList.contains('domc3'), true);
+      strictEqual(elem1.classList.contains('domc3'), false);
+      strictEqual(elem2.classList.contains('domc3'), true);
     });
   });
   describe('get name', () => {
@@ -1187,13 +1074,13 @@ describe('it should test HtmlElement#', () => {
       const div = nativeDocument.createElement('div');
       const input = nativeDocument.createElement('input');
       const fieldset = nativeDocument.createElement('fieldset');
-      const divWrap = new HtmlElement(div);
-      const inputWrap = new HtmlElement(input);
-      const fieldsetWrap = new HtmlElement(fieldset);
+      const divWrap = new Elem(div);
+      const inputWrap = new Elem(input);
+      const fieldsetWrap = new Elem(fieldset);
 
-      assert.strictEqual(divWrap.name, 'div');
-      assert.strictEqual(inputWrap.name, 'input');
-      assert.strictEqual(fieldsetWrap.name, 'fieldset');
+      strictEqual(divWrap.name, 'div');
+      strictEqual(inputWrap.name, 'input');
+      strictEqual(fieldsetWrap.name, 'fieldset');
     });
   });
   describe('next()', () => {
@@ -1201,34 +1088,34 @@ describe('it should test HtmlElement#', () => {
       const parent = nativeDocument.createElement('div');
       const elem1 = nativeDocument.createElement('div');
       const elem2 = nativeDocument.createElement('div');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
+      const wrap1 = new Elem(elem1);
+      const wrap2 = new Elem(elem2);
 
       parent.appendChild(elem1);
       parent.appendChild(elem2);
 
-      assert.strictEqual(wrap1.next().$, elem2);
-      assert.strictEqual(wrap2.next().$, null);
+      strictEqual(wrap1.next().$, elem2);
+      strictEqual(wrap2.next().$, null);
     });
     it('should return a wrap of the next element sibling', () => {
       const elem = nativeDocument.createElement('div');
       const child1 = nativeDocument.createElement('div');
       const child2 = nativeDocument.createTextNode('div');
       const child3 = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(child1);
+      const wrap = new Elem(child1);
 
       elem.appendChild(child1);
       elem.appendChild(child2);
       elem.appendChild(child3);
 
-      assert.strictEqual(wrap.next(true).$, child3);
+      strictEqual(wrap.next(true).$, child3);
     });
   });
   // TODO: off()
   describe('on()', () => {
     it('should support (event, listener) syntax', (done) => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.on('click', () => {
         done();
@@ -1239,7 +1126,7 @@ describe('it should test HtmlElement#', () => {
       let times = 0;
 
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
       const listener = () => {
         if (++times === 2) {
           done();
@@ -1258,7 +1145,7 @@ describe('it should test HtmlElement#', () => {
       let times = 0;
 
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
       const removeListener = wrap.on('click', () => {
         if (++times === 1) {
           return removeListener();
@@ -1276,21 +1163,11 @@ describe('it should test HtmlElement#', () => {
   describe('get outerHTML', () => {
     it('should return the same as element.outerHTML', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.innerHTML = '<input />';
 
-      assert.strictEqual(wrap.outerHTML, elem.outerHTML);
-    });
-  });
-  describe('overline()', () => {
-    it('should set text-decoration-line to overline', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      wrap.overline();
-
-      assert.strictEqual(elem.style.textDecorationLine, 'overline');
+      strictEqual(wrap.outerHTML, elem.outerHTML);
     });
   });
   describe('parent()', () => {
@@ -1298,13 +1175,13 @@ describe('it should test HtmlElement#', () => {
       const elem1 = nativeDocument.createElement('div');
       const elem2 = nativeDocument.createElement('div');
       const parent = nativeDocument.createElement('div');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
+      const wrap1 = new Elem(elem1);
+      const wrap2 = new Elem(elem2);
 
       parent.appendChild(elem1);
 
-      assert.strictEqual(wrap1.parent().$, parent);
-      assert.strictEqual(wrap2.parent().$, null);
+      strictEqual(wrap1.parent().$, parent);
+      strictEqual(wrap2.parent().$, null);
     });
   });
   describe('parentTree()', () => {
@@ -1313,7 +1190,7 @@ describe('it should test HtmlElement#', () => {
       const parent2 = nativeDocument.createElement('div');
       const parent3 = nativeDocument.createElement('div');
       const child = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(child);
+      const wrap = new Elem(child);
 
       parent1.appendChild(parent2);
       parent2.appendChild(parent3);
@@ -1321,19 +1198,9 @@ describe('it should test HtmlElement#', () => {
 
       const tree = wrap.parentTree().$;
 
-      assert.strictEqual(tree[0].$, parent3);
-      assert.strictEqual(tree[1].$, parent2);
-      assert.strictEqual(tree[2].$, parent1);
-    });
-  });
-  describe('pointer()', () => {
-    it('should set cursor to pointer', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      wrap.pointer();
-
-      assert.strictEqual(elem.style.cursor, 'pointer');
+      strictEqual(tree[0].$, parent3);
+      strictEqual(tree[1].$, parent2);
+      strictEqual(tree[2].$, parent1);
     });
   });
   describe('prev()', () => {
@@ -1341,83 +1208,73 @@ describe('it should test HtmlElement#', () => {
       const parent = nativeDocument.createElement('div');
       const elem1 = nativeDocument.createElement('div');
       const elem2 = nativeDocument.createElement('div');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
+      const wrap1 = new Elem(elem1);
+      const wrap2 = new Elem(elem2);
 
       parent.appendChild(elem1);
       parent.appendChild(elem2);
 
-      assert.strictEqual(wrap1.prev().$, null);
-      assert.strictEqual(wrap2.prev().$, elem1);
+      strictEqual(wrap1.prev().$, null);
+      strictEqual(wrap2.prev().$, elem1);
     });
     it('should return a wrap of the previous element sibling', () => {
       const elem = nativeDocument.createElement('div');
       const child1 = nativeDocument.createElement('div');
       const child2 = nativeDocument.createTextNode('div');
       const child3 = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(child3);
+      const wrap = new Elem(child3);
 
       elem.appendChild(child1);
       elem.appendChild(child2);
       elem.appendChild(child3);
 
-      assert.strictEqual(wrap.prev(true).$, child1);
+      strictEqual(wrap.prev(true).$, child1);
     });
   });
   // TODO: ref()
-  describe('relative()', () => {
-    it('should set position to relative', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      wrap.relative();
-
-      assert.strictEqual(elem.style.position, 'relative');
-    });
-  });
   describe('remove()', () => {
     it('should remove the element', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       nativeDocument.body.appendChild(elem);
       wrap.remove();
 
-      assert.strictEqual(nativeDocument.body.contains(elem), false);
+      strictEqual(nativeDocument.body.contains(elem), false);
     });
   });
   describe('removeAttr()', () => {
     it('should remove attributes from arguments', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.setAttribute('foo', 'bar');
       elem.setAttribute('bar', 'baz');
       elem.setAttribute('baz', 'foo');
       wrap.removeAttr('foo', 'bar', 'baz');
 
-      assert.strictEqual(elem.hasAttribute('foo'), false);
-      assert.strictEqual(elem.hasAttribute('bar'), false);
-      assert.strictEqual(elem.hasAttribute('baz'), false);
+      strictEqual(elem.hasAttribute('foo'), false);
+      strictEqual(elem.hasAttribute('bar'), false);
+      strictEqual(elem.hasAttribute('baz'), false);
     });
   });
   describe('removeClasses()', () => {
     it('should remove classes from arguments', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.className = 'foo bar baz';
       wrap.removeClasses('foo', 'bar', 'baz');
 
-      assert.strictEqual(elem.classList.contains('foo'), false);
-      assert.strictEqual(elem.classList.contains('bar'), false);
-      assert.strictEqual(elem.classList.contains('baz'), false);
+      strictEqual(elem.classList.contains('foo'), false);
+      strictEqual(elem.classList.contains('bar'), false);
+      strictEqual(elem.classList.contains('baz'), false);
     });
   });
   describe('removeCSS()', () => {
     it('should remove css properties from arguments', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.style.display = 'inline';
       elem.style.cursor = 'pointer';
@@ -1425,94 +1282,94 @@ describe('it should test HtmlElement#', () => {
 
       wrap.removeCSS('display', 'cursor', 'margin');
 
-      assert.strictEqual(elem.style.display, '');
-      assert.strictEqual(elem.style.cursor, '');
-      assert.strictEqual(elem.style.margin, '');
-      assert.strictEqual(elem.style.marginLeft, '');
-      assert.strictEqual(elem.style.marginTop, '');
-      assert.strictEqual(elem.style.marginRight, '');
-      assert.strictEqual(elem.style.marginBottom, '');
+      strictEqual(elem.style.display, '');
+      strictEqual(elem.style.cursor, '');
+      strictEqual(elem.style.margin, '');
+      strictEqual(elem.style.marginLeft, '');
+      strictEqual(elem.style.marginTop, '');
+      strictEqual(elem.style.marginRight, '');
+      strictEqual(elem.style.marginBottom, '');
     });
   });
   // TODO: replace()
   describe('setOf', () => {
     it('should add set of elements of specified type', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
       const elements = [];
 
       wrap.setOf('div', 3, (elem) => {
         elements.push(elem.$);
       });
 
-      assert.deepEqual(elem.childNodes, elements);
+      deepStrictEqual(elem.childNodes, elements);
     });
   });
   describe('show', () => {
     it('should not change display if it is not none and delete element.domcData.previousDisplay', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.hide();
       elem.style.display = 'inline';
       wrap.show();
 
-      assert.strictEqual(elem.style.display, 'inline');
-      assert.strictEqual('previousDisplay' in elem.domcData, false);
+      strictEqual(elem.style.display, 'inline');
+      strictEqual('previousDisplay' in elem.domcData, false);
     });
     it('should set display to element.domcData.previousDisplay', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.style.display = 'inline';
       wrap.hide();
       wrap.show();
 
-      assert.strictEqual(elem.style.display, 'inline');
+      strictEqual(elem.style.display, 'inline');
     });
   });
   describe('text()', () => {
     it('should get text of the element with no arguments', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.innerHTML = '123';
 
-      assert.strictEqual(wrap.text(), '123');
+      strictEqual(wrap.text(), '123');
     });
     it('should set text of the element', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.text('123');
 
-      assert.strictEqual(elem.innerHTML, '123');
+      strictEqual(elem.innerHTML, '123');
     });
   });
   describe('toggleAttr()', () => {
     it('should toggle attribute from argument if it is one', () => {
       const elem1 = nativeDocument.createElement('div');
       const elem2 = nativeDocument.createElement('div');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
+      const wrap1 = new Elem(elem1);
+      const wrap2 = new Elem(elem2);
 
       elem1.setAttribute('foo', 'bar');
       elem2.setAttribute('foo', 'bar');
       wrap1.toggleAttr('foo');
       wrap2.toggleAttr('baz');
 
-      assert.strictEqual(elem1.hasAttribute('foo'), false);
-      assert.strictEqual(elem2.hasAttribute('baz'), true);
+      strictEqual(elem1.hasAttribute('foo'), false);
+      strictEqual(elem2.hasAttribute('baz'), true);
     });
     it('should add attribute from the first argument if the second is truthy and remove if not', () => {
       const elem1 = nativeDocument.createElement('div');
       const elem2 = nativeDocument.createElement('div');
       const elem3 = nativeDocument.createElement('div');
       const elem4 = nativeDocument.createElement('div');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
-      const wrap3 = new HtmlElement(elem3);
-      const wrap4 = new HtmlElement(elem4);
+      const wrap1 = new Elem(elem1);
+      const wrap2 = new Elem(elem2);
+      const wrap3 = new Elem(elem3);
+      const wrap4 = new Elem(elem4);
 
       elem1.setAttribute('foo', 'bar');
       elem2.setAttribute('foo', 'bar');
@@ -1524,36 +1381,36 @@ describe('it should test HtmlElement#', () => {
       wrap3.toggleAttr('baz', null);
       wrap4.toggleAttr('baz', 1);
 
-      assert.strictEqual(elem1.hasAttribute('foo'), false);
-      assert.strictEqual(elem2.hasAttribute('foo'), true);
-      assert.strictEqual(elem3.hasAttribute('baz'), false);
-      assert.strictEqual(elem4.hasAttribute('baz'), true);
+      strictEqual(elem1.hasAttribute('foo'), false);
+      strictEqual(elem2.hasAttribute('foo'), true);
+      strictEqual(elem3.hasAttribute('baz'), false);
+      strictEqual(elem4.hasAttribute('baz'), true);
     });
   });
   describe('toggleClass()', () => {
     it('should toggle class from argument if it is one', () => {
       const elem1 = nativeDocument.createElement('div');
       const elem2 = nativeDocument.createElement('div');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
+      const wrap1 = new Elem(elem1);
+      const wrap2 = new Elem(elem2);
 
       elem1.className = 'foo bar';
       elem2.className = 'foo bar';
       wrap1.toggleClass('foo');
       wrap2.toggleClass('baz');
 
-      assert.strictEqual(elem1.classList.contains('foo'), false);
-      assert.strictEqual(elem2.classList.contains('baz'), true);
+      strictEqual(elem1.classList.contains('foo'), false);
+      strictEqual(elem2.classList.contains('baz'), true);
     });
     it('should add class from the first argument if the second is truthy and remove if not', () => {
       const elem1 = nativeDocument.createElement('div');
       const elem2 = nativeDocument.createElement('div');
       const elem3 = nativeDocument.createElement('div');
       const elem4 = nativeDocument.createElement('div');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
-      const wrap3 = new HtmlElement(elem3);
-      const wrap4 = new HtmlElement(elem4);
+      const wrap1 = new Elem(elem1);
+      const wrap2 = new Elem(elem2);
+      const wrap3 = new Elem(elem3);
+      const wrap4 = new Elem(elem4);
 
       elem1.className = 'foo bar';
       elem2.className = 'foo bar';
@@ -1565,88 +1422,78 @@ describe('it should test HtmlElement#', () => {
       wrap3.toggleClass('baz', null);
       wrap4.toggleClass('baz', 1);
 
-      assert.strictEqual(elem1.classList.contains('foo'), false);
-      assert.strictEqual(elem2.classList.contains('foo'), true);
-      assert.strictEqual(elem3.classList.contains('baz'), false);
-      assert.strictEqual(elem4.classList.contains('baz'), true);
+      strictEqual(elem1.classList.contains('foo'), false);
+      strictEqual(elem2.classList.contains('foo'), true);
+      strictEqual(elem3.classList.contains('baz'), false);
+      strictEqual(elem4.classList.contains('baz'), true);
     });
   });
   describe('type()', () => {
     it('should return type with no arguments', () => {
       const elem = nativeDocument.createElement('input');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.type = 'email';
 
-      assert.strictEqual(wrap.type(), 'email');
+      strictEqual(wrap.type(), 'email');
     });
     it('should set type with more arguments', () => {
       const elem = nativeDocument.createElement('input');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.type('email');
 
-      assert.strictEqual(elem.type, 'email');
-    });
-  });
-  describe('underline()', () => {
-    it('should set text-decoration-line to underline', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
-
-      wrap.underline();
-
-      assert.strictEqual(elem.style.textDecorationLine, 'underline');
+      strictEqual(elem.type, 'email');
     });
   });
   describe('up()', () => {
     it('should return a wrap of the parent element with no arguments', () => {
       const elem = nativeDocument.createElement('div');
       const parent = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       parent.appendChild(elem);
 
-      assert.strictEqual(wrap.up().$, parent);
+      strictEqual(wrap.up().$, parent);
     });
     it('should return a wrap of the element with 0 argument', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
-      assert.strictEqual(wrap.up(0).$, elem);
+      strictEqual(wrap.up(0).$, elem);
     });
     it('should return a wrap of the n-th parent element with n argument', () => {
       const parent1 = nativeDocument.createElement('div');
       const parent2 = nativeDocument.createElement('div');
       const parent3 = nativeDocument.createElement('div');
       const child = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(child);
+      const wrap = new Elem(child);
 
       parent1.appendChild(parent2);
       parent2.appendChild(parent3);
       parent3.appendChild(child);
 
-      assert.strictEqual(wrap.up(1).$, parent3);
-      assert.strictEqual(wrap.up(2).$, parent2);
-      assert.strictEqual(wrap.up(3).$, parent1);
+      strictEqual(wrap.up(1).$, parent3);
+      strictEqual(wrap.up(2).$, parent2);
+      strictEqual(wrap.up(3).$, parent1);
     });
   });
   describe('get valid', () => {
     it('should return true if element is not validated', () => {
       const elem = nativeDocument.createElement('div');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
-      assert.strictEqual(wrap.valid, true);
+      strictEqual(wrap.valid, true);
     });
     it('should return if the element is valid', () => {
       const elem1 = nativeDocument.createElement('input');
       const elem2 = nativeDocument.createElement('input');
       const elem3 = nativeDocument.createElement('input');
       const elem4 = nativeDocument.createElement('input');
-      const wrap1 = new HtmlElement(elem1);
-      const wrap2 = new HtmlElement(elem2);
-      const wrap3 = new HtmlElement(elem3);
-      const wrap4 = new HtmlElement(elem4);
+      const wrap1 = new Elem(elem1);
+      const wrap2 = new Elem(elem2);
+      const wrap3 = new Elem(elem3);
+      const wrap4 = new Elem(elem4);
 
       elem1.required = true;
       elem3.type = 'email';
@@ -1654,33 +1501,33 @@ describe('it should test HtmlElement#', () => {
       elem4.type = 'email';
       elem4.value = 'example@subdomain.domain';
 
-      assert.strictEqual(wrap1.valid, false);
-      assert.strictEqual(wrap2.valid, true);
-      assert.strictEqual(wrap3.valid, false);
-      assert.strictEqual(wrap4.valid, true);
+      strictEqual(wrap1.valid, false);
+      strictEqual(wrap2.valid, true);
+      strictEqual(wrap3.valid, false);
+      strictEqual(wrap4.valid, true);
     });
   });
   describe('value()', () => {
     it('should return value with no arguments', () => {
       const elem = nativeDocument.createElement('input');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       elem.value = 'domc';
 
-      assert.strictEqual(wrap.value(), 'domc');
+      strictEqual(wrap.value(), 'domc');
     });
     it('should set value with more arguments', () => {
       const elem = nativeDocument.createElement('input');
-      const wrap = new HtmlElement(elem);
+      const wrap = new Elem(elem);
 
       wrap.value('domc');
 
-      assert.strictEqual(elem.value, 'domc');
+      strictEqual(elem.value, 'domc');
     });
   });
 });
 
-describe('it should test exported methods from HtmlElement', () => {
+describe('it should test exported methods from Elem', () => {
   describe('find()', () => {
     it('should find a wrap of first element in nested children, that matches selector', () => {
       const elem = nativeDocument.createElement('div');
@@ -1696,7 +1543,7 @@ describe('it should test exported methods from HtmlElement', () => {
       child1.className = 'foo';
       child3.className = 'foo';
 
-      assert.strictEqual(find('.foo').$, child1);
+      strictEqual(find('.foo').$, child1);
 
       elem.remove();
     });
@@ -1714,7 +1561,7 @@ describe('it should test exported methods from HtmlElement', () => {
       elem.className = 'foo';
       child3.className = 'foo';
 
-      assert.strictEqual(find('.bar').$, null);
+      strictEqual(find('.bar').$, null);
 
       elem.remove();
     });
@@ -1736,8 +1583,8 @@ describe('it should test exported methods from HtmlElement', () => {
 
       const found = findAll('.foo').$;
 
-      assert.strictEqual(found[0].$, child1);
-      assert.strictEqual(found[1].$, child3);
+      strictEqual(found[0].$, child1);
+      strictEqual(found[1].$, child3);
 
       elem.remove();
     });
@@ -1755,57 +1602,9 @@ describe('it should test exported methods from HtmlElement', () => {
       elem.className = 'foo';
       child3.className = 'foo';
 
-      assert.deepEqual(findAll('.bar').$, []);
+      deepStrictEqual(findAll('.bar').$, []);
 
       elem.remove();
-    });
-  });
-  describe('loadImages()', () => {
-    it('return promise.all for all images', function (done) {
-      this.timeout(5000);
-
-      const source = [
-        'https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png',
-        'http://cdni.wired.co.uk/1920x1280/g_j/GOOGLELOGO_1.jpg',
-        'https://www.facebookbrand.com/img/fb-art.jpg'
-      ];
-
-      loadImages(new Super(source))
-        .then((images) => {
-          assert.deepEqual(images.map((img) => img.ref()).$, source);
-
-          done();
-        })
-        .catch(done);
-    });
-    it('return resolve already loaded images as well', (done) => {
-      const source = 'https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png';
-      const img = nativeDocument.createElement('img');
-
-      img.onload = load;
-      img.src = source;
-
-      function load() {
-        loadImages([img])
-          .then((images) => {
-            assert.strictEqual(images.$[0].ref(), source);
-
-            done();
-          })
-          .catch(done);
-      }
-    });
-    it('return resolve broken images as well', function (done) {
-      this.timeout(3000);
-      const source = 'http://localhost/some/broken/image';
-
-      loadImages([source])
-        .then((images) => {
-          assert.strictEqual(images.$[0].ref(), source);
-
-          done();
-        })
-        .catch(done);
     });
   });
   // TODO: parseHTML()
@@ -1850,7 +1649,7 @@ describe('it should test Elems#', () => {
       wrap.into(parent);
 
       wrap.forEach((elem) => {
-        assert.strictEqual(elem.parent().$, parent);
+        strictEqual(elem.parent().$, parent);
       });
     });
   });
@@ -1863,8 +1662,8 @@ describe('it should test Elems#', () => {
       wrap.hide();
 
       wrap.forEach((elem) => {
-        assert.strictEqual(elem.css('display'), 'none');
-        assert.strictEqual(elem.$.domcData.previousDisplay, 'inline');
+        strictEqual(elem.css('display'), 'none');
+        strictEqual(elem.$.domcData.previousDisplay, 'inline');
       });
     });
   });
@@ -1904,7 +1703,7 @@ describe('it should test Elems#', () => {
 
       wrap.remove();
 
-      assert.strictEqual(nativeDocument.getElementsByClassName('foo').length, all - count);
+      strictEqual(nativeDocument.getElementsByClassName('foo').length, all - count);
     });
   });
   describe('show()', () => {
@@ -1917,7 +1716,7 @@ describe('it should test Elems#', () => {
       wrap.show();
 
       wrap.forEach((elem) => {
-        assert.strictEqual(elem.css('display'), 'inline');
+        strictEqual(elem.css('display'), 'inline');
       });
     });
   });
