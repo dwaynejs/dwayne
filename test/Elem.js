@@ -755,6 +755,7 @@ describe('it should test Elem#', () => {
     });
   });
   // TODO: getFormData()
+  // TODO: getRule()
   describe('hasAttr()', () => {
     it('should return true if the element has class', () => {
       const elem = nativeDocument.createElement('div');
@@ -1478,35 +1479,7 @@ describe('it should test Elem#', () => {
       strictEqual(wrap.up(3).$, parent1);
     });
   });
-  describe('get valid', () => {
-    it('should return true if element is not validated', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
-
-      strictEqual(wrap.valid, true);
-    });
-    it('should return if the element is valid', () => {
-      const elem1 = nativeDocument.createElement('input');
-      const elem2 = nativeDocument.createElement('input');
-      const elem3 = nativeDocument.createElement('input');
-      const elem4 = nativeDocument.createElement('input');
-      const wrap1 = new Elem(elem1);
-      const wrap2 = new Elem(elem2);
-      const wrap3 = new Elem(elem3);
-      const wrap4 = new Elem(elem4);
-
-      elem1.required = true;
-      elem3.type = 'email';
-      elem3.value = '123';
-      elem4.type = 'email';
-      elem4.value = 'example@subdomain.domain';
-
-      strictEqual(wrap1.valid, false);
-      strictEqual(wrap2.valid, true);
-      strictEqual(wrap3.valid, false);
-      strictEqual(wrap4.valid, true);
-    });
-  });
+  // TODO: validate()
   describe('value()', () => {
     it('should return value with no arguments', () => {
       const elem = nativeDocument.createElement('input');
