@@ -5,4 +5,5 @@ assign(D, statics);
 
 delete D.default;
 
+export * from './lib';
 export default D;
