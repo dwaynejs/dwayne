@@ -143,7 +143,7 @@ describe('it should test Func#', () => {
       const func = concat;
       const wrap = new Func(func);
 
-      wrap.bind('concat: ', [1, 2, 3]);
+      wrap.bind('concat: ', 1, 2, 3);
 
       strictEqual(wrap(4, 5), 'concat: 12345');
     });
@@ -289,7 +289,7 @@ describe('it should test Func#', () => {
       const wrap = new Func(func);
 
       wrap
-        .bind({ a: 'concat: ' }, [1, 2, 3])
+        .bind({ a: 'concat: ' }, 1, 2, 3)
         .unbind()
         .bindContext({ a: 'no: ' });
 
