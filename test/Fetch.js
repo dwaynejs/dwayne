@@ -1,6 +1,7 @@
 import { deepStrictEqual, notEqual, strictEqual } from 'assert';
 import Fetch from '../lib/Fetch';
 import D from '../lib/D';
+import { parseJSON } from '../lib/Str';
 import { isDate } from '../lib/helpers';
 
 const random = Math.random;
@@ -564,12 +565,10 @@ describe('it should test Fetch#', () => {
       });
 
       fetch
-        .before(() => {
-          fetch.headers({
-            fooHeader: 1,
-            barHeader: ['a', 'b'],
-            bazHeader: 'a'
-          });
+        .before(({ headers }) => {
+          (headers.fooHeader = headers.fooHeader || []).push(1);
+          (headers.barHeader = headers.barHeader || []).push('a', 'b');
+          (headers.bazHeader = headers.bazHeader || []).push('a');
         })
         .before((req) => {
           const { headers } = req;
@@ -633,8 +632,8 @@ describe('it should test Fetch#', () => {
       });
       let testsDone = 0;
 
-      fetch.before(() => {
-        fetch.headers('fooHeader', 1);
+      fetch.before(({ headers }) => {
+        (headers.fooHeader = headers.fooHeader || []).push(1);
       });
 
       fetch.after(({ status }) => {
@@ -652,12 +651,12 @@ describe('it should test Fetch#', () => {
       });
 
       fetch.after((response) => {
-        response.json = D(response.data).parseJSON({ dates: true });
+        response.json = parseJSON(response.data, { dates: true });
       });
 
       fetch('/middlewares-with-headers')
         .then(({ data }) => {
-          const { headers } = D(data).parseJSON().$;
+          const { headers } = parseJSON(data).$;
 
           strictEqual(headers['foo-header'], '1');
 
