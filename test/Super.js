@@ -1,6 +1,10 @@
 import { deepStrictEqual, notEqual, strictEqual } from 'assert';
 import Super from '../lib/Super';
 
+describe('it should test Super.', () => {
+  // TODO: addProperty()
+});
+
 describe('it should test Super#', () => {
   describe('assign()', () => {
     it('should rewrite original values', () => {
