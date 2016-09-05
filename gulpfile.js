@@ -74,9 +74,7 @@ gulp.task('test-server', () =>
 gulp.task('build:default', () => {
   const config = _.cloneDeep(webpackConfig);
 
-  delete config.devtool;
-
-  config.output.filename = 'domc.js';
+  config.output.filename = 'dwayne.js';
 
   return gulp.src('./browser.js')
     .pipe(webpackStream(config))
@@ -86,9 +84,7 @@ gulp.task('build:default', () => {
 gulp.task('build:min', () => {
   const config = _.cloneDeep(webpackConfig);
 
-  delete config.devtool;
-
-  config.output.filename = 'domc.min.js';
+  config.output.filename = 'dwayne.min.js';
   config.plugins.push(new webpack.optimize.UglifyJsPlugin());
 
   return gulp.src('./browser.js')
