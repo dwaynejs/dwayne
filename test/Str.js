@@ -1,5 +1,5 @@
 import { deepEqual, deepStrictEqual, strictEqual } from 'assert';
-import Str from '../lib/Str';
+import Str, { parseJSON } from '../lib/Str';
 import { isDate, isString } from '../lib/helpers';
 
 describe('it should test Str#', () => {
@@ -98,54 +98,6 @@ describe('it should test Str#', () => {
 
       deepEqual(wrap.match(/o/).$, { 0: 'o', index: 1, input: s });
       deepStrictEqual(wrap.match(/o/g).$, ['o', 'o']);
-    });
-  });
-  describe('parseJSON()', () => {
-    it('should parse string as json', () => {
-      const s1 = '{ "foo": "bar" }';
-      const s2 = '["foo", "bar"]';
-      const s3 = 'null';
-      const s4 = '1';
-      const s5 = '"1"';
-      const wrap1 = new Str(s1);
-      const wrap2 = new Str(s2);
-      const wrap3 = new Str(s3);
-      const wrap4 = new Str(s4);
-      const wrap5 = new Str(s5);
-
-      deepStrictEqual(wrap1.parseJSON().$, { foo: 'bar' });
-      deepStrictEqual(wrap2.parseJSON().$, ['foo', 'bar']);
-      strictEqual(wrap3.parseJSON().$, null);
-      strictEqual(wrap4.parseJSON().$, 1);
-      strictEqual(wrap5.parseJSON().$, '1');
-    });
-    it('should use callback for parsing if present', () => {
-      const s = '{ "foo": "bar", "bar": { "baz": "baz" } }';
-      const wrap = new Str(s);
-
-      const parsed = wrap.parseJSON((key, value) => {
-        if (isString(value)) {
-          return `concat: ${ value }`;
-        }
-
-        return value;
-      });
-
-      deepStrictEqual(parsed.$, {
-        foo: 'concat: bar',
-        bar: {
-          baz: 'concat: baz'
-        }
-      });
-    });
-    it('should parse dates and numbers if it\'s in options parameter', () => {
-      const s = '{ "foo": "1999-12-31T23:59:59.999Z", "bar": "1" }';
-      const wrap = new Str(s);
-
-      const parsed = wrap.parseJSON({ dates: true, numbers: true });
-
-      strictEqual(isDate(parsed.$.foo), true);
-      strictEqual(parsed.$.bar, 1);
     });
   });
   describe('repeat()', () => {
@@ -295,6 +247,14 @@ describe('it should test Str#', () => {
       strictEqual(wrap.toDotCase().$, 'foo.bar.baz');
     });
   });
+  describe('toHyphenCase()', () => {
+    it('should return a wrap of string with spinal-case letters', () => {
+      const s = '-_ . foo . Bar -- _.baz .__ ';
+      const wrap = new Str(s);
+
+      strictEqual(wrap.toHyphenCase().$, 'foo-bar-baz');
+    });
+  });
   describe('toLowerCase()', () => {
     it('should return a wrap of string with lowercase letters', () => {
       const s = 'Foo Bar';
@@ -317,14 +277,6 @@ describe('it should test Str#', () => {
       const wrap = new Str(s);
 
       strictEqual(wrap.toSpaceCase().$, 'foo bar baz');
-    });
-  });
-  describe('toSpinalCase()', () => {
-    it('should return a wrap of string with spinal-case letters', () => {
-      const s = '-_ . foo . Bar -- _.baz .__ ';
-      const wrap = new Str(s);
-
-      strictEqual(wrap.toSpinalCase().$, 'foo-bar-baz');
     });
   });
   describe('toString()', () => {
@@ -365,6 +317,49 @@ describe('it should test Str#', () => {
       const wrap = new Str(s);
 
       strictEqual(wrap.trimRight().$, '   foobar');
+    });
+  });
+});
+
+describe('it should test exported methods from Str', () => {
+  describe('parseJSON()', () => {
+    it('should parse string as json', () => {
+      const s1 = '{ "foo": "bar" }';
+      const s2 = '["foo", "bar"]';
+      const s3 = 'null';
+      const s4 = '1';
+      const s5 = '"1"';
+
+      deepStrictEqual(parseJSON(s1).$, { foo: 'bar' });
+      deepStrictEqual(parseJSON(s2).$, ['foo', 'bar']);
+      strictEqual(parseJSON(s3).$, null);
+      strictEqual(parseJSON(s4).$, 1);
+      strictEqual(parseJSON(s5).$, '1');
+    });
+    it('should use callback for parsing if present', () => {
+      const s = '{ "foo": "bar", "bar": { "baz": "baz" } }';
+      const parsed = parseJSON(s, (key, value) => {
+        if (isString(value)) {
+          return `concat: ${ value }`;
+        }
+
+        return value;
+      });
+
+      deepStrictEqual(parsed.$, {
+        foo: 'concat: bar',
+        bar: {
+          baz: 'concat: baz'
+        }
+      });
+    });
+    it('should parse dates and numbers if it\'s in options parameter', () => {
+      const s = '{ "foo": "1999-12-31T23:59:59.999Z", "bar": "1" }';
+
+      const parsed = parseJSON(s, { dates: true, numbers: true });
+
+      strictEqual(isDate(parsed.$.foo), true);
+      strictEqual(parsed.$.bar, 1);
     });
   });
 });
