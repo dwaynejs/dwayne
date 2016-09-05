@@ -58,6 +58,7 @@ describe('it should test Fetch#', () => {
 
       strictEqual(fetch.$$.timeout, rand);
     });
+    // TODO: write test for fetch.config(param, value)
   });
   describe('delete()', () => {
     it('should support call without arguments', () => {
