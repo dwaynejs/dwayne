@@ -8,7 +8,7 @@ const nativeDocument = global.document;
 
 describe('it should test Elem#', () => {
   // TODO: add()
-  describe('addClasses()', () => {
+  describe('addClass()', () => {
     it('should add classes from arguments', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new Elem(elem);
@@ -246,17 +246,8 @@ describe('it should test Elem#', () => {
       strictEqual(elem.getAttribute('contentEditable'), '');
     });
   });
+  // TODO: blob()
   // TODO: calcCSS()
-  describe('centerText()', () => {
-    it('should set text-align to center', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
-
-      wrap.centerText();
-
-      strictEqual(elem.style.textAlign, 'center');
-    });
-  });
   // TODO: changeRule()
   describe('child()', () => {
     it('should return wrap of n-th child if argument is non-negative integer', () => {
@@ -754,6 +745,7 @@ describe('it should test Elem#', () => {
       strictEqual(wrap.first(true).$, child2);
     });
   });
+  // TODO: firstChild()
   // TODO: getFormData()
   // TODO: getRule()
   describe('hasAttr()', () => {
@@ -844,92 +836,6 @@ describe('it should test Elem#', () => {
       strictEqual(elem.id, 'domc');
     });
   });
-  describe('insertAfter()', () => {
-    it('should insert context to the argument\'s parent\'s end if it\'s last child', () => {
-      const elem = nativeDocument.createElement('div');
-      const child1 = nativeDocument.createElement('div');
-      const child2 = nativeDocument.createElement('div');
-      const wrap = new Elem(child2);
-
-      elem.appendChild(child1);
-      wrap.insertAfter(child1);
-
-      deepStrictEqual(elem.childNodes, [child1, child2]);
-    });
-    it('should insert context after argument', () => {
-      const elem = nativeDocument.createElement('div');
-      const child1 = nativeDocument.createElement('div');
-      const child2 = nativeDocument.createElement('div');
-      const child3 = nativeDocument.createElement('div');
-      const wrap = new Elem(child3);
-
-      elem.appendChild(child1);
-      elem.appendChild(child2);
-      wrap.insertAfter(child1);
-
-      deepStrictEqual(elem.childNodes, [child1, child3, child2]);
-    });
-    it('should support selector syntax', () => {
-      const elem = nativeDocument.createElement('div');
-      const child1 = nativeDocument.createElement('div');
-      const child2 = nativeDocument.createElement('div');
-      const child3 = nativeDocument.createElement('div');
-      const wrap = new Elem(child3);
-
-      nativeDocument.body.appendChild(elem);
-      child1.id = 'domc';
-      elem.appendChild(child1);
-      elem.appendChild(child2);
-      wrap.insertAfter('#domc');
-
-      deepStrictEqual(elem.childNodes, [child1, child3, child2]);
-
-      elem.remove();
-    });
-  });
-  describe('insertBefore()', () => {
-    it('should insert context to the argument\'s parent\'s start if it\'s first child', () => {
-      const elem = nativeDocument.createElement('div');
-      const child1 = nativeDocument.createElement('div');
-      const child2 = nativeDocument.createElement('div');
-      const wrap = new Elem(child2);
-
-      elem.appendChild(child1);
-      wrap.insertBefore(child1);
-
-      deepStrictEqual(elem.childNodes, [child2, child1]);
-    });
-    it('should insert context before argument', () => {
-      const elem = nativeDocument.createElement('div');
-      const child1 = nativeDocument.createElement('div');
-      const child2 = nativeDocument.createElement('div');
-      const child3 = nativeDocument.createElement('div');
-      const wrap = new Elem(child3);
-
-      elem.appendChild(child1);
-      elem.appendChild(child2);
-      wrap.insertBefore(child2);
-
-      deepStrictEqual(elem.childNodes, [child1, child3, child2]);
-    });
-    it('should support selector syntax', () => {
-      const elem = nativeDocument.createElement('div');
-      const child1 = nativeDocument.createElement('div');
-      const child2 = nativeDocument.createElement('div');
-      const child3 = nativeDocument.createElement('div');
-      const wrap = new Elem(child3);
-
-      nativeDocument.body.appendChild(elem);
-      child2.id = 'domc';
-      elem.appendChild(child1);
-      elem.appendChild(child2);
-      wrap.insertBefore('#domc');
-
-      deepStrictEqual(elem.childNodes, [child1, child3, child2]);
-
-      elem.remove();
-    });
-  });
   describe('into()', () => {
     it('should support (element) syntax', () => {
       const elem = nativeDocument.createElement('div');
@@ -964,6 +870,8 @@ describe('it should test Elem#', () => {
       parent.remove();
     });
   });
+  // TODO: innerHeight
+  // TODO: innerWidth
   // TODO: isBroken()
   describe('last()', () => {
     it('should return wrap of the last child', () => {
@@ -992,6 +900,7 @@ describe('it should test Elem#', () => {
       strictEqual(wrap.last(true).$, child1);
     });
   });
+  // TODO: lastChild()
   // TODO: load()
   describe('matches()', () => {
     it('should return if context matches selector', () => {
@@ -1070,7 +979,7 @@ describe('it should test Elem#', () => {
       strictEqual(elem2.classList.contains('domc3'), true);
     });
   });
-  describe('get name', () => {
+  describe('name', () => {
     it('should return tagName.toLowerCase()', () => {
       const div = nativeDocument.createElement('div');
       const input = nativeDocument.createElement('input');
@@ -1171,6 +1080,8 @@ describe('it should test Elem#', () => {
       strictEqual(wrap.outerHTML, elem.outerHTML);
     });
   });
+  // TODO: outerHeight
+  // TODO: outerWidth
   describe('parent()', () => {
     it('should return a wrap of the parent element', () => {
       const elem1 = nativeDocument.createElement('div');
@@ -1259,7 +1170,7 @@ describe('it should test Elem#', () => {
       strictEqual(elem.hasAttribute('baz'), false);
     });
   });
-  describe('removeClasses()', () => {
+  describe('removeClass()', () => {
     it('should remove classes from arguments', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new Elem(elem);
@@ -1293,7 +1204,7 @@ describe('it should test Elem#', () => {
     });
   });
   // TODO: replace()
-  describe('setOf', () => {
+  describe('setOf()', () => {
     it('should add set of elements of specified type', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new Elem(elem);
@@ -1306,7 +1217,7 @@ describe('it should test Elem#', () => {
       deepStrictEqual(elem.childNodes, elements);
     });
   });
-  describe('show', () => {
+  describe('show()', () => {
     it('should not change display if it is not none and delete element.domcData.previousDisplay', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new Elem(elem);
