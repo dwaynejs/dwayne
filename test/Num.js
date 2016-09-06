@@ -358,19 +358,18 @@ describe('it should test Num#', () => {
       const n = 100;
       const wrap = new Num(n);
       const abort = wrap.interval(() => {
-        if (number !== 2) {
-          return number++;
+        if (++number === 2) {
+          done();
+
+          return abort();
+        }
+
+        if (number < 2) {
+          return;
         }
 
         done(new Error('Clear failed'));
-
-        number++;
       });
-
-      setTimeout(() => {
-        abort();
-        done();
-      }, 150);
     });
     it('should be { clear() {} } context in repeated function', (done) => {
       let number = 0;
@@ -396,18 +395,18 @@ describe('it should test Num#', () => {
       const n = 100;
       const wrap = new Num(n);
       const abort = wrap.interval(() => {
-        number++;
-      });
-
-      setTimeout(() => {
-        try {
-          strictEqual(number, 10);
-          abort();
+        if (++number === 10) {
           done();
-        } catch (err) {
-          done(err);
+
+          return abort();
         }
-      }, 999);
+
+        if (number < 10) {
+          return;
+        }
+
+        done(new Error(`${ number } times!`));
+      });
     });
   });
   describe('ln', () => {
