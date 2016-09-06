@@ -1,8 +1,8 @@
 import { strictEqual } from 'assert';
 import {
-  isArray, isArrayLike, isBoolean, isDate, isDateLike, isElement, isFinite,
-  isFunction, isInteger, isIntegerLike, isNaN, isNull, isNullOrUndefined, isNumber,
-  isNumberLike, isObject, isPrimitive, isRegExp, isString, isSymbol, isUndefined
+  isArray, isArrayLike, isBoolean, isDate, isDateLike, isElement, isFinite, isFunction,
+  isInteger, isIntegerLike, isNaN, isNull, isNullOrUndefined, isNumber, isNumberLike,
+  isObject, isPlainObject, isPrimitive, isRegExp, isString, isSymbol, isUndefined
 } from './../lib/D';
 
 /* eslint no-new-wrappers: 0 */
@@ -161,6 +161,27 @@ describe('it should test D.', () => {
     });
     it('should return true with object argument', () => {
       strictEqual(isObject({}), true);
+    });
+  });
+  describe('isPlainObject()', () => {
+    it('should return true with plain objects arguments', () => {
+      strictEqual(isPlainObject({}), true);
+      strictEqual(isPlainObject({ a: 1 }), true);
+    });
+    it('should return true with objects that has null prototype', () => {
+      const object = {};
+
+      Object.setPrototypeOf(object, null);
+
+      strictEqual(isPlainObject(object), true);
+    });
+    it('should return false with constructed objects', () => {
+      const object = {};
+
+      Object.setPrototypeOf(object, {});
+
+      strictEqual(isPlainObject(object), false);
+      strictEqual(isPlainObject(object), false);
     });
   });
   describe('isPrimitive()', () => {
