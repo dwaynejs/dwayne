@@ -47,6 +47,14 @@ describe('it should test Fetch#', () => {
 
       strictEqual(fetch.$$.timeout, rand);
     });
+    it('should support (prop, value) argument', () => {
+      const fetch = new Fetch();
+      const rand = random();
+
+      fetch.config('timeout', rand);
+
+      strictEqual(fetch.$$.timeout, rand);
+    });
     it('should support function argument', () => {
       const fetch = new Fetch();
       const rand = random();
@@ -59,7 +67,6 @@ describe('it should test Fetch#', () => {
 
       strictEqual(fetch.$$.timeout, rand);
     });
-    // TODO: write test for fetch.config(param, value)
   });
   describe('delete()', () => {
     it('should support call without arguments', () => {
