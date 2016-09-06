@@ -166,7 +166,10 @@
     "no-unused-vars": 0,
     "no-use-before-define": [
       "error",
-      "nofunc"
+      {
+        "functions": false,
+        "classes": false
+      }
     ],
     "no-useless-call": 2,
     "no-useless-concat": 2,
