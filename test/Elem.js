@@ -1,12 +1,89 @@
-import { deepStrictEqual, notEqual, strictEqual } from 'assert';
-import Elem, { find, px } from '../lib/Elem';
+import { deepStrictEqual, strictEqual } from 'assert';
+import Elem, { find, px, parseHTML } from '../lib/Elem';
 import Super from '../lib/Super';
+import Num from '../lib/Num';
 import elements from '../lib/constants/elements';
 
 const nativeDocument = global.document;
+const nativeBody = nativeDocument.body;
+const nativeHead = nativeDocument.head;
 
 describe('it should test Elem#', () => {
-  // TODO: add()
+  describe('add()', () => {
+    it('should add elements from arguments', () => {
+      const elem = [
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div')
+      ];
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const wrap = new Elem(elem);
+
+      wrap.add(elem1, elem2);
+
+      strictEqual(wrap.length, 5);
+      strictEqual(wrap.$[3], elem1);
+      strictEqual(wrap.$[4], elem2);
+    });
+    it('should not duplicate elements', () => {
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem = [
+        elem1,
+        elem2,
+        nativeDocument.createElement('div')
+      ];
+      const wrap = new Elem(elem);
+
+      wrap.add(elem1, elem2);
+
+      strictEqual(wrap.length, 3);
+    });
+    it('should support Elem syntax', () => {
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem = [
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div')
+      ];
+      const wrap = new Elem(elem);
+      const wrap1 = new Elem(elem1);
+      const wrap2 = new Elem(elem2);
+
+      wrap.add(wrap1, wrap2);
+
+      strictEqual(wrap.length, 5);
+      strictEqual(wrap.$[3], elem1);
+      strictEqual(wrap.$[4], elem2);
+    });
+    it('should support selector syntax', () => {
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem = [
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div')
+      ];
+      const wrap = new Elem(elem);
+
+      elem1.className = 'foo';
+      elem2.className = 'foo';
+
+      nativeBody.appendChild(elem1);
+      nativeBody.appendChild(elem2);
+
+      wrap.add('body .foo');
+
+      strictEqual(wrap.length, 5);
+      strictEqual(wrap.$[3], elem1);
+      strictEqual(wrap.$[4], elem2);
+
+      elem1.remove();
+      elem2.remove();
+    });
+  });
   describe('addClass()', () => {
     it('should add classes from arguments', () => {
       const elem = [
@@ -63,7 +140,33 @@ describe('it should test Elem#', () => {
         });
     });
   });
-  // TODO: addRule()
+  describe('addRule()', () => {
+    it('should add rule to the first style element in the set', () => {
+      const style = nativeDocument.createElement('style');
+      const elem = nativeDocument.createElement('div');
+      const styleWrap = new Elem(style);
+      const elemWrap = new Elem(elem);
+
+      elem.className = 'foo';
+
+      nativeHead.appendChild(style);
+      nativeBody.appendChild(elem);
+
+      styleWrap.addRule('dwayne-style', '.foo', {
+        margin: '2px 1px 3px'
+      });
+
+      const css = elemWrap.calcCSS();
+
+      strictEqual(css.marginTop, '2px');
+      strictEqual(css.marginRight, '1px');
+      strictEqual(css.marginBottom, '3px');
+      strictEqual(css.marginLeft, '1px');
+
+      style.remove();
+      elem.remove();
+    });
+  });
   describe('apply()', () => {
     it('should set id to the value from the string', () => {
       const elem = [
@@ -264,8 +367,8 @@ describe('it should test Elem#', () => {
           elem.setAttribute('contentEditable', '');
         })
         .forEach((elem) => {
-          deepStrictEqual(new Elem(elem).attr('attr'), '123');
-          deepStrictEqual(new Elem(elem).attr('contentEditable'), '');
+          strictEqual(new Elem(elem).attr('attr'), '123');
+          strictEqual(new Elem(elem).attr('contentEditable'), '');
         });
     });
     it('should support (attr, value) syntax', () => {
@@ -315,9 +418,102 @@ describe('it should test Elem#', () => {
         });
     });
   });
-  // TODO: blob()
-  // TODO: calcCSS()
-  // TODO: changeRule()
+  describe('blob', () => {
+    it('should return a blob promise with canvas context', (done) => {
+      const elem = nativeDocument.createElement('canvas');
+      const wrap = new Elem(elem);
+
+      wrap
+        .width(1)
+        .height(1)
+        .blob({ type: 'image/png' })
+        .then((blob) => blob.readAs('dataURL'))
+        .then((string) => {
+          strictEqual(string, 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQIW2NkAAIAAAoAAggA9GkAAAAASUVORK5CYII=');
+
+          done();
+        })
+        .catch(done);
+    });
+    it('should return a blob promise with image context', (done) => {
+      const elem = nativeDocument.createElement('img');
+      const wrap = new Elem(elem);
+
+      wrap
+        .ref('/image.png')
+        .blob({ type: 'image/png' })
+        .then((blob) => blob.readAs('dataURL'))
+        .then((string) => {
+          strictEqual(string, 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQIW2NkAAIAAAoAAggA9GkAAAAASUVORK5CYII=');
+
+          done();
+        })
+        .catch(done);
+    });
+  });
+  describe('calcCSS()', () => {
+    it('should calculate css for the first element in the set', () => {
+      const style = nativeDocument.createElement('style');
+      const elem = nativeDocument.createElement('div');
+      const styleWrap = new Elem(style);
+      const elemWrap = new Elem(elem);
+
+      elem.className = 'foo';
+
+      nativeHead.appendChild(style);
+      nativeBody.appendChild(elem);
+
+      styleWrap.addRule('dwayne-style', '.foo', {
+        margin: '2px 1px 3px'
+      });
+
+      const css = elemWrap.calcCSS();
+
+      strictEqual(css.marginTop, '2px');
+      strictEqual(css.marginRight, '1px');
+      strictEqual(css.marginBottom, '3px');
+      strictEqual(css.marginLeft, '1px');
+
+      style.remove();
+      elem.remove();
+    });
+  });
+  describe('changeRule()', () => {
+    it('should add rule to the first style element in the set', () => {
+      const style = nativeDocument.createElement('style');
+      const elem = nativeDocument.createElement('div');
+      const styleWrap = new Elem(style);
+      const elemWrap = new Elem(elem);
+
+      elem.className = 'foo';
+
+      nativeHead.appendChild(style);
+      nativeBody.appendChild(elem);
+
+      styleWrap.addRule('dwayne-style', '.foo', {
+        margin: '2px 1px 3px'
+      });
+
+      styleWrap.changeRule('dwayne-style', {
+        marginLeft: '4px',
+        padding: '5px 6px 7px 8px'
+      });
+
+      const css = elemWrap.calcCSS();
+
+      strictEqual(css.marginTop, '2px');
+      strictEqual(css.marginRight, '1px');
+      strictEqual(css.marginBottom, '3px');
+      strictEqual(css.marginLeft, '4px');
+      strictEqual(css.paddingTop, '5px');
+      strictEqual(css.paddingRight, '6px');
+      strictEqual(css.paddingBottom, '7px');
+      strictEqual(css.paddingLeft, '8px');
+
+      style.remove();
+      elem.remove();
+    });
+  });
   describe('child()', () => {
     it('should return wrap of n-th child of the first element if argument is non-negative integer', () => {
       const elem1 = nativeDocument.createElement('div');
@@ -381,7 +577,7 @@ describe('it should test Elem#', () => {
       const wrap = new Elem(elem);
 
       child.id = 'dwayne-child';
-      nativeDocument.body.appendChild(child);
+      nativeBody.appendChild(child);
       wrap.child('body #dwayne-child');
 
       strictEqual(elem1.contains(child), true);
@@ -408,6 +604,7 @@ describe('it should test Elem#', () => {
       const children1 = wrap1.children();
       const children2 = wrap2.children();
 
+      strictEqual(children1.length, 2);
       strictEqual(children1.$[0], child1);
       strictEqual(children1.$[1], child2);
       strictEqual(children2.length, 0);
@@ -488,10 +685,12 @@ describe('it should test Elem#', () => {
       parent2.appendChild(child3);
       parent3.appendChild(parent2);
 
-      deepStrictEqual(wrap.closest('.foo').$, [child2, parent3]);
+      const closest = wrap.closest('.foo').$;
+
+      strictEqual(closest[0], child2);
+      strictEqual(closest[1], parent3);
     });
   });
-  // TODO: clone()
   describe('contains', () => {
     it('should return true, if element contains another, and false if not', () => {
       const elem1 = nativeDocument.createElement('div');
@@ -519,7 +718,7 @@ describe('it should test Elem#', () => {
   
       parent.appendChild(child);
       child.id = 'foo';
-      nativeDocument.body.appendChild(parent);
+      nativeBody.appendChild(parent);
       
       strictEqual(wrap.contains('#foo'), true);
       strictEqual(wrap.contains('.foo'), false);
@@ -715,8 +914,8 @@ describe('it should test Elem#', () => {
           elem.setAttribute('data-dwayne-power', 'Infinity');
         })
         .forEach((elem) => {
-          deepStrictEqual(new Elem(elem).data('dwayneAttr'), '123');
-          deepStrictEqual(new Elem(elem).data('dwaynePower'), 'Infinity');
+          strictEqual(new Elem(elem).data('dwayneAttr'), '123');
+          strictEqual(new Elem(elem).data('dwaynePower'), 'Infinity');
         });
     });
     it('should support (key, value) setter syntax', () => {
@@ -769,23 +968,33 @@ describe('it should test Elem#', () => {
         });
     });
   });
-  // TODO: deleteRule()
-  describe('disabled()', () => {
-    it('should set disabled state to true with no arguments', () => {
-      const elem = nativeDocument.createElement('button');
-      const wrap = new Elem(elem);
+  describe('deleteRule()', () => {
+    it('should add rule to the first style element in the set', () => {
+      const style = nativeDocument.createElement('style');
+      const elem = nativeDocument.createElement('div');
+      const styleWrap = new Elem(style);
+      const elemWrap = new Elem(elem);
 
-      wrap.disabled();
+      elem.className = 'foo';
 
-      strictEqual(elem.disabled, true);
-    });
-    it('should set disabled state to Boolean(argument)', () => {
-      const elem = nativeDocument.createElement('button');
-      const wrap = new Elem(elem);
+      nativeHead.appendChild(style);
+      nativeBody.appendChild(elem);
 
-      wrap.disabled(null);
+      styleWrap.addRule('dwayne-style', '.foo', {
+        margin: '2px 1px 3px'
+      });
 
-      strictEqual(elem.disabled, false);
+      styleWrap.deleteRule('dwayne-style');
+
+      const css = elemWrap.calcCSS();
+
+      strictEqual(css.marginTop, '0px');
+      strictEqual(css.marginRight, '0px');
+      strictEqual(css.marginBottom, '0px');
+      strictEqual(css.marginLeft, '0px');
+
+      style.remove();
+      elem.remove();
     });
   });
   describe('dispatch()', () => {
@@ -852,86 +1061,214 @@ describe('it should test Elem#', () => {
 
       wrap.on('click', (e) => {
         try {
-          deepStrictEqual(e.detail, unique);
-          deepStrictEqual(e.data, unique);
+          strictEqual(e.detail, unique);
+          strictEqual(e.data, unique);
 
           done();
         } catch (err) {
           done(err);
         }
       });
-      wrap.dispatch('click', null, {
+      wrap.dispatch('click', {}, {
         detail: unique,
         data: unique
       });
     });
   });
-  // TODO: elem()
-  describe('find()', () => {
-    it('should find a wrap of first element in nested children, that matches selector', () => {
-      const elem = nativeDocument.createElement('div');
-      const child1 = nativeDocument.createElement('div');
-      const child2 = nativeDocument.createElement('div');
-      const child3 = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
+  describe('elem()', () => {
+    it('should return wrap of the n-th element', () => {
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem = [
+        elem1,
+        elem2
+      ];
+      const wrap1 = new Elem(elem);
+      const wrap2 = new Elem();
 
-      elem.appendChild(child1);
-      elem.appendChild(child2);
-      child2.appendChild(child3);
-
-      child1.className = 'foo';
-      child3.className = 'foo';
-
-      strictEqual(wrap.find('.foo').$, child1);
-    });
-    it('should find a wrap of null if not find', () => {
-      const elem = nativeDocument.createElement('div');
-      const child1 = nativeDocument.createElement('div');
-      const child2 = nativeDocument.createElement('div');
-      const child3 = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
-
-      elem.appendChild(child1);
-      elem.appendChild(child2);
-      child2.appendChild(child3);
-
-      elem.className = 'foo';
-      child3.className = 'foo';
-
-      strictEqual(wrap.find('.bar').$, null);
+      strictEqual(wrap1.elem().length, 1);
+      strictEqual(wrap1.elem().$[0], elem1);
+      strictEqual(wrap1.elem(0).length, 1);
+      strictEqual(wrap1.elem(0).$[0], elem1);
+      strictEqual(wrap1.elem(1).length, 1);
+      strictEqual(wrap1.elem(1).$[0], elem2);
+      strictEqual(wrap2.elem().length, 0);
     });
   });
-  // TODO: filter()
-  describe('first()', () => {
-    it('should return wrap of the first child', () => {
+  describe('find()', () => {
+    it('should find a wrap of all elements in nested children, that matches selector', () => {
       const elem1 = nativeDocument.createElement('div');
       const elem2 = nativeDocument.createElement('div');
       const child1 = nativeDocument.createElement('div');
       const child2 = nativeDocument.createElement('div');
-      const wrap1 = new Elem(elem1);
-      const wrap2 = new Elem(elem2);
+      const child3 = nativeDocument.createElement('div');
+      const elem = [
+        elem1,
+        elem2,
+        nativeDocument.createElement('div')
+      ];
+      const wrap = new Elem(elem);
 
       elem1.appendChild(child1);
       elem1.appendChild(child2);
+      elem2.appendChild(child3);
 
-      strictEqual(wrap1.first().$, child1);
-      strictEqual(wrap2.first().$, null);
-    });
-    it('should return wrap of the first element child', () => {
-      const elem = nativeDocument.createElement('div');
-      const child1 = nativeDocument.createTextNode('div');
-      const child2 = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
+      child1.className = 'foo';
+      child2.className = 'foo';
+      child3.className = 'foo';
 
-      elem.appendChild(child1);
-      elem.appendChild(child2);
+      const found = wrap.find('.foo').$;
 
-      strictEqual(wrap.first(true).$, child2);
+      strictEqual(found.length, 3);
+      strictEqual(found[0], child1);
+      strictEqual(found[1], child2);
+      strictEqual(found[2], child3);
     });
   });
-  // TODO: firstChild()
-  // TODO: getFormData()
-  // TODO: getRule()
+  describe('filter()', () => {
+    it('should find a wrap of all elements in nested children, that matches selector', () => {
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem = [
+        elem1,
+        elem2,
+        elem3
+      ];
+      const wrap = new Elem(elem);
+
+      elem1.className = 'foo';
+      elem3.className = 'foo';
+
+      const filtered = wrap.filter('.foo').$;
+
+      strictEqual(filtered.length, 2);
+      strictEqual(filtered[0], elem1);
+      strictEqual(filtered[1], elem3);
+    });
+  });
+  describe('first()', () => {
+    it('should return wrap of the first element', () => {
+      const elem1 = nativeDocument.createElement('div');
+      const elem = [
+        elem1,
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div')
+      ];
+      const wrap1 = new Elem(elem);
+      const wrap2 = new Elem();
+
+      strictEqual(wrap1.first().length, 1);
+      strictEqual(wrap1.first().$[0], elem1);
+      strictEqual(wrap2.first().length, 0);
+    });
+  });
+  describe('firstChild()', () => {
+    it('should return a wrap of the first children of all elements in the set with no arguments', () => {
+      const parent1 = nativeDocument.createElement('div');
+      const parent2 = nativeDocument.createElement('div');
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const wrap = new Elem([
+        parent1,
+        parent2
+      ]);
+
+      parent1.appendChild(elem1);
+      parent1.appendChild(elem2);
+      parent2.appendChild(elem3);
+      parent2.appendChild(elem4);
+
+      const firstChildren = wrap.firstChild().$;
+
+      strictEqual(firstChildren.length, 2);
+      strictEqual(firstChildren[0], elem1);
+      strictEqual(firstChildren[1], elem3);
+    });
+    it('should return a wrap of the first children of all elements in the set that match selector  with selector argument', () => {
+      const parent1 = nativeDocument.createElement('div');
+      const parent2 = nativeDocument.createElement('div');
+      const parent3 = nativeDocument.createElement('div');
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const elem5 = nativeDocument.createElement('div');
+      const elem6 = nativeDocument.createElement('div');
+      const wrap = new Elem([
+        parent1,
+        parent2,
+        parent3
+      ]);
+
+      parent1.appendChild(elem1);
+      parent1.appendChild(elem2);
+      parent1.appendChild(elem3);
+      parent2.appendChild(elem4);
+      parent2.appendChild(elem5);
+      parent3.appendChild(elem6);
+
+      elem3.className = 'foo';
+      elem6.className = 'foo';
+
+      const firstChildren = wrap.firstChild('.foo').$;
+
+      strictEqual(firstChildren.length, 2);
+      strictEqual(firstChildren[0], elem3);
+      strictEqual(firstChildren[1], elem6);
+    });
+  });
+  describe('getFormData()', () => {
+    it('should return form data', () => {
+      const form = nativeDocument.createElement('form');
+      const input1 = nativeDocument.createElement('input');
+      const input2 = nativeDocument.createElement('input');
+      const input3 = nativeDocument.createElement('input');
+      const wrap = new Elem(form);
+
+      form.appendChild(input1);
+      form.appendChild(input2);
+      form.appendChild(input3);
+
+      input1.name = 'input1';
+      input1.value = '1';
+      input2.name = 'input2';
+      input2.value = '2';
+      input3.name = 'input3';
+      input3.value = '3';
+
+      deepStrictEqual(wrap.getFormData(), {
+        input1: '1',
+        input2: '2',
+        input3: '3'
+      });
+    });
+  });
+  describe('getRule()', () => {
+    it('should add rule to the first style element in the set', () => {
+      const style = nativeDocument.createElement('style');
+      const styleWrap = new Elem(style);
+
+      nativeHead.appendChild(style);
+
+      styleWrap.addRule('dwayne-style', '.foo', {
+        margin: '2px 1px 3px !important',
+        padding: '5px 6px 7px 8px'
+      });
+
+      deepStrictEqual(styleWrap.getRule('dwayne-style'), {
+        selector: '.foo',
+        rules: {
+          margin: '2px 1px 3px !important',
+          padding: '5px 6px 7px 8px'
+        }
+      });
+
+      style.remove();
+    });
+  });
   describe('hasAttr()', () => {
     it('should return true if the element has class', () => {
       const elem = nativeDocument.createElement('div');
@@ -993,13 +1330,30 @@ describe('it should test Elem#', () => {
 
       strictEqual(wrap.html(), '<div></div>');
     });
-    it('should set innerHTML with more arguments', () => {
+    it('should set innerHTML with non-function argument', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new Elem(elem);
 
       wrap.html('<div></div>');
 
       strictEqual(elem.innerHTML, '<div></div>');
+    });
+    it('should support callback', () => {
+      const elem = [
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div')
+      ];
+      const wrap = new Elem(elem);
+
+      wrap
+        .forEach((elem, index) => {
+          elem.innerHTML = `<div>${ index }</div>`;
+        })
+        .html((html) => `x${ html }x`)
+        .forEach((elem, index) => {
+          strictEqual(elem.innerHTML, `x<div>${ index }</div>x`);
+        });
     });
   });
   describe('id()', () => {
@@ -1022,71 +1376,108 @@ describe('it should test Elem#', () => {
   });
   describe('into()', () => {
     it('should support (element) syntax', () => {
-      const elem = nativeDocument.createElement('div');
       const parent = nativeDocument.createElement('div');
+      const elem = [
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div')
+      ];
       const wrap = new Elem(elem);
 
-      wrap.into(parent);
-
-      strictEqual(parent.contains(elem), true);
+      wrap
+        .into(parent)
+        .forEach((elem) => {
+          strictEqual(parent.contains(elem), true);
+        });
     });
     it('should support (Elem) syntax', () => {
-      const elem = nativeDocument.createElement('div');
       const parent = nativeDocument.createElement('div');
+      const elem = [
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div')
+      ];
       const wrap = new Elem(elem);
       const parentWrap = new Elem(parent);
 
-      wrap.into(parentWrap);
-
-      strictEqual(parent.contains(elem), true);
+      wrap
+        .into(parentWrap)
+        .forEach((elem) => {
+          strictEqual(parent.contains(elem), true);
+        });
     });
     it('should support (selector) syntax', () => {
-      const elem = nativeDocument.createElement('div');
       const parent = nativeDocument.createElement('div');
+      const elem = [
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div')
+      ];
       const wrap = new Elem(elem);
 
       parent.id = 'dwayne-parent';
-      nativeDocument.body.appendChild(parent);
-      wrap.into('body #dwayne-parent');
+      nativeBody.appendChild(parent);
 
-      strictEqual(parent.contains(elem), true);
+      wrap
+        .into('body #dwayne-parent')
+        .forEach((elem) => {
+          strictEqual(parent.contains(elem), true);
+        });
 
       parent.remove();
     });
   });
-  // TODO: innerHeight
-  // TODO: innerWidth
-  // TODO: isBroken()
-  describe('last()', () => {
-    it('should return wrap of the last child', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const child1 = nativeDocument.createElement('div');
-      const child2 = nativeDocument.createElement('div');
-      const wrap1 = new Elem(elem1);
-      const wrap2 = new Elem(elem2);
-
-      elem1.appendChild(child1);
-      elem1.appendChild(child2);
-
-      strictEqual(wrap1.last().$, child2);
-      strictEqual(wrap2.last().$, null);
-    });
-    it('should return wrap of the last element child', () => {
+  describe('innerHeight', () => {
+    it('should return inner height', () => {
       const elem = nativeDocument.createElement('div');
-      const child1 = nativeDocument.createElement('div');
-      const child2 = nativeDocument.createTextNode('div');
       const wrap = new Elem(elem);
 
-      elem.appendChild(child1);
-      elem.appendChild(child2);
+      nativeBody.appendChild(elem);
 
-      strictEqual(wrap.last(true).$, child1);
+      wrap.css({
+        boxSizing: 'border-box',
+        height: '200px',
+        paddingTop: '2px',
+        paddingBottom: '3px',
+        borderTop: '1px solid black',
+        borderBottom: '4px solid black'
+      });
+
+      strictEqual(wrap.innerHeight, 190);
+
+      wrap.css('box-sizing', 'content-box');
+
+      strictEqual(wrap.innerHeight, 200);
+
+      elem.remove();
     });
   });
-  // TODO: lastChild()
-  // TODO: load()
-  describe('matches()', () => {
+  describe('innerWidth', () => {
+    it('should return inner width', () => {
+      const elem = nativeDocument.createElement('div');
+      const wrap = new Elem(elem);
+
+      nativeBody.appendChild(elem);
+
+      wrap.css({
+        boxSizing: 'border-box',
+        width: '200px',
+        paddingLeft: '2px',
+        paddingRight: '3px',
+        borderLeft: '1px solid black',
+        borderRight: '4px solid black'
+      });
+
+      strictEqual(wrap.innerWidth, 190);
+
+      wrap.css('box-sizing', 'content-box');
+
+      strictEqual(wrap.innerWidth, 200);
+
+      elem.remove();
+    });
+  });
+  describe('is()', () => {
     it('should return if context matches selector', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new Elem(elem);
@@ -1095,8 +1486,136 @@ describe('it should test Elem#', () => {
       elem.className = 'bar';
       elem.setAttribute('baz', '');
 
-      strictEqual(wrap.matches('#foo.bar[baz]'), true);
-      strictEqual(wrap.matches('#foo.bar[bar]'), false);
+      strictEqual(wrap.is('#foo.bar[baz]'), true);
+      strictEqual(wrap.is('#foo.bar[bar]'), false);
+    });
+  });
+  describe('isBroken()', () => {
+    it('should return if the image is broken', (done) => {
+      const proper = nativeDocument.createElement('img');
+      const broken = nativeDocument.createElement('img');
+      const elem = [
+        proper,
+        broken
+      ];
+      const wrap = new Elem(elem);
+      const properWrap = new Elem(proper);
+      const brokenWrap = new Elem(broken);
+
+      properWrap.ref('/image.png');
+      brokenWrap.ref('/some/broken/image');
+
+      strictEqual(properWrap.isBroken(), false);
+      strictEqual(brokenWrap.isBroken(), false);
+
+      wrap
+        .load()
+        .then(() => {
+          strictEqual(properWrap.isBroken(), false);
+          strictEqual(brokenWrap.isBroken(), true);
+
+          done();
+        })
+        .catch(done);
+    });
+  });
+  describe('last()', () => {
+    it('should return wrap of the last element', () => {
+      const elem1 = nativeDocument.createElement('div');
+      const elem = [
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div'),
+        elem1
+      ];
+      const wrap1 = new Elem(elem);
+      const wrap2 = new Elem();
+
+      strictEqual(wrap1.last().length, 1);
+      strictEqual(wrap1.last().$[0], elem1);
+      strictEqual(wrap2.last().length, 0);
+    });
+  });
+  describe('lastChild()', () => {
+    it('should return a wrap of the last children of all elements in the set with no arguments', () => {
+      const parent1 = nativeDocument.createElement('div');
+      const parent2 = nativeDocument.createElement('div');
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const wrap = new Elem([
+        parent1,
+        parent2
+      ]);
+
+      parent1.appendChild(elem1);
+      parent1.appendChild(elem2);
+      parent2.appendChild(elem3);
+      parent2.appendChild(elem4);
+
+      const lastChildren = wrap.lastChild().$;
+
+      strictEqual(lastChildren.length, 2);
+      strictEqual(lastChildren[0], elem2);
+      strictEqual(lastChildren[1], elem4);
+    });
+    it('should return a wrap of the last children of all elements in the set that match selector  with selector argument', () => {
+      const parent1 = nativeDocument.createElement('div');
+      const parent2 = nativeDocument.createElement('div');
+      const parent3 = nativeDocument.createElement('div');
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const elem5 = nativeDocument.createElement('div');
+      const elem6 = nativeDocument.createElement('div');
+      const wrap = new Elem([
+        parent1,
+        parent2,
+        parent3
+      ]);
+
+      parent1.appendChild(elem1);
+      parent1.appendChild(elem2);
+      parent1.appendChild(elem3);
+      parent2.appendChild(elem4);
+      parent2.appendChild(elem5);
+      parent3.appendChild(elem6);
+
+      elem1.className = 'foo';
+      elem5.className = 'foo';
+
+      const lastChildren = wrap.lastChild('.foo').$;
+
+      strictEqual(lastChildren.length, 2);
+      strictEqual(lastChildren[0], elem1);
+      strictEqual(lastChildren[1], elem5);
+    });
+  });
+  describe('load()', () => {
+    it('should load all the images in the set', (done) => {
+      const properImage = nativeDocument.createElement('img');
+      const brokenImage = nativeDocument.createElement('img');
+      const elem = [
+        properImage,
+        brokenImage
+      ];
+      const wrap = new Elem(elem);
+
+      properImage.src = '/image.png';
+      brokenImage.src = '/some/broken/image';
+
+      wrap
+        .load()
+        .then(({ proper, broken }) => {
+          strictEqual(proper.length, 1);
+          strictEqual(proper.$[0], properImage);
+          strictEqual(broken.length, 1);
+          strictEqual(broken.$[0], brokenImage);
+
+          done();
+        })
+        .catch(done);
     });
   });
   describe('moveAttr()', () => {
@@ -1178,34 +1697,105 @@ describe('it should test Elem#', () => {
     });
   });
   describe('next()', () => {
-    it('should return a wrap of the next sibling', () => {
-      const parent = nativeDocument.createElement('div');
+    it('should return a wrap of the next elements to all elements in the set with no arguments', () => {
+      const parent1 = nativeDocument.createElement('div');
+      const parent2 = nativeDocument.createElement('div');
       const elem1 = nativeDocument.createElement('div');
       const elem2 = nativeDocument.createElement('div');
-      const wrap1 = new Elem(elem1);
-      const wrap2 = new Elem(elem2);
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const wrap = new Elem([
+        elem1,
+        elem2,
+        elem3,
+        elem4
+      ]);
 
-      parent.appendChild(elem1);
-      parent.appendChild(elem2);
+      parent1.appendChild(elem1);
+      parent1.appendChild(elem2);
+      parent2.appendChild(elem3);
+      parent2.appendChild(elem4);
 
-      strictEqual(wrap1.next().$, elem2);
-      strictEqual(wrap2.next().$, null);
+      const next = wrap.next().$;
+
+      strictEqual(next.length, 2);
+      strictEqual(next[0], elem2);
+      strictEqual(next[1], elem4);
     });
-    it('should return a wrap of the next element sibling', () => {
-      const elem = nativeDocument.createElement('div');
-      const child1 = nativeDocument.createElement('div');
-      const child2 = nativeDocument.createTextNode('div');
-      const child3 = nativeDocument.createElement('div');
-      const wrap = new Elem(child1);
+    it('should return a wrap of the next elements that match selector to all elements in the set with selector argument', () => {
+      const parent1 = nativeDocument.createElement('div');
+      const parent2 = nativeDocument.createElement('div');
+      const parent3 = nativeDocument.createElement('div');
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const elem5 = nativeDocument.createElement('div');
+      const elem6 = nativeDocument.createElement('div');
+      const wrap = new Elem([
+        elem1,
+        elem2,
+        elem3,
+        elem4,
+        elem5,
+        elem6
+      ]);
 
-      elem.appendChild(child1);
-      elem.appendChild(child2);
-      elem.appendChild(child3);
+      parent1.appendChild(elem1);
+      parent1.appendChild(elem2);
+      parent1.appendChild(elem3);
+      parent2.appendChild(elem4);
+      parent2.appendChild(elem5);
+      parent3.appendChild(elem6);
 
-      strictEqual(wrap.next(true).$, child3);
+      elem3.className = 'foo';
+      elem5.className = 'foo';
+
+      const next = wrap.next('.foo').$;
+
+      strictEqual(next.length, 2);
+      strictEqual(next[0], elem3);
+      strictEqual(next[1], elem5);
     });
   });
-  // TODO: off()
+  describe('off()', () => {
+    it('should support (event) syntax', (done) => {
+      const elem = nativeDocument.createElement('div');
+      const wrap = new Elem(elem);
+      let times = 0;
+
+      wrap.on('click', () => {
+        if (++times === 1) {
+          done();
+
+          return wrap.off('click');
+        }
+
+        done('Hasn\'t been cleared');
+      });
+      wrap
+        .dispatch('click')
+        .dispatch('click');
+    });
+    it('should support (events) syntax', (done) => {
+      const elem = nativeDocument.createElement('div');
+      const wrap = new Elem(elem);
+      let times = 0;
+
+      wrap.on('click', () => {
+        if (++times === 1) {
+          done();
+
+          return wrap.off('click, contextmenu');
+        }
+
+        done('Hasn\'t been cleared');
+      });
+      wrap
+        .dispatch('click')
+        .dispatch('contextmenu');
+    });
+  });
   describe('on()', () => {
     it('should support (event, listener) syntax', (done) => {
       const elem = nativeDocument.createElement('div');
@@ -1215,6 +1805,21 @@ describe('it should test Elem#', () => {
         done();
       });
       wrap.dispatch('click');
+    });
+    it('should support (events, listener) syntax', (done) => {
+      const elem = nativeDocument.createElement('div');
+      const wrap = new Elem(elem);
+      let times = 0;
+
+      wrap.on('click, contextmenu', () => {
+        if (++times === 2) {
+          done();
+        }
+      });
+
+      wrap
+        .dispatch('click')
+        .dispatch('contextmenu');
     });
     it('should support ({ [event]: listener, ... }) syntax', (done) => {
       let times = 0;
@@ -1233,8 +1838,37 @@ describe('it should test Elem#', () => {
       });
       wrap.dispatch('click').dispatch('contextmenu');
     });
-    // TODO: test (event, secector, syntax)
-    // TODO: test ({ [event]: listener }, selector) syntax
+    it('should support (event, selector, listener) syntax', (done) => {
+      const elem = nativeDocument.createElement('div');
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const wrap = new Elem(elem);
+      let times = 0;
+
+      elem1.className = 'foo';
+      elem2.className = 'foo';
+
+      elem.appendChild(elem1);
+      elem.appendChild(elem2);
+      elem.appendChild(elem3);
+
+      wrap.on('click', '.foo', () => {
+        if (++times === 2) {
+          return done();
+        }
+
+        if (times < 3) {
+          return;
+        }
+
+        done(new Error('Hasn\'t been filtered'));
+      });
+
+      elem1.click();
+      elem2.click();
+      elem3.click();
+    });
     it('should return removeEventListeners function', (done) => {
       let times = 0;
 
@@ -1242,42 +1876,130 @@ describe('it should test Elem#', () => {
       const wrap = new Elem(elem);
       const removeListener = wrap.on('click', () => {
         if (++times === 1) {
+          done();
+
           return removeListener();
         }
 
         done(new Error('Not removed'));
       });
 
-      wrap.dispatch('click').dispatch('click');
-
-      setTimeout(done, 50);
+      wrap
+        .dispatch('click')
+        .dispatch('click');
     });
-    // TODO: test selector parameter
+    it('should return removeEventListeners function that supports arguments', (done) => {
+      let times = 0;
+
+      const elem = nativeDocument.createElement('div');
+      const wrap = new Elem(elem);
+      const removeListener = wrap.on('click, contextmenu', () => {
+        if (++times === 2) {
+          done();
+
+          return removeListener('click');
+        }
+
+        if (times < 2) {
+          return;
+        }
+
+        done(new Error('Not removed'));
+      });
+
+      wrap
+        .dispatch('click')
+        .dispatch('contextmenu')
+        .dispatch('click');
+    });
   });
-  describe('get outerHTML', () => {
-    it('should return the same as element.outerHTML', () => {
+  describe('outerHeight', () => {
+    it('should return outer height', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new Elem(elem);
 
-      elem.innerHTML = '<input />';
+      nativeBody.appendChild(elem);
 
-      strictEqual(wrap.outerHTML, elem.outerHTML);
+      wrap.css({
+        boxSizing: 'border-box',
+        height: '200px',
+        paddingTop: '2px',
+        paddingBottom: '3px',
+        borderTop: '1px solid black',
+        borderBottom: '4px solid black',
+        marginTop: '0px',
+        marginBottom: '5px'
+      });
+
+      strictEqual(wrap.outerHeight, 205);
+
+      wrap.css('box-sizing', 'content-box');
+
+      strictEqual(wrap.outerHeight, 215);
+
+      elem.remove();
     });
   });
-  // TODO: outerHeight
-  // TODO: outerWidth
+  describe('outerWidth', () => {
+    it('should return outer width', () => {
+      const elem = nativeDocument.createElement('div');
+      const wrap = new Elem(elem);
+
+      nativeBody.appendChild(elem);
+
+      wrap.css({
+        boxSizing: 'border-box',
+        width: '200px',
+        paddingLeft: '2px',
+        paddingRight: '3px',
+        borderLeft: '1px solid black',
+        borderRight: '4px solid black',
+        marginLeft: '0px',
+        marginRight: '5px'
+      });
+
+      strictEqual(wrap.outerWidth, 205);
+
+      wrap.css('box-sizing', 'content-box');
+
+      strictEqual(wrap.outerWidth, 215);
+
+      elem.remove();
+    });
+  });
   describe('parent()', () => {
-    it('should return a wrap of the parent element', () => {
+    it('should return a wrap of the parent elements of all the elements in the set', () => {
+      const parent1 = nativeDocument.createElement('div');
+      const parent2 = nativeDocument.createElement('div');
+      const parent3 = nativeDocument.createElement('div');
       const elem1 = nativeDocument.createElement('div');
       const elem2 = nativeDocument.createElement('div');
-      const parent = nativeDocument.createElement('div');
-      const wrap1 = new Elem(elem1);
-      const wrap2 = new Elem(elem2);
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const elem5 = nativeDocument.createElement('div');
+      const elem6 = nativeDocument.createElement('div');
+      const wrap = new Elem([
+        elem1,
+        elem2,
+        elem3,
+        elem4,
+        elem5,
+        elem6
+      ]);
 
-      parent.appendChild(elem1);
+      parent1.appendChild(elem1);
+      parent1.appendChild(elem2);
+      parent1.appendChild(elem3);
+      parent2.appendChild(elem4);
+      parent2.appendChild(elem5);
+      parent3.appendChild(elem6);
 
-      strictEqual(wrap1.parent().$, parent);
-      strictEqual(wrap2.parent().$, null);
+      const parents = wrap.parent().$;
+
+      strictEqual(parents.length, 3);
+      strictEqual(parents[0], parent1);
+      strictEqual(parents[1], parent2);
+      strictEqual(parents[2], parent3);
     });
   });
   describe('parentTree()', () => {
@@ -1285,55 +2007,143 @@ describe('it should test Elem#', () => {
       const parent1 = nativeDocument.createElement('div');
       const parent2 = nativeDocument.createElement('div');
       const parent3 = nativeDocument.createElement('div');
-      const child = nativeDocument.createElement('div');
-      const wrap = new Elem(child);
+      const parent4 = nativeDocument.createElement('div');
+      const parent5 = nativeDocument.createElement('div');
+      const parent6 = nativeDocument.createElement('div');
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const elem5 = nativeDocument.createElement('div');
+      const elem6 = nativeDocument.createElement('div');
+      const wrap = new Elem([
+        elem1,
+        elem2,
+        elem3,
+        elem4,
+        elem5,
+        elem6
+      ]);
 
-      parent1.appendChild(parent2);
-      parent2.appendChild(parent3);
-      parent3.appendChild(child);
+      parent1.appendChild(elem1);
+      parent1.appendChild(elem2);
+      parent1.appendChild(elem3);
+      parent2.appendChild(elem4);
+      parent2.appendChild(elem5);
+      parent3.appendChild(elem6);
+      parent4.appendChild(parent1);
+      parent5.appendChild(parent4);
+      parent6.appendChild(parent2);
 
       const tree = wrap.parentTree().$;
 
-      strictEqual(tree[0].$, parent3);
-      strictEqual(tree[1].$, parent2);
-      strictEqual(tree[2].$, parent1);
+      strictEqual(tree.length, 6);
+      strictEqual(tree[0], parent1);
+      strictEqual(tree[1], parent4);
+      strictEqual(tree[2], parent5);
+      strictEqual(tree[3], parent2);
+      strictEqual(tree[4], parent6);
+      strictEqual(tree[5], parent3);
     });
   });
   describe('prev()', () => {
-    it('should return a wrap of the previous sibling', () => {
-      const parent = nativeDocument.createElement('div');
+    it('should return a wrap of the previous elements to all elements in the set with no arguments', () => {
+      const parent1 = nativeDocument.createElement('div');
+      const parent2 = nativeDocument.createElement('div');
       const elem1 = nativeDocument.createElement('div');
       const elem2 = nativeDocument.createElement('div');
-      const wrap1 = new Elem(elem1);
-      const wrap2 = new Elem(elem2);
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const wrap = new Elem([
+        elem1,
+        elem2,
+        elem3,
+        elem4
+      ]);
 
-      parent.appendChild(elem1);
-      parent.appendChild(elem2);
+      parent1.appendChild(elem1);
+      parent1.appendChild(elem2);
+      parent2.appendChild(elem3);
+      parent2.appendChild(elem4);
 
-      strictEqual(wrap1.prev().$, null);
-      strictEqual(wrap2.prev().$, elem1);
+      const prev = wrap.prev().$;
+
+      strictEqual(prev.length, 2);
+      strictEqual(prev[0], elem1);
+      strictEqual(prev[1], elem3);
     });
-    it('should return a wrap of the previous element sibling', () => {
-      const elem = nativeDocument.createElement('div');
-      const child1 = nativeDocument.createElement('div');
-      const child2 = nativeDocument.createTextNode('div');
-      const child3 = nativeDocument.createElement('div');
-      const wrap = new Elem(child3);
+    it('should return a wrap of the previous elements that match selector to all elements in the set with selector argument', () => {
+      const parent1 = nativeDocument.createElement('div');
+      const parent2 = nativeDocument.createElement('div');
+      const parent3 = nativeDocument.createElement('div');
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const elem5 = nativeDocument.createElement('div');
+      const elem6 = nativeDocument.createElement('div');
+      const wrap = new Elem([
+        elem1,
+        elem2,
+        elem3,
+        elem4,
+        elem5,
+        elem6
+      ]);
 
-      elem.appendChild(child1);
-      elem.appendChild(child2);
-      elem.appendChild(child3);
+      parent1.appendChild(elem1);
+      parent1.appendChild(elem2);
+      parent1.appendChild(elem3);
+      parent2.appendChild(elem4);
+      parent2.appendChild(elem5);
+      parent3.appendChild(elem6);
 
-      strictEqual(wrap.prev(true).$, child1);
+      elem1.className = 'foo';
+      elem4.className = 'foo';
+
+      const prev = wrap.prev('.foo').$;
+
+      strictEqual(prev.length, 2);
+      strictEqual(prev[0], elem1);
+      strictEqual(prev[1], elem4);
     });
   });
-  // TODO: ref()
+  describe('ref()', () => {
+    it('should set references to elements', () => {
+      const elem1 = nativeDocument.createElement('img');
+      const elem2 = nativeDocument.createElement('form');
+      const elem3 = nativeDocument.createElement('script');
+      const elem4 = nativeDocument.createElement('link');
+      const elem5 = nativeDocument.createElement('iframe');
+      const elem6 = nativeDocument.createElement('audio');
+      const elem7 = nativeDocument.createElement('video');
+      const wrap = new Elem([
+        elem1,
+        elem2,
+        elem3,
+        elem4,
+        elem5,
+        elem6,
+        elem7
+      ]);
+
+      wrap.ref('http://google.com/');
+
+      strictEqual(elem1.src, 'http://google.com/');
+      strictEqual(elem2.action, 'http://google.com/');
+      strictEqual(elem3.src, 'http://google.com/');
+      strictEqual(elem4.href, 'http://google.com/');
+      strictEqual(elem5.src, 'http://google.com/');
+      strictEqual(elem6.src, 'http://google.com/');
+      strictEqual(elem7.src, 'http://google.com/');
+    });
+  });
   describe('remove()', () => {
     it('should remove the element', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new Elem(elem);
 
-      nativeDocument.body.appendChild(elem);
+      nativeBody.appendChild(elem);
       wrap.remove();
 
       strictEqual(nativeDocument.body.contains(elem), false);
@@ -1360,7 +2170,7 @@ describe('it should test Elem#', () => {
       const wrap = new Elem(elem);
 
       elem.className = 'foo bar baz';
-      wrap.removeClasses('foo', 'bar', 'baz');
+      wrap.removeClass('foo', 'bar', 'baz');
 
       strictEqual(elem.classList.contains('foo'), false);
       strictEqual(elem.classList.contains('bar'), false);
@@ -1387,31 +2197,62 @@ describe('it should test Elem#', () => {
       strictEqual(elem.style.marginBottom, '');
     });
   });
-  // TODO: replace()
+  describe('replace()', () => {
+    it('should replace the element with another', () => {
+      const parent = nativeDocument.createElement('div');
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem = [
+        elem1,
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div')
+      ];
+      const wrap = new Elem(elem);
+
+      parent.appendChild(elem1);
+
+      wrap.replace(elem2);
+
+      strictEqual(elem1.parentNode, null);
+      strictEqual(elem2.parentNode, parent);
+    });
+  });
   describe('setOf()', () => {
     it('should add set of elements of specified type', () => {
-      const elem = nativeDocument.createElement('div');
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem = [
+        elem1,
+        elem2,
+        elem3
+      ];
       const wrap = new Elem(elem);
-      const elements = [];
 
-      wrap.setOf('div', 3, (elem) => {
-        elements.push(elem.$);
-      });
+      wrap
+        .setOf('div', 3, (elem, index) => {
+          elem.className = index;
+        })
+        .forEach((elem, index) => {
+          index = new Num(index / 3).floor;
 
-      deepStrictEqual(elem.childNodes, elements);
+          strictEqual(elem.parentElement, wrap.elem(index).$[0]);
+          strictEqual(elem.className, index);
+        });
     });
   });
   describe('show()', () => {
-    it('should not change display if it is not none and delete element.dwayneData.previousDisplay', () => {
+    it('should not change display if it is not none and set element.dwayneData.previousDisplay to \'\'', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new Elem(elem);
 
+      elem.style.display = 'inline-block';
       wrap.hide();
       elem.style.display = 'inline';
       wrap.show();
 
       strictEqual(elem.style.display, 'inline');
-      strictEqual('previousDisplay' in elem.dwayneData, false);
+      strictEqual(elem.dwayneData.previousDisplay, '');
     });
     it('should set display to element.dwayneData.previousDisplay', () => {
       const elem = nativeDocument.createElement('div');
@@ -1524,116 +2365,236 @@ describe('it should test Elem#', () => {
       strictEqual(elem4.classList.contains('baz'), true);
     });
   });
-  describe('type()', () => {
-    it('should return type with no arguments', () => {
-      const elem = nativeDocument.createElement('input');
-      const wrap = new Elem(elem);
-
-      elem.type = 'email';
-
-      strictEqual(wrap.type(), 'email');
-    });
-    it('should set type with more arguments', () => {
-      const elem = nativeDocument.createElement('input');
-      const wrap = new Elem(elem);
-
-      wrap.type('email');
-
-      strictEqual(elem.type, 'email');
-    });
-  });
   describe('up()', () => {
-    it('should return a wrap of the parent element with no arguments', () => {
-      const elem = nativeDocument.createElement('div');
-      const parent = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
-
-      parent.appendChild(elem);
-
-      strictEqual(wrap.up().$, parent);
-    });
-    it('should return a wrap of the element with 0 argument', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
-
-      strictEqual(wrap.up(0).$, elem);
-    });
-    it('should return a wrap of the n-th parent element with n argument', () => {
+    it('should return a wrap of the parent elements with no arguments', () => {
       const parent1 = nativeDocument.createElement('div');
       const parent2 = nativeDocument.createElement('div');
       const parent3 = nativeDocument.createElement('div');
-      const child = nativeDocument.createElement('div');
-      const wrap = new Elem(child);
+      const parent4 = nativeDocument.createElement('div');
+      const parent5 = nativeDocument.createElement('div');
+      const parent6 = nativeDocument.createElement('div');
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const elem5 = nativeDocument.createElement('div');
+      const elem6 = nativeDocument.createElement('div');
+      const wrap = new Elem([
+        elem1,
+        elem2,
+        elem3,
+        elem4,
+        elem5,
+        elem6
+      ]);
 
-      parent1.appendChild(parent2);
-      parent2.appendChild(parent3);
-      parent3.appendChild(child);
+      parent1.appendChild(elem1);
+      parent1.appendChild(elem2);
+      parent1.appendChild(elem3);
+      parent2.appendChild(elem4);
+      parent2.appendChild(elem5);
+      parent3.appendChild(elem6);
+      parent4.appendChild(parent1);
+      parent5.appendChild(parent4);
+      parent6.appendChild(parent2);
 
-      strictEqual(wrap.up(1).$, parent3);
-      strictEqual(wrap.up(2).$, parent2);
-      strictEqual(wrap.up(3).$, parent1);
+      const parents = wrap.up().$;
+
+      strictEqual(parents.length, 3);
+      strictEqual(parents[0], parent1);
+      strictEqual(parents[1], parent2);
+      strictEqual(parents[2], parent3);
+    });
+    it('should return a wrap of the elements with 0 argument', () => {
+      const parent1 = nativeDocument.createElement('div');
+      const parent2 = nativeDocument.createElement('div');
+      const parent3 = nativeDocument.createElement('div');
+      const parent4 = nativeDocument.createElement('div');
+      const parent5 = nativeDocument.createElement('div');
+      const parent6 = nativeDocument.createElement('div');
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const elem5 = nativeDocument.createElement('div');
+      const elem6 = nativeDocument.createElement('div');
+      const wrap = new Elem([
+        elem1,
+        elem2,
+        elem3,
+        elem4,
+        elem5,
+        elem6
+      ]);
+
+      parent1.appendChild(elem1);
+      parent1.appendChild(elem2);
+      parent1.appendChild(elem3);
+      parent2.appendChild(elem4);
+      parent2.appendChild(elem5);
+      parent3.appendChild(elem6);
+      parent4.appendChild(parent1);
+      parent5.appendChild(parent4);
+      parent6.appendChild(parent2);
+
+      const parents = wrap.up(0).$;
+
+      strictEqual(parents.length, 6);
+      strictEqual(parents[0], elem1);
+      strictEqual(parents[1], elem2);
+      strictEqual(parents[2], elem3);
+      strictEqual(parents[3], elem4);
+      strictEqual(parents[4], elem5);
+      strictEqual(parents[5], elem6);
+    });
+    it('should return a wrap of the n-th parent elements with n argument', () => {
+      const parent1 = nativeDocument.createElement('div');
+      const parent2 = nativeDocument.createElement('div');
+      const parent3 = nativeDocument.createElement('div');
+      const parent4 = nativeDocument.createElement('div');
+      const parent5 = nativeDocument.createElement('div');
+      const parent6 = nativeDocument.createElement('div');
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const elem5 = nativeDocument.createElement('div');
+      const elem6 = nativeDocument.createElement('div');
+      const wrap = new Elem([
+        elem1,
+        elem2,
+        elem3,
+        elem4,
+        elem5,
+        elem6
+      ]);
+
+      parent1.appendChild(elem1);
+      parent1.appendChild(elem2);
+      parent1.appendChild(elem3);
+      parent2.appendChild(elem4);
+      parent2.appendChild(elem5);
+      parent3.appendChild(elem6);
+      parent4.appendChild(parent1);
+      parent5.appendChild(parent4);
+      parent6.appendChild(parent2);
+
+      const parents = wrap.up(2).$;
+
+      strictEqual(parents.length, 2);
+      strictEqual(parents[0], parent4);
+      strictEqual(parents[1], parent6);
     });
   });
-  // TODO: validate()
-  describe('value()', () => {
-    it('should return value with no arguments', () => {
-      const elem = nativeDocument.createElement('input');
-      const wrap = new Elem(elem);
+  describe('validate()', () => {
+    it('should return a wrap of the parent elements with no arguments', () => {
+      const form = nativeDocument.createElement('form');
+      const input = nativeDocument.createElement('input');
+      const formWrap = new Elem(form);
+      const inputWrap = new Elem(input);
+      let errors;
 
-      elem.value = 'dwayne';
+      form.appendChild(input);
 
-      strictEqual(wrap.value(), 'dwayne');
-    });
-    it('should set value with more arguments', () => {
-      const elem = nativeDocument.createElement('input');
-      const wrap = new Elem(elem);
+      inputWrap.attr({
+        name: 'input1',
+        required: ''
+      });
 
-      wrap.value('dwayne');
+      errors = inputWrap.validate();
 
-      strictEqual(elem.value, 'dwayne');
+      strictEqual(errors.input1.message, 'Please fill out this field.');
+
+      errors = formWrap.validate();
+
+      strictEqual(errors.input1.message, 'Please fill out this field.');
+
+      inputWrap.validate((text) => {
+        if (text[0].toLowerCase() === text[0]) {
+          throw new Error('Input must be capitilized.');
+        }
+      });
+
+      errors = inputWrap
+        .prop('value', 't')
+        .validate();
+
+      strictEqual(errors.input1.message, 'Input must be capitilized.');
+
+      errors = formWrap.validate();
+
+      strictEqual(errors.input1.message, 'Input must be capitilized.');
+
+      errors = inputWrap
+        .prop('value', 'T')
+        .validate();
+
+      strictEqual(errors, null);
     });
   });
 });
 
 describe('it should test exported methods from Elem', () => {
   describe('find()', () => {
-    it('should find a wrap of first element in nested children, that matches selector', () => {
+    it('should find a wrap of all elements in nested children, that matches selector', () => {
       const elem = nativeDocument.createElement('div');
       const child1 = nativeDocument.createElement('div');
       const child2 = nativeDocument.createElement('div');
       const child3 = nativeDocument.createElement('div');
 
-      nativeDocument.body.appendChild(elem);
+      nativeBody.appendChild(elem);
       elem.appendChild(child1);
       elem.appendChild(child2);
       child2.appendChild(child3);
 
-      child1.className = 'foo';
-      child3.className = 'foo';
+      child1.className = 'dwayne-unique-class';
+      child3.className = 'dwayne-unique-class';
 
-      strictEqual(find('.foo').$, child1);
+      const found = find('.dwayne-unique-class').$;
 
-      elem.remove();
-    });
-    it('should find a wrap of null if not find', () => {
-      const elem = nativeDocument.createElement('div');
-      const child1 = nativeDocument.createElement('div');
-      const child2 = nativeDocument.createElement('div');
-      const child3 = nativeDocument.createElement('div');
-
-      nativeDocument.body.appendChild(elem);
-      elem.appendChild(child1);
-      elem.appendChild(child2);
-      child2.appendChild(child3);
-
-      elem.className = 'foo';
-      child3.className = 'foo';
-
-      strictEqual(find('.bar').$, null);
+      strictEqual(found.length, 2);
+      strictEqual(found[0], child1);
+      strictEqual(found[1], child3);
 
       elem.remove();
     });
   });
-  // TODO: parseHTML()
-  // TODO: px()
+  describe('parseHTML()', () => {
+    it('should parse HTML', () => {
+      const html = `
+        <div id="foo">
+          <div attr="value"></div>
+        </div>
+        <span class="foo"></span>
+        <input type="button"/>
+      `;
+      const parsed = parseHTML(html);
+      const parsed0 = parsed.elem(0);
+      const parsed1 = parsed.elem(1);
+      const parsed2 = parsed.elem(2);
+
+      strictEqual(parsed.length, 3);
+      strictEqual(parsed0.name, 'div');
+      strictEqual(parsed0.id(), 'foo');
+      strictEqual(parsed0.children().length, 1);
+      strictEqual(parsed0.find('div').attr('attr'), 'value');
+      strictEqual(parsed1.name, 'span');
+      strictEqual(parsed1.class().join(' '), 'foo');
+      strictEqual(parsed2.name, 'input');
+      strictEqual(parsed2.attr('type'), 'button');
+    });
+  });
+  describe('px()', () => {
+    it('should return number of px from the string', () => {
+      const px1 = '';
+      const px2 = 0;
+      const px3 = '0px';
+      const px4 = '42px';
+
+      strictEqual(px(px1), 0);
+      strictEqual(px(px2), 0);
+      strictEqual(px(px3), 0);
+      strictEqual(px(px4), 42);
+    });
+  });
 });
