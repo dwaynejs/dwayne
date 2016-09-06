@@ -2,7 +2,38 @@ import { deepStrictEqual, notEqual, strictEqual } from 'assert';
 import Super from '../lib/Super';
 
 describe('it should test Super.', () => {
-  // TODO: addProperty()
+  describe('addStaticProperties()', () => {
+    it('should support (prop, value) syntax', () => {
+      Super.addStaticProperties('coolMethod', () => 42);
+
+      strictEqual(Super.coolMethod(), 42);
+    });
+    it('should support ({ [prop]: value, ... }) syntax', () => {
+      Super.addStaticProperties({
+        coolMethod: () => 42,
+        superCoolMethod: () => 42 * 42
+      });
+
+      strictEqual(Super.coolMethod(), 42);
+      strictEqual(Super.superCoolMethod(), 42 * 42);
+    });
+  });
+  describe('addInstanceProperties()', () => {
+    it('should support (prop, value) syntax', () => {
+      Super.addInstanceProperties('coolMethod', () => 42);
+
+      strictEqual(new Super().coolMethod(), 42);
+    });
+    it('should support ({ [prop]: value, ... }) syntax', () => {
+      Super.addInstanceProperties({
+        coolMethod: () => 42,
+        superCoolMethod: () => 42 * 42
+      });
+
+      strictEqual(new Super().coolMethod(), 42);
+      strictEqual(new Super().superCoolMethod(), 42 * 42);
+    });
+  });
 });
 
 describe('it should test Super#', () => {
@@ -1028,7 +1059,7 @@ describe('it should test Super#', () => {
 
       deepStrictEqual(wrap.max(), { key: 'c', value: 3 });
     });
-    it('should return { key, value: max } using mapFn', () => {
+    it('should return { key, value: max } using callback argument', () => {
       const o = { a: 1, b: 2, c: 3 };
       const wrap = new Super(o);
       const max = wrap.max((value) => 4 - value);
@@ -1049,7 +1080,7 @@ describe('it should test Super#', () => {
 
       deepStrictEqual(wrap.min(), { key: 'a', value: 1 });
     });
-    it('should return { key, value: min } using mapFn', () => {
+    it('should return { key, value: min } using callback argument', () => {
       const o = { a: 1, b: 2, c: 3 };
       const wrap = new Super(o);
       const min = wrap.min((value) => 4 - value);
@@ -1058,7 +1089,7 @@ describe('it should test Super#', () => {
     });
   });
   describe('object()', () => {
-    it('should return wrap of an object using mapFn', () => {
+    it('should return wrap of an object using callback argument', () => {
       const o = { a: 1, b: 2, c: 3 };
       const wrap = new Super(o);
 
@@ -1067,7 +1098,15 @@ describe('it should test Super#', () => {
         { 1: 'a1', 2: 'b2', 3: 'c3' }
       );
     });
-    // TODO: test for the second argument
+    it('should return wrap of an object using second argument', () => {
+      const o = { a: 1, b: 2, c: 3 };
+      const wrap = new Super(o);
+
+      deepStrictEqual(
+        wrap.object((array, value) => array.push(value), []).$,
+        [1, 2, 3]
+      );
+    });
   });
   describe('prop()', () => {
     it('should get object[property] with one string argument', () => {
