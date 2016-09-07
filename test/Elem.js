@@ -427,9 +427,17 @@ describe('it should test Elem#', () => {
         .width(1)
         .height(1)
         .blob({ type: 'image/png' })
-        .then((blob) => blob.readAs('dataURL'))
-        .then((string) => {
-          strictEqual(string, 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQIW2NkAAIAAAoAAggA9GkAAAAASUVORK5CYII=');
+        .then((blob) => blob.readAs('buffer'))
+        .then((buffer) => {
+          deepStrictEqual(new Int8Array(buffer), new Int8Array([
+            -119, 80, 78, 71, 13, 10, 26, 10, 0, 0,
+            0, 13, 73, 72, 68, 82, 0, 0, 0, 1, 0, 0,
+            0, 1, 8, 6, 0, 0, 0, 31, 21, -60, -119,
+            0, 0, 0, 11, 73, 68, 65, 84, 24, 87, 99,
+            96, 0, 2, 0, 0, 5, 0, 1, -86, -43, -56,
+            81, 0, 0, 0, 0, 73, 69, 78, 68, -82, 66,
+            96, -126
+          ]));
 
           done();
         })
@@ -442,9 +450,17 @@ describe('it should test Elem#', () => {
       wrap
         .ref('/image.png')
         .blob({ type: 'image/png' })
-        .then((blob) => blob.readAs('dataURL'))
-        .then((string) => {
-          strictEqual(string, 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQIW2NkAAIAAAoAAggA9GkAAAAASUVORK5CYII=');
+        .then((blob) => blob.readAs('buffer'))
+        .then((buffer) => {
+          deepStrictEqual(new Int8Array(buffer), new Int8Array([
+            -119, 80, 78, 71, 13, 10, 26, 10, 0, 0,
+            0, 13, 73, 72, 68, 82, 0, 0, 0, 1, 0, 0,
+            0, 1, 8, 6, 0, 0, 0, 31, 21, -60, -119,
+            0, 0, 0, 11, 73, 68, 65, 84, 24, 87, 99,
+            96, 0, 2, 0, 0, 5, 0, 1, -86, -43, -56,
+            81, 0, 0, 0, 0, 73, 69, 78, 68, -82, 66,
+            96, -126
+          ]));
 
           done();
         })
