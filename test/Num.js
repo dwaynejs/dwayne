@@ -11,6 +11,7 @@ const ln10 = Math.LN10;
 const pow = Math.pow;
 const sqrt = Math.sqrt;
 const abs = Math.abs;
+const exp = Math.exp;
 const ceil = Math.ceil;
 const floor = Math.floor;
 const round = Math.round;
@@ -315,10 +316,10 @@ describe('it should test Num#', () => {
       const wrap4 = new Num(n4);
       const wrap5 = new Num(n5);
       const wrap6 = new Num(n6);
-      const diff1 = abs(wrap1.exp - pow(e, n1));
-      const diff2 = abs(wrap2.exp - pow(e, n2));
-      const diff3 = abs(wrap3.exp - pow(e, n3));
-      const diff4 = abs(wrap4.exp - pow(e, n4));
+      const diff1 = abs(wrap1.exp - exp(n1));
+      const diff2 = abs(wrap2.exp - exp(n2));
+      const diff3 = abs(wrap3.exp - exp(n3));
+      const diff4 = abs(wrap4.exp - exp(n4));
 
       strictEqual(diff1 <= eps, true, `exp(1): ${ diff1 } <= ${ eps }`);
       strictEqual(diff2 <= eps, true, `exp(-5): ${ diff2 } <= ${ eps }`);
