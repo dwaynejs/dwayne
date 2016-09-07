@@ -448,7 +448,7 @@ describe('it should test Elem#', () => {
       const wrap = new Elem(elem);
 
       wrap
-        .ref('/image.png')
+        .ref('/test/image.png')
         .blob({ type: 'image/png' })
         .then((blob) => blob.readAs('buffer'))
         .then((buffer) => {
@@ -1518,7 +1518,7 @@ describe('it should test Elem#', () => {
       const properWrap = new Elem(proper);
       const brokenWrap = new Elem(broken);
 
-      properWrap.ref('/image.png');
+      properWrap.ref('/test/image.png');
       brokenWrap.ref('/some/broken/image');
 
       strictEqual(properWrap.isBroken(), false);
@@ -1618,7 +1618,7 @@ describe('it should test Elem#', () => {
       ];
       const wrap = new Elem(elem);
 
-      properImage.src = '/image.png';
+      properImage.src = '/test/image.png';
       brokenImage.src = '/some/broken/image';
 
       wrap
