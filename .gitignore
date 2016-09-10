@@ -3,10 +3,4 @@ node_modules/
 /docs/
 /docs_public/
 
-/bundle.js
-/bundle.js.map
-/dwayne.js
-/dwayne.js.map
-/dwayne.min.js
-/dwayne.min.js.map
 /config.json

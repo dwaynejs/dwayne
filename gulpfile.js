@@ -33,7 +33,7 @@ gulp.task('default', (callback) => {
     stats: {
       colors: true
     }
-  }).listen(serverConfig.webpackDevServer.port, 'localhost', callback);
+  }).listen(serverConfig.webpackDevServer.port, '0.0.0.0', callback);
 });
 
 gulp.task('build', ['build:default', 'build:min']);
@@ -75,21 +75,23 @@ gulp.task('build:default', () => {
   const config = _.cloneDeep(webpackConfig);
 
   config.output.filename = 'dwayne.js';
+  config.devtool = 'source-map';
 
   return gulp.src('./browser.js')
     .pipe(webpackStream(config))
-    .pipe(gulp.dest('./'));
+    .pipe(gulp.dest('./build'));
 });
 
 gulp.task('build:min', () => {
   const config = _.cloneDeep(webpackConfig);
 
   config.output.filename = 'dwayne.min.js';
+  config.devtool = 'source-map';
   config.plugins.push(new webpack.optimize.UglifyJsPlugin());
 
   return gulp.src('./browser.js')
     .pipe(webpackStream(config))
-    .pipe(gulp.dest('./'));
+    .pipe(gulp.dest('./build'));
 });
 
 gulp.task('jsdoc:compile', () => (
