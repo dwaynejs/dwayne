@@ -537,6 +537,8 @@ describe('it should test Fetch#', () => {
         url: '/foo/bar/:baz/:baz/:foo/:bar?foo=bar'
       });
 
+      // TODO: test for object (and nested object) query parameter
+
       fetch
         .before((req) => {
           strictEqual(
