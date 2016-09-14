@@ -1,4 +1,5 @@
-import D from './D';
+import global from './lib/constants/global';
+
+import D from './dwayne';
 
 global.D = D;
-global.top.D = D;

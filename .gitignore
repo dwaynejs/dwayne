@@ -4,3 +4,7 @@ node_modules/
 /docs_public/
 
 /config.json
+/bundle.js
+/bundle.js.map
+/test.js
+/test.js.map

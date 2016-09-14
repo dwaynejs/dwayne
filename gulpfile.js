@@ -1,13 +1,19 @@
 const gulp = require('gulp');
 const _ = require('lodash');
-const webpack = require('webpack');
-const webpackStream = require('webpack-stream');
-const WebpackDevServer = require('webpack-dev-server');
 const run = require('gulp-run');
+const rollup = require('rollup');
+const rollupStream = require('rollup-stream');
+const sourcemaps = require('gulp-sourcemaps');
+const buffer = require('vinyl-buffer');
+const source = require('vinyl-source-stream');
+const watch = require('rollup-watch');
+const uglify = require('rollup-plugin-uglify');
 
 const server = require('./server');
 
-const webpackConfig = require('./webpack.config');
+const rollupDevConfig = require('./rollup.dev.config');
+const rollupBuildConfig = require('./rollup.build.config');
+const rollupTestConfig = require('./rollup.test.config');
 const serverConfig = require('./config.json');
 
 const modules = [
@@ -28,12 +34,12 @@ const modules = [
   'Switcher'
 ];
 
-gulp.task('default', (callback) => {
-  new WebpackDevServer(webpack(webpackConfig), {
-    stats: {
-      colors: true
-    }
-  }).listen(serverConfig.webpackDevServer.port, '0.0.0.0', callback);
+gulp.task('default', () => {
+  const watcher = watch(rollup, rollupDevConfig);
+
+  watcher.on('event', (event) => {
+    console.log(event);
+  });
 });
 
 gulp.task('build', ['build:default', 'build:min']);
@@ -50,20 +56,20 @@ modules.forEach((module) => {
   const taskName = `test${ module ? `:${ module }` : '' }`;
   const deps = module === 'Fetch' || !module ? ['test-server'] : [];
   
-  gulp.task(taskName, deps, (callback) => {
+  gulp.task(taskName, deps, () => {
     const fileName = module || 'all';
-    const config = _.cloneDeep(webpackConfig);
+    const config = _.cloneDeep(rollupTestConfig);
 
     config.entry = [
-      `mocha!./test/${ fileName }.js`,
+      `./test/${ fileName }.js`,
       './browser.js'
     ];
 
-    new WebpackDevServer(webpack(config), {
-      stats: {
-        colors: true
-      }
-    }).listen(serverConfig.webpackTestServer.port, 'localhost', callback);
+    const watcher = watch(rollup, config);
+
+    watcher.on('event', (event) => {
+      console.log(event);
+    });
   });
 });
 
@@ -72,25 +78,26 @@ gulp.task('test-server', () =>
 );
 
 gulp.task('build:default', () => {
-  const config = _.cloneDeep(webpackConfig);
+  const config = _.cloneDeep(rollupBuildConfig);
 
-  config.output.filename = 'dwayne.js';
-  config.devtool = 'source-map';
-
-  return gulp.src('./browser.js')
-    .pipe(webpackStream(config))
+  return rollupStream(config)
+    .pipe(source('dwayne.js'))
+    .pipe(buffer())
+    .pipe(sourcemaps.init({ loadMaps: true }))
+    .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('./build'));
 });
 
 gulp.task('build:min', () => {
-  const config = _.cloneDeep(webpackConfig);
+  const config = _.cloneDeep(rollupBuildConfig);
 
-  config.output.filename = 'dwayne.min.js';
-  config.devtool = 'source-map';
-  config.plugins.push(new webpack.optimize.UglifyJsPlugin());
+  config.plugins.push(uglify());
 
-  return gulp.src('./browser.js')
-    .pipe(webpackStream(config))
+  return rollupStream(config)
+    .pipe(source('dwayne.min.js'))
+    .pipe(buffer())
+    .pipe(sourcemaps.init({ loadMaps: true }))
+    .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('./build'));
 });
 
