@@ -1,4 +1,5 @@
 import { deepStrictEqual, strictEqual } from 'assert';
+import global from '../lib/constants/global';
 import Elem, { find, px, parseHTML } from '../lib/Elem';
 import Super from '../lib/Super';
 import Num from '../lib/Num';
@@ -448,7 +449,7 @@ describe('it should test Elem#', () => {
       const wrap = new Elem(elem);
 
       wrap
-        .ref('/test/image.png')
+        .ref('/test/images/image.png')
         .blob({ type: 'image/png' })
         .then((blob) => blob.readAs('buffer'))
         .then((buffer) => {
@@ -1518,7 +1519,7 @@ describe('it should test Elem#', () => {
       const properWrap = new Elem(proper);
       const brokenWrap = new Elem(broken);
 
-      properWrap.ref('/test/image.png');
+      properWrap.ref('/test/images/image.png');
       brokenWrap.ref('/some/broken/image');
 
       strictEqual(properWrap.isBroken(), false);
@@ -1618,7 +1619,7 @@ describe('it should test Elem#', () => {
       ];
       const wrap = new Elem(elem);
 
-      properImage.src = '/test/image.png';
+      properImage.src = '/test/images/image.png';
       brokenImage.src = '/some/broken/image';
 
       wrap

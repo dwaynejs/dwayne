@@ -1,11 +1,12 @@
 import { deepStrictEqual, notEqual, strictEqual } from 'assert';
+import global from '../lib/constants/global';
 import Fetch from '../lib/Fetch';
 import D from '../lib/D';
 import { parseJSON } from '../lib/Str';
 import { isDate } from '../lib/helpers';
 
 const random = Math.random;
-const origin = 'http://localhost:8888';
+const origin = '//';
 
 describe('it should test Fetch#', () => {
   describe('after()', () => {

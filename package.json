@@ -21,11 +21,15 @@
     "rollup": "^0.35.10",
     "rollup-plugin-babel": "^2.6.1",
     "rollup-plugin-commonjs": "^4.1.0",
+    "rollup-plugin-eslint": "^3.0.0",
+    "rollup-plugin-multi-entry": "^2.0.1",
     "rollup-plugin-node-builtins": "^1.0.8",
     "rollup-plugin-node-resolve": "^2.0.0",
     "rollup-plugin-uglify": "^1.0.1",
     "rollup-stream": "^1.13.0",
     "rollup-watch": "^2.5.0",
+    "socket.io": "^1.4.8",
+    "socket.io-client": "^1.4.8",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
   }
