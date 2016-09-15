@@ -1,4 +1,5 @@
 import { strictEqual } from 'assert';
+import global from '../lib/constants/global';
 import {
   isArray, isArrayLike, isBoolean, isDate, isDateLike, isElement, isFinite, isFunction,
   isInteger, isIntegerLike, isNaN, isNull, isNullOrUndefined, isNumber, isNumberLike,

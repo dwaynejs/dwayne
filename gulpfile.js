@@ -1,14 +1,23 @@
 const gulp = require('gulp');
 const _ = require('lodash');
-const webpack = require('webpack');
-const webpackStream = require('webpack-stream');
-const WebpackDevServer = require('webpack-dev-server');
 const run = require('gulp-run');
+const rollup = require('rollup');
+const rollupStream = require('rollup-stream');
+const sourcemaps = require('gulp-sourcemaps');
+const buffer = require('vinyl-buffer');
+const source = require('vinyl-source-stream');
+const watch = require('rollup-watch');
+const uglify = require('rollup-plugin-uglify');
 
-const server = require('./server');
+const createServer = require('./server');
 
-const webpackConfig = require('./webpack.config');
-const serverConfig = require('./config.json');
+const rollupDevConfig = require('./rollup.dev.config');
+const rollupBuildConfig = require('./rollup.build.config');
+const rollupTestConfig = require('./rollup.test.config');
+const config = require('./config.json');
+
+const devServer = createServer();
+const testServer = createServer(true);
 
 const modules = [
   '',
@@ -28,69 +37,90 @@ const modules = [
   'Switcher'
 ];
 
-gulp.task('default', (callback) => {
-  new WebpackDevServer(webpack(webpackConfig), {
-    stats: {
-      colors: true
+gulp.task('default', ['server:dev'], () => {
+  const watcher = watch(rollup, rollupDevConfig);
+
+  watcher.on('event', (event) => {
+    console.log(event);
+
+    if (event.code === 'BUILD_START') {
+      devServer.io.emit('toreload');
     }
-  }).listen(serverConfig.webpackDevServer.port, '0.0.0.0', callback);
+
+    if (event.code === 'BUILD_END') {
+      devServer.io.emit('reload');
+    }
+  });
 });
 
 gulp.task('build', ['build:default', 'build:min']);
 
-gulp.task('jsdoc', ['test-server', 'jsdoc:compile'], () => (
+gulp.task('jsdoc', ['server:dev', 'jsdoc:compile'], () => (
   gulp.watch(['./lib/**/*.js'], ['jsdoc:compile'])
 ));
 
-gulp.task('jsdoc:public', ['test-server', 'jsdoc:public:compile'], () => (
+gulp.task('jsdoc:public', ['server:dev', 'jsdoc:public:compile'], () => (
   gulp.watch(['./lib/**/*.js'], ['jsdoc:public:compile'])
 ));
 
 modules.forEach((module) => {
   const taskName = `test${ module ? `:${ module }` : '' }`;
-  const deps = module === 'Fetch' || !module ? ['test-server'] : [];
   
-  gulp.task(taskName, deps, (callback) => {
+  gulp.task(taskName, ['server:test'], () => {
     const fileName = module || 'all';
-    const config = _.cloneDeep(webpackConfig);
+    const config = _.cloneDeep(rollupTestConfig);
 
     config.entry = [
-      `mocha!./test/${ fileName }.js`,
-      './browser.js'
+      `./test/${ fileName }.js`,
+      './browser.js',
+      './livereload.js'
     ];
 
-    new WebpackDevServer(webpack(config), {
-      stats: {
-        colors: true
+    const watcher = watch(rollup, config);
+
+    watcher.on('event', (event) => {
+      console.log(event);
+
+      if (event.code === 'BUILD_START') {
+        testServer.io.emit('toreload');
       }
-    }).listen(serverConfig.webpackTestServer.port, 'localhost', callback);
+
+      if (event.code === 'BUILD_END') {
+        testServer.io.emit('reload');
+      }
+    });
   });
 });
 
-gulp.task('test-server', () =>
-  server(serverConfig.testServer.port)
-);
+gulp.task('server:dev', () => (
+  devServer.listen(config.devServer.port)
+));
+
+gulp.task('server:test', () => (
+  testServer.listen(config.testServer.port)
+));
 
 gulp.task('build:default', () => {
-  const config = _.cloneDeep(webpackConfig);
+  const config = _.cloneDeep(rollupBuildConfig);
 
-  config.output.filename = 'dwayne.js';
-  config.devtool = 'source-map';
-
-  return gulp.src('./browser.js')
-    .pipe(webpackStream(config))
+  return rollupStream(config)
+    .pipe(source('dwayne.js'))
+    .pipe(buffer())
+    .pipe(sourcemaps.init({ loadMaps: true }))
+    .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('./build'));
 });
 
 gulp.task('build:min', () => {
-  const config = _.cloneDeep(webpackConfig);
+  const config = _.cloneDeep(rollupBuildConfig);
 
-  config.output.filename = 'dwayne.min.js';
-  config.devtool = 'source-map';
-  config.plugins.push(new webpack.optimize.UglifyJsPlugin());
+  config.plugins.push(uglify());
 
-  return gulp.src('./browser.js')
-    .pipe(webpackStream(config))
+  return rollupStream(config)
+    .pipe(source('dwayne.min.js'))
+    .pipe(buffer())
+    .pipe(sourcemaps.init({ loadMaps: true }))
+    .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('./build'));
 });
 

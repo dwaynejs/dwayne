@@ -1,11 +1,8 @@
 {
-  "testServer": {
+  "devServer": {
     "port": 8888
   },
-  "webpackDevServer": {
+  "testServer": {
     "port": 7777
-  },
-  "webpackTestServer": {
-    "port": 2222
   }
 }
