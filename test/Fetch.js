@@ -538,18 +538,44 @@ describe('it should test Fetch#', () => {
         url: '/foo/bar/:baz/:baz/:foo/:bar?foo=bar'
       });
 
-      // TODO: test for object (and nested object) query parameter
-
       fetch
         .before((req) => {
           strictEqual(
             req.url,
-            `${ origin }/foo/bar/foo/foo/bar/baz?foo=bar&bar%5B%5D=foo&bar%5B%5D=baz&baz=foo`
+            `
+              /foo/bar/foo/foo/bar/baz?foo=bar&a=2&b%5B%5D=s&b%5B%5D=2&c%5Bd%5D=t&
+              c%5Be%5D%5Bf%5D=3&c%5Be%5D%5Bg%5D%5B%5D=5&c%5Be%5D%5Bg%5D%5B%5D%5Bh%5D=1&
+              c%5Be%5D%5Bg%5D%5B%5D%5Bi%5D%5B%5D=2&c%5Be%5D%5Bg%5D%5B%5D%5Bi%5D%5B%5D%5B%5D=9&
+              c%5Be%5D%5Bg%5D%5B%5D%5Bi%5D%5B%5D%5B%5D=p
+            `.replace(/\s+/g, '')
           );
         }, false)
         .request({
-          params: { foo: 'bar', bar: 'baz', baz: 'foo' },
-          query: { bar: ['foo', 'baz'], baz: 'foo' }
+          params: {
+            foo: 'bar',
+            bar: 'baz',
+            baz: 'foo'
+          },
+          query: {
+            a: 2,
+            b: ['s', 2],
+            c: {
+              d: 't',
+              e: {
+                f: 3,
+                g: [
+                  '5',
+                  {
+                    h: 1,
+                    i: [
+                      2,
+                      [9, 'p']
+                    ]
+                  }
+                ]
+              }
+            }
+          }
         })
         .then(() => done())
         .catch(done);

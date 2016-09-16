@@ -54,6 +54,10 @@ module.exports = (test) => {
     });
   }
 
+  app.use(/.*/, (req, res) => {
+    res.sendFile(path.resolve('./index.html'));
+  });
+
   return {
     listen(port) {
       return new Promise((resolve, reject) => {

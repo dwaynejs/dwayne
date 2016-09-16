@@ -2251,10 +2251,12 @@ describe('it should test Elem#', () => {
           elem.className = index;
         })
         .forEach((elem, index) => {
-          index = new Num(index / 3).floor;
+          const index1 = new Num(index / 3).floor;
 
-          strictEqual(elem.parentElement, wrap.elem(index).$[0]);
-          strictEqual(elem.className, index);
+          index %= 3;
+
+          strictEqual(elem.parentElement, wrap.elem(index1).$[0]);
+          strictEqual(elem.className, String(index));
         });
     });
   });
