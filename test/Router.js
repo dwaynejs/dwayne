@@ -9,6 +9,7 @@ import UserStateTemplate from './fixtures/Router/UserState.pug';
 import UserFriendStateTemplate from './fixtures/Router/UserFriendState.pug';
 import RegExpStateTemplate from './fixtures/Router/RegExpState.pug';
 import QueryStateTemplate from './fixtures/Router/QueryState.pug';
+import UnreachableStateTemplate from './fixtures/Router/UnreachableState.pug';
 import D, { Router, registerState, go, find } from '../dwayne';
 
 let MainState;
@@ -20,6 +21,8 @@ let FriendsListState;
 let UserFriendState;
 let RegExpState;
 let QueryState;
+let UnreachableState;
+let StringTemplateState;
 
 before((done) => {
   const removeListener = Router.on('init', () => {
@@ -88,21 +91,26 @@ describe('it should test Router', () => {
       MainState.go();
     });
     it('should be able to stop stoppable events', (done) => {
-      clean = MainState.on({
+      clean = UnreachableState.on({
         beforeLoad(e) {
           e.stop();
 
           done();
-        },
-        load() {
+        }
+      });
+
+      UnreachableState.on({
+        load(e) {
+          console.log('loaded', e);
+
           done(new Error('Couldn\'t stop the event'));
         }
       });
 
-      MainState.go();
+      UnreachableState.go();
     });
     it('should be able to stop stoppable events after pausing them', (done) => {
-      clean = MainState.on({
+      clean = UnreachableState.on({
         beforeLoad(e) {
           e.pause();
 
@@ -111,13 +119,16 @@ describe('it should test Router', () => {
 
             done();
           }, 100);
-        },
+        }
+      });
+
+      UnreachableState.on({
         load() {
           done(new Error('Couldn\'t stop the event'));
         }
       });
 
-      MainState.go();
+      UnreachableState.go();
     });
     it('should not be able to stop unstoppable events by calling .stop()', (done) => {
       clean = MainState.on({
@@ -448,13 +459,8 @@ describe('it should test Router', () => {
 
       go('/test.html');
     });
-    it('can stop event propagation', (done) => {
-      const clean1 = MainState.on({
-        load() {
-          done(new Error('I couldn\'t be stopped!'));
-        }
-      });
-      const clean2 = DefaultState.on({
+    it('should be able to stop event propagation', (done) => {
+      clean = DefaultState.on({
         beforeLeave(e) {
           e.stop();
 
@@ -462,12 +468,13 @@ describe('it should test Router', () => {
         }
       });
 
-      clean = () => {
-        clean1();
-        clean2();
-      };
+      UnreachableState.on({
+        load() {
+          done(new Error('Couldn\'t stop the event'));
+        }
+      });
 
-      MainState.go();
+      UnreachableState.go();
     });
   });
   describe('it should support regexp states', () => {
@@ -510,7 +517,8 @@ describe('it should test Router', () => {
       go('/regexp');
     });
   });
-  // TOTO: tests for title and icon
+  // TODO: tests for title and icon
+  // TODO: tests for string templates
 });
 
 function initialize() {
@@ -614,10 +622,6 @@ function initialize() {
         params
       });
     }
-
-    onLeave() {
-      console.log('leaving user...');
-    }
   };
   FriendsListState = class extends UserState {
     static stateName = 'friendsList';
@@ -694,6 +698,16 @@ function initialize() {
         .replace(/\n( *)/g, (match, spaces) => `<br>${ D('&nbsp;').repeat(spaces.length) }`);
     }
   };
+  UnreachableState = class extends Router {
+    static stateName = 'unreachable';
+    static path = '/unreachable';
+    static template = UnreachableStateTemplate;
+  };
+  StringTemplateState = class extends Router {
+    static stateName = 'stringTemplate';
+    static path = '/string-template';
+    static template = 'string template';
+  };
 
   registerState(MainState);
   registerState(DefaultState);
@@ -704,6 +718,7 @@ function initialize() {
   registerState(UserFriendState);
   registerState(RegExpState);
   registerState(QueryState);
+  registerState(UnreachableState);
 
   Router.default = DefaultState;
 
