@@ -1,13 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>D</title>
+  <title id="dwayne-router-title"></title>
+  <link id="dwayne-router-icon" rel="shortcut icon" type="image/png">
   <link href="https://cdn.rawgit.com/mochajs/mocha/2.2.5/mocha.css" rel="stylesheet" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" />
 </head>
 <body>
 <div id="livereload"></div>
 <div id="mocha"></div>
+<div
+  id="dwayne-router"
+  style="
+    margin-top: 100px;
+    width: 100%;
+    height: 500px;
+    background-color: #f55;
+  "
+>
+
+</div>
 <script src="https://cdn.rawgit.com/mochajs/mocha/2.2.5/mocha.js"></script>
 <script>mocha.setup('bdd')</script>
 <script src="/test.js"></script>
