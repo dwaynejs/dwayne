@@ -6,7 +6,7 @@ import { parseJSON } from '../lib/Str';
 import { isDate } from '../lib/helpers';
 
 const random = Math.random;
-const origin = '//';
+const origin = '/fetch';
 
 describe('it should test Fetch#', () => {
   describe('after()', () => {
@@ -543,7 +543,7 @@ describe('it should test Fetch#', () => {
           strictEqual(
             req.url,
             `
-              /foo/bar/foo/foo/bar/baz?foo=bar&a=2&b%5B%5D=s&b%5B%5D=2&c%5Bd%5D=t&
+              /fetch/foo/bar/foo/foo/bar/baz?foo=bar&a=2&b%5B%5D=s&b%5B%5D=2&c%5Bd%5D=t&
               c%5Be%5D%5Bf%5D=3&c%5Be%5D%5Bg%5D%5B%5D=5&c%5Be%5D%5Bg%5D%5B%5D%5Bh%5D=1&
               c%5Be%5D%5Bg%5D%5B%5D%5Bi%5D%5B%5D=2&c%5Be%5D%5Bg%5D%5B%5D%5Bi%5D%5B%5D%5B%5D=9&
               c%5Be%5D%5Bg%5D%5B%5D%5Bi%5D%5B%5D%5B%5D=p
