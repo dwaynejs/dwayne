@@ -169,6 +169,44 @@ var set$1 = function set$1(object, property, value, receiver) {
   return value;
 };
 
+var slicedToArray = function () {
+  function sliceIterator(arr, i) {
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _e = undefined;
+
+    try {
+      for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+        _arr.push(_s.value);
+
+        if (i && _arr.length === i) break;
+      }
+    } catch (err) {
+      _d = true;
+      _e = err;
+    } finally {
+      try {
+        if (!_n && _i["return"]) _i["return"]();
+      } finally {
+        if (_d) throw _e;
+      }
+    }
+
+    return _arr;
+  }
+
+  return function (arr, i) {
+    if (Array.isArray(arr)) {
+      return arr;
+    } else if (Symbol.iterator in Object(arr)) {
+      return sliceIterator(arr, i);
+    } else {
+      throw new TypeError("Invalid attempt to destructure non-iterable instance");
+    }
+  };
+}();
+
 /**
  * @module helpers/checkTypes
  * @private
@@ -1029,7 +1067,7 @@ function validate$1(args, options, name) {
       checker = checkExpressions[checker];
 
       if (!checker.check(args[number])) {
-        throw new checker.error(checker.text.replace('$n', numbers[number]) + (name ? ' (in ' + name + ')' : ''));
+        throw new checker.error(checker.text.replace('$n', numbers[number]) + (name ? ' (at ' + name + ')' : ''));
       }
     });
   });
@@ -1369,7 +1407,7 @@ var Switcher = function (_Function) {
     var defaultValue = arguments[2];
     classCallCheck(this, Switcher);
 
-    var _this = possibleConstructorReturn(this, (Switcher.__proto__ || Object.getPrototypeOf(Switcher)).call(this));
+    var _this = possibleConstructorReturn(this, Object.getPrototypeOf(Switcher).call(this));
 
     if (isString(cases)) {
       if (!isUndefined(arguments[1])) {
@@ -1710,7 +1748,7 @@ var cloneSwitcher = switcher('call', function (object) {
 }).case(function (object) {
   return new Super(object) === object;
 }, function (object) {
-  return new (object.proto().constructor(object))();
+  return new (object.proto().$.constructor)(object);
 }).case(isElement, function (object, deep) {
   return object.clone(deep);
 }).case(isDate, function (object) {
@@ -2956,7 +2994,7 @@ var Super = function () {
      * @method Super#proto
      * @public
      * @param {*} [proto] - If it's present it's set as a prototype to the object.
-     * @returns {DWrap|*} In getter mode returns prototype and in setter mode returns this.
+     * @returns {DWrap} In getter mode returns wrap of the prototype and in setter mode returns this.
      * @description Synonym for both
      * [Object.getPrototypeOf]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Object/getPrototypeOf}
      * and
@@ -2976,7 +3014,7 @@ var Super = function () {
         return this;
       }
 
-      return isObject(object) ? Object.getPrototypeOf(object) : undefined;
+      return isObject(object) ? new Super(Object.getPrototypeOf(object)) : undefined;
     }
 
     /**
@@ -3372,11 +3410,6 @@ function _deepClone(object) {
  * @returns {Boolean} - If the object are deep equal or not.
  */
 function deepEqual(o1, o2, strict) {
-  if (o1 instanceof Super && o2 instanceof Super) {
-    o1 = o1.$;
-    o2 = o2.$;
-  }
-
   if (o1 === o2) {
     return true;
   }
@@ -3442,8 +3475,6 @@ function deepEqual(o1, o2, strict) {
  * @returns {Boolean} - If all the callback calls returned truthy value.
  */
 function _deepEvery(object, callback, n, tree) {
-  object = new Super(object).$;
-
   var end = n === 1;
 
   return iterate(object, function (value, key, object) {
@@ -3466,8 +3497,6 @@ function _deepEvery(object, callback, n, tree) {
  * @returns {*} Filtered object.
  */
 function _deepFilter(object, callback, n, tree) {
-  object = new Super(object).$;
-
   var array = isArrayLike(object);
   var nul = isNullOrUndefined(object);
   var o = array ? [] : nul ? object : {};
@@ -3521,8 +3550,6 @@ function _deepFilter(object, callback, n, tree) {
  * @returns {Tree|null} - If found the whole tree is returned and if not it's null what's returned.
  */
 function _deepFind(object, callback, n, tree) {
-  object = new Super(object).$;
-
   var end = n === 1;
 
   return iterate(object, function (value, key, object) {
@@ -3565,8 +3592,6 @@ function _deepFreeze(object) {
  * @returns {void}
  */
 function _deepForEach(object, callback, n, tree) {
-  object = new Super(object).$;
-
   var end = n === 1;
 
   iterate(object, function (value, key, object) {
@@ -3591,8 +3616,6 @@ function _deepForEach(object, callback, n, tree) {
  * @returns {*} New object.
  */
 function _deepMap(object, callback, n, tree) {
-  object = new Super(object).$;
-
   var o = isArrayLike(object) ? [] : isNullOrUndefined(object) ? object : {};
   var end = n === 1;
 
@@ -3618,8 +3641,6 @@ function _deepMap(object, callback, n, tree) {
  * @returns {{ IV: * }} Transformed IV.
  */
 function _deepReduce(object, callback, n, start, IV, tree) {
-  object = new Super(object).$;
-
   var end = n === 1;
 
   iterate(object, function (value, key, object) {
@@ -3649,8 +3670,6 @@ function _deepReduce(object, callback, n, start, IV, tree) {
  * @returns {Boolean} - If some of the callback calls returned truthy value.
  */
 function _deepSome(object, callback, n, tree) {
-  object = new Super(object).$;
-
   var end = n === 1;
 
   return iterate(object, function (value, key, object) {
@@ -3718,7 +3737,7 @@ var Arr = function (_Super) {
   function Arr() {
     var array = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
     classCallCheck(this, Arr);
-    return possibleConstructorReturn(this, (Arr.__proto__ || Object.getPrototypeOf(Arr)).call(this, toArray$1(array)));
+    return possibleConstructorReturn(this, Object.getPrototypeOf(Arr).call(this, toArray$1(array)));
 
     /**
      * @member Arr#$
@@ -4358,12 +4377,45 @@ var Promise$1 = function () {
   }, {
     key: 'catch',
     value: function _catch(onRejected) {
-      return resolveOrReject(this.$$, null, onRejected);
+      return this.then(null, onRejected);
     }
   }, {
     key: 'then',
     value: function then(onFulfilled, onRejected) {
-      return resolveOrReject(this.$$, onFulfilled, onRejected);
+      var promise = this.$$;
+
+      if (promise.status === 'pending') {
+        return new Promise(function (resolve, reject) {
+          promise.handle('reject', onRejected, resolve, reject, secret);
+          promise.handle('resolve', onFulfilled, resolve, reject, secret);
+        });
+      }
+
+      promise.handled = secret;
+
+      var value = promise.value;
+
+
+      var method = void 0;
+      var handler = void 0;
+
+      if (promise.status === 'fulfilled') {
+        method = 'resolve';
+        handler = onFulfilled;
+      } else {
+        method = 'reject';
+        handler = onRejected;
+      }
+
+      if (!isFunction(handler)) {
+        return Promise[method](value);
+      }
+
+      try {
+        return Promise.resolve(handler(value));
+      } catch (err) {
+        return Promise.reject(err);
+      }
     }
   }], [{
     key: 'all',
@@ -4483,49 +4535,6 @@ var Promise$1 = function () {
 defineProperties(Promise$1.prototype, defineProperty({}, _Symbol.toStringTag, 'Promise'));
 
 /**
- * @function resolveOrReject
- * @private
- * @param {hiddenPromise} promise - Promise to resolve or reject.
- * @param {Function} [onResolved] - Resolve function.
- * @param {Function} [onRejected] - Reject function.
- * @returns {Promise} New instance of Promise.
- */
-function resolveOrReject(promise, onResolved, onRejected) {
-  if (promise.status === 'pending') {
-    return new Promise$1(function (resolve, reject) {
-      promise.handle('reject', onRejected, resolve, reject, secret);
-      promise.handle('resolve', onResolved, resolve, reject, secret);
-    });
-  }
-
-  promise.handled = secret;
-
-  var value = promise.value;
-
-
-  var method = void 0;
-  var handler = void 0;
-
-  if (promise.status === 'fulfilled') {
-    method = 'resolve';
-    handler = onResolved;
-  } else {
-    method = 'reject';
-    handler = onRejected;
-  }
-
-  if (!isFunction(handler)) {
-    return Promise$1[method](value);
-  }
-
-  try {
-    return Promise$1.resolve(handler(value));
-  } catch (err) {
-    return Promise$1.reject(err);
-  }
-}
-
-/**
  * @module BlobObject
  * @private
  * @mixin
@@ -4543,7 +4552,8 @@ var methods = {
   dataURL: 'DataURL',
   text: 'Text'
 };
-var URL = global$1.URL;
+var _global = global$1;
+var URL = _global.URL;
 
 /**
  * @typedef {('buffer'|'binary'|'dataURL'|'text')} ReadBlobMethod
@@ -4581,7 +4591,7 @@ var BlobObject = function (_Super) {
 
   function BlobObject() {
     classCallCheck(this, BlobObject);
-    return possibleConstructorReturn(this, (BlobObject.__proto__ || Object.getPrototypeOf(BlobObject)).apply(this, arguments));
+    return possibleConstructorReturn(this, Object.getPrototypeOf(BlobObject).apply(this, arguments));
   }
 
   createClass(BlobObject, [{
@@ -4769,25 +4779,19 @@ var Func = function (_Super) {
   inherits(Func, _Super);
 
   function Func() {
-    var _ret2;
+    var _ret;
 
     var func = arguments.length <= 0 || arguments[0] === undefined ? function () {} : arguments[0];
     classCallCheck(this, Func);
 
-    var _this = possibleConstructorReturn(this, (Func.__proto__ || Object.getPrototypeOf(Func)).call(this));
-
-    if (func instanceof Func) {
-      var _ret;
-
-      return _ret = func, possibleConstructorReturn(_this, _ret);
-    }
+    var _this = possibleConstructorReturn(this, Object.getPrototypeOf(Func).call(this));
 
     function proxy() {
       var _this2 = this,
           _arguments = arguments;
 
       if (++proxy.$$.called < proxy.$$.canBeCalled) {
-        var _ret3 = function () {
+        var _ret2 = function () {
           var _proxy$$$ = proxy.$$;
           var before = _proxy$$$.before;
           var after = _proxy$$$.after;
@@ -4841,7 +4845,7 @@ var Func = function (_Super) {
           };
         }();
 
-        if ((typeof _ret3 === 'undefined' ? 'undefined' : _typeof(_ret3)) === "object") return _ret3.v;
+        if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
       }
     }
 
@@ -4883,7 +4887,7 @@ var Func = function (_Super) {
     Object.defineProperty(proxy, '$', { value: func });
     Object.setPrototypeOf(proxy, Func.prototype);
 
-    return _ret2 = proxy, possibleConstructorReturn(_this, _ret2);
+    return _ret = proxy, possibleConstructorReturn(_this, _ret);
   }
 
   /**
@@ -5504,7 +5508,7 @@ var Num = function (_Super) {
   function Num() {
     var number = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
     classCallCheck(this, Num);
-    return possibleConstructorReturn(this, (Num.__proto__ || Object.getPrototypeOf(Num)).call(this, number));
+    return possibleConstructorReturn(this, Object.getPrototypeOf(Num).call(this, number));
 
     /**
      * @member Num#$
@@ -6281,7 +6285,7 @@ var Str = function (_Super) {
   function Str() {
     var string = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
     classCallCheck(this, Str);
-    return possibleConstructorReturn(this, (Str.__proto__ || Object.getPrototypeOf(Str)).call(this, string));
+    return possibleConstructorReturn(this, Object.getPrototypeOf(Str).call(this, string));
 
     /**
      * @member Str#$
@@ -7191,7 +7195,7 @@ var Dat = function (_Super) {
   function Dat() {
     var date = arguments.length <= 0 || arguments[0] === undefined ? new Date() : arguments[0];
     classCallCheck(this, Dat);
-    return possibleConstructorReturn(this, (Dat.__proto__ || Object.getPrototypeOf(Dat)).call(this, date));
+    return possibleConstructorReturn(this, Object.getPrototypeOf(Dat).call(this, date));
 
     /**
      * @member Dat#$
@@ -7676,19 +7680,29 @@ function date(date) {
 var absoluteURLRegexp = /^(([a-z][a-z\d\+\-\.]*:)?\/\/|data:[a-z]+\/[a-z]+;base64,)/i;
 var querySwitcher = switcher('call', function () {
   return new Arr([]);
-}).case(isArray, function (query, prefix) {
-  return new Arr(query).map(function (value) {
-    return {
+}).case(isArray, function (prefix, query) {
+  var queryParams = new Arr([]);
+
+  iterate(query, function (value) {
+    if (isPlainObject(value) || isArray(value)) {
+      queryParams = queryParams.concat(querySwitcher(value, [prefix + '[]']));
+
+      return;
+    }
+
+    queryParams.push({
       param: prefix + '[]',
       value: value
-    };
-  }).$;
-}).case(isPlainObject, function (query, prefix) {
+    });
+  });
+
+  return queryParams.$;
+}).case(isPlainObject, function (prefix, query) {
   var queryParams = new Arr([]);
 
   iterate(query, function (value, param) {
-    if (isPlainObject(value)) {
-      queryParams = queryParams.concat(querySwitcher(value, prefix ? prefix + '[' + param + ']' : param));
+    if (isPlainObject(value) || isArray(value)) {
+      queryParams = queryParams.concat(querySwitcher(value, [prefix ? prefix + '[' + param + ']' : param]));
 
       return;
     }
@@ -7740,7 +7754,7 @@ var constructURL = (function (baseURL, url, params, query) {
   }
 
   return '' + URL + (hash ? '#' + hash : '');
-});
+})
 
 /**
  * @function isAbsolute
@@ -7787,7 +7801,7 @@ var parseHeaders = (function (rawHeaders) {
   });
 
   return headers;
-});
+})
 
 /**
  * @module helpers/transformData
@@ -7821,7 +7835,7 @@ var transformData = (function (data, method, headers) {
   }
 
   return data;
-});
+})
 
 /**
  * @module Fetch
@@ -7943,7 +7957,7 @@ var Fetch = function (_Function) {
     var config = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
     classCallCheck(this, Fetch);
 
-    var _this = possibleConstructorReturn(this, (Fetch.__proto__ || Object.getPrototypeOf(Fetch)).call(this));
+    var _this = possibleConstructorReturn(this, Object.getPrototypeOf(Fetch).call(this));
 
     function fetch() {
       return fetch.request.apply(fetch, arguments);
@@ -8558,6 +8572,7 @@ function fetchBeforeMiddleware(config) {
 
 /**
  * @const {Fetch} fetch
+ * @type {Fetch}
  * @public
  * @description Empty instance of Fetch.
  */
@@ -9943,7 +9958,7 @@ var eventSeparator = /, *| +/;
 var textProperty = new Super(Node.prototype).propertyDescriptor('textContent') ? 'textContent' : 'innerText';
 var classes = {};
 var attrs = {};
-var windowsDwayneData = new Arr();
+var windowsDwayneData = new Arr([]);
 var inputElements = 'input, select, textarea, datalist, keygen, output';
 var dataURLFetch = new Fetch({ responseType: 'arraybuffer' });
 var refSwitcher = switcher('strictEquals', 'href').case(['img', 'script', 'iframe', 'audio', 'video'], 'src').case('form', 'action');
@@ -9959,13 +9974,6 @@ var filterSwitcher = switcher('call', function (selector) {
   return function (elem) {
     return elems.indexOf(elem) !== -1;
   };
-});
-var formDataSwitcher = switcher('strictEquals', function (_ref) {
-  var value = _ref.value;
-  return value;
-}).case('file', function (_ref2) {
-  var files = _ref2.files;
-  return files;
 });
 var innerSwitcher = switcher('strictEquals', 0).case('padding-box', function (paddings) {
   return paddings;
@@ -10002,7 +10010,7 @@ var Elem = function (_Arr) {
     var elem = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
     classCallCheck(this, Elem);
 
-    var _this = possibleConstructorReturn(this, (Elem.__proto__ || Object.getPrototypeOf(Elem)).call(this, function () {
+    var _this = possibleConstructorReturn(this, Object.getPrototypeOf(Elem).call(this, function () {
       var element = elem;
 
       if (isArrayLike(element) && (isWindow(element) || isHTMLDocument(element) || isElement(element))) {
@@ -10368,8 +10376,8 @@ var Elem = function (_Arr) {
         });
       }).then(function (canvas) {
         return dataURLFetch(canvas.dataURL());
-      }).then(function (_ref3) {
-        var ab = _ref3.data;
+      }).then(function (_ref) {
+        var ab = _ref.data;
         return blob$1(ab, options);
       });
     }
@@ -10429,11 +10437,11 @@ var Elem = function (_Arr) {
     value: function changeRule(name, style) {
       this.some(function (elem) {
         if (getName(elem) === 'style') {
-          var _ref4 = new Arr(elem.sheet.cssRules).find(function (rule) {
+          var _ref2 = new Arr(elem.sheet.cssRules).find(function (rule) {
             return rule.dwayneData && rule.dwayneData.name === name;
           }) || {};
 
-          var rule = _ref4.value;
+          var rule = _ref2.value;
 
 
           if (rule) {
@@ -10870,12 +10878,12 @@ var Elem = function (_Arr) {
       var eventInit = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
       var details = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
-      var _ref5 = eventInit || {};
+      var _ref3 = eventInit || {};
 
-      var _ref5$bubbles = _ref5.bubbles;
-      var bubbles = _ref5$bubbles === undefined ? true : _ref5$bubbles;
-      var _ref5$cancelable = _ref5.cancelable;
-      var cancelable = _ref5$cancelable === undefined ? true : _ref5$cancelable;
+      var _ref3$bubbles = _ref3.bubbles;
+      var bubbles = _ref3$bubbles === undefined ? true : _ref3$bubbles;
+      var _ref3$cancelable = _ref3.cancelable;
+      var cancelable = _ref3$cancelable === undefined ? true : _ref3$cancelable;
 
       var finalEvent = event;
 
@@ -10938,7 +10946,7 @@ var Elem = function (_Arr) {
     value: function filter() {
       var selector = arguments.length <= 0 || arguments[0] === undefined ? Boolean : arguments[0];
 
-      return new Elem(get$1(Elem.prototype.__proto__ || Object.getPrototypeOf(Elem.prototype), 'filter', this).call(this, filterSwitcher(selector)));
+      return new Elem(get$1(Object.getPrototypeOf(Elem.prototype), 'filter', this).call(this, filterSwitcher(selector)));
     }
 
     /**
@@ -10955,7 +10963,7 @@ var Elem = function (_Arr) {
     key: 'find',
     value: function find(selector) {
       if (!isString(selector)) {
-        return get$1(Elem.prototype.__proto__ || Object.getPrototypeOf(Elem.prototype), 'find', this).call(this, selector);
+        return get$1(Object.getPrototypeOf(Elem.prototype), 'find', this).call(this, selector);
       }
 
       return this.object(function (elems, elem) {
@@ -10995,11 +11003,11 @@ var Elem = function (_Arr) {
       var selector = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
 
       return this.object(function (elems, elem) {
-        var _ref6 = new Arr(elem.children).find(function (elem) {
+        var _ref4 = new Arr(elem.children).find(function (elem) {
           return new Elem(elem).is(selector);
         }) || {};
 
-        var found = _ref6.value;
+        var found = _ref4.value;
 
 
         elems.add(found);
@@ -11020,21 +11028,6 @@ var Elem = function (_Arr) {
       return this.forEach(function (elem) {
         elem.focus();
       });
-    }
-
-    /**
-     * @method Elem#getFormData
-     * @public
-     * @returns {Object} Form data object.
-     * @description Method allows you to get form data from the form.
-     */
-
-  }, {
-    key: 'getFormData',
-    value: function getFormData() {
-      return this.find(inputElements).object(function (data, input) {
-        data[input.name] = formDataSwitcher(input.type, [input]);
-      }, {}).$;
     }
 
     /**
@@ -11070,11 +11063,11 @@ var Elem = function (_Arr) {
 
       this.some(function (elem) {
         if (getName(elem) === 'style') {
-          var _ref7 = new Arr(elem.sheet.cssRules).find(function (rule) {
+          var _ref5 = new Arr(elem.sheet.cssRules).find(function (rule) {
             return rule.dwayneData && rule.dwayneData.name === name;
           }) || {};
 
-          var rule = _ref7.value;
+          var rule = _ref5.value;
 
 
           if (rule) {
@@ -11162,7 +11155,12 @@ var Elem = function (_Arr) {
       return this.forEach(function (elem) {
         elem = new Elem(elem);
 
-        elem.prop('dwayneData').previousDisplay = elem.css('display');
+        var currentDisplay = elem.css('display');
+
+        if (currentDisplay.indexOf('none')) {
+          elem.prop('dwayneData').previousDisplay = currentDisplay;
+        }
+
         elem.css('display', 'none !important');
       });
     }
@@ -11244,6 +11242,9 @@ var Elem = function (_Arr) {
   }, {
     key: 'into',
 
+
+    // TODO: insertAfter()
+    // TODO: insertBefore()
 
     /**
      * @method Elem#into
@@ -11341,6 +11342,8 @@ var Elem = function (_Arr) {
       return isBroken;
     }
 
+    // TODO: isWithinDocument()
+
     /**
      * @method Elem#last
      * @public
@@ -11373,11 +11376,11 @@ var Elem = function (_Arr) {
       var selector = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
 
       return this.object(function (elems, elem) {
-        var _ref8 = new Arr(elem.children).reverse().find(function (elem) {
+        var _ref6 = new Arr(elem.children).reverse().find(function (elem) {
           return new Elem(elem).is(selector);
         }) || {};
 
-        var found = _ref8.value;
+        var found = _ref6.value;
 
 
         elems.add(found);
@@ -11571,8 +11574,8 @@ var Elem = function (_Arr) {
 
         iterate(_arguments2, function (event) {
           iterate(event.split(eventSeparator), function (event) {
-            (listeners[event] || new Super()).forEach(function (_ref9) {
-              var removeListener = _ref9.removeListener;
+            (listeners[event] || new Super()).forEach(function (_ref7) {
+              var removeListener = _ref7.removeListener;
               return removeListener();
             });
           });
@@ -11647,12 +11650,12 @@ var Elem = function (_Arr) {
       });
 
       this.forEach(function (elem) {
-        var _ref10 = elem.dwayneData || windowsDwayneData.find(function (_ref12) {
-          var element = _ref12.element;
+        var _ref8 = (windowsDwayneData.find(function (_ref10) {
+          var element = _ref10.element;
           return element === elem;
-        });
+        }) || {}).value || elem.dwayneData;
 
-        var listeners = _ref10.listeners;
+        var listeners = _ref8.listeners;
 
 
         event.forEach(function (listener, event) {
@@ -11665,9 +11668,9 @@ var Elem = function (_Arr) {
 
           if (!removeEventListeners.has('listener')) {
             var newListener = function newListener(e) {
-              removeEventListeners.forEach(function (_ref11) {
-                var selector = _ref11.selector;
-                var listener = _ref11.listener;
+              removeEventListeners.forEach(function (_ref9) {
+                var selector = _ref9.selector;
+                var listener = _ref9.listener;
 
                 if (new Elem(e.target).is(selector)) {
                   listener.call(elem, e, elem, index);
@@ -12044,17 +12047,17 @@ var Elem = function (_Arr) {
         try {
           validate$1({ 1: iterator }, { 1: ['intLike', '>=0'] }, 'Elem#setOf');
         } catch (e) {
-          throw new Error('\n\t\t\t\t\t2nd argument must be either or non-negative integer, or object!\n\t\t\t\t');
+          throw new Error('2nd argument must be either or non-negative integer, or object! (at Elem#setOf)');
         }
 
-        iterator = array(iterator);
+        iterator = array(iterator).$;
       }
 
       return this.object(function (elems, elem, index) {
         iterate(iterator, function (value, key) {
           var created = new Elem(elem).create(type);
 
-          callback(created.$, value, key, iterator, elem, index);
+          callback(created.$[0], value, key, iterator, elem, index);
 
           elems.add(created);
         });
@@ -12111,7 +12114,9 @@ var Elem = function (_Arr) {
       }
 
       return this.forEach(function (elem, index) {
-        new Elem(elem).html('').addText(isFunction(_text) ? _text(elem[textProperty], elem, index) : _text);
+        var txt = elem[textProperty];
+
+        new Elem(elem).html('').addText(isFunction(_text) ? _text(txt, elem, index) : _text);
       });
     }
 
@@ -12228,8 +12233,8 @@ var Elem = function (_Arr) {
       validate$1([validator], ['function||!'], 'Elem#validate');
 
       if (validator) {
-        return this.forEach(function (_ref13) {
-          var dwayneData = _ref13.dwayneData;
+        return this.forEach(function (_ref11) {
+          var dwayneData = _ref11.dwayneData;
 
           dwayneData.validators.push(validator);
         });
@@ -12462,10 +12467,44 @@ var Elem = function (_Arr) {
 
 defineProperties(Elem.prototype, defineProperty({}, _Symbol.toStringTag, 'Elem'));
 
-var window$1 = new Elem(global$1);
-var document$1 = new Elem(nativeDocument);
+/**
+ * @const {Elem} win
+ * @type {Elem}
+ * @public
+ * @description Elem instance of window.
+ */
+var win = new Elem(global$1);
+
+/**
+ * @const {Elem} doc
+ * @type {Elem}
+ * @public
+ * @description Elem instance of document.
+ */
+var doc = new Elem(nativeDocument);
+
+/**
+ * @const {Elem} html
+ * @type {Elem}
+ * @public
+ * @description Elem instance of document.documentElement.
+ */
 var html = new Elem(nativeDocument.documentElement);
+
+/**
+ * @const {Elem} body
+ * @type {Elem}
+ * @public
+ * @description Elem instance of document.body.
+ */
 var body = new Elem(nativeDocument.body);
+
+/**
+ * @const {Elem} head
+ * @type {Elem}
+ * @public
+ * @description Elem instance of document.head.
+ */
 var head$1 = new Elem(nativeDocument.head);
 
 dynamicDefineProperties(Elem.prototype, elements, function (elem) {
@@ -12589,8 +12628,8 @@ function addDwayneData(elem) {
         validators: new Arr([])
       }
     });
-  } else if (!windowsDwayneData.some(function (_ref14) {
-    var element = _ref14.element;
+  } else if (!windowsDwayneData.some(function (_ref12) {
+    var element = _ref12.element;
     return element === elem;
   })) {
     windowsDwayneData.push({
@@ -12633,7 +12672,7 @@ function _find(selector) {
  * parseHTML('&lt;div&gt;123&lt;/div&gt;'); // Elem
  */
 function parseHTML(html) {
-  return document$1.div().html(html).children();
+  return doc.div().html(html).children();
 }
 
 /**
@@ -12649,6 +12688,909 @@ function parseHTML(html) {
  */
 function px(size) {
   return Number(String(size).replace(/px$/, ''));
+}
+
+/**
+ * @module helpers/resolveURL
+ * @private
+ * @description Exports Object.assign-like method.
+ */
+
+var resolveURL = (function (url, decodeQuery) {
+  var query = url.search;
+  var hash = url.hash;
+
+  var params = {
+    query: {},
+    hash: hash.replace(/^#/, '')
+  };
+
+  if (!query) {
+    return params;
+  }
+
+  new Str(query.replace(/^\?/, '')).split('&').forEach(function (rawParam) {
+    var _rawParam$split = rawParam.split('=');
+
+    var _rawParam$split2 = slicedToArray(_rawParam$split, 2);
+
+    var param = _rawParam$split2[0];
+    var _rawParam$split2$ = _rawParam$split2[1];
+    var value = _rawParam$split2$ === undefined ? '' : _rawParam$split2$;
+
+
+    param = decodeQuery ? decodeURIComponent(param) : param;
+    value = decodeQuery ? decodeURIComponent(value) : value;
+
+    if (!/^[^\[]+/.test(param)) {
+      return;
+    }
+
+    var paramName = void 0;
+    var paramObject = params.query;
+
+    new Str(param).match(/^[^\[\]]*|\[[^\[\]]*\]/g).forEach(function (name) {
+      if (name.indexOf('[')) {
+        paramName = name;
+
+        return;
+      }
+
+      name = name.slice(1, -1);
+
+      paramObject = paramObject[paramName] = paramObject[paramName] || (name ? {} : []);
+      paramName = name || paramObject.length;
+    });
+
+    paramObject[paramName] = value;
+  });
+
+  return params;
+})
+
+/**
+ * @typedef {Object} RouterStateOptions
+ * @property {Object} [params = {}] - Parameters for URL. For '/users/:userId' userId is a param.
+ * @property {Object} [query = {}] - Query parameters for URL.
+ */
+
+var extendLink = 'https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Classes#Sub_classing_with_extends';
+var stateAttrName = 'dwayne-router-state';
+var isPrototypeOf = {}.isPrototypeOf;
+var _global$1 = global$1;
+var URL$1 = _global$1.URL;
+var history = _global$1.history;
+var location = _global$1.location;
+var _global$location = _global$1.location;
+var origin = _global$location.origin;
+var href = _global$location.href;
+
+var stoppable = new Arr(['beforeLeave', 'beforeLoad']);
+var stopError = new Error();
+var states = new Arr([]);
+var pathSwitcher = switcher('call', function () {
+  throw new Error('State path must be a string, a regular expression or undefined! (at registerState)');
+}).case(isRegExp, function (path) {
+  return {
+    path: path.source.replace(/\\\//g, '/'),
+    url: path,
+    params: {}
+  };
+}).case(isNullOrUndefined, function () {
+  return {
+    path: '/',
+    url: '/',
+    params: {}
+  };
+}).case(isString, function (path) {
+  if (path.indexOf('/')) {
+    throw new Error('If state path is a string it must start with "/"! (at registerState)');
+  }
+
+  var index = path.indexOf('?');
+  var params = new Super({});
+  var newURL = '';
+  var newPath = new Str(path).slice(0, index === -1 ? path.length : index).replace(/^\/|\/$/g).split(/\//).map(function (part, i, array$$1) {
+    if (!part && array$$1.length > 1) {
+      throw new Error('If state path is a string it must not contain "//" or end with "/"! (at registerState)');
+    }
+
+    var index = part.indexOf(':');
+
+    if (index > 0) {
+      throw new Error('If state path is a string resource part must be either a string or an URL parameter! (at registerState)');
+    }
+
+    if (index === -1) {
+      return {
+        url: part,
+        value: part
+      };
+    }
+
+    var _resolveParameter = resolveParameter(part.slice(1), 'URL parameter must not be an empty string or contain characters besides "a-zA-Z_$"! (at registerState)', 'URL parameter regexp validator must be within parentheses (e.g. :userId(\\d+) and not contain ones)! (at registerState)');
+
+    var name = _resolveParameter.name;
+    var _resolveParameter$reg = _resolveParameter.regexp;
+    var regexp = _resolveParameter$reg === undefined ? /[^\/]*/ : _resolveParameter$reg;
+
+
+    params.$[name] = params.count;
+
+    return {
+      type: 'param',
+      url: ':' + name,
+      value: regexp
+    };
+  }).word(function (_ref) {
+    var type = _ref.type;
+    var url = _ref.url;
+    var value = _ref.value;
+
+    var newPath = void 0;
+
+    if (type === 'param') {
+      newPath = '(' + value.source.replace(/\\\//g, '/') + ')';
+    } else {
+      newPath = new Str(value).escapeRegExp().$;
+    }
+
+    newURL += '/' + url;
+
+    return '/' + newPath;
+  });
+
+  return {
+    path: newPath,
+    url: newURL,
+    params: params.$
+  };
+});
+
+var eventPromise = Promise$1.resolve();
+var pushed = void 0;
+var initialized = void 0;
+var routerLoaded = void 0;
+var router = void 0;
+var pageTitle = void 0;
+var pageIcon = void 0;
+var currentState = void 0;
+var currentTitle = void 0;
+var currentIcon = void 0;
+
+var Router = function () {
+  createClass(Router, null, [{
+    key: 'buildURL',
+    value: function buildURL() {
+      var relativeToURL = arguments.length <= 0 || arguments[0] === undefined ? location.href : arguments[0];
+      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+      if (arguments.length === 1 && !isString(relativeToURL)) {
+        options = relativeToURL;
+        relativeToURL = location.href;
+      }
+
+      var url = this.url;
+
+
+      if (isRegExp(url)) {
+        throw new Error('URL can be built only from the string URLs! (Router.buildURL)');
+      }
+
+      var _options = options;
+      var _options$params = _options.params;
+      var params = _options$params === undefined ? {} : _options$params;
+      var _options$query = _options.query;
+      var query = _options$query === undefined ? {} : _options$query;
+      var _options$hash = _options.hash;
+      var hash = _options$hash === undefined ? '' : _options$hash;
+
+      var _ref2 = new URL$1(url, relativeToURL);
+
+      var origin = _ref2.origin;
+      var pathname = _ref2.pathname;
+
+
+      return constructURL(origin, pathname, params, query, hash, {
+        params: this.encodeParams,
+        query: this.encodeQuery
+      });
+    }
+  }, {
+    key: 'go',
+    value: function go(options) {
+      if (this.abstract) {
+        throw new Error('Cannot go to an abstract state! (at Router.go)');
+      }
+
+      _go(this.buildURL(options));
+
+      return this;
+    }
+  }, {
+    key: 'init',
+    value: function init() {
+      initialized = true;
+
+      initialize();
+
+      return this;
+    }
+  }, {
+    key: 'on',
+    value: function on(event, listener) {
+      var _this = this;
+
+      if (arguments.length >= 2) {
+        event = defineProperty({}, event, listener);
+      }
+
+      var listeners = this.$$.listeners;
+
+      var allListeners = {};
+
+      iterate(event, function (listener, event) {
+        var array$$1 = listeners[event] || new Arr([]);
+
+        listener = new Func(listener).bindContext(_this);
+
+        allListeners[event] = listener;
+        (listeners[event] = array$$1).push(listener);
+      });
+
+      return function removeEventListeners(event) {
+        var actualListeners = allListeners;
+
+        if (allListeners[event]) {
+          actualListeners = defineProperty({}, event, allListeners[event]);
+        }
+
+        iterate(actualListeners, function (listener, event) {
+          var eventListeners = listeners[event];
+
+          var found = eventListeners.find(function (l) {
+            return l === listener;
+          });
+
+          if (found) {
+            eventListeners.splice(found.key);
+          }
+        });
+      };
+    }
+  }]);
+
+  function Router() {
+    var props = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+    classCallCheck(this, Router);
+    var name = props.name;
+    var url = props.url;
+    var _props$params = props.params;
+    var params = _props$params === undefined ? {} : _props$params;
+    var _props$query = props.query;
+    var query = _props$query === undefined ? {} : _props$query;
+    var _props$hash = props.hash;
+    var hash = _props$hash === undefined ? '' : _props$hash;
+    var _proto$$$constructor = new Super(this).proto().$.constructor;
+    var templateParams = _proto$$$constructor.templateParams;
+    var title = _proto$$$constructor.title;
+    var icon = _proto$$$constructor.icon;
+
+
+    this.name = name;
+    this.url = url;
+    this.params = params;
+    this.query = query;
+    this.hash = hash;
+    this.title = title;
+    this.icon = icon;
+    this.templateParams = new Super(templateParams).create().$;
+  }
+
+  createClass(Router, [{
+    key: 'onBeforeLeave',
+    value: function onBeforeLeave() {}
+  }, {
+    key: 'onBeforeLoad',
+    value: function onBeforeLoad() {}
+  }, {
+    key: 'onInit',
+    value: function onInit() {}
+  }, {
+    key: 'onLeave',
+    value: function onLeave() {}
+  }, {
+    key: 'onLoad',
+    value: function onLoad() {}
+  }, {
+    key: 'onRender',
+    value: function onRender() {}
+  }]);
+  return Router;
+}();
+
+var MainState = Router.prototype;
+
+var defaultState = Router;
+
+defineProperties(Router, {
+  $$: {
+    listeners: {},
+    state: null,
+    states: states
+  },
+
+  parent: null,
+  children: new Arr([]),
+  abstract: false,
+  stateName: null,
+  url: '/',
+  path: /^\/$/,
+  relativeURL: '/',
+  relativePath: '/',
+  params: {},
+  templateParams: {},
+  query: {},
+  template: '',
+  encodeParams: true,
+  decodeParams: true,
+  encodeQuery: true,
+  decodeQuery: true,
+  icon: null,
+  title: null,
+
+  'get/set default': {
+    get: function get() {
+      return defaultState;
+    },
+    set: function set(state) {
+      if (states.indexOf(state) === -1) {
+        throw new Error('State must be registered! (Router.default)');
+      }
+
+      var abstract = state.abstract;
+      var url = state.url;
+      var params = state.params;
+      var query = state.query;
+
+
+      if (abstract) {
+        throw new Error('Default state must not be abstract! (Router.default)');
+      }
+
+      if (isRegExp(url)) {
+        throw new Error('Default state must not have regexp path! (Router.default)');
+      }
+
+      if (new Super(params).count || new Super(query).count) {
+        throw new Error('Default state must not have URL or query params! (Router.default)');
+      }
+
+      defaultState = state;
+    }
+  }
+});
+
+function redirect(url, push) {
+  var _currentState = currentState;
+  var currentURL = _currentState.url;
+
+  var newURL = new URL$1(url, currentURL.href);
+
+  eventPromise = eventPromise.then(function () {
+    return dispatchNewEvent('beforeLeave');
+  }).then(function () {
+    return dispatchNewEvent('leave');
+  }).then(function () {
+    currentState.base.hide().html('');
+  }).then(function () {
+    return beforeLoad(newURL, push ? 'pushState' : 'replaceState');
+  }).catch(handleError).catch(function () {});
+
+  function dispatchNewEvent(type) {
+    return dispatchEvent(new Super({}).value({
+      type: type,
+      state: currentState,
+      fromURL: newURL,
+      toURL: currentURL
+    }).$);
+  }
+}
+function beforeLoad(newURL, action) {
+  if (newURL.origin !== origin) {
+    location.href = newURL.href;
+
+    return Promise$1.reject(stopError);
+  }
+
+  var _resolveURL = resolveURL(newURL, Router.decodeQuery);
+
+  var hash = _resolveURL.hash;
+
+  var newState = void 0;
+
+  return Promise$1.resolve().then(function () {
+    var promise = Promise$1.reject();
+
+    findStatesByURL(newURL).forEach(function (_ref3) {
+      var state = _ref3.state;
+      var params = _ref3.params;
+      var query = _ref3.query;
+
+      promise = promise.catch(function () {
+        newState = new state({
+          name: state.stateName,
+          url: newURL,
+          params: params,
+          query: query,
+          hash: hash
+        });
+
+        return dispatchNewEvent('beforeLoad');
+      });
+    });
+
+    return promise;
+  }).then(function () {
+    if (action) {
+      history[action](null, null, newURL.href);
+    }
+
+    pushed = true;
+
+    currentState = Router.$$.state = newState;
+
+    return dispatchNewEvent('load');
+  }).then(function () {
+    var proto = new Super(newState).proto().$.constructor;
+    var renderStates = new Arr([proto]);
+    var _newState = newState;
+    var stateName = _newState.stateName;
+    var templateParams = _newState.templateParams;
+    var title = _newState.title;
+    var icon = _newState.icon;
+
+    var ownTemplateParams = new Super(templateParams).clone();
+    var state = proto;
+    var promise = Promise$1.resolve();
+
+    while (!getStateBase(state).length && (state = state.parent)) {
+      renderStates.unshift(state);
+    }
+
+    _find('[' + stateAttrName + ']').forEach(function (elem) {
+      elem = new Elem(elem);
+
+      var stateNameFromAttr = elem.attr(stateAttrName);
+
+      var _ref4 = states.find(function (_ref5) {
+        var stateName = _ref5.stateName;
+        return stateName === stateNameFromAttr;
+      }) || {};
+
+      var foundState = _ref4.value;
+
+
+      if (!foundState || stateNameFromAttr !== stateName && !(newState instanceof foundState)) {
+        elem.hide().html('');
+      }
+    });
+
+    renderStates.forEach(function (state) {
+      var template = state.template;
+      var parentTemplateParams = state.templateParams;
+
+      var templateParams = new Super(parentTemplateParams).create().assign(ownTemplateParams).$;
+
+      promise = promise.then(function () {
+        var base = getStateBase(state).first().show();
+
+        try {
+          base.html(isFunction(template) ? template(templateParams) : template);
+        } catch (err) {
+          console.error('%s %o', 'Render error:', err);
+        }
+
+        base.find('[' + stateAttrName + ']').hide();
+
+        if (state === proto) {
+          newState.base = base;
+
+          if (!isNull(title) && title !== currentTitle) {
+            pageTitle.text(currentTitle = title);
+          }
+
+          if (!isNull(icon) && icon !== currentIcon) {
+            pageIcon.ref(currentIcon = icon);
+          }
+        }
+
+        return dispatchNewEvent('render', state);
+      });
+    });
+
+    return promise;
+  }).catch(handleError).catch(function () {});
+
+  function dispatchNewEvent(type, renderingState) {
+    return dispatchEvent(new Super({}).value({
+      type: type,
+      state: newState,
+      url: newURL
+    }).$, renderingState);
+  }
+}
+
+function decode(string, decodeParams) {
+  return decodeParams ? decodeURIComponent(string) : string;
+}
+function handleError(err) {
+  if (err !== stopError) {
+    printError(err);
+
+    throw err;
+  }
+}
+function printError(err) {
+  console.error('%s %o', 'Uncaught (in event listener)', err);
+}
+function getStateBase(state) {
+  return state === Router ? router : _find('[' + stateAttrName + '="' + state.stateName + '"]');
+}
+function isInstanceOfRouterState(state) {
+  return isPrototypeOf.call(Router, state) || isPrototypeOf.call(MainState, state.prototype);
+}
+function resolveParameter(param, nameErrorName, valueErrorName) {
+  var nameMatch = param.match(/^[a-z_\$]+/i);
+
+  if (!nameMatch) {
+    throw new Error(nameErrorName);
+  }
+
+  var name = nameMatch[0];
+  var value = param.slice(name.length);
+  var regexp = void 0;
+
+  if (value && (value.indexOf('(') || value.indexOf(')') !== value.length - 1)) {
+    throw new Error(valueErrorName);
+  }
+
+  if (value) {
+    regexp = new RegExp(value.slice(1, -1));
+  }
+
+  return {
+    name: name,
+    regexp: regexp
+  };
+}
+function findStatesByURL(url) {
+  var pathname = url.pathname || '/';
+  var search = url.search || '';
+  var eventualStates = states.object(function (states, state) {
+    if (state.abstract) {
+      return;
+    }
+
+    var stateURL = state.url;
+    var path = state.path;
+    var params = state.params;
+    var requiredQuery = state.query;
+    var decodeParams = state.decodeParams;
+    var decodeQuery = state.decodeQuery;
+
+    var query = new Super(resolveURL(url, decodeQuery).query);
+    var eventualParams = {};
+    var match = ((pathname.replace(/\/$/, '') || '/') + (isRegExp(stateURL) ? search : '')).match(path);
+
+    if (!match) {
+      return false;
+    }
+
+    /* eslint guard-for-in: 0 */
+    for (var param in requiredQuery) {
+      if (!query.hasOwn(param) || !requiredQuery[param].test(query.$[param])) {
+        return;
+      }
+    }
+
+    match.shift();
+
+    for (var _param in params) {
+      eventualParams[_param] = decode(match[params[_param]], decodeParams);
+    }
+
+    states.push({
+      state: state,
+      params: eventualParams,
+      query: query.$
+    });
+  }, new Arr([]));
+
+  if (eventualStates.every(function (_ref6) {
+    var state = _ref6.state;
+    return state !== defaultState;
+  })) {
+    eventualStates.push({
+      state: defaultState,
+      params: {},
+      query: resolveURL(url, defaultState.decodeQuery).query
+    });
+  }
+
+  return eventualStates;
+}
+function dispatchEvent(event, renderingState) {
+  var paused = void 0;
+  var stopped = void 0;
+  var continuePropagation = function continuePropagation() {};
+  var stopPropagation = function stopPropagation() {};
+  var promise = Promise$1.resolve();
+
+  var type = event.type;
+  var state = event.state;
+
+  var isStoppable = stoppable.indexOfStrict(type) !== -1 && (new Super(state).proto().$.constructor !== defaultState || type !== 'beforeLoad');
+
+  new Super(event).value({
+    continue: function _continue() {
+      if (isStoppable) {
+        paused = false;
+        continuePropagation();
+      }
+    },
+    pause: function pause() {
+      if (isStoppable) {
+        paused = true;
+      }
+    },
+    stop: function stop() {
+      if (isStoppable) {
+        stopped = true;
+        stopPropagation();
+      }
+    }
+  });
+
+  getListeners(state, type, renderingState).forEach(function (listener) {
+    promise = promise.then(function () {
+      return new Promise$1(function (resolve, reject) {
+        var finished = false;
+
+        continuePropagation = function continuePropagation() {
+          if (finished) {
+            resolve();
+          }
+        };
+
+        stopPropagation = function stopPropagation() {
+          reject(stopError);
+        };
+
+        listener(event);
+
+        finished = true;
+
+        if (stopped) {
+          return reject(stopError);
+        }
+
+        if (!paused) {
+          resolve();
+        }
+      });
+    });
+  });
+
+  return promise.catch(function (err) {
+    if (err !== stopError && !isStoppable) {
+      printError(err);
+    }
+
+    if (isStoppable) {
+      throw err;
+    }
+  });
+}
+function getListeners() {
+  var state = arguments.length <= 0 || arguments[0] === undefined ? new Super(MainState).create().$ : arguments[0];
+  var type = arguments[1];
+  var renderingState = arguments[2];
+
+  var tree = new Arr([]);
+  var desc = /leave/i.test(type);
+  var method$$1 = desc ? 'push' : 'unshift';
+  var listenerName = 'on' + new Str(type).capitalizeFirst();
+  var proto = new Super(state).proto().$.constructor;
+
+  while (proto) {
+    if (!renderingState || isPrototypeOf.call(proto, renderingState) || renderingState === proto) {
+      tree[method$$1](proto);
+    }
+
+    proto = proto.parent;
+  }
+
+  return tree.object(function (listeners, _ref7) {
+    var ownListeners = _ref7.$$.listeners;
+    var proto = _ref7.prototype;
+
+    if (new Super(proto).hasOwn(listenerName)) {
+      listeners.push(new Func(proto[listenerName]).bind(state));
+    }
+
+    listeners.push.apply(listeners, (ownListeners[type] || new Arr([])).$);
+  }, new Arr([]));
+}
+function initialize() {
+  if (initialized && !routerLoaded) {
+    routerLoaded = true;
+    pageTitle = _find('#dwayne-router-title');
+    pageIcon = _find('#dwayne-router-icon');
+
+    _find('[' + stateAttrName + ']').hide();
+
+    defineProperties(MainState, {
+      base: router = _find('#dwayne-router').first()
+    });
+
+    win.on('click', function (e) {
+      var target = new Elem(e.target);
+
+      if (target.name === 'a' && target.attr('target') !== '_blank') {
+        var url = target.attr('href') || '';
+        var currentURL = location.href;
+        var newURL = new URL$1(url, currentURL);
+        var index = newURL.href.indexOf('#');
+
+        if (index !== -1 && (currentURL.indexOf('#') === -1 || currentURL.slice(index) === newURL.href.slice(index) && location.hash !== newURL.hash)) {
+          return;
+        }
+
+        e.preventDefault();
+
+        redirect(newURL, true);
+      }
+    });
+
+    states.forEach(function (state) {
+      var _state$parent = state.parent;
+      var children = _state$parent.children;
+      var parentParams = _state$parent.params;
+      var parentQuery = _state$parent.query;
+      var parentTemplateParams = _state$parent.templateParams;
+      var params = state.params;
+      var query = state.query;
+      var templateParams = state.templateParams;
+      var relativeURL = state.relativeURL;
+      var relativePath = state.relativePath;
+
+      var proto = state;
+      var count = 0;
+      var newPath = relativePath;
+      var newURL = '';
+
+      while (proto = proto.parent) {
+        count += new Super(proto.params).count;
+        newPath = proto.relativePath + newPath;
+        newURL = proto.relativeURL + newURL;
+      }
+
+      newPath = new RegExp('^' + (newPath.replace(/\/+/g, '/').replace(/\/$/, '') || '/') + '$');
+      newURL = isRegExp(relativeURL) ? newPath : (newURL + relativeURL).replace(/\/+/g, '/').replace(/\/$/, '') || '/';
+
+      children.push(state);
+
+      new Super(templateParams).proto(parentTemplateParams);
+      new Super(query).proto(parentQuery);
+      new Super(params).proto(parentParams).forEach(function (value, key, params) {
+        params[key] += count;
+      });
+
+      defineProperties(state, {
+        url: newURL,
+        path: newPath
+      });
+    });
+
+    eventPromise = eventPromise.then(function () {
+      return dispatchEvent(new Super({}).value({
+        type: 'init'
+      }).$);
+    }).then(function () {
+      return beforeLoad(new URL$1(location.href));
+    }).then(function () {
+      win.on('popstate', function () {
+        if (location.href !== href) {
+          pushed = true;
+        }
+
+        if (pushed) {
+          eventPromise = eventPromise.then(function () {
+            return beforeLoad(new URL$1(location.href));
+          });
+        }
+      });
+    });
+  }
+}
+
+function _go(url) {
+  redirect(new URL$1(url, location.href), true);
+}
+function redirectTo(url) {
+  redirect(new URL$1(url, location.href));
+}
+function registerState(state) {
+  if (states.indexOf(state) !== -1) {
+    return;
+  }
+
+  if (!isInstanceOfRouterState(state)) {
+    throw new Error('State must extend (' + extendLink + ') Router! (at registerState)');
+  }
+
+  var stateName = state.stateName;
+
+
+  if (!new Super(state).hasOwn('stateName') || states.find(function (_ref8) {
+    var n = _ref8.stateName;
+    return n === stateName;
+  })) {
+    throw new Error('State must have unique stateName! (at registerState)');
+  }
+
+  var proto = Object.getPrototypeOf(state);
+
+  if (isRegExp(proto.url)) {
+    throw new Error('URL regexp state cannot be extended! (at registerState)');
+  }
+
+  var $state = new Super(state);
+  var path = $state.hasOwn('path') ? state.path : '';
+
+  var _pathSwitcher = pathSwitcher(path);
+
+  var relativeURL = _pathSwitcher.url;
+  var relativePath = _pathSwitcher.path;
+  var params = _pathSwitcher.params;
+
+
+  defineProperties(state, {
+    $$: {
+      listeners: {}
+    },
+
+    stateName: stateName,
+    parent: proto,
+    children: new Arr([]),
+    template: $state.hasOwn('template') ? state.template : '',
+    relativeURL: relativeURL,
+    relativePath: relativePath,
+    params: params,
+    abstract: $state.hasOwn('abstract') && !!state.abstract,
+    templateParams: $state.hasOwn('templateParams') ? state.templateParams : {},
+    query: {}
+  });
+
+  var query = state.query;
+
+  var index = isString(path) ? path.indexOf('?') : -1;
+
+  if (index !== -1) {
+    new Str(path).replace(/&$/).slice(index + 1).split('&').forEach(function (param) {
+      var _resolveParameter2 = resolveParameter(param, 'Query parameter must not be an empty string or contain characters besides "a-zA-Z_$"! (at registerState)', 'Query parameter regexp validator must be within parentheses (e.g. :userId(\\d+)) and not contain them! (at registerState)');
+
+      var name = _resolveParameter2.name;
+      var _resolveParameter2$re = _resolveParameter2.regexp;
+      var regexp = _resolveParameter2$re === undefined ? /[\s\S]*/ : _resolveParameter2$re;
+
+
+      query[name] = new RegExp('^' + regexp.source.replace(/\\\//g, '/') + '$');
+    });
+  }
+
+  states.push(state);
 }
 
 
@@ -12690,8 +13632,8 @@ var statics = Object.freeze({
 	date: date,
 	find: _find,
 	Elem: Elem,
-	window: window$1,
-	document: document$1,
+	win: win,
+	doc: doc,
 	html: html,
 	body: body,
 	head: head$1,
@@ -12707,6 +13649,10 @@ var statics = Object.freeze({
 	rand: rand,
 	random: random,
 	Promise: Promise$1,
+	go: _go,
+	Router: Router,
+	redirectTo: redirectTo,
+	registerState: registerState,
 	Str: Str,
 	parseJSON: parseJSON,
 	Super: Super,
