@@ -1925,6 +1925,8 @@ describe('it should test Elem#', () => {
       elem.remove();
     });
   });
+  // TODO: insertAfter
+  // TODO: insertBefore
   describe('is()', () => {
     it('should return if context matches selector', () => {
       const elem = nativeDocument.createElement('div');
@@ -1967,6 +1969,7 @@ describe('it should test Elem#', () => {
         .catch(done);
     });
   });
+  // TODO: isWithinDocument
   describe('last()', () => {
     it('should return wrap of the last element', () => {
       const elem1 = nativeDocument.createElement('div');
@@ -2646,6 +2649,8 @@ describe('it should test Elem#', () => {
     });
   });
   describe('replace()', () => {
+    // TODO: rewrite the test considering replacing element with a set of elements
+    // TODO: write tests for the first child, last child, only child
     it('should replace the element with another', () => {
       const parent = nativeDocument.createElement('div');
       const elem1 = nativeDocument.createElement('div');
