@@ -1,6 +1,8 @@
+const path = require('path');
 const npm = require('rollup-plugin-node-resolve');
 const eslint = require('rollup-plugin-eslint');
 const babel = require('rollup-plugin-babel');
+const inject = require('rollup-plugin-inject');
 
 module.exports = {
   entry: './browser.js',
@@ -16,6 +18,12 @@ module.exports = {
     babel({
       presets: ['es2015-rollup'],
       babelrc: false
+    }),
+    inject({
+      exclude: './lib/constants/global.js',
+      modules: {
+        global: path.resolve('./lib/constants/global.js')
+      }
     })
   ]
 };

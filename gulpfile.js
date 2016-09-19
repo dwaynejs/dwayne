@@ -70,11 +70,7 @@ modules.forEach((module) => {
     const fileName = module || 'all';
     const config = _.cloneDeep(rollupTestConfig);
 
-    config.entry = [
-      `./test/${ fileName }.js`,
-      './browser.js',
-      './livereload.js'
-    ];
+    config.entry.push(`./test/${ fileName }.js`);
 
     const watcher = watch(rollup, config);
 
