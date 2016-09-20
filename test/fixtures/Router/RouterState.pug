@@ -1,0 +1,40 @@
+h1= header
+ul
+  each link, name in links
+    - const attrs = name === 'outerBlank' ? { target: '_blank' } : {};
+
+    li
+      a(href=link class=`link-to-${ name }`)&attributes(attrs) go to #{ name }
+
+div(
+  dwayne-router-state="main"
+  style={ 'background-color': '#55f' }
+)
+div(
+  dwayne-router-state="default"
+  style={'background-color': '#f55'}
+)
+div(
+  dwayne-router-state="users"
+  style={'background-color': '#5f5'}
+)
+div(
+  dwayne-router-state="about"
+  style={'background-color': '#aa0'}
+)
+div(
+  dwayne-router-state="regexp"
+  style={'background-color': 'orange'}
+)
+div(
+  dwayne-router-state="query"
+  style={'background-color': 'white'}
+)
+div(
+  dwayne-router-state="unreachable"
+  style={'background-color': 'black'}
+)
+div(
+  dwayne-router-state="stringTemplate"
+  style={'background-color': 'gray'}
+)

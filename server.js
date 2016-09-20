@@ -12,10 +12,12 @@ module.exports = (test) => {
   app.use(express.static(path.resolve('./')));
 
   if (test) {
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: false }));
+    const router = express.Router();
 
-    app.use(/.*/, (req, res, next) => {
+    router.use(bodyParser.json());
+    router.use(bodyParser.urlencoded({ extended: false }));
+
+    router.use(/.*/, (req, res, next) => {
       res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
       res.header(
         'Access-Control-Allow-Headers',
@@ -35,24 +37,44 @@ module.exports = (test) => {
       next();
     });
 
-    app.use('/timeout/:timeout', (req, res) => {
+    router.use('/timeout/:timeout', (req, res) => {
       setTimeout(() => res.send('Long'), parseInt(req.params.timeout));
     });
 
-    app.use('/status/:status', (req, res) => {
+    router.use('/status/:status', (req, res) => {
       res.sendStatus(parseInt(req.params.status));
     });
 
-    app.use(/.*/, (req, res) => {
-      const { body, query, headers } = req;
+    router.use(/.*/, (req, res) => {
+      const {
+        originalUrl: url,
+        body,
+        query,
+        headers
+      } = req;
 
       res.header('Foo-Header', 'Foo');
       res.header('Bar-Header', 'Bar');
       res.header('Baz-Header', 'Baz');
 
-      res.json({ body, query, headers });
+      res.json({
+        url,
+        body,
+        query,
+        headers
+      });
+    });
+
+    app.use('/fetch', router);
+
+    app.use(/.*/, (req, res) => {
+      res.sendFile(path.resolve('test.html'));
     });
   }
+
+  app.use(/.*/, (req, res) => {
+    res.sendFile(path.resolve('index.html'));
+  });
 
   return {
     listen(port) {

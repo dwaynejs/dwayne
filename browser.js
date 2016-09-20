@@ -1,5 +1,11 @@
-import global from './lib/constants/global';
+import * as statics from './lib/browser';
+import { assign } from './lib/helpers/assign';
 
-import D from './dwayne';
+const { D } = statics;
+
+assign(D, statics);
+
+delete D.default;
+delete D.D;
 
 global.D = D;

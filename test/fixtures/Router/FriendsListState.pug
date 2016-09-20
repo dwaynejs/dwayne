@@ -1,0 +1,7 @@
+p Friends list
+ul
+  each friend in friendsList
+    - const { name, link } = friend;
+
+    li
+      a(href=link)= name

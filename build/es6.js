@@ -1,10 +1,3 @@
-(function () {
-'use strict';
-
-/* eslint no-nested-ternary: 0 */
-/* eslint no-negated-condition: 0 */
-var global$1 = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
 /**
  * @module constants/constructors
  * @private
@@ -626,7 +619,7 @@ function isUndefined(value) {
  * D(new Date());    // Dat
  * D(document.body); // Elem
  */
-function D$1(value) {
+function D$2(value) {
   for (var i = constructors.length - 1; i >= 0; i--) {
     var levelConstructors = constructors[i];
 
@@ -792,6 +785,10 @@ function defineProperties(target, properties) {
     }
   });
 }
+
+/* eslint no-nested-ternary: 0 */
+/* eslint no-negated-condition: 0 */
+var global$1 = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 /**
  * @module helpers/Symbol
@@ -1943,7 +1940,7 @@ var Super = function () {
      * }).$; // { a: 1 }
      */
     value: function create(descriptors) {
-      return D$1(isPrimitive(this.$) ? undefined : Object.create(this.$, descriptors));
+      return D$2(isPrimitive(this.$) ? undefined : Object.create(this.$, descriptors));
     }
 
     /**
@@ -2114,7 +2111,7 @@ var Super = function () {
 
       var filtered = _deepFilter(this.$, callback, n, [{ key: null, value: this.$ }]);
 
-      return D$1(isNullOrUndefined(filtered) ? filtered : filtered || {});
+      return D$2(isNullOrUndefined(filtered) ? filtered : filtered || {});
     }
 
     /**
@@ -2222,7 +2219,7 @@ var Super = function () {
 
       n = Number(n);
 
-      return D$1(_deepMap(this.$, callback, n, [{ key: null, value: this.$ }]));
+      return D$2(_deepMap(this.$, callback, n, [{ key: null, value: this.$ }]));
     }
 
     /**
@@ -2472,7 +2469,7 @@ var Super = function () {
         }
       });
 
-      return D$1(o);
+      return D$2(o);
     }
 
     /**
@@ -2773,7 +2770,7 @@ var Super = function () {
     value: function keys() {
       var object = this.$;
 
-      return D$1(isObject(object) ? Object.keys(object) : []);
+      return D$2(isObject(object) ? Object.keys(object) : []);
     }
 
     /**
@@ -2801,7 +2798,7 @@ var Super = function () {
         o[key] = callback(value, key, object);
       });
 
-      return D$1(o);
+      return D$2(o);
     }
 
     /**
@@ -2895,7 +2892,7 @@ var Super = function () {
         callback(_object, value, key, obj);
       });
 
-      return D$1(_object);
+      return D$2(_object);
     }
 
     /**
@@ -2971,7 +2968,7 @@ var Super = function () {
     value: function propertyNames() {
       var object = this.$;
 
-      return D$1(isObject(object) ? Object.getOwnPropertyNames(object) : []);
+      return D$2(isObject(object) ? Object.getOwnPropertyNames(object) : []);
     }
 
     /**
@@ -2991,7 +2988,7 @@ var Super = function () {
     value: function propertySymbols() {
       var object = this.$;
 
-      return D$1(isObject(object) ? Object.getOwnPropertySymbols(object) : []);
+      return D$2(isObject(object) ? Object.getOwnPropertySymbols(object) : []);
     }
 
     /**
@@ -3254,7 +3251,7 @@ var Super = function () {
         array.push(value);
       });
 
-      return D$1(array);
+      return D$2(array);
     }
 
     /**
@@ -6462,7 +6459,7 @@ var Str = function (_Super) {
      * [String#match]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/match}.
      */
     value: function match(regexp) {
-      return D$1(this.$.match.apply(this.$, arguments));
+      return D$2(this.$.match.apply(this.$, arguments));
     }
 
     /**
@@ -6613,7 +6610,7 @@ var Str = function (_Super) {
   }, {
     key: 'split',
     value: function split(separator) {
-      return D$1(this.$.split.apply(this.$, arguments));
+      return D$2(this.$.split.apply(this.$, arguments));
     }
 
     /**
@@ -6912,7 +6909,7 @@ function parseJSON() {
   var callback = arguments[2];
 
   if (arguments.length <= 1) {
-    return D$1(JSON.parse(json));
+    return D$2(JSON.parse(json));
   }
 
   if (isFunction(options)) {
@@ -6934,7 +6931,7 @@ function parseJSON() {
     return callback ? callback.apply(this, arguments) : value;
   });
 
-  return D$1(parsed);
+  return D$2(parsed);
 }
 
 constructors[2].push({
@@ -14356,7 +14353,7 @@ function registerState(state) {
 
 
 var statics = Object.freeze({
-	D: D$1,
+	D: D$2,
 	isArray: isArray,
 	isArrayLike: isArrayLike,
 	isBoolean: isBoolean,
@@ -14420,7 +14417,7 @@ var statics = Object.freeze({
 	when: when
 });
 
-var D$$1 = D$1;
+var D$$1 = D$2;
 
 
 assign$1(D$$1, statics);
@@ -14428,8 +14425,4 @@ assign$1(D$$1, statics);
 delete D$$1.default;
 delete D$$1.D;
 
-global$1.D = D$$1;
-
-}());
-
-//# sourceMappingURL=dwayne.js.map
+export { D$2 as D, isArray, isArrayLike, isBoolean, isDate, isDateLike, isElement, isFinite, isFunction, isInteger, isIntegerLike, isNaN, isNull, isNullOrUndefined, isNumber, isNumberLike, isObject, isPlainObject, isPrimitive, isRegExp, isString, isSymbol, isUndefined, Alphabet, alphabet, Arr, array, iterate$1 as iterate, BlobObject, blob$1 as blob, Dat, now, date, _find as find, Elem, win, doc, html, body, head$1 as head, parseHTML, px, Fetch, fetch, Func, method, noop, self$1 as self, Num, rand, random, Promise$1 as Promise, _go as go, Router, redirectTo, registerState, Str, parseJSON, Super, Switcher, switcher, when };export default D$$1;

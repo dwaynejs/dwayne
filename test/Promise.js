@@ -119,7 +119,7 @@ describe('it should test Promise#', () => {
   });
 });
 
-describe('it should test Promise.[methods]', () => {
+describe('it should test Promise.', () => {
   describe('all()', () => {
     it('should return resolved promise with array of resolved values', (done) => {
       const unique1 = {};

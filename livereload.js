@@ -1,5 +1,5 @@
 import io from 'socket.io-client';
-import { find, body, document as doc, Elem } from './dwayne';
+import { find, body, doc, Elem } from './dwayne';
 
 body.css('margin', '0px');
 
@@ -15,9 +15,8 @@ new Elem([ready, loading])
   .load()
   .then(() => {
     livereload
-
       .css({
-        position: 'absolute',
+        position: 'fixed',
         top: '0',
         left: '0',
         padding: '10px 0 0 10px',
@@ -32,11 +31,11 @@ new Elem([ready, loading])
 const socket = io();
 
 socket.on('connect', () => {
-  console.log('livereload enabled');
+  console.log('%c%s', colored('green'), 'livereload enabled');
 });
 
 socket.on('toreload', () => {
-  console.log('something changed...');
+  console.log('%c%s', colored('orange'), 'something changed...');
 
   livereload
     .css({
@@ -47,7 +46,11 @@ socket.on('toreload', () => {
 });
 
 socket.on('reload', () => {
-  console.log('reloading...');
+  console.log('%c%s', colored('red'), 'reloading...');
 
   location.reload();
 });
+
+function colored(color) {
+  return `color: ${ color }; font-weight: 900; font-size: 16px;`;
+}

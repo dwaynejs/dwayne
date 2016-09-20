@@ -1170,7 +1170,7 @@ describe('it should test Super#', () => {
       const o = Object.create(proto);
       const wrap = new Super(o);
 
-      strictEqual(wrap.proto(), Object.getPrototypeOf(o));
+      strictEqual(wrap.proto().$, Object.getPrototypeOf(o));
     });
     it('should set prototype of context to argument, if its present', () => {
       const o = {};
