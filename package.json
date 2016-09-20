@@ -1,7 +1,9 @@
 {
   "name": "dwayne",
   "version": "0.3.0",
-  "main": "D.js",
+  "browser": "build/es6.js",
+  "main": "build/es5.js",
+  "jsnext:main": "build/es6.js",
   "devDependencies": {
     "babel-core": "^6.4.0",
     "babel-eslint": "^6.1.2",
