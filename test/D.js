@@ -6,6 +6,8 @@ import {
   isObject, isPlainObject, isPrimitive, isRegExp, isString, isSymbol, isUndefined
 } from './../lib/D';
 
+const document = global.document;
+
 /* eslint no-new-wrappers: 0 */
 
 describe('it should test D.', () => {
@@ -26,7 +28,9 @@ describe('it should test D.', () => {
       })(1, 2, 3), true);
     });
     it('should return true with HTMLCollection argument', () => {
-      strictEqual(isArrayLike(document.getElementsByTagName('body')), true);
+      if (document) {
+        strictEqual(isArrayLike(document.getElementsByTagName('body')), true);
+      }
     });
     it('should return true with a string argument ("")', () => {
       strictEqual(isArrayLike('123'), true);
@@ -57,10 +61,12 @@ describe('it should test D.', () => {
       strictEqual(isDateLike(null), true);
     });
   });
-  describe('isDateLike()', () => {
+  describe('isElement()', () => {
     it('should return true with Element arguments', () => {
-      strictEqual(isElement(document.createElement('html')), true);
-      strictEqual(isElement(document.createElement('div')), true);
+      if (document) {
+        strictEqual(isElement(document.createElement('html')), true);
+        strictEqual(isElement(document.createElement('div')), true);
+      }
     });
   });
   describe('isFinite()', () => {
