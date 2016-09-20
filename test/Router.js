@@ -44,6 +44,7 @@ describe('it should test Router', () => {
       strictEqual(UserFriendState.params.userId, 0);
     });
     it('should set query params inheritance', () => {
+      // noinspection JSUnresolvedVariable
       strictEqual(Object.getPrototypeOf(MainState.query), Router.query);
     });
   });
@@ -517,8 +518,81 @@ describe('it should test Router', () => {
       go('/regexp');
     });
   });
-  // TODO: tests for title and icon
-  // TODO: tests for string templates
+  describe('it should change titles and icons', () => {
+    let clean = () => {};
+
+    afterEach((done) => {
+      clean();
+
+      const removeListener = DefaultState.on('load', () => {
+        removeListener();
+
+        done();
+      });
+
+      go('/test.html');
+    });
+    it('should change the title if it\'s not the same', (done) => {
+      clean = MainState.on({
+        render() {
+          try {
+            strictEqual(find('#dwayne-router-title').text(), MainState.title);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }
+      });
+
+      MainState.go();
+    });
+    it('should change the icon if it\'s not the same', (done) => {
+      clean = MainState.on({
+        render() {
+          try {
+            strictEqual(find('#dwayne-router-icon').ref(), MainState.icon);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }
+      });
+
+      MainState.go();
+    });
+  });
+  describe('it should support string templates', () => {
+    let clean = () => {};
+
+    afterEach((done) => {
+      clean();
+
+      const removeListener = DefaultState.on('load', () => {
+        removeListener();
+
+        done();
+      });
+
+      go('/test.html');
+    });
+    it('should support string templates', (done) => {
+      clean = StringTemplateState.on({
+        render() {
+          try {
+            strictEqual(find('[dwayne-router-state="stringTemplate"]').html(), StringTemplateState.template);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }
+      });
+
+      StringTemplateState.go();
+    });
+  });
 });
 
 function initialize() {
@@ -719,6 +793,7 @@ function initialize() {
   registerState(RegExpState);
   registerState(QueryState);
   registerState(UnreachableState);
+  registerState(StringTemplateState);
 
   Router.default = DefaultState;
 
