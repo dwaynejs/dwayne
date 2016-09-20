@@ -31,7 +31,11 @@ module.exports = {
     }),
     cjs({
       include: 'node_modules/**',
-      exclude: 'node_modules/rollup-plugin-node-builtins/**',
+      exclude: [
+        'node_modules/rollup-plugin-node-builtins/**',
+        'node_modules/buffer-es6/**',
+        'node_modules/process-es6/**'
+      ],
       namedExports: {
         'node_modules/assert/assert.js': [
           'deepEqual',
