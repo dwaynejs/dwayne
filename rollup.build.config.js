@@ -16,7 +16,9 @@ module.exports = {
       throwError: true
     }),
     babel({
-      presets: ['es2015-rollup'],
+      presets: ['es2015-rollup', 'stage-0'],
+      include: './**/*.js',
+      plugins: ['transform-class-properties'],
       babelrc: false
     }),
     inject({
