@@ -1783,6 +1783,228 @@ describe('it should test Elem#', () => {
       strictEqual(elem.id, 'dwayne');
     });
   });
+  describe('innerHeight', () => {
+    it('should return inner height', () => {
+      const elem = nativeDocument.createElement('div');
+      const wrap = new Elem(elem);
+
+      nativeBody.appendChild(elem);
+
+      wrap.css({
+        boxSizing: 'border-box',
+        height: '200px',
+        paddingTop: '2px',
+        paddingBottom: '3px',
+        borderTop: '1px solid black',
+        borderBottom: '4px solid black'
+      });
+
+      strictEqual(wrap.innerHeight, 190);
+
+      wrap.css('box-sizing', 'content-box');
+
+      strictEqual(wrap.innerHeight, 200);
+
+      elem.remove();
+    });
+  });
+  describe('innerWidth', () => {
+    it('should return inner width', () => {
+      const elem = nativeDocument.createElement('div');
+      const wrap = new Elem(elem);
+
+      nativeBody.appendChild(elem);
+
+      wrap.css({
+        boxSizing: 'border-box',
+        width: '200px',
+        paddingLeft: '2px',
+        paddingRight: '3px',
+        borderLeft: '1px solid black',
+        borderRight: '4px solid black'
+      });
+
+      strictEqual(wrap.innerWidth, 190);
+
+      wrap.css('box-sizing', 'content-box');
+
+      strictEqual(wrap.innerWidth, 200);
+
+      elem.remove();
+    });
+  });
+  describe('insertAfter()', () => {
+    it('should support (element) syntax', () => {
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const elem5 = nativeDocument.createElement('div');
+      const elem = [
+        elem1,
+        elem2,
+        elem3
+      ];
+      const wrap = new Elem(elem);
+      const wrap2 = new Elem(elem4);
+
+      elem4.appendChild(elem5);
+
+      wrap.insertAfter(elem5);
+
+      const children = wrap2.children().$;
+
+      strictEqual(children.length, 4);
+      strictEqual(children[0], elem5);
+      strictEqual(children[1], elem1);
+      strictEqual(children[2], elem2);
+      strictEqual(children[3], elem3);
+    });
+    it('should support (Elem) syntax', () => {
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const elem5 = nativeDocument.createElement('div');
+      const elem = [
+        elem1,
+        elem2,
+        elem3
+      ];
+      const wrap = new Elem(elem);
+      const wrap2 = new Elem(elem4);
+      const wrap3 = new Elem(elem5);
+
+      elem4.appendChild(elem5);
+
+      wrap.insertAfter(wrap3);
+
+      const children = wrap2.children().$;
+
+      strictEqual(children.length, 4);
+      strictEqual(children[0], elem5);
+      strictEqual(children[1], elem1);
+      strictEqual(children[2], elem2);
+      strictEqual(children[3], elem3);
+    });
+    it('should support (selector) syntax', () => {
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const elem5 = nativeDocument.createElement('div');
+      const elem = [
+        elem1,
+        elem2,
+        elem3
+      ];
+      const wrap = new Elem(elem);
+      const wrap2 = new Elem(elem4);
+
+      elem4.appendChild(elem5);
+      nativeBody.appendChild(elem4);
+
+      elem5.className = 'insert-after-selector';
+
+      wrap.insertAfter('.insert-after-selector');
+
+      const children = wrap2.children().$;
+
+      strictEqual(children.length, 4);
+      strictEqual(children[0], elem5);
+      strictEqual(children[1], elem1);
+      strictEqual(children[2], elem2);
+      strictEqual(children[3], elem3);
+
+      elem4.remove();
+    });
+  });
+  describe('insertBefore()', () => {
+    it('should support (element) syntax', () => {
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const elem5 = nativeDocument.createElement('div');
+      const elem = [
+        elem1,
+        elem2,
+        elem3
+      ];
+      const wrap = new Elem(elem);
+      const wrap2 = new Elem(elem4);
+
+      elem4.appendChild(elem5);
+
+      wrap.insertBefore(elem5);
+
+      const children = wrap2.children().$;
+
+      strictEqual(children.length, 4);
+      strictEqual(children[0], elem1);
+      strictEqual(children[1], elem2);
+      strictEqual(children[2], elem3);
+      strictEqual(children[3], elem5);
+    });
+    it('should support (Elem) syntax', () => {
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const elem5 = nativeDocument.createElement('div');
+      const elem = [
+        elem1,
+        elem2,
+        elem3
+      ];
+      const wrap = new Elem(elem);
+      const wrap2 = new Elem(elem4);
+      const wrap3 = new Elem(elem5);
+
+      elem4.appendChild(elem5);
+
+      wrap.insertBefore(wrap3);
+
+      const children = wrap2.children().$;
+
+      strictEqual(children.length, 4);
+      strictEqual(children[0], elem1);
+      strictEqual(children[1], elem2);
+      strictEqual(children[2], elem3);
+      strictEqual(children[3], elem5);
+    });
+    it('should support (selector) syntax', () => {
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const elem5 = nativeDocument.createElement('div');
+      const elem = [
+        elem1,
+        elem2,
+        elem3
+      ];
+      const wrap = new Elem(elem);
+      const wrap2 = new Elem(elem4);
+
+      elem4.appendChild(elem5);
+      nativeBody.appendChild(elem4);
+
+      elem5.className = 'insert-before-selector';
+
+      wrap.insertBefore('.insert-before-selector');
+
+      const children = wrap2.children().$;
+
+      strictEqual(children.length, 4);
+      strictEqual(children[0], elem1);
+      strictEqual(children[1], elem2);
+      strictEqual(children[2], elem3);
+      strictEqual(children[3], elem5);
+
+      elem4.remove();
+    });
+  });
   describe('into()', () => {
     it('should support (element) syntax', (done) => {
       const parent = nativeDocument.createElement('div');
@@ -1875,58 +2097,6 @@ describe('it should test Elem#', () => {
       }
     });
   });
-  describe('innerHeight', () => {
-    it('should return inner height', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
-
-      nativeBody.appendChild(elem);
-
-      wrap.css({
-        boxSizing: 'border-box',
-        height: '200px',
-        paddingTop: '2px',
-        paddingBottom: '3px',
-        borderTop: '1px solid black',
-        borderBottom: '4px solid black'
-      });
-
-      strictEqual(wrap.innerHeight, 190);
-
-      wrap.css('box-sizing', 'content-box');
-
-      strictEqual(wrap.innerHeight, 200);
-
-      elem.remove();
-    });
-  });
-  describe('innerWidth', () => {
-    it('should return inner width', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
-
-      nativeBody.appendChild(elem);
-
-      wrap.css({
-        boxSizing: 'border-box',
-        width: '200px',
-        paddingLeft: '2px',
-        paddingRight: '3px',
-        borderLeft: '1px solid black',
-        borderRight: '4px solid black'
-      });
-
-      strictEqual(wrap.innerWidth, 190);
-
-      wrap.css('box-sizing', 'content-box');
-
-      strictEqual(wrap.innerWidth, 200);
-
-      elem.remove();
-    });
-  });
-  // TODO: insertAfter
-  // TODO: insertBefore
   describe('is()', () => {
     it('should return if context matches selector', () => {
       const elem = nativeDocument.createElement('div');
@@ -1969,7 +2139,20 @@ describe('it should test Elem#', () => {
         .catch(done);
     });
   });
-  // TODO: isWithinDocument
+  describe('isBroken()', () => {
+    it('should return false if the element is not within document', () => {
+      const elem = nativeDocument.createElement('div');
+      const wrap = new Elem(elem);
+
+      strictEqual(wrap.isWithinDocument(), false);
+    });
+    it('should return true if the element is within document', () => {
+      const elem = nativeBody;
+      const wrap = new Elem(elem);
+
+      strictEqual(wrap.isWithinDocument(), true);
+    });
+  });
   describe('last()', () => {
     it('should return wrap of the last element', () => {
       const elem1 = nativeDocument.createElement('div');
@@ -2649,25 +2832,176 @@ describe('it should test Elem#', () => {
     });
   });
   describe('replace()', () => {
-    // TODO: rewrite the test considering replacing element with a set of elements
-    // TODO: write tests for the first child, last child, only child
-    it('should replace the element with another', () => {
+    it('should replace the element with a set of elements if it\'s not the only, first or last child', () => {
       const parent = nativeDocument.createElement('div');
       const elem1 = nativeDocument.createElement('div');
       const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const elem5 = nativeDocument.createElement('div');
+      const elem6 = nativeDocument.createElement('div');
       const elem = [
-        elem1,
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
+        elem4,
+        elem5,
+        elem6
       ];
       const wrap = new Elem(elem);
+      const wrap2 = new Elem(elem2);
+      const parentWrap = new Elem(parent);
+
+      parent.appendChild(elem1);
+      parent.appendChild(elem2);
+      parent.appendChild(elem3);
+
+      wrap2.replace(wrap);
+
+      const children = parentWrap.children().$;
+
+      strictEqual(children.length, 5);
+      strictEqual(children[0], elem1);
+      strictEqual(children[1], elem4);
+      strictEqual(children[2], elem5);
+      strictEqual(children[3], elem6);
+      strictEqual(children[4], elem3);
+    });
+    it('should replace the element with a set of elements if it\'s a first child', () => {
+      const parent = nativeDocument.createElement('div');
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const elem5 = nativeDocument.createElement('div');
+      const elem6 = nativeDocument.createElement('div');
+      const elem = [
+        elem4,
+        elem5,
+        elem6
+      ];
+      const wrap = new Elem(elem);
+      const wrap2 = new Elem(elem1);
+      const parentWrap = new Elem(parent);
+
+      parent.appendChild(elem1);
+      parent.appendChild(elem2);
+      parent.appendChild(elem3);
+
+      wrap2.replace(wrap);
+
+      const children = parentWrap.children().$;
+
+      strictEqual(children.length, 5);
+      strictEqual(children[0], elem4);
+      strictEqual(children[1], elem5);
+      strictEqual(children[2], elem6);
+      strictEqual(children[3], elem2);
+      strictEqual(children[4], elem3);
+    });
+    it('should replace the element with a set of elements if it\'s a last child', () => {
+      const parent = nativeDocument.createElement('div');
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const elem5 = nativeDocument.createElement('div');
+      const elem6 = nativeDocument.createElement('div');
+      const elem = [
+        elem4,
+        elem5,
+        elem6
+      ];
+      const wrap = new Elem(elem);
+      const wrap2 = new Elem(elem3);
+      const parentWrap = new Elem(parent);
+
+      parent.appendChild(elem1);
+      parent.appendChild(elem2);
+      parent.appendChild(elem3);
+
+      wrap2.replace(wrap);
+
+      const children = parentWrap.children().$;
+
+      strictEqual(children.length, 5);
+      strictEqual(children[0], elem1);
+      strictEqual(children[1], elem2);
+      strictEqual(children[2], elem4);
+      strictEqual(children[3], elem5);
+      strictEqual(children[4], elem6);
+    });
+    it('should replace the element with a set of elements if it\'s an only child', () => {
+      const parent = nativeDocument.createElement('div');
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const elem = [
+        elem2,
+        elem3,
+        elem4
+      ];
+      const wrap = new Elem(elem);
+      const wrap2 = new Elem(elem1);
+      const parentWrap = new Elem(parent);
 
       parent.appendChild(elem1);
 
-      wrap.replace(elem2);
+      wrap2.replace(wrap);
 
-      strictEqual(elem1.parentNode, null);
-      strictEqual(elem2.parentNode, parent);
+      const children = parentWrap.children().$;
+
+      strictEqual(children.length, 3);
+      strictEqual(children[0], elem2);
+      strictEqual(children[1], elem3);
+      strictEqual(children[2], elem4);
+    });
+    it('should support (element) syntax', () => {
+      const parent = nativeDocument.createElement('div');
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const wrap = new Elem(elem2);
+      const wrap2 = new Elem(elem1);
+      const parentWrap = new Elem(parent);
+
+      parent.appendChild(elem1);
+
+      wrap2.replace(elem2);
+
+      const children = parentWrap.children().$;
+
+      strictEqual(children.length, 1);
+      strictEqual(children[0], elem2);
+    });
+    it('should support (selector) syntax', () => {
+      const parent = nativeDocument.createElement('div');
+      const elem1 = nativeDocument.createElement('div');
+      const elem2 = nativeDocument.createElement('div');
+      const elem3 = nativeDocument.createElement('div');
+      const elem4 = nativeDocument.createElement('div');
+      const elem = [
+        elem2,
+        elem3,
+        elem4
+      ];
+      const wrap = new Elem(elem);
+      const wrap2 = new Elem(elem1);
+      const parentWrap = new Elem(parent);
+
+      parent.appendChild(elem1);
+
+      wrap
+        .into(nativeBody)
+        .class('replace-selector');
+
+      wrap2.replace('.replace-selector');
+
+      const children = parentWrap.children().$;
+
+      strictEqual(children.length, 3);
+      strictEqual(children[0], elem2);
+      strictEqual(children[1], elem3);
+      strictEqual(children[2], elem4);
+
+      wrap.remove();
     });
   });
   describe('setOf()', () => {
@@ -2732,7 +3066,17 @@ describe('it should test Elem#', () => {
 
       strictEqual(elem.style.display, 'inline');
     });
-    // TODO: test double hide
+    it('should support double hiding', () => {
+      const elem = nativeDocument.createElement('div');
+      const wrap = new Elem(elem);
+
+      elem.style.display = 'inline';
+      wrap.hide();
+      wrap.hide();
+      wrap.show();
+
+      strictEqual(elem.style.display, 'inline');
+    });
   });
   describe('text()', () => {
     it('should get text of the element with no arguments', () => {
