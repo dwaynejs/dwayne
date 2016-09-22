@@ -1407,7 +1407,7 @@ var Switcher = function (_Function) {
     var defaultValue = arguments[2];
     classCallCheck(this, Switcher);
 
-    var _this = possibleConstructorReturn(this, Object.getPrototypeOf(Switcher).call(this));
+    var _this = possibleConstructorReturn(this, (Switcher.__proto__ || Object.getPrototypeOf(Switcher)).call(this));
 
     if (isString(cases)) {
       if (!isUndefined(arguments[1])) {
@@ -3742,7 +3742,7 @@ var Arr = function (_Super) {
   function Arr() {
     var array = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
     classCallCheck(this, Arr);
-    return possibleConstructorReturn(this, Object.getPrototypeOf(Arr).call(this, toArray$1(array)));
+    return possibleConstructorReturn(this, (Arr.__proto__ || Object.getPrototypeOf(Arr)).call(this, toArray$1(array)));
 
     /**
      * @member Arr#$
@@ -4596,7 +4596,7 @@ var BlobObject = function (_Super) {
 
   function BlobObject() {
     classCallCheck(this, BlobObject);
-    return possibleConstructorReturn(this, Object.getPrototypeOf(BlobObject).apply(this, arguments));
+    return possibleConstructorReturn(this, (BlobObject.__proto__ || Object.getPrototypeOf(BlobObject)).apply(this, arguments));
   }
 
   createClass(BlobObject, [{
@@ -4789,7 +4789,7 @@ var Func = function (_Super) {
     var func = arguments.length <= 0 || arguments[0] === undefined ? function () {} : arguments[0];
     classCallCheck(this, Func);
 
-    var _this = possibleConstructorReturn(this, Object.getPrototypeOf(Func).call(this));
+    var _this = possibleConstructorReturn(this, (Func.__proto__ || Object.getPrototypeOf(Func)).call(this));
 
     function proxy() {
       var _this2 = this,
@@ -5513,7 +5513,7 @@ var Num = function (_Super) {
   function Num() {
     var number = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
     classCallCheck(this, Num);
-    return possibleConstructorReturn(this, Object.getPrototypeOf(Num).call(this, number));
+    return possibleConstructorReturn(this, (Num.__proto__ || Object.getPrototypeOf(Num)).call(this, number));
 
     /**
      * @member Num#$
@@ -6293,7 +6293,7 @@ var Str = function (_Super) {
   function Str() {
     var string = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
     classCallCheck(this, Str);
-    return possibleConstructorReturn(this, Object.getPrototypeOf(Str).call(this, string));
+    return possibleConstructorReturn(this, (Str.__proto__ || Object.getPrototypeOf(Str)).call(this, string));
 
     /**
      * @member Str#$
@@ -7203,7 +7203,7 @@ var Dat = function (_Super) {
   function Dat() {
     var date = arguments.length <= 0 || arguments[0] === undefined ? new Date() : arguments[0];
     classCallCheck(this, Dat);
-    return possibleConstructorReturn(this, Object.getPrototypeOf(Dat).call(this, date));
+    return possibleConstructorReturn(this, (Dat.__proto__ || Object.getPrototypeOf(Dat)).call(this, date));
 
     /**
      * @member Dat#$
@@ -7762,7 +7762,7 @@ var constructURL = (function (baseURL, url, params, query) {
   }
 
   return '' + URL + (hash ? '#' + hash : '');
-})
+});
 
 /**
  * @function isAbsolute
@@ -7809,7 +7809,7 @@ var parseHeaders = (function (rawHeaders) {
   });
 
   return headers;
-})
+});
 
 /**
  * @module helpers/transformData
@@ -7843,7 +7843,7 @@ var transformData = (function (data, method, headers) {
   }
 
   return data;
-})
+});
 
 /**
  * @module Fetch
@@ -7965,7 +7965,7 @@ var Fetch = function (_Function) {
     var config = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
     classCallCheck(this, Fetch);
 
-    var _this = possibleConstructorReturn(this, Object.getPrototypeOf(Fetch).call(this));
+    var _this = possibleConstructorReturn(this, (Fetch.__proto__ || Object.getPrototypeOf(Fetch)).call(this));
 
     function fetch() {
       return fetch.request.apply(fetch, arguments);
@@ -7973,7 +7973,9 @@ var Fetch = function (_Function) {
 
     var conf = new Super({}).deepAssign(defaults$1, config).$;
 
-    conf.before.push(fetchBeforeMiddleware);
+    if (conf.before.indexOf(fetchBeforeMiddleware) === -1) {
+      conf.before.push(fetchBeforeMiddleware);
+    }
 
     /**
      * @member {FetchConfig} Fetch#$$
@@ -8266,10 +8268,6 @@ var Fetch = function (_Function) {
       delete config.data;
 
       var conf = new Super({}).deepAssign(this.$$, config).assign(dataConfig).$;
-
-      if (conf.before.indexOf(fetchBeforeMiddleware) === -1) {
-        conf.before.push(fetchBeforeMiddleware);
-      }
 
       return new Fetch(conf);
     }
@@ -10018,7 +10016,7 @@ var Elem = function (_Arr) {
     var elem = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
     classCallCheck(this, Elem);
 
-    var _this = possibleConstructorReturn(this, Object.getPrototypeOf(Elem).call(this, function () {
+    var _this = possibleConstructorReturn(this, (Elem.__proto__ || Object.getPrototypeOf(Elem)).call(this, function () {
       var element = elem;
 
       if (isArrayLike(element) && (isWindow(element) || isHTMLDocument(element) || isElement(element))) {
@@ -10952,7 +10950,7 @@ var Elem = function (_Arr) {
     value: function filter() {
       var selector = arguments.length <= 0 || arguments[0] === undefined ? Boolean : arguments[0];
 
-      return new Elem(get$1(Object.getPrototypeOf(Elem.prototype), 'filter', this).call(this, filterSwitcher(selector)));
+      return new Elem(get$1(Elem.prototype.__proto__ || Object.getPrototypeOf(Elem.prototype), 'filter', this).call(this, filterSwitcher(selector)));
     }
 
     /**
@@ -10969,7 +10967,7 @@ var Elem = function (_Arr) {
     key: 'find',
     value: function find(selector) {
       if (!isString(selector)) {
-        return get$1(Object.getPrototypeOf(Elem.prototype), 'find', this).call(this, selector);
+        return get$1(Elem.prototype.__proto__ || Object.getPrototypeOf(Elem.prototype), 'find', this).call(this, selector);
       }
 
       return this.object(function (elems, elem) {
@@ -12847,7 +12845,7 @@ var resolveURL = (function (url, decodeQuery) {
   });
 
   return params;
-})
+});
 
 /**
  * @module Router
