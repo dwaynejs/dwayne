@@ -65,6 +65,52 @@ describe('it should test Arr#', () => {
       strictEqual(wrap.indexOfStrict(NaN), 1);
     });
   });
+  describe('isContentEqual()', () => {
+    it('should return true if contents are equal', () => {
+      const a1 = [0, 1, 2];
+      const a2 = [1, 2, '0'];
+      const wrap = new Arr(a1);
+
+      strictEqual(wrap.isContentEqual(a2), true);
+    });
+    it('should return false if contents are not equal', () => {
+      const a1 = [0, 1, 2];
+      const a2 = [0, 1];
+      const wrap = new Arr(a1);
+
+      strictEqual(wrap.isContentEqual(a2), false);
+    });
+    it('should return true if arrays are empty', () => {
+      const a1 = [];
+      const a2 = [];
+      const wrap = new Arr(a1);
+
+      strictEqual(wrap.isContentEqual(a2), true);
+    });
+  });
+  describe('isContentStrictEqual()', () => {
+    it('should return true if contents are strict equal', () => {
+      const a1 = [0, 1, 2];
+      const a2 = [1, 2, 0];
+      const wrap = new Arr(a1);
+
+      strictEqual(wrap.isContentStrictEqual(a2), true);
+    });
+    it('should return false if contents are strict equal', () => {
+      const a1 = [0, 1, 2];
+      const a2 = [0, 1, '2'];
+      const wrap = new Arr(a1);
+
+      strictEqual(wrap.isContentStrictEqual(a2), false);
+    });
+    it('should return true if arrays are empty', () => {
+      const a1 = [];
+      const a2 = [];
+      const wrap = new Arr(a1);
+
+      strictEqual(wrap.isContentStrictEqual(a2), true);
+    });
+  });
   describe('join()', () => {
     it('should return a wrap of joined string', () => {
       const a = [1, 2, 3, 4, 5];

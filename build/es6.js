@@ -1808,7 +1808,7 @@ var Super = function () {
     /**
      * @method Super#assign
      * @public
-     * @param {...*} objects - Objects to be assigned to the object.
+     * @param {...(Object|Super|*)} objects - Objects to be assigned to the object.
      * @returns {DWrap} Returns this.
      * @description Synonym for
      * [Object.assign]
@@ -3367,21 +3367,15 @@ defineProperties(Super.prototype, defineProperty({}, _Symbol.toStringTag, 'Super
  */
 function _deepAssign(target, object) {
   iterate(object, function (value, key) {
-    if (isPrimitive(value)) {
-      target[key] = value;
-
-      return;
-    }
-
-    var hasProperty = {}.hasOwnProperty.call(target, key);
-
-    if (isPrimitive(target[key]) || !hasProperty) {
+    if (isPrimitive(target[key]) || !{}.hasOwnProperty.call(target, key)) {
       target[key] = _deepClone(value);
 
       return;
     }
 
-    _deepAssign(target[key], value);
+    if (!isPrimitive(target[key])) {
+      _deepAssign(target[key], value);
+    }
   });
 }
 
@@ -3752,7 +3746,7 @@ var Arr = function (_Super) {
   /**
    * @method Arr#concat
    * @public
-   * @param {...(Array|*)} values - Arrays or any other values to concat the array with.
+   * @param {...(Array|Arr|*)} values - Arrays or any other values to concat the array with.
    * @returns {Arr} New instance of Arr.
    * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/concat
    * @description Synonym for
@@ -3843,6 +3837,53 @@ var Arr = function (_Super) {
       var key = this.keyOfStrict(value);
 
       return key === null ? -1 : Number(key);
+    }
+
+    /**
+     * @method Arr#isContentEqual
+     * @public
+     * @param {Arr|Array} elem - Array to compare.
+     * @returns {Boolean} If sets are equal.
+     * @description Returns true if the arrays lengths are equal and
+     * their elements are equal (order is not taken into account).
+     *
+     * @example
+     * new Arr([1, 2, 3]).isContentEqual([1, '3', '2']); // true
+     * new Arr([1, 2, 3]).isContentEqual([1, 2]);        // false
+     * new Arr([]).isContentEqual([]);                   // true
+     */
+
+  }, {
+    key: 'isContentEqual',
+    value: function isContentEqual(elem) {
+      elem = new Arr(elem);
+
+      return this.length === elem.length && this.every(function (element) {
+        return elem.indexOf(element) !== -1;
+      });
+    }
+
+    /**
+     * @method Arr#isContentStrictEqual
+     * @public
+     * @param {Arr|Array} elem - Array to compare.
+     * @returns {Boolean} If sets are equal.
+     * @description Returns true if the arrays lengths are equal and
+     * their elements are equal (order is not taken into account).
+     *
+     * @example
+     * new Arr([1, 2, 3]).isContentStrictEqual([1, '3', '2']); // false
+     * new Arr([1, 2, 3]).isContentStrictEqual([1, 3, 2]);     // true
+     */
+
+  }, {
+    key: 'isContentStrictEqual',
+    value: function isContentStrictEqual(elem) {
+      elem = new Arr(elem);
+
+      return this.length === elem.length && this.every(function (element) {
+        return elem.indexOfStrict(element) !== -1;
+      });
     }
 
     /**
@@ -10351,6 +10392,8 @@ var Elem = function (_Arr) {
 
       var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
+      // TODO: write using ArrayBuffer
+
       return new Promise$1(function (resolve, reject) {
         var elem = _this4.first();
         var name = elem.name;
@@ -10890,7 +10933,7 @@ var Elem = function (_Arr) {
 
       if (!/Event$/.test(toStringTag(finalEvent))) {
         try {
-          finalEvent = new Event(finalEvent, eventInit);
+          finalEvent = new Event(finalEvent, { bubbles: bubbles, cancelable: cancelable });
         } catch (err) {
           finalEvent = nativeDocument.createEvent('Event');
           finalEvent.initEvent(event, bubbles, cancelable);
@@ -12336,19 +12379,57 @@ var Elem = function (_Arr) {
         });
       }
 
-      var errors = null;
+      var errors = new Super({ errors: null });
 
       this.filter(inputElements + ', form').forEach(function (elem, index) {
         if (getName(elem) === 'form') {
-          return new Elem(elem).find(inputElements).forEach(function (input, index) {
-            validatorWrap(input, index);
-          });
+          var _ret = function () {
+            var formErrors = { errors: null };
+            var form = new Elem(elem);
+            var inputs = form.find(inputElements);
+
+            inputs.forEach(function (input, index) {
+              validatorWrap(input, index, formErrors);
+            });
+
+            errors.deepAssign(formErrors);
+
+            formErrors = formErrors.errors;
+
+            form.dispatch('validate', {}, {
+              valid: !formErrors,
+              errors: formErrors
+            });
+
+            return {
+              v: inputs.forEach(function (input) {
+                var inputError = (formErrors || {})[input.name];
+
+                new Elem(input).dispatch('validate', {}, {
+                  valid: !inputError,
+                  error: inputError || null
+                });
+              })
+            };
+          }();
+
+          if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
         }
 
-        validatorWrap(elem, index);
+        var inputError = { errors: null };
+
+        validatorWrap(elem, index, inputError);
+        errors.deepAssign(inputError);
+
+        inputError = (inputError.errors || {})[elem.name];
+
+        new Elem(elem).dispatch('validate', {}, {
+          valid: !inputError,
+          error: inputError || null
+        });
       });
 
-      function validatorWrap(input, index) {
+      function validatorWrap(input, index, errors) {
         try {
           if (input.validity && !input.validity.valid) {
             throw new Error(input.validationMessage);
@@ -12358,11 +12439,11 @@ var Elem = function (_Arr) {
             validator(input.value, input, index);
           });
         } catch (err) {
-          (errors = errors || {})[input.name] = err;
+          (errors.errors = errors.errors || {})[input.name] = err;
         }
       }
 
-      return errors;
+      return errors.$.errors;
     }
 
     /**
@@ -13310,6 +13391,8 @@ var Router = function () {
         });
       };
     }
+
+    // TODO: Router#store
 
     /**
      * @member {Elem} Router#base

@@ -2431,6 +2431,8 @@ describe('it should test Elem#', () => {
     });
   });
   describe('on()', () => {
+    // TODO: fix safari
+
     it('should support (event, listener) syntax', (done) => {
       const elem = nativeDocument.createElement('div');
       const wrap = new Elem(elem);
@@ -3044,6 +3046,8 @@ describe('it should test Elem#', () => {
     });
   });
   describe('show()', () => {
+    // TODO: fix safari
+
     it('should not change display if it is not none and set element.dwayneData.previousDisplay to \'\'', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new Elem(elem);
@@ -3330,7 +3334,7 @@ describe('it should test Elem#', () => {
     });
   });
   describe('validate()', () => {
-    it('should return a wrap of the parent elements with no arguments', () => {
+    it('should validate inputs and forms', () => {
       const form = nativeDocument.createElement('form');
       const input = nativeDocument.createElement('input');
       const inputRequired = nativeDocument.createElement('input');
@@ -3376,6 +3380,170 @@ describe('it should test Elem#', () => {
         .validate();
 
       strictEqual(errors, null);
+    });
+    it('should fire a validate event on inputs', (done) => {
+      const input = nativeDocument.createElement('input');
+      const inputRequired = nativeDocument.createElement('input');
+      const inputWrap = new Elem(input);
+      let times = 0;
+      let error;
+
+      inputRequired.setAttribute('required', '');
+
+      inputWrap.attr({
+        name: 'input1',
+        required: ''
+      });
+
+      inputWrap.on('validate', (e) => {
+        /* eslint indent: 0 */
+        switch (times) {
+          case 0: {
+            try {
+              strictEqual(e.valid, false);
+              strictEqual(e.error.message, inputRequired.validationMessage);
+
+              doneAll();
+            } catch (err) {
+              doneAll(err);
+            }
+
+            return;
+          }
+          case 1: {
+            try {
+              strictEqual(e.valid, true);
+              strictEqual(e.error, null);
+
+              doneAll();
+            } catch (err) {
+              doneAll(err);
+            }
+
+            return;
+          }
+        }
+      });
+
+      inputWrap.validate();
+
+      inputWrap.prop('value', '1');
+
+      inputWrap.validate();
+
+      function doneAll(err) {
+        if (err) {
+          error = err;
+
+          return done(err);
+        }
+
+        if (++times === 2 && !error) {
+          done();
+        }
+      }
+    });
+    it('should fire a validate event on forms', (done) => {
+      const form = nativeDocument.createElement('form');
+      const input1 = nativeDocument.createElement('input');
+      const input2 = nativeDocument.createElement('input');
+      const inputRequired = nativeDocument.createElement('input');
+      const formWrap = new Elem(form);
+      const inputWrap1 = new Elem(input1);
+      const inputWrap2 = new Elem(input2);
+      let times = 0;
+      let error;
+
+      inputRequired.setAttribute('required', '');
+      form.appendChild(input1);
+      form.appendChild(input2);
+
+      inputWrap1.attr({
+        name: 'input1',
+        required: ''
+      });
+
+      inputWrap2.attr({
+        name: 'input2',
+        required: ''
+      });
+
+      inputWrap2.validate((text) => {
+        if (text[0].toLowerCase() === text[0]) {
+          throw new Error('Input must be capitilized.');
+        }
+      });
+
+      formWrap.on('validate', (e) => {
+        if (e.target !== form) {
+          return;
+        }
+
+        switch (times) {
+          case 0: {
+            try {
+              strictEqual(e.valid, false);
+              deepStrictEqual(Object.keys(e.errors), ['input1', 'input2']);
+              strictEqual(e.errors.input1.message, inputRequired.validationMessage);
+              strictEqual(e.errors.input2.message, inputRequired.validationMessage);
+
+              doneAll();
+            } catch (err) {
+              doneAll(err);
+            }
+
+            return;
+          }
+          case 1: {
+            try {
+              strictEqual(e.valid, false);
+              deepStrictEqual(Object.keys(e.errors), ['input2']);
+              strictEqual(e.errors.input2.message, 'Input must be capitilized.');
+
+              doneAll();
+            } catch (err) {
+              doneAll(err);
+            }
+
+            return;
+          }
+          case 2: {
+            try {
+              strictEqual(e.valid, true);
+              strictEqual(e.errors, null);
+
+              doneAll();
+            } catch (err) {
+              doneAll(err);
+            }
+
+            return;
+          }
+        }
+      });
+
+      formWrap.validate();
+
+      inputWrap1.prop('value', '1');
+      inputWrap2.prop('value', 't');
+
+      formWrap.validate();
+
+      inputWrap2.prop('value', 'T');
+
+      formWrap.validate();
+
+      function doneAll(err) {
+        if (err) {
+          error = err;
+
+          return done(err);
+        }
+
+        if (++times === 3 && !error) {
+          done();
+        }
+      }
     });
   });
 });
