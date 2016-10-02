@@ -10,7 +10,7 @@ import UserFriendStateTemplate from './fixtures/Router/UserFriendState.pug';
 import RegExpStateTemplate from './fixtures/Router/RegExpState.pug';
 import QueryStateTemplate from './fixtures/Router/QueryState.pug';
 import UnreachableStateTemplate from './fixtures/Router/UnreachableState.pug';
-import D, { Router, registerState, go, find } from '../dwayne';
+import { D, Router, registerState, go, find } from '../dwayne';
 
 let MainState;
 let DefaultState;
@@ -23,6 +23,7 @@ let RegExpState;
 let QueryState;
 let UnreachableState;
 let StringTemplateState;
+let RedirectState;
 
 before((done) => {
   const removeListener = Router.on('init', () => {
@@ -235,7 +236,7 @@ describe('it should test Router', () => {
       clean = DefaultState.on({
         render({ state }) {
           try {
-            strictEqual(state.base.text(), `State not found (url: "${ state.url.pathname }"). Go to home.`);
+            strictEqual(state.base.text(), `State not found (url: "${ location.pathname }"). Go to home.`);
 
             done();
           } catch (err) {
@@ -389,8 +390,6 @@ describe('it should test Router', () => {
     it('should resolve query params', (done) => {
       clean = MainState.on({
         load({ state }) {
-          console.log(state);
-
           try {
             deepStrictEqual(state.query, {
               a: '12',
@@ -609,7 +608,7 @@ function initialize() {
         relative: 'dogs',
         missing: '/trtrtr',
         outer: '//google.com',
-        outerBlank: '//lostfilm.tv',
+        outerBlank: '//google.com',
         home: MainState.buildURL(),
         about: AboutState.buildURL(),
         users: UsersState.buildURL(),
@@ -633,7 +632,8 @@ function initialize() {
             a: '',
             b: '56'
           }
-        })
+        }),
+        redirecting: RedirectState.buildURL()
       }
     });
   });
@@ -661,7 +661,7 @@ function initialize() {
       super(props);
 
       D(this.templateParams).deepAssign({
-        content: `State not found (url: "${ this.url.pathname }"). Go to `
+        content: `State not found (url: "${ location.pathname }"). Go to `
       });
     }
   };
@@ -782,6 +782,15 @@ function initialize() {
     static path = '/string-template';
     static template = 'string template';
   };
+  RedirectState = class extends Router {
+    static stateName = 'redirect';
+    static path = '/redirect';
+    static template = 'Redirect state';
+
+    onBeforeLoad(e) {
+      e.redirectTo(AboutState.buildURL());
+    }
+  };
 
   registerState(MainState);
   registerState(DefaultState);
@@ -794,6 +803,7 @@ function initialize() {
   registerState(QueryState);
   registerState(UnreachableState);
   registerState(StringTemplateState);
+  registerState(RedirectState);
 
   Router.default = DefaultState;
 

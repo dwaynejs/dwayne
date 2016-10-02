@@ -1336,7 +1336,7 @@ var Switcher = function (_Function) {
     var defaultValue = arguments[2];
     classCallCheck(this, Switcher);
 
-    var _this = possibleConstructorReturn(this, (Switcher.__proto__ || Object.getPrototypeOf(Switcher)).call(this));
+    var _this = possibleConstructorReturn(this, Object.getPrototypeOf(Switcher).call(this));
 
     if (isString(cases)) {
       if (!isUndefined(arguments[1])) {
@@ -1683,7 +1683,7 @@ var cloneSwitcher = switcher('call', function (object) {
 }).case(isDate, function (object) {
   return new Date(object);
 }).case(isRegExp, function (object) {
-  return new RegExp(object.source, object.flags);
+  return new RegExp(object.source, object.toString().match(/[gimuy]*$/)[0]);
 }).case(isArray, function () {
   return [];
 }).case(isPlainObject, function () {
@@ -3363,7 +3363,7 @@ function deepEqual(o1, o2, strict) {
   }
 
   if (isRegExp(o1) && isRegExp(o2)) {
-    return o1.source === o2.source && o1.flags === o2.flags && o1.lastIndex === o2.lastIndex;
+    return o1.source === o2.source && o1.toString().match(/[gimuy]*$/)[0] === o2.toString().match(/[gimuy]*$/)[0] && o1.lastIndex === o2.lastIndex;
   }
 
   if (isRegExp(o1) || isRegExp(o2)) {
@@ -3665,7 +3665,7 @@ var Arr = function (_Super) {
   function Arr() {
     var array = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
     classCallCheck(this, Arr);
-    return possibleConstructorReturn(this, (Arr.__proto__ || Object.getPrototypeOf(Arr)).call(this, toArray$1(array)));
+    return possibleConstructorReturn(this, Object.getPrototypeOf(Arr).call(this, toArray$1(array instanceof Arr ? array.$ : array)));
 
     /**
      * @member Arr#$
@@ -3769,53 +3769,6 @@ var Arr = function (_Super) {
       var key = this.keyOfStrict(value);
 
       return key === null ? -1 : Number(key);
-    }
-
-    /**
-     * @method Arr#isContentEqual
-     * @public
-     * @param {Arr|Array} elem - Array to compare.
-     * @returns {Boolean} If sets are equal.
-     * @description Returns true if the arrays lengths are equal and
-     * their elements are equal (order is not taken into account).
-     *
-     * @example
-     * new Arr([1, 2, 3]).isContentEqual([1, '3', '2']); // true
-     * new Arr([1, 2, 3]).isContentEqual([1, 2]);        // false
-     * new Arr([]).isContentEqual([]);                   // true
-     */
-
-  }, {
-    key: 'isContentEqual',
-    value: function isContentEqual(elem) {
-      elem = new Arr(elem);
-
-      return this.length === elem.length && this.every(function (element) {
-        return elem.indexOf(element) !== -1;
-      });
-    }
-
-    /**
-     * @method Arr#isContentStrictEqual
-     * @public
-     * @param {Arr|Array} elem - Array to compare.
-     * @returns {Boolean} If sets are equal.
-     * @description Returns true if the arrays lengths are equal and
-     * their elements are equal (order is not taken into account).
-     *
-     * @example
-     * new Arr([1, 2, 3]).isContentStrictEqual([1, '3', '2']); // false
-     * new Arr([1, 2, 3]).isContentStrictEqual([1, 3, 2]);     // true
-     */
-
-  }, {
-    key: 'isContentStrictEqual',
-    value: function isContentStrictEqual(elem) {
-      elem = new Arr(elem);
-
-      return this.length === elem.length && this.every(function (element) {
-        return elem.indexOfStrict(element) !== -1;
-      });
     }
 
     /**
@@ -4445,7 +4398,7 @@ var Promise$1 = function () {
 
       return new Promise(function (resolve, reject) {
         var _loop2 = function _loop2(i) {
-          var promise = Promise.resolve(array[i]);
+          var promise = Promise.resolve(iterable[i]);
 
           promise.then(function (value) {
             toResolve--;
@@ -4465,8 +4418,6 @@ var Promise$1 = function () {
   }, {
     key: 'race',
     value: function race(iterable) {
-      var array = [];
-
       if (iterable[iterator]) {
         iterable = iterable[iterator]();
 
@@ -4480,8 +4431,8 @@ var Promise$1 = function () {
       }
 
       return new Promise(function (resolve, reject) {
-        for (var i = 0, length = array.length; i < length; i++) {
-          array[i].then(resolve, reject);
+        for (var i = 0, length = iterable.length; i < length; i++) {
+          iterable[i].then(resolve, reject);
         }
       });
     }
@@ -4552,7 +4503,7 @@ var Func = function (_Super) {
     var func = arguments.length <= 0 || arguments[0] === undefined ? function () {} : arguments[0];
     classCallCheck(this, Func);
 
-    var _this = possibleConstructorReturn(this, (Func.__proto__ || Object.getPrototypeOf(Func)).call(this));
+    var _this = possibleConstructorReturn(this, Object.getPrototypeOf(Func).call(this));
 
     function proxy() {
       var _this2 = this,
@@ -5276,7 +5227,7 @@ var Num = function (_Super) {
   function Num() {
     var number = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
     classCallCheck(this, Num);
-    return possibleConstructorReturn(this, (Num.__proto__ || Object.getPrototypeOf(Num)).call(this, number));
+    return possibleConstructorReturn(this, Object.getPrototypeOf(Num).call(this, number));
 
     /**
      * @member Num#$
@@ -6056,7 +6007,7 @@ var Str = function (_Super) {
   function Str() {
     var string = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
     classCallCheck(this, Str);
-    return possibleConstructorReturn(this, (Str.__proto__ || Object.getPrototypeOf(Str)).call(this, string));
+    return possibleConstructorReturn(this, Object.getPrototypeOf(Str).call(this, string));
 
     /**
      * @member Str#$
@@ -6966,7 +6917,7 @@ var Dat = function (_Super) {
   function Dat() {
     var date = arguments.length <= 0 || arguments[0] === undefined ? new Date() : arguments[0];
     classCallCheck(this, Dat);
-    return possibleConstructorReturn(this, (Dat.__proto__ || Object.getPrototypeOf(Dat)).call(this, date));
+    return possibleConstructorReturn(this, Object.getPrototypeOf(Dat).call(this, date));
 
     /**
      * @member Dat#$
@@ -7430,7 +7381,7 @@ function now() {
  */
 function date(date) {
   if (!arguments.length) {
-    return new Dat(new Date());
+    return new Dat(new Date(now()));
   }
 
   date = new Super(date).$;

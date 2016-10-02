@@ -223,13 +223,13 @@ describe('it should test D.', () => {
       strictEqual(isString(''), true);
     });
   });
-  if (isFunction(global.Symbol)) {
-    describe('isSymbol()', () => {
-      it('should return true with Symbol argument', () => {
+  describe('isSymbol()', () => {
+    it('should return true with Symbol argument', () => {
+      if (global.Symbol) {
         strictEqual(isSymbol(Symbol('1')), true);
-      });
+      }
     });
-  }
+  });
   describe('isUndefined()', () => {
     it('should return false with null argument', () => {
       strictEqual(isUndefined(null), false);

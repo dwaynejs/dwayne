@@ -159,7 +159,7 @@ describe('it should test Promise.', () => {
         .catch(done);
     });
     it('should support iterators parameters, if Symbol.iterator is supported', (done) => {
-      if (Symbol && Symbol.iterator) {
+      if (global.Symbol && global.Symbol.iterator) {
         const unique1 = {};
         const unique2 = {};
         const unique3 = {};
@@ -189,6 +189,8 @@ describe('it should test Promise.', () => {
             done();
           })
           .catch(done);
+      } else {
+        done();
       }
     });
   });
@@ -229,7 +231,7 @@ describe('it should test Promise.', () => {
         .catch(done);
     });
     it('should support iterators parameters, if Symbol.iterator is supported', (done) => {
-      if (Symbol && Symbol.iterator) {
+      if (global.Symbol && global.Symbol.iterator) {
         const unique1 = {};
         const unique2 = new Error();
         const unique3 = {};
@@ -257,6 +259,8 @@ describe('it should test Promise.', () => {
             done();
           })
           .catch(done);
+      } else {
+        done();
       }
     });
   });
