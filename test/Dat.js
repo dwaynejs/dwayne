@@ -141,14 +141,14 @@ describe('it should test Dat#', () => {
     it('should return true with argument before context', () => {
       const date = new Date();
       const wrap = new Dat(date);
-      const before = new Date(now() - 100);
+      const before = new Date(now() - 10000);
 
       strictEqual(wrap.isAfter(before), true);
     });
     it('should return false with argument after context', () => {
       const date = new Date();
       const wrap = new Dat(date);
-      const after = new Date(now() + 100);
+      const after = new Date(now() + 10000);
 
       strictEqual(wrap.isAfter(after), false);
     });
@@ -157,14 +157,14 @@ describe('it should test Dat#', () => {
     it('should return true with argument after context', () => {
       const date = new Date();
       const wrap = new Dat(date);
-      const after = new Date(now() + 100);
+      const after = new Date(now() + 10000);
 
       strictEqual(wrap.isBefore(after), true);
     });
     it('should return false with argument before context', () => {
       const date = new Date();
       const wrap = new Dat(date);
-      const before = new Date(now() - 100);
+      const before = new Date(now() - 10000);
 
       strictEqual(wrap.isBefore(before), false);
     });
@@ -173,16 +173,16 @@ describe('it should test Dat#', () => {
     it('should return true with first argument before context and second after', () => {
       const date = new Date();
       const wrap = new Dat(date);
-      const before = new Date(now() - 100);
-      const after = new Date(now() + 100);
+      const before = new Date(now() - 10000);
+      const after = new Date(now() + 10000);
 
       strictEqual(wrap.isBetween(before, after), true);
     });
     it('should return true with first argument after context or second before', () => {
       const date = new Date();
       const wrap = new Dat(date);
-      const before = new Date(now() - 100);
-      const after = new Date(now() + 100);
+      const before = new Date(now() - 10000);
+      const after = new Date(now() + 10000);
 
       strictEqual(wrap.isBetween(before, before), false);
       strictEqual(wrap.isBetween(after, after), false);

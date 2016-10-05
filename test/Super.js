@@ -1154,7 +1154,7 @@ describe('it should test Super#', () => {
   });
   describe('propertySymbols()', () => {
     it('should return property symbols if Symbol is supported', () => {
-      if (Symbol && Symbol.for) {
+      if (global.Symbol && global.Symbol.for) {
         const symbol = Symbol('D');
         const symbolFor = Symbol.for('D');
         const o = { [symbol]: 1, [symbolFor]: 2 };

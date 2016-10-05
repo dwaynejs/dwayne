@@ -36,8 +36,125 @@ function toStringTag(object) {
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
 } : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
 };
+
+
+
+
+
+var asyncGenerator = function () {
+  function AwaitValue(value) {
+    this.value = value;
+  }
+
+  function AsyncGenerator(gen) {
+    var front, back;
+
+    function send(key, arg) {
+      return new Promise(function (resolve, reject) {
+        var request = {
+          key: key,
+          arg: arg,
+          resolve: resolve,
+          reject: reject,
+          next: null
+        };
+
+        if (back) {
+          back = back.next = request;
+        } else {
+          front = back = request;
+          resume(key, arg);
+        }
+      });
+    }
+
+    function resume(key, arg) {
+      try {
+        var result = gen[key](arg);
+        var value = result.value;
+
+        if (value instanceof AwaitValue) {
+          Promise.resolve(value.value).then(function (arg) {
+            resume("next", arg);
+          }, function (arg) {
+            resume("throw", arg);
+          });
+        } else {
+          settle(result.done ? "return" : "normal", result.value);
+        }
+      } catch (err) {
+        settle("throw", err);
+      }
+    }
+
+    function settle(type, value) {
+      switch (type) {
+        case "return":
+          front.resolve({
+            value: value,
+            done: true
+          });
+          break;
+
+        case "throw":
+          front.reject(value);
+          break;
+
+        default:
+          front.resolve({
+            value: value,
+            done: false
+          });
+          break;
+      }
+
+      front = front.next;
+
+      if (front) {
+        resume(front.key, front.arg);
+      } else {
+        back = null;
+      }
+    }
+
+    this._invoke = send;
+
+    if (typeof gen.return !== "function") {
+      this.return = undefined;
+    }
+  }
+
+  if (typeof Symbol === "function" && Symbol.asyncIterator) {
+    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
+      return this;
+    };
+  }
+
+  AsyncGenerator.prototype.next = function (arg) {
+    return this._invoke("next", arg);
+  };
+
+  AsyncGenerator.prototype.throw = function (arg) {
+    return this._invoke("throw", arg);
+  };
+
+  AsyncGenerator.prototype.return = function (arg) {
+    return this._invoke("return", arg);
+  };
+
+  return {
+    wrap: function (fn) {
+      return function () {
+        return new AsyncGenerator(fn.apply(this, arguments));
+      };
+    },
+    await: function (value) {
+      return new AwaitValue(value);
+    }
+  };
+}();
 
 
 
@@ -1099,7 +1216,7 @@ function validate$1(args, options, name) {
  */
 var Alphabet = function () {
   function Alphabet() {
-    var alphabet = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+    var alphabet = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
     classCallCheck(this, Alphabet);
 
     var a = {};
@@ -1399,8 +1516,8 @@ var Switcher = function (_Function) {
   inherits(Switcher, _Function);
 
   function Switcher() {
-    var cases = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-    var mode = arguments.length <= 1 || arguments[1] === undefined ? 'equals' : arguments[1];
+    var cases = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var mode = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'equals';
 
     var _ret;
 
@@ -1425,7 +1542,7 @@ var Switcher = function (_Function) {
     });
 
     function switcher(value) {
-      var args = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+      var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
       var _switcher$$$ = switcher.$$;
       var mode = _switcher$$$.mode;
       var def = _switcher$$$.default;
@@ -1754,7 +1871,7 @@ var cloneSwitcher = switcher('call', function (object) {
 }).case(isDate, function (object) {
   return new Date(object);
 }).case(isRegExp, function (object) {
-  return new RegExp(object.source, object.flags);
+  return new RegExp(object.source, object.toString().match(/[gimuy]*$/)[0]);
 }).case(isArray, function () {
   return [];
 }).case(isPlainObject, function () {
@@ -1811,7 +1928,7 @@ var Super = function () {
     /**
      * @method Super#assign
      * @public
-     * @param {...*} objects - Objects to be assigned to the object.
+     * @param {...(Object|Super|*)} objects - Objects to be assigned to the object.
      * @returns {DWrap} Returns this.
      * @description Synonym for
      * [Object.assign]
@@ -1851,7 +1968,7 @@ var Super = function () {
   }, {
     key: 'average',
     value: function average() {
-      var callback = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+      var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       validate$1([callback], ['function||!'], 'Super#average');
 
@@ -2042,7 +2159,7 @@ var Super = function () {
   }, {
     key: 'deepEquals',
     value: function deepEquals() {
-      var object = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+      var object = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       return deepEqual(this.$, object, false);
     }
@@ -2170,7 +2287,7 @@ var Super = function () {
   }, {
     key: 'deepForEach',
     value: function deepForEach(callback) {
-      var n = arguments.length <= 1 || arguments[1] === undefined ? Infinity : arguments[1];
+      var n = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Infinity;
 
       validate$1([callback, n], ['function', ['numberLike', '>0']], 'Super#deepForEach');
 
@@ -2216,7 +2333,7 @@ var Super = function () {
   }, {
     key: 'deepMap',
     value: function deepMap(callback) {
-      var n = arguments.length <= 1 || arguments[1] === undefined ? Infinity : arguments[1];
+      var n = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Infinity;
 
       validate$1([callback, n], ['function', ['numberLike', '>0']], 'Super#deepMap');
 
@@ -2242,7 +2359,7 @@ var Super = function () {
   }, {
     key: 'deepReduce',
     value: function deepReduce(callback) {
-      var n = arguments.length <= 1 || arguments[1] === undefined ? Infinity : arguments[1];
+      var n = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Infinity;
       var IV = arguments[2];
 
       validate$1([callback, n], ['function', ['numberLike', '>0']], 'Super#deepReduce');
@@ -2309,7 +2426,7 @@ var Super = function () {
   }, {
     key: 'deepStrictEquals',
     value: function deepStrictEquals() {
-      var object = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+      var object = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       return deepEqual(this.$, object, true);
     }
@@ -2425,7 +2542,7 @@ var Super = function () {
   }, {
     key: 'every',
     value: function every() {
-      var callback = arguments.length <= 0 || arguments[0] === undefined ? Boolean : arguments[0];
+      var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Boolean;
 
       validate$1([callback], ['function'], 'Super#every');
 
@@ -2452,7 +2569,7 @@ var Super = function () {
   }, {
     key: 'filter',
     value: function filter() {
-      var callback = arguments.length <= 0 || arguments[0] === undefined ? Boolean : arguments[0];
+      var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Boolean;
 
       validate$1([callback], ['function'], 'Super#filter');
 
@@ -2822,7 +2939,7 @@ var Super = function () {
   }, {
     key: 'max',
     value: function max() {
-      var callback = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+      var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       validate$1([callback], ['function||!'], 'Super#max');
 
@@ -2854,7 +2971,7 @@ var Super = function () {
   }, {
     key: 'min',
     value: function min() {
-      var callback = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+      var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       validate$1([callback], ['function||!'], 'Super#min');
 
@@ -2887,7 +3004,7 @@ var Super = function () {
   }, {
     key: 'object',
     value: function object(callback) {
-      var _object = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+      var _object = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
       validate$1([callback], ['function'], 'Super#object');
 
@@ -3124,7 +3241,7 @@ var Super = function () {
   }, {
     key: 'some',
     value: function some() {
-      var callback = arguments.length <= 0 || arguments[0] === undefined ? Boolean : arguments[0];
+      var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Boolean;
 
       validate$1([callback], ['function'], 'Super#some');
 
@@ -3174,7 +3291,7 @@ var Super = function () {
   }, {
     key: 'sum',
     value: function sum() {
-      var callback = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+      var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       validate$1([callback], ['function||!'], 'Super#sum');
 
@@ -3273,7 +3390,7 @@ var Super = function () {
   }, {
     key: 'word',
     value: function word() {
-      var callback = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+      var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       validate$1([callback], ['function||!'], 'Super#word');
 
@@ -3370,21 +3487,15 @@ defineProperties(Super.prototype, defineProperty({}, _Symbol.toStringTag, 'Super
  */
 function _deepAssign(target, object) {
   iterate(object, function (value, key) {
-    if (isPrimitive(value)) {
-      target[key] = value;
-
-      return;
-    }
-
-    var hasProperty = {}.hasOwnProperty.call(target, key);
-
-    if (isPrimitive(target[key]) || !hasProperty) {
+    if (isPrimitive(target[key]) || !{}.hasOwnProperty.call(target, key)) {
       target[key] = _deepClone(value);
 
       return;
     }
 
-    _deepAssign(target[key], value);
+    if (!isPrimitive(target[key])) {
+      _deepAssign(target[key], value);
+    }
   });
 }
 
@@ -3440,7 +3551,7 @@ function deepEqual(o1, o2, strict) {
   }
 
   if (isRegExp(o1) && isRegExp(o2)) {
-    return o1.source === o2.source && o1.flags === o2.flags && o1.lastIndex === o2.lastIndex;
+    return o1.source === o2.source && o1.toString().match(/[gimuy]*$/)[0] === o2.toString().match(/[gimuy]*$/)[0] && o1.lastIndex === o2.lastIndex;
   }
 
   if (isRegExp(o1) || isRegExp(o2)) {
@@ -3740,9 +3851,9 @@ var Arr = function (_Super) {
   inherits(Arr, _Super);
 
   function Arr() {
-    var array = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+    var array = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
     classCallCheck(this, Arr);
-    return possibleConstructorReturn(this, (Arr.__proto__ || Object.getPrototypeOf(Arr)).call(this, toArray$1(array)));
+    return possibleConstructorReturn(this, (Arr.__proto__ || Object.getPrototypeOf(Arr)).call(this, toArray$1(array instanceof Arr ? array.$ : array)));
 
     /**
      * @member Arr#$
@@ -3755,7 +3866,7 @@ var Arr = function (_Super) {
   /**
    * @method Arr#concat
    * @public
-   * @param {...(Array|*)} values - Arrays or any other values to concat the array with.
+   * @param {...(Array|Arr|*)} values - Arrays or any other values to concat the array with.
    * @returns {Arr} New instance of Arr.
    * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/concat
    * @description Synonym for
@@ -4475,7 +4586,7 @@ var Promise$1 = function () {
 
       return new Promise(function (resolve, reject) {
         var _loop2 = function _loop2(i) {
-          var promise = Promise.resolve(array[i]);
+          var promise = Promise.resolve(iterable[i]);
 
           promise.then(function (value) {
             toResolve--;
@@ -4495,8 +4606,6 @@ var Promise$1 = function () {
   }, {
     key: 'race',
     value: function race(iterable) {
-      var array = [];
-
       if (iterable[iterator]) {
         iterable = iterable[iterator]();
 
@@ -4510,8 +4619,8 @@ var Promise$1 = function () {
       }
 
       return new Promise(function (resolve, reject) {
-        for (var i = 0, length = array.length; i < length; i++) {
-          array[i].then(resolve, reject);
+        for (var i = 0, length = iterable.length; i < length; i++) {
+          iterable[i].then(resolve, reject);
         }
       });
     }
@@ -4682,7 +4791,7 @@ var BlobObject = function (_Super) {
   }, {
     key: 'saveAs',
     value: function saveAs() {
-      var name = arguments.length <= 0 || arguments[0] === undefined ? 'download' : arguments[0];
+      var name = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'download';
 
       var anchor = document.createElement('a');
 
@@ -4737,7 +4846,7 @@ constructors[1].push({
  * @description Function for creating blobs not involving BlobObject and Blob constructors.
  */
 function blob$1(blobParts) {
-  var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   if (!isArray(blobParts)) {
     blobParts = [blobParts];
@@ -4786,7 +4895,7 @@ var Func = function (_Super) {
   function Func() {
     var _ret;
 
-    var func = arguments.length <= 0 || arguments[0] === undefined ? function () {} : arguments[0];
+    var func = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
     classCallCheck(this, Func);
 
     var _this = possibleConstructorReturn(this, (Func.__proto__ || Object.getPrototypeOf(Func)).call(this));
@@ -4916,7 +5025,7 @@ var Func = function (_Super) {
   createClass(Func, [{
     key: 'after',
     value: function after(middleware) {
-      var afterAll = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+      var afterAll = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
       validate$1([middleware], ['function'], 'Func#after');
 
@@ -4967,7 +5076,7 @@ var Func = function (_Super) {
   }, {
     key: 'async',
     value: function async() {
-      var condition = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+      var condition = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
       this.$$.sync = !condition;
 
@@ -4994,7 +5103,7 @@ var Func = function (_Super) {
   }, {
     key: 'before',
     value: function before(middleware) {
-      var beforeAll = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+      var beforeAll = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
       validate$1([middleware], ['function'], 'Func#before');
 
@@ -5455,7 +5564,7 @@ constructors[1].push({
  * [1.2345, 2.789, 3.14].map(method('toFixed', [2])); // ['1.23', '2.79', '3.14']
  */
 function method(method) {
-  var args = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+  var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
   return function (x) {
     return x[method].apply(x, toArray$1(args));
@@ -5511,7 +5620,7 @@ var Num = function (_Super) {
   inherits(Num, _Super);
 
   function Num() {
-    var number = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+    var number = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
     classCallCheck(this, Num);
     return possibleConstructorReturn(this, (Num.__proto__ || Object.getPrototypeOf(Num)).call(this, number));
 
@@ -5659,7 +5768,7 @@ var Num = function (_Super) {
      * });
      */
     value: function interval(func) {
-      var args = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+      var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
       validate$1([func], ['function'], 'Num#interval');
 
@@ -5895,7 +6004,7 @@ var Num = function (_Super) {
   }, {
     key: 'toBase',
     value: function toBase() {
-      var base = arguments.length <= 0 || arguments[0] === undefined ? 10 : arguments[0];
+      var base = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 10;
 
       return this.$.toString(base);
     }
@@ -6219,8 +6328,8 @@ constructors[1].push({
  * rand(1, 5); // 4.356763
  */
 function rand() {
-  var start = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
-  var end = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
+  var start = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+  var end = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
 
   return start + (end - start) * Math.random();
 }
@@ -6291,7 +6400,7 @@ var Str = function (_Super) {
   inherits(Str, _Super);
 
   function Str() {
-    var string = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+    var string = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
     classCallCheck(this, Str);
     return possibleConstructorReturn(this, (Str.__proto__ || Object.getPrototypeOf(Str)).call(this, string));
 
@@ -6512,7 +6621,7 @@ var Str = function (_Super) {
   }, {
     key: 'replace',
     value: function replace(regexp) {
-      var replacer = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+      var replacer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
 
       return new Str(this.$.replace(regexp, replacer));
     }
@@ -6533,7 +6642,7 @@ var Str = function (_Super) {
   }, {
     key: 'replaceString',
     value: function replaceString(string) {
-      var replacer = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+      var replacer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
 
       string = new Super(string).$;
 
@@ -6630,7 +6739,7 @@ var Str = function (_Super) {
   }, {
     key: 'startsWith',
     value: function startsWith(searchString) {
-      var position = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+      var position = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
 
       return this.$.indexOf.apply(this.$, arguments) === position;
     }
@@ -6907,8 +7016,8 @@ function trim(string) {
  * parseJSON('{ "a": "1999-12-31T23:59:59.999Z" }', { dates: true }).$; // { a: Date {...} }
  */
 function parseJSON() {
-  var json = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
-  var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+  var json = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   var callback = arguments[2];
 
   if (arguments.length <= 1) {
@@ -7201,7 +7310,7 @@ var Dat = function (_Super) {
   inherits(Dat, _Super);
 
   function Dat() {
-    var date = arguments.length <= 0 || arguments[0] === undefined ? new Date() : arguments[0];
+    var date = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Date();
     classCallCheck(this, Dat);
     return possibleConstructorReturn(this, (Dat.__proto__ || Object.getPrototypeOf(Dat)).call(this, date));
 
@@ -7282,7 +7391,7 @@ var Dat = function (_Super) {
     value: function format(string) {
       var _this2 = this;
 
-      var prefix = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+      var prefix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
 
       string = new Str(new Super(string).$);
       prefix = String(new Super(prefix).$);
@@ -7329,7 +7438,7 @@ var Dat = function (_Super) {
     value: function formatUTC(string) {
       var _this3 = this;
 
-      var prefix = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+      var prefix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
 
       string = new Str(new Super(string).$);
       prefix = String(new Super(prefix).$);
@@ -7667,7 +7776,7 @@ function now() {
  */
 function date(date) {
   if (!arguments.length) {
-    return new Dat(new Date());
+    return new Dat(new Date(now()));
   }
 
   date = new Super(date).$;
@@ -7738,8 +7847,8 @@ var querySwitcher = switcher('call', function () {
  * @description Function for constructing URL from the base URL, URL, params and query params.
  */
 var constructURL = (function (baseURL, url, params, query) {
-  var hash = arguments.length <= 4 || arguments[4] === undefined ? '' : arguments[4];
-  var encodeOptions = arguments.length <= 5 || arguments[5] === undefined ? {} : arguments[5];
+  var hash = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : '';
+  var encodeOptions = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {};
   var _encodeOptions$params = encodeOptions.params;
   var encodeParams = _encodeOptions$params === undefined ? true : _encodeOptions$params;
   var _encodeOptions$query = encodeOptions.query;
@@ -7834,7 +7943,7 @@ var transformData = (function (data, method, headers) {
     return null;
   }
 
-  if (isObject(data) && notToTransform.keyOfStrict(toStringTag(data)) !== -1) {
+  if (isObject(data) && notToTransform.indexOfStrict(toStringTag(data)) === -1) {
     if (!headers.contentType) {
       headers.contentType = ['application/json;charset=utf-8'];
     }
@@ -7962,7 +8071,7 @@ var Fetch = function (_Function) {
   function Fetch() {
     var _ret;
 
-    var config = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     classCallCheck(this, Fetch);
 
     var _this = possibleConstructorReturn(this, (Fetch.__proto__ || Object.getPrototypeOf(Fetch)).call(this));
@@ -8016,7 +8125,7 @@ var Fetch = function (_Function) {
   createClass(Fetch, [{
     key: 'after',
     value: function after(middleware) {
-      var afterAll = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+      var afterAll = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
       validate$1([middleware], ['function'], 'Fetch#after');
 
@@ -8060,7 +8169,7 @@ var Fetch = function (_Function) {
   }, {
     key: 'before',
     value: function before(middleware) {
-      var beforeAll = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+      var beforeAll = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
       validate$1([middleware], ['function'], 'Fetch#before');
 
@@ -8137,7 +8246,7 @@ var Fetch = function (_Function) {
   }, {
     key: 'delete',
     value: function _delete(url) {
-      var config = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+      var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
       if (!isString(url)) {
         config = url;
@@ -8164,7 +8273,7 @@ var Fetch = function (_Function) {
   }, {
     key: 'get',
     value: function get(url) {
-      var config = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+      var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
       if (!isString(url)) {
         config = url;
@@ -8191,7 +8300,7 @@ var Fetch = function (_Function) {
   }, {
     key: 'head',
     value: function head(url) {
-      var config = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+      var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
       if (!isString(url)) {
         config = url;
@@ -8261,7 +8370,7 @@ var Fetch = function (_Function) {
   }, {
     key: 'instance',
     value: function instance() {
-      var config = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+      var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
       var dataConfig = new Super(config).hasOwn('data') ? { data: config.data } : {};
 
@@ -8290,8 +8399,8 @@ var Fetch = function (_Function) {
   }, {
     key: 'patch',
     value: function patch(url) {
-      var data = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-      var config = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+      var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      var config = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
       if (arguments.length && !isString(url)) {
         config = data;
@@ -8320,8 +8429,8 @@ var Fetch = function (_Function) {
   }, {
     key: 'post',
     value: function post(url) {
-      var data = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-      var config = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+      var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      var config = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
       if (arguments.length && !isString(url)) {
         config = data;
@@ -8350,8 +8459,8 @@ var Fetch = function (_Function) {
   }, {
     key: 'put',
     value: function put(url) {
-      var data = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-      var config = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+      var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      var config = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
       if (arguments.length && !isString(url)) {
         config = data;
@@ -8390,7 +8499,7 @@ var Fetch = function (_Function) {
   }, {
     key: 'request',
     value: function request(url) {
-      var config = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+      var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
       if (arguments.length === 1 && !isString(url)) {
         config = url;
@@ -9944,7 +10053,7 @@ var canvasRestMethods = [
  */
 
 /**
- * @callback Listener
+ * @callback ElemListener
  * @public
  * @param {Event} e - Fired event.
  * @param {Element} elem - Element on which the listener was called.
@@ -9967,6 +10076,7 @@ var attrs = {};
 var windowsDwayneData = new Arr([]);
 var inputElements = 'input, select, textarea, datalist, keygen, output';
 var dataURLFetch = new Fetch({ responseType: 'arraybuffer' });
+var _click = method('click');
 var refSwitcher = switcher('strictEquals', 'href').case(['img', 'script', 'iframe', 'audio', 'video'], 'src').case('form', 'action');
 var filterSwitcher = switcher('call', function (selector) {
   return selector;
@@ -10013,7 +10123,7 @@ var Elem = function (_Arr) {
   inherits(Elem, _Arr);
 
   function Elem() {
-    var elem = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+    var elem = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
     classCallCheck(this, Elem);
 
     var _this = possibleConstructorReturn(this, (Elem.__proto__ || Object.getPrototypeOf(Elem)).call(this, function () {
@@ -10100,6 +10210,8 @@ var Elem = function (_Arr) {
   }, {
     key: 'addClass',
     value: function addClass() {
+      var _arguments = arguments;
+
       for (var _len2 = arguments.length, classes = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
         classes[_key2] = arguments[_key2];
       }
@@ -10107,7 +10219,9 @@ var Elem = function (_Arr) {
       return this.forEach(function (elem) {
         var list = elem.classList;
 
-        list.add.apply(list, classes);
+        iterate(_arguments, function (cls) {
+          return list.add(cls);
+        });
       });
     }
 
@@ -10352,7 +10466,9 @@ var Elem = function (_Arr) {
     value: function blob() {
       var _this4 = this;
 
-      var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      // TODO: write using ArrayBuffer
 
       return new Promise$1(function (resolve, reject) {
         var elem = _this4.first();
@@ -10417,7 +10533,7 @@ var Elem = function (_Arr) {
   }, {
     key: 'calcCSS',
     value: function calcCSS() {
-      var pseudo = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+      var pseudo = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       return getComputedStyle(getElem(this), pseudo);
     }
@@ -10540,9 +10656,7 @@ var Elem = function (_Arr) {
   }, {
     key: 'click',
     value: function click() {
-      return this.forEach(function (elem) {
-        elem.click();
-      });
+      return this.forEach(_click);
     }
 
     /**
@@ -10558,7 +10672,7 @@ var Elem = function (_Arr) {
   }, {
     key: 'clone',
     value: function clone() {
-      var deep = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
+      var deep = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
       return this.object(function (elems, elem) {
         elems.add(elem.cloneNode(!!deep));
@@ -10691,13 +10805,14 @@ var Elem = function (_Arr) {
 
       return this.forEach(function (elem, index) {
         new Super(property).forEach(function (value, property) {
-          property = new Str(property).toHyphenCase();
+          property = new Str(property).toHyphenCase().$;
 
           if (isFunction(value)) {
-            value = value(new Elem(elem).css(property.$), elem, index);
+            value = value(new Elem(elem).css(property), elem, index);
           }
 
-          elem.style.setProperty(property, value.replace(/!important$/, ''), /!important$/.test(value) ? 'important' : '');
+          elem.style.removeProperty(property);
+          elem.style.setProperty(property, value.replace(/ ?!important$/, ''), /!important$/.test(value) ? 'important' : '');
         });
       });
     }
@@ -10879,8 +10994,8 @@ var Elem = function (_Arr) {
   }, {
     key: 'dispatch',
     value: function dispatch(event) {
-      var eventInit = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-      var details = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+      var eventInit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      var details = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
       var _ref3 = eventInit || {};
 
@@ -10893,7 +11008,7 @@ var Elem = function (_Arr) {
 
       if (!/Event$/.test(toStringTag(finalEvent))) {
         try {
-          finalEvent = new Event(finalEvent, eventInit);
+          finalEvent = new Event(finalEvent, { bubbles: bubbles, cancelable: cancelable });
         } catch (err) {
           finalEvent = nativeDocument.createEvent('Event');
           finalEvent.initEvent(event, bubbles, cancelable);
@@ -10921,7 +11036,7 @@ var Elem = function (_Arr) {
   }, {
     key: 'elem',
     value: function elem() {
-      var index = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+      var index = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
       if (index < 0) {
         index = this.length + index;
@@ -10948,7 +11063,7 @@ var Elem = function (_Arr) {
   }, {
     key: 'filter',
     value: function filter() {
-      var selector = arguments.length <= 0 || arguments[0] === undefined ? Boolean : arguments[0];
+      var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Boolean;
 
       return new Elem(get$1(Elem.prototype.__proto__ || Object.getPrototypeOf(Elem.prototype), 'filter', this).call(this, filterSwitcher(selector)));
     }
@@ -11004,7 +11119,7 @@ var Elem = function (_Arr) {
   }, {
     key: 'firstChild',
     value: function firstChild() {
-      var selector = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+      var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       return this.object(function (elems, elem) {
         var _ref4 = new Arr(elem.children).find(function (elem) {
@@ -11461,7 +11576,7 @@ var Elem = function (_Arr) {
   }, {
     key: 'lastChild',
     value: function lastChild() {
-      var selector = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+      var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       return this.object(function (elems, elem) {
         var _ref6 = new Arr(elem.children).reverse().find(function (elem) {
@@ -11544,7 +11659,7 @@ var Elem = function (_Arr) {
   }, {
     key: 'moveAttr',
     value: function moveAttr(attr) {
-      var value = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+      var value = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
 
       var prev = attrs[attr];
       var elem = this.elem();
@@ -11622,7 +11737,7 @@ var Elem = function (_Arr) {
      * elem.next('.foo'); // finds next element to each element that has 'foo' class
      */
     value: function next() {
-      var selector = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+      var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       return this.object(function (elems, elem) {
         /* eslint no-cond-assign: 0 */
@@ -11650,7 +11765,7 @@ var Elem = function (_Arr) {
   }, {
     key: 'off',
     value: function off() {
-      var _arguments = arguments;
+      var _arguments2 = arguments;
 
       for (var _len5 = arguments.length, events = Array(_len5), _key6 = 0; _key6 < _len5; _key6++) {
         events[_key6] = arguments[_key6];
@@ -11660,7 +11775,7 @@ var Elem = function (_Arr) {
         var listeners = elem.dwayneData.listeners;
 
 
-        iterate(_arguments, function (event) {
+        iterate(_arguments2, function (event) {
           iterate(event.split(eventSeparator), function (event) {
             (listeners[event] || new Super()).forEach(function (_ref7) {
               var removeListener = _ref7.removeListener;
@@ -11674,10 +11789,10 @@ var Elem = function (_Arr) {
     /**
      * @method Elem#on
      * @public
-     * @param {ElemEventString|Object.<ElemEventString|Listener>} event - Either a {@link ElemEventString} string
+     * @param {ElemEventString|Object.<ElemEventString|ElemListener>} event - Either a {@link ElemEventString} string
      * or an object with event keys (a key is also ElemEventString) and listeners values.
      * @param {String} [selector = null] - Selector to filter event targets.
-     * @param {Listener} [listener] - If the first argument is a string it must be a listener function for
+     * @param {ElemListener} [listener] - If the first argument is a string it must be a listener function for
      * specified event(s).
      * @returns {ElemRemoveListeners} Function that takes optional event argument.
      * @description Adds event listeners for all the elements in the set.
@@ -11717,7 +11832,7 @@ var Elem = function (_Arr) {
   }, {
     key: 'on',
     value: function on(event) {
-      var selector = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+      var selector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
       var listener = arguments[2];
 
       var allListeners = new Super({});
@@ -11899,7 +12014,7 @@ var Elem = function (_Arr) {
   }, {
     key: 'prev',
     value: function prev() {
-      var selector = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+      var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       return this.object(function (elems, elem) {
         /* eslint no-cond-assign: 0 */
@@ -11988,7 +12103,11 @@ var Elem = function (_Arr) {
     key: 'remove',
     value: function remove() {
       return this.forEach(function (elem) {
-        elem.remove();
+        var parent = elem.parentElement;
+
+        if (parent) {
+          parent.removeChild(elem);
+        }
       });
     }
 
@@ -12006,14 +12125,14 @@ var Elem = function (_Arr) {
   }, {
     key: 'removeAttr',
     value: function removeAttr() {
-      var _arguments2 = arguments;
+      var _arguments3 = arguments;
 
       for (var _len6 = arguments.length, attributes = Array(_len6), _key7 = 0; _key7 < _len6; _key7++) {
         attributes[_key7] = arguments[_key7];
       }
 
       return this.forEach(function (elem) {
-        iterate(_arguments2, function (attr) {
+        iterate(_arguments3, function (attr) {
           elem.removeAttribute(attr);
         });
       });
@@ -12033,7 +12152,7 @@ var Elem = function (_Arr) {
   }, {
     key: 'removeClass',
     value: function removeClass() {
-      var _arguments3 = arguments;
+      var _arguments4 = arguments;
 
       for (var _len7 = arguments.length, classes = Array(_len7), _key8 = 0; _key8 < _len7; _key8++) {
         classes[_key8] = arguments[_key8];
@@ -12042,7 +12161,9 @@ var Elem = function (_Arr) {
       return this.forEach(function (elem) {
         var list = elem.classList;
 
-        list.remove.apply(list, _arguments3);
+        iterate(_arguments4, function (cls) {
+          return list.remove(cls);
+        });
       });
     }
 
@@ -12060,14 +12181,14 @@ var Elem = function (_Arr) {
   }, {
     key: 'removeCSS',
     value: function removeCSS() {
-      var _arguments4 = arguments;
+      var _arguments5 = arguments;
 
       for (var _len8 = arguments.length, props = Array(_len8), _key9 = 0; _key9 < _len8; _key9++) {
         props[_key9] = arguments[_key9];
       }
 
       return this.forEach(function (elem) {
-        iterate(_arguments4, function (css) {
+        iterate(_arguments5, function (css) {
           elem.style.removeProperty(css);
         });
       });
@@ -12100,21 +12221,21 @@ var Elem = function (_Arr) {
       }
 
       var elem = parent;
-      var method = 'into';
+      var method$$1 = 'into';
       var next = this.next().first().$[0];
       var prev = this.prev().first().$[0];
 
       if (next) {
         elem = next;
-        method = 'insertBefore';
+        method$$1 = 'insertBefore';
       } else if (prev) {
         elem = prev;
-        method = 'insertAfter';
+        method$$1 = 'insertAfter';
       }
 
       this.first().remove();
 
-      element[method](elem);
+      element[method$$1](elem);
     }
 
     /**
@@ -12237,12 +12358,12 @@ var Elem = function (_Arr) {
   }, {
     key: 'toggleAttr',
     value: function toggleAttr(attr, condition) {
-      var _arguments5 = arguments;
+      var _arguments6 = arguments;
 
       return this.forEach(function (elem) {
         elem = new Elem(elem);
 
-        if (_arguments5.length < 2 ? !elem.hasAttr(attr) : condition) {
+        if (_arguments6.length < 2 ? !elem.hasAttr(attr) : condition) {
           elem.attr(attr, '');
         } else {
           elem.removeAttr(attr);
@@ -12285,7 +12406,7 @@ var Elem = function (_Arr) {
      * elem.up(2);
      */
     value: function up() {
-      var level = arguments.length <= 0 || arguments[0] === undefined ? 1 : arguments[0];
+      var level = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
       validate$1([level], [['intLike', '>=0']], 'Elem#up');
 
@@ -12309,8 +12430,10 @@ var Elem = function (_Arr) {
      * @returns {Elem|Object.<String, Error|*>|{ form: Error?, inputs: <Object.<String, Error>>|null }|null}
      * If a callback argument provided returns this. If no arguments provided returns either an object
      * with input names keys and errors values or null if no errors found.
-     * @description If a callback argument provided adds it to the element validators list. If no arguments provided
-     * validates every input element in the set with its own functions. If an element is a form it validates all input elements inside it.
+     * @description If a callback argument provided adds it to the element validators list.
+     * If no arguments provided validates every input element in the set with its own functions.
+     * If an element is a form it validates all input elements inside it. After the validation
+     * fires 'validate' event with 'valid' and 'error' (if form it's errors) properties.
      *
      * @example
      * form.on('input change', 'input', (value, input) => {
@@ -12339,19 +12462,57 @@ var Elem = function (_Arr) {
         });
       }
 
-      var errors = null;
+      var errors = new Super({ errors: null });
 
       this.filter(inputElements + ', form').forEach(function (elem, index) {
         if (getName(elem) === 'form') {
-          return new Elem(elem).find(inputElements).forEach(function (input, index) {
-            validatorWrap(input, index);
-          });
+          var _ret = function () {
+            var formErrors = { errors: null };
+            var form = new Elem(elem);
+            var inputs = form.find(inputElements);
+
+            inputs.forEach(function (input, index) {
+              validatorWrap(input, index, formErrors);
+            });
+
+            errors.deepAssign(formErrors);
+
+            formErrors = formErrors.errors;
+
+            form.dispatch('validate', {}, {
+              valid: !formErrors,
+              errors: formErrors
+            });
+
+            return {
+              v: inputs.forEach(function (input) {
+                var inputError = (formErrors || {})[input.name];
+
+                new Elem(input).dispatch('validate', {}, {
+                  valid: !inputError,
+                  error: inputError || null
+                });
+              })
+            };
+          }();
+
+          if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
         }
 
-        validatorWrap(elem, index);
+        var inputError = { errors: null };
+
+        validatorWrap(elem, index, inputError);
+        errors.deepAssign(inputError);
+
+        inputError = (inputError.errors || {})[elem.name];
+
+        new Elem(elem).dispatch('validate', {}, {
+          valid: !inputError,
+          error: inputError || null
+        });
       });
 
-      function validatorWrap(input, index) {
+      function validatorWrap(input, index, errors) {
         try {
           if (input.validity && !input.validity.valid) {
             throw new Error(input.validationMessage);
@@ -12361,11 +12522,17 @@ var Elem = function (_Arr) {
             validator(input.value, input, index);
           });
         } catch (err) {
-          (errors = errors || {})[input.name] = err;
+          (errors.errors = errors.errors || {})[input.name] = err;
         }
       }
 
-      return errors;
+      if (errors.every(function (error) {
+        return isNull(error);
+      })) {
+        return null;
+      }
+
+      return errors.$.errors;
     }
 
     /**
@@ -12612,22 +12779,22 @@ dynamicDefineProperties(Elem.prototype, elements, function (elem) {
   };
 });
 
-dynamicDefineProperties(Elem.prototype, canvasGetMethods, function (method) {
+dynamicDefineProperties(Elem.prototype, canvasGetMethods, function (method$$1) {
   return function () {
     var ctx = this.ctx();
 
     if (ctx) {
-      return ctx[method].apply(ctx, arguments);
+      return ctx[method$$1].apply(ctx, arguments);
     }
   };
 });
 
-dynamicDefineProperties(Elem.prototype, canvasRestMethods, function (method) {
+dynamicDefineProperties(Elem.prototype, canvasRestMethods, function (method$$1) {
   return function () {
     var ctx = this.ctx();
 
     if (ctx) {
-      ctx[method].apply(ctx, arguments);
+      ctx[method$$1].apply(ctx, arguments);
     }
 
     return this;
@@ -12755,7 +12922,7 @@ constructors[2].push({
  * [Document#querySelectorAll]{@link https://developer.mozilla.org/en/docs/Web/API/Document/querySelectorAll}.
  */
 function _find(selector) {
-  var base = arguments.length <= 1 || arguments[1] === undefined ? nativeDocument : arguments[1];
+  var base = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : nativeDocument;
 
   return new Elem(base.querySelectorAll(String(selector)));
 }
@@ -12795,9 +12962,13 @@ function px(size) {
  * @description Exports Object.assign-like method.
  */
 
-var resolveURL = (function (url, decodeQuery) {
-  var query = url.search;
-  var hash = url.hash;
+var _global$2 = global$1;
+var location$1 = _global$2.location;
+
+
+var resolveURL = (function (decodeQuery) {
+  var query = location$1.search;
+  var hash = location$1.hash;
 
   var params = {
     query: {},
@@ -12899,10 +13070,30 @@ var resolveURL = (function (url, decodeQuery) {
  */
 
 /**
+ * @method Router#event#go
+ * @public
+ * @description Method that prevents Router from loading the default state forcing the page
+ * going directly to another URL.
+ *
+ * @example
+ * event.go('/login');
+ */
+
+/**
+ * @method Router#event#redirectTo
+ * @public
+ * @description Method that prevents Router from loading the default state forcing the page
+ * going directly to another URL.
+ *
+ * @example
+ * event.go('/login');
+ */
+
+/**
  * @event Router#event:init
  * @public
  * @property {String} type - 'init' string.
- * @description Router init event. Is fired once after Router.init has been called
+ * @description Router init event. Is fired on Router once after Router.init has been called
  * and Router initialization. It cannot be [paused]{@link Router#event#pause}
  * or [stopped]{@link Router#event#stop}.
  */
@@ -12911,9 +13102,8 @@ var resolveURL = (function (url, decodeQuery) {
  * @event Router#event:beforeLeave
  * @public
  * @property {String} type - 'beforeLeave' string.
- * @property {Router} state - Current state.
- * @property {URL} url - Current URL.
- * @property {URL} toURL - URL the redirect goes to.
+ * @property {Router} state - Initial state.
+ * @property {String} toURL - URL the redirect goes to.
  * @description Router beforeLeave event. Is fired when an attempt to leave the state happened
  * (or it bubbled to the parent state). It can be [paused]{@link Router#event#pause}
  * and [stopped]{@link Router#event#stop}.
@@ -12923,19 +13113,24 @@ var resolveURL = (function (url, decodeQuery) {
  * @event Router#event:leave
  * @public
  * @property {String} type - 'leave' string.
- * @property {Router} state - Current state.
- * @property {URL} url - Current URL.
- * @property {URL} toURL - URL the redirect goes to.
+ * @property {Router} state - Initial state.
+ * @property {String} toURL - URL the redirect goes to.
  * @description Router leave event. Is fired right after {@link Router#event:beforeLeave} has been fired.
  * It cannot be [paused]{@link Router#event#pause} or [stopped]{@link Router#event#stop}.
+ */
+
+/**
+ * @event Router#event:reload
+ * @public
+ * @property {String} type - 'reload' string.
+ * @description Router reload event. Is fired only on Router during {@link reload} is called.
  */
 
 /**
  * @event Router#event:beforeLoad
  * @public
  * @property {String} type - 'beforeLoad' string.
- * @property {Router} state - Loading state.
- * @property {URL} url - Loading URL.
+ * @property {Router} state - Eventual state.
  * @description Router beforeLoad event. Is fired when the URL has been already changed after
  * {@link Router#event:leave} has been fired, after the only {@link Router#event:init}
  * has been fired and after browser back or forward buttons has been pressed.
@@ -12948,8 +13143,7 @@ var resolveURL = (function (url, decodeQuery) {
  * @event Router#event:load
  * @public
  * @property {String} type - 'leave' string.
- * @property {Router} state - Loading state.
- * @property {URL} url - Loading URL.
+ * @property {Router} state - Eventual state.
  * @description Router load event. Is fired right after {@link Router#event:beforeLoad} has been fired.
  * It cannot be [paused]{@link Router#event#pause} or [stopped]{@link Router#event#stop}.
  * Is fired from the Router state down to the loading state.
@@ -12959,12 +13153,18 @@ var resolveURL = (function (url, decodeQuery) {
  * @event Router#event:render
  * @public
  * @property {String} type - 'render' string.
- * @property {Router} state - Rendering state.
- * @property {URL} url - Loading URL.
+ * @property {Router} state - Eventual state.
+ * @property {Router} renderingState - Constructor of current rendering state.
  * @description Router load event. Is fired right after {@link Router#event:beforeLoad} has been fired.
  * It cannot be [paused]{@link Router#event#pause} or [stopped]{@link Router#event#stop}.
  * In order to render the state there should be an element with the "dwayne-router-state" attribute
  * set to the state name. States are rendered from the Router down to the current state.
+ */
+
+/**
+ * @callback RouterListener
+ * @public
+ * @param {Router#event} e - Fired event.
  */
 
 /**
@@ -12978,7 +13178,6 @@ var extendLink = 'https://developer.mozilla.org/en/docs/Web/JavaScript/Reference
 var stateAttrName = 'dwayne-router-state';
 var isPrototypeOf = {}.isPrototypeOf;
 var _global$1 = global$1;
-var URL$1 = _global$1.URL;
 var history = _global$1.history;
 var location = _global$1.location;
 var _global$location = _global$1.location;
@@ -12986,7 +13185,6 @@ var origin = _global$location.origin;
 var href = _global$location.href;
 
 var stoppable = new Arr(['beforeLeave', 'beforeLoad']);
-var stopError = new Error();
 var states = new Arr([]);
 var pathSwitcher = switcher('call', function () {
   throw new Error('State path must be a string, a regular expression or undefined! (at registerState)');
@@ -13066,6 +13264,23 @@ var pathSwitcher = switcher('call', function () {
     params: params.$
   };
 });
+var selectorMatchesSwitcher = switcher('call', function (selector) {
+  return function (name) {
+    return name === selector;
+  };
+}).case(isNull, function (selector) {
+  return function (name) {
+    return true;
+  };
+}).case(isRegExp, function (selector) {
+  return function (name) {
+    return selector.test(name);
+  };
+}).case(isArray, function (selector) {
+  return function (name) {
+    return selector.indexOf(name) !== -1;
+  };
+});
 
 var eventPromise = Promise$1.resolve();
 var pushed = void 0;
@@ -13076,9 +13291,11 @@ var pageTitle = void 0;
 var pageIcon = void 0;
 var defaultState = void 0;
 var currentState = void 0;
-var currentURL = new URL$1(location.href);
 var currentTitle = void 0;
 var currentIcon = void 0;
+var initTitle = void 0;
+var initIcon = void 0;
+var initHTML = void 0;
 
 /**
  * @class Router
@@ -13103,7 +13320,6 @@ var Router = function () {
     /**
      * @method Router.buildURL
      * @public
-     * @param {String} [relativeToURL = location.href] - Relative to what URL new URL should be built.
      * @param {URLOptions} [options = {}] - URL options.
      * @returns {String} Built URL.
      * @description Method for building URLs that guaranteed to be matched by this state.
@@ -13129,14 +13345,7 @@ var Router = function () {
      * });
      */
     value: function buildURL() {
-      var relativeToURL = arguments.length <= 0 || arguments[0] === undefined ? location.href : arguments[0];
-      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-
-      if (arguments.length === 1 && !isString(relativeToURL)) {
-        options = relativeToURL;
-        relativeToURL = location.href;
-      }
-
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
       var url = this.url;
 
 
@@ -13144,21 +13353,15 @@ var Router = function () {
         throw new Error('URL can be built only from the string URLs! (Router.buildURL)');
       }
 
-      var _options = options;
-      var _options$params = _options.params;
+      var _options$params = options.params;
       var params = _options$params === undefined ? {} : _options$params;
-      var _options$query = _options.query;
+      var _options$query = options.query;
       var query = _options$query === undefined ? {} : _options$query;
-      var _options$hash = _options.hash;
+      var _options$hash = options.hash;
       var hash = _options$hash === undefined ? '' : _options$hash;
 
-      var _ref2 = new URL$1(url, relativeToURL);
 
-      var origin = _ref2.origin;
-      var pathname = _ref2.pathname;
-
-
-      return constructURL(origin, pathname, params, query, hash, {
+      return constructURL(origin, url, params, query, hash, {
         params: this.encodeParams,
         query: this.encodeQuery
       });
@@ -13265,32 +13468,57 @@ var Router = function () {
      * @listens Router#event
      * @param {String|Object.<String|Listener>} event - Either a event string
      * or an object with event keys and listeners values.
-     * @param {Listener} [listener] - If the first argument is a string it must be a listener function for
-     * specified event.
+     * @param {String|String[]|RegExp} selector - String, array of strings or
+     * a regular expression to filter states by the state name. Render event is treated
+     * the special way: current rendering state name is compared to the selector.
+     * @param {RouterListener} [listener] - If the first argument is a string it must be
+     * a listener function for specified event.
      * @returns {RouterRemoveListeners} Function that can remove listeners that has just been set.
      * @description Method for listening to all events you want. beforeLeave
      */
 
   }, {
     key: 'on',
-    value: function on(event, listener) {
+    value: function on(event) {
       var _this = this;
 
-      if (arguments.length >= 2) {
+      var selector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      var listener = arguments[2];
+
+      if (isFunction(selector)) {
+        listener = selector;
+        selector = null;
+      }
+
+      if (isString(event)) {
         event = defineProperty({}, event, listener);
       }
 
       var listeners = this.$$.listeners;
 
       var allListeners = {};
+      var matchesSelector = selectorMatchesSwitcher(selector);
 
       iterate(event, function (listener, event) {
         var array$$1 = listeners[event] || new Arr([]);
+        var newListener = function newListener(e) {
+          var name = e.state && e.state.name;
 
-        listener = new Func(listener).bindContext(_this);
+          if (e.renderingState) {
+            name = e.renderingState.stateName;
+          }
 
-        allListeners[event] = listener;
-        (listeners[event] = array$$1).push(listener);
+          if (matchesSelector(name)) {
+            listener.call(_this, e);
+          }
+        };
+
+        newListener.toString = function () {
+          return listener.toString();
+        };
+
+        allListeners[event] = newListener;
+        (listeners[event] = array$$1).push(newListener);
       });
 
       return function removeEventListeners(event) {
@@ -13314,6 +13542,8 @@ var Router = function () {
       };
     }
 
+    // TODO: Router#store
+
     /**
      * @member {Elem} Router#base
      * @type {Elem}
@@ -13328,15 +13558,6 @@ var Router = function () {
      * @type {String}
      * @public
      * @description State name (inherited from the constructor).
-     * Created during state initialization.
-     */
-
-
-    /**
-     * @member {URL} Router#url
-     * @type {URL}
-     * @public
-     * @description State URL.
      * Created during state initialization.
      */
 
@@ -13393,7 +13614,7 @@ var Router = function () {
      * @member {Boolean} Router.icon
      * @type {String}
      * @public
-     * @description URL to the app icon (one within the tab). To set icons you should create a link element
+     * @description URL to the state icon (one within the tab). To set icons you should create a link element
      * with "dwayne-router-icon" id. Router will set href itself.
      * Not required and inherited from the parent state. Router default value is null.
      */
@@ -13596,11 +13817,10 @@ var Router = function () {
   }]);
 
   function Router() {
-    var props = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+    var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     classCallCheck(this, Router);
     this.base = router;
     this.name = null;
-    this.url = new URL$1(location.href);
     this.params = {};
     this.query = {};
     this.hash = '';
@@ -13713,84 +13933,68 @@ var MainState = Router.prototype;
 
 defaultState = Router;
 
+var RouterError = function RouterError() {
+  classCallCheck(this, RouterError);
+};
+
+var stopError = new RouterError();
+
 /**
  * @function redirect
  * @private
- * @param {URL} newURL - New URL to go to.
+ * @param {String} newURL - New URL to go to.
  * @param {Boolean} [push] - If it's need to push state or rather replace it.
  */
 function redirect(newURL, push) {
   eventPromise = eventPromise.then(function () {
+    return beforeLeave(newURL);
+  }).then(function () {
+    (currentState ? currentState.base : new Elem([])).hide().html('');
+
+    changeHistory(newURL, push);
+  }).then(function () {
+    currentState = Router.$$.state = null;
+  }).then(beforeLoad).catch(printError);
+}
+
+/**
+ * @function beforeLeave
+ * @private
+ * @param {String} newURL - New URL to go to.
+ * @returns {Promise}
+ */
+function beforeLeave(newURL) {
+  return Promise$1.resolve().then(function () {
     return dispatchNewEvent('beforeLeave');
   }).then(function () {
     return dispatchNewEvent('leave');
-  }).then(function () {
-    (currentState ? currentState.base : new Elem([])).hide().html('');
-  }).then(function () {
-    return beforeLoad(newURL, push ? 'pushState' : 'replaceState');
-  }).catch(handleError).catch(function () {});
+  });
 
   function dispatchNewEvent(type) {
-    return dispatchEvent(new Super({}).value({
+    return dispatchEvent(type, {
       type: type,
       state: currentState,
-      url: newURL,
-      toURL: currentURL
-    }).$);
+      toURL: newURL
+    });
   }
 }
 
 /**
  * @function beforeLoad
  * @private
- * @param {URL} newURL - New URL to load.
- * @param {'pushState'|'replaceState'|undefined} action - Action to do.
  * @returns {Promise}
  */
-function beforeLoad(newURL, action) {
-  if (newURL.origin !== origin) {
-    location.href = newURL.href;
-
-    return Promise$1.reject(stopError);
-  }
-
-  var _resolveURL = resolveURL(newURL, Router.decodeQuery);
+function beforeLoad() {
+  var _resolveURL = resolveURL(Router.decodeQuery);
 
   var hash = _resolveURL.hash;
 
   var newState = void 0;
 
   return Promise$1.resolve().then(function () {
-    var promise = Promise$1.reject();
-
-    findStatesByURL(newURL).forEach(function (_ref3) {
-      var state = _ref3.state;
-      var params = _ref3.params;
-      var query = _ref3.query;
-
-      promise = promise.catch(function () {
-        newState = new state({
-          name: state.stateName,
-          url: newURL,
-          params: params,
-          query: query,
-          hash: hash
-        });
-
-        return dispatchNewEvent('beforeLoad');
-      });
-    });
-
-    return promise;
+    return loadStatesByOne();
   }).then(function () {
-    if (action) {
-      history[action](null, null, newURL.href);
-    }
-
-    pushed = true;
-
     currentState = Router.$$.state = newState;
-    currentURL = newURL;
 
     return dispatchNewEvent('load');
   }).then(function () {
@@ -13815,12 +14019,12 @@ function beforeLoad(newURL, action) {
 
       var stateNameFromAttr = elem.attr(stateAttrName);
 
-      var _ref4 = states.find(function (_ref5) {
-        var stateName = _ref5.stateName;
+      var _ref2 = states.find(function (_ref3) {
+        var stateName = _ref3.stateName;
         return stateName === stateNameFromAttr;
       }) || {};
 
-      var foundState = _ref4.value;
+      var foundState = _ref2.value;
 
 
       if (!foundState || stateNameFromAttr !== stateName && !(newState instanceof foundState)) {
@@ -13862,14 +14066,66 @@ function beforeLoad(newURL, action) {
     });
 
     return promise;
-  }).catch(handleError).catch(function () {});
+  }).catch(printError);
 
   function dispatchNewEvent(type, renderingState) {
-    return dispatchEvent(new Super({}).value({
+    return dispatchEvent(type, {
       type: type,
-      state: newState,
-      url: newURL
-    }).$, renderingState);
+      state: newState
+    }, renderingState);
+  }
+
+  function loadStatesByOne() {
+    var promise = Promise$1.reject(stopError);
+
+    findStatesByURL().forEach(function (_ref4) {
+      var state = _ref4.state;
+      var params = _ref4.params;
+      var query = _ref4.query;
+
+      promise = promise.catch(function (err) {
+        if (err instanceof RouterError && err.type === 'redirect') {
+          throw err;
+        }
+
+        printError(err);
+
+        newState = new state({
+          name: state.stateName,
+          params: params,
+          query: query,
+          hash: hash
+        });
+
+        return dispatchNewEvent('beforeLoad');
+      });
+    });
+
+    return promise.catch(function (err) {
+      if (err instanceof RouterError && err.type === 'redirect') {
+        changeHistory(err.url, err.push);
+
+        return loadStatesByOne();
+      }
+
+      throw err;
+    });
+  }
+}
+
+/**
+ * @function changeHistory
+ * @private
+ * @param {String} url - URL to go to.
+ * @param {Boolean} push - If the state is needed to be pushed or replaced.
+ * @description Function for manipulating history.
+ */
+function changeHistory(url, push) {
+  try {
+    history[push ? 'pushState' : 'replaceState'](null, null, url);
+    pushed = true;
+  } catch (err) {
+    location.href = url;
   }
 }
 
@@ -13885,25 +14141,14 @@ function decode(string, decodeParams) {
 }
 
 /**
- * @function handleError
- * @private
- * @param {Error} err - Error to handle.
- */
-function handleError(err) {
-  if (err !== stopError) {
-    printError(err);
-
-    throw err;
-  }
-}
-
-/**
  * @function printError
  * @private
  * @param {Error} err - Error to log.
  */
 function printError(err) {
-  console.error('%s %o', 'Uncaught (in event listener)', err);
+  if (!(err instanceof RouterError)) {
+    console.error('%s %o', 'Uncaught (in event listener)', err);
+  }
 }
 
 /**
@@ -13960,12 +14205,11 @@ function resolveParameter(param, nameErrorName, valueErrorName) {
 /**
  * @function findStatesByURL
  * @private
- * @param {URL} url - Current URL.
  * @returns {Arr} Arr of matching states.
  */
-function findStatesByURL(url) {
-  var pathname = url.pathname || '/';
-  var search = url.search || '';
+function findStatesByURL() {
+  var pathname = location.pathname || '/';
+  var search = location.search || '';
   var eventualStates = states.object(function (states, state) {
     if (state.abstract) {
       return;
@@ -13978,7 +14222,7 @@ function findStatesByURL(url) {
     var decodeParams = state.decodeParams;
     var decodeQuery = state.decodeQuery;
 
-    var query = new Super(resolveURL(url, decodeQuery).query);
+    var query = new Super(resolveURL(decodeQuery).query);
     var eventualParams = {};
     var match = ((pathname.replace(/\/$/, '') || '/') + (isRegExp(stateURL) ? search : '')).match(validatePath);
 
@@ -14006,14 +14250,14 @@ function findStatesByURL(url) {
     });
   }, new Arr([]));
 
-  if (eventualStates.every(function (_ref6) {
-    var state = _ref6.state;
+  if (eventualStates.every(function (_ref5) {
+    var state = _ref5.state;
     return state !== defaultState;
   })) {
     eventualStates.push({
       state: defaultState,
       params: {},
-      query: resolveURL(url, defaultState.decodeQuery).query
+      query: resolveURL(defaultState.decodeQuery).query
     });
   }
 
@@ -14023,22 +14267,30 @@ function findStatesByURL(url) {
 /**
  * @function dispatchEvent
  * @private
- * @param {Router#event} event - Event to be fired.
- * @param {Router} [renderingState] - If it's render event it's current rendering state.
+ * @param {String} event - Event to be fired.
+ * @param {Object} [assigned] - Properties to be assigned to the event.
+ * @param {Router} [renderingState] - Current state.
  */
-function dispatchEvent(event, renderingState) {
+function dispatchEvent(event, assigned, renderingState) {
+  var eventualEvent = new Super({}).value({
+    type: event
+  }).value(assigned || {}).$;
+  var type = eventualEvent.type;
+  var state = eventualEvent.state;
+
+  var isStoppable = stoppable.indexOfStrict(type) !== -1 && state && (new Super(state).proto().$.constructor !== defaultState || type !== 'beforeLoad');
+
   var paused = void 0;
   var stopped = void 0;
   var continuePropagation = function continuePropagation() {};
   var stopPropagation = function stopPropagation() {};
+  var redirect = function redirect() {};
   var promise = Promise$1.resolve();
+  var currentState = void 0;
 
-  var type = event.type;
-  var state = event.state;
-
-  var isStoppable = stoppable.indexOfStrict(type) !== -1 && state && (new Super(state).proto().$.constructor !== defaultState || type !== 'beforeLoad');
-
-  new Super(event).value({
+  new Super(eventualEvent).get('renderingState', function () {
+    return currentState;
+  }).value({
     continue: function _continue() {
       if (isStoppable) {
         paused = false;
@@ -14055,12 +14307,27 @@ function dispatchEvent(event, renderingState) {
         stopped = true;
         stopPropagation();
       }
+    },
+    go: function go(url) {
+      if (isStoppable && type === 'beforeLoad') {
+        redirect(url, true);
+      }
+    },
+    redirectTo: function redirectTo(url) {
+      if (isStoppable && type === 'beforeLoad') {
+        redirect(url);
+      }
     }
   });
 
-  getListeners(state, type, renderingState).forEach(function (listener) {
+  getListeners(state, type, renderingState).forEach(function (_ref6) {
+    var renderingState = _ref6.renderingState;
+    var listener = _ref6.listener;
+
     promise = promise.then(function () {
       return new Promise$1(function (resolve, reject) {
+        currentState = renderingState;
+
         var finished = false;
 
         continuePropagation = function continuePropagation() {
@@ -14069,11 +14336,21 @@ function dispatchEvent(event, renderingState) {
           }
         };
 
+        redirect = function redirect(url, push) {
+          var err = new RouterError();
+
+          err.type = 'redirect';
+          err.push = push;
+          err.url = url;
+
+          reject(err);
+        };
+
         stopPropagation = function stopPropagation() {
           reject(stopError);
         };
 
-        listener(event);
+        listener(eventualEvent);
 
         finished = true;
 
@@ -14089,13 +14366,11 @@ function dispatchEvent(event, renderingState) {
   });
 
   return promise.catch(function (err) {
-    if (err !== stopError && !isStoppable) {
-      printError(err);
-    }
-
     if (isStoppable) {
       throw err;
     }
+
+    printError(err);
   });
 }
 
@@ -14107,7 +14382,7 @@ function dispatchEvent(event, renderingState) {
  * @param {Router} [renderingState] - If the type is "render" then it's current rendering state.
  */
 function getListeners() {
-  var state = arguments.length <= 0 || arguments[0] === undefined ? new Super(MainState).create().$ : arguments[0];
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Super(MainState).create().$;
   var type = arguments[1];
   var renderingState = arguments[2];
 
@@ -14130,10 +14405,18 @@ function getListeners() {
     var proto = _ref7.prototype;
 
     if (new Super(proto).hasOwn(listenerName)) {
-      listeners.push(new Func(proto[listenerName]).bind(state));
+      listeners.push({
+        renderingState: renderingState,
+        listener: new Func(proto[listenerName]).bindContext(state)
+      });
     }
 
-    listeners.push.apply(listeners, (ownListeners[type] || new Arr([])).$);
+    listeners.push.apply(listeners, (ownListeners[type] || new Arr([])).map(function (listener) {
+      return {
+        renderingState: renderingState,
+        listener: listener
+      };
+    }).$);
   }, new Arr([]));
 }
 
@@ -14142,96 +14425,91 @@ function getListeners() {
  * @private
  */
 function initialize() {
-  if (initialized && !routerLoaded) {
-    routerLoaded = true;
-    pageTitle = _find('#dwayne-router-title');
-    pageIcon = _find('#dwayne-router-icon');
-
-    _find('[' + stateAttrName + ']').hide();
-
-    defineProperties(MainState, {
-      base: router = _find('#dwayne-router').first()
-    });
-
-    win.on('click', function (e) {
-      var target = new Elem(e.target);
-
-      if (target.name === 'a' && target.attr('target') !== '_blank') {
-        var url = target.attr('href') || '';
-        var _currentURL = location.href;
-        var newURL = new URL$1(url, _currentURL);
-        var index = newURL.href.indexOf('#');
-
-        if (index !== -1 && (_currentURL.indexOf('#') === -1 || _currentURL.slice(index) === newURL.href.slice(index) && location.hash !== newURL.hash)) {
-          return;
-        }
-
-        e.preventDefault();
-
-        redirect(newURL, true);
-      }
-    });
-
-    states.forEach(function (state) {
-      var _state$parent = state.parent;
-      var children = _state$parent.children;
-      var parentParams = _state$parent.params;
-      var parentQuery = _state$parent.query;
-      var parentTemplateParams = _state$parent.templateParams;
-      var params = state.params;
-      var query = state.query;
-      var templateParams = state.templateParams;
-      var relativeURL = state.relativeURL;
-      var relativePath = state.relativePath;
-
-      var proto = state;
-      var count = 0;
-      var newPath = relativePath;
-      var newURL = '';
-
-      while (proto = proto.parent) {
-        count += new Super(proto.params).count;
-        newPath = proto.relativePath + newPath;
-        newURL = proto.relativeURL + newURL;
-      }
-
-      newPath = new RegExp('^' + (newPath.replace(/\/+/g, '/').replace(/\/$/, '') || '/') + '$');
-      newURL = isRegExp(relativeURL) ? newPath : (newURL + relativeURL).replace(/\/+/g, '/').replace(/\/$/, '') || '/';
-
-      children.push(state);
-
-      new Super(templateParams).proto(parentTemplateParams);
-      new Super(query).proto(parentQuery);
-      new Super(params).proto(parentParams).forEach(function (value, key, params) {
-        params[key] += count;
-      });
-
-      defineProperties(state, {
-        url: newURL,
-        validatePath: newPath
-      });
-    });
-
-    eventPromise = eventPromise.then(function () {
-      return dispatchEvent(new Super({}).value({
-        type: 'init'
-      }).$);
-    }).then(function () {
-      return beforeLoad(new URL$1(location.href));
-    }).then(function () {
-      win.on('popstate', function () {
-        if (location.href !== href) {
-          pushed = true;
-        }
-
-        if (pushed) {
-          eventPromise = eventPromise.then(function () {
-            return beforeLoad(new URL$1(location.href));
-          });
-        }
-      });
-    });
+  if (!initialized || routerLoaded) {
+    return;
   }
+
+  routerLoaded = true;
+  pageTitle = _find('#dwayne-router-title').first();
+  pageIcon = _find('#dwayne-router-icon').first();
+  router = _find('#dwayne-router').first();
+  initHTML = router.html() || '';
+  initTitle = pageTitle.text() || '';
+  initIcon = pageIcon.ref() || '';
+
+  _find('[' + stateAttrName + ']').hide();
+
+  defineProperties(MainState, {
+    base: router
+  });
+
+  win.on('click', function (e) {
+    var target = new Elem(e.target);
+
+    if (target.name === 'a' && target.attr('target') !== '_blank') {
+      e.preventDefault();
+
+      redirect(target.attr('href') || '', true);
+    }
+  });
+
+  states.forEach(function (state) {
+    var _state$parent = state.parent;
+    var children = _state$parent.children;
+    var parentParams = _state$parent.params;
+    var parentQuery = _state$parent.query;
+    var parentTemplateParams = _state$parent.templateParams;
+    var params = state.params;
+    var query = state.query;
+    var templateParams = state.templateParams;
+    var relativeURL = state.relativeURL;
+    var relativePath = state.relativePath;
+
+    var proto = state;
+    var count = 0;
+    var newPath = relativePath;
+    var newURL = '';
+
+    while (proto = proto.parent) {
+      count += new Super(proto.params).count;
+      newPath = proto.relativePath + newPath;
+      newURL = proto.relativeURL + newURL;
+    }
+
+    newPath = new RegExp('^' + (newPath.replace(/\/+/g, '/').replace(/\/$/, '') || '/') + '$');
+    newURL = isRegExp(relativeURL) ? newPath : (newURL + relativeURL).replace(/\/+/g, '/').replace(/\/$/, '') || '/';
+
+    children.push(state);
+
+    new Super(templateParams).proto(parentTemplateParams);
+    new Super(query).proto(parentQuery);
+    new Super(params).proto(parentParams).forEach(function (value, key, params) {
+      params[key] += count;
+    });
+
+    defineProperties(state, {
+      url: newURL,
+      validatePath: newPath
+    });
+  });
+
+  eventPromise = eventPromise.then(function () {
+    return dispatchEvent('init');
+  }).then(function () {
+    return beforeLoad();
+  }).then(function () {
+    win.on('popstate', function () {
+      if (location.href !== href) {
+        pushed = true;
+      }
+
+      if (pushed) {
+        eventPromise = eventPromise.then(function () {
+          return beforeLoad();
+        });
+      }
+    });
+  });
 }
 
 /**
@@ -14246,7 +14524,7 @@ function initialize() {
  * go('/user/56');
  */
 function _go(url) {
-  redirect(new URL$1(url, location.href), true);
+  redirect(url, true);
 }
 
 /**
@@ -14261,7 +14539,30 @@ function _go(url) {
  * redirectTo('/user/56');
  */
 function redirectTo(url) {
-  redirect(new URL$1(url, location.href));
+  redirect(url);
+}
+
+/**
+ * @function reload
+ * @public
+ * @fires Router#event:beforeLeave
+ * @returns {void}
+ * @description Fires {@link Router#event:beforeLeave}, {@link Router#event:leave}
+ * as usual, then resets router content, page title and icon to initial content,
+ * fires {@link Router#event:reload} and then loads page like if it was the first time.
+ */
+function reload() {
+  eventPromise = eventPromise.then(function () {
+    return beforeLeave(location.href);
+  }).then(function () {
+    router.html(initHTML);
+    pageTitle.text(initTitle);
+    pageIcon.ref(initIcon);
+  }).then(function () {
+    currentState = Router.$$.state = null;
+  }).then(function () {
+    return dispatchEvent('reload');
+  }).then(beforeLoad).catch(printError);
 }
 
 /**
@@ -14409,6 +14710,7 @@ var statics = Object.freeze({
 	go: _go,
 	Router: Router,
 	redirectTo: redirectTo,
+	reload: reload,
 	registerState: registerState,
 	Str: Str,
 	parseJSON: parseJSON,

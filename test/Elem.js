@@ -81,8 +81,8 @@ describe('it should test Elem#', () => {
       strictEqual(wrap.$[3], elem1);
       strictEqual(wrap.$[4], elem2);
 
-      elem1.remove();
-      elem2.remove();
+      new Elem(elem1).remove();
+      new Elem(elem2).remove();
     });
   });
   describe('addClass()', () => {
@@ -203,8 +203,8 @@ describe('it should test Elem#', () => {
       strictEqual(css.marginBottom, '3px');
       strictEqual(css.marginLeft, '1px');
 
-      style.remove();
-      elem.remove();
+      styleWrap.remove();
+      elemWrap.remove();
     });
   });
   describe('apply()', () => {
@@ -666,7 +666,7 @@ describe('it should test Elem#', () => {
       }
     });
   });
-  describe('blob', () => {
+  describe('blob()', () => {
     it('should return a blob promise with canvas context', (done) => {
       const elem = nativeDocument.createElement('canvas');
       const wrap = new Elem(elem);
@@ -738,8 +738,8 @@ describe('it should test Elem#', () => {
       strictEqual(css.marginBottom, '3px');
       strictEqual(css.marginLeft, '1px');
 
-      style.remove();
-      elem.remove();
+      styleWrap.remove();
+      elemWrap.remove();
     });
   });
   describe('changeRule()', () => {
@@ -774,8 +774,8 @@ describe('it should test Elem#', () => {
       strictEqual(css.paddingBottom, '7px');
       strictEqual(css.paddingLeft, '8px');
 
-      style.remove();
-      elem.remove();
+      styleWrap.remove();
+      elemWrap.remove();
     });
   });
   describe('child()', () => {
@@ -846,7 +846,7 @@ describe('it should test Elem#', () => {
 
       strictEqual(elem1.contains(child), true);
 
-      child.remove();
+      new Elem(child).remove();
     });
   });
   describe('children()', () => {
@@ -942,12 +942,15 @@ describe('it should test Elem#', () => {
       const wrap = new Elem(elem);
       let fired = 0;
 
+      wrap.into(nativeBody);
       wrap.on('click', doneAll);
 
       wrap.click();
 
       function doneAll() {
         if (++fired === 3) {
+          wrap.remove();
+
           done();
         }
       }
@@ -981,7 +984,7 @@ describe('it should test Elem#', () => {
       strictEqual(closest[1], parent3);
     });
   });
-  describe('contains', () => {
+  describe('contains()', () => {
     it('should return true, if element contains another, and false if not', () => {
       const elem1 = nativeDocument.createElement('div');
       const elem2 = nativeDocument.createElement('div');
@@ -1012,8 +1015,8 @@ describe('it should test Elem#', () => {
       
       strictEqual(wrap.contains('#foo'), true);
       strictEqual(wrap.contains('.foo'), false);
-      
-      parent.remove();
+
+      new Elem(parent).remove();
     });
     it('should support (Elem) syntax', () => {
       const parent = nativeDocument.createElement('div');
@@ -1415,8 +1418,8 @@ describe('it should test Elem#', () => {
       strictEqual(css.marginBottom, '0px');
       strictEqual(css.marginLeft, '0px');
 
-      style.remove();
-      elem.remove();
+      styleWrap.remove();
+      elemWrap.remove();
     });
   });
   describe('dispatch()', () => {
@@ -1429,12 +1432,15 @@ describe('it should test Elem#', () => {
       const wrap = new Elem(elem);
       let fired = 0;
 
+      wrap.into(nativeBody);
       wrap.on('click', doneAll);
 
       wrap.dispatch('click');
 
       function doneAll() {
         if (++fired === 3) {
+          wrap.remove();
+
           done();
         }
       }
@@ -1453,8 +1459,10 @@ describe('it should test Elem#', () => {
         event = new Event('click');
       } catch (err) {
         event = nativeDocument.createEvent('Event');
+        event.initEvent('click', false, false);
       }
 
+      wrap.into(nativeBody);
       wrap.on('click', (e) => {
         try {
           strictEqual(e, event);
@@ -1472,6 +1480,8 @@ describe('it should test Elem#', () => {
         }
 
         if (++fired === 3) {
+          wrap.remove();
+
           done();
         }
       }
@@ -1481,10 +1491,13 @@ describe('it should test Elem#', () => {
       const wrap = new Elem(elem);
       const unique = {};
 
+      wrap.into(nativeBody);
       wrap.on('click', (e) => {
         try {
           strictEqual(e.detail, unique);
           strictEqual(e.data, unique);
+
+          wrap.remove();
 
           done();
         } catch (err) {
@@ -1609,7 +1622,7 @@ describe('it should test Elem#', () => {
       strictEqual(firstChildren[0], elem1);
       strictEqual(firstChildren[1], elem3);
     });
-    it('should return a wrap of the first children of all elements in the set that match selector  with selector argument', () => {
+    it('should return a wrap of the first children of all elements in the set that match selector with selector argument', () => {
       const parent1 = nativeDocument.createElement('div');
       const parent2 = nativeDocument.createElement('div');
       const parent3 = nativeDocument.createElement('div');
@@ -1662,7 +1675,7 @@ describe('it should test Elem#', () => {
         }
       });
 
-      style.remove();
+      styleWrap.remove();
     });
   });
   describe('hasAttr()', () => {
@@ -1705,7 +1718,7 @@ describe('it should test Elem#', () => {
       strictEqual(wrap.hasClass('a'), false);
     });
   });
-  describe('hide', () => {
+  describe('hide()', () => {
     it('should set display to none and set element.dwayneData.previousDisplay to previous display', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new Elem(elem);
@@ -1805,7 +1818,7 @@ describe('it should test Elem#', () => {
 
       strictEqual(wrap.innerHeight, 200);
 
-      elem.remove();
+      wrap.remove();
     });
   });
   describe('innerWidth', () => {
@@ -1830,7 +1843,7 @@ describe('it should test Elem#', () => {
 
       strictEqual(wrap.innerWidth, 200);
 
-      elem.remove();
+      wrap.remove();
     });
   });
   describe('insertAfter()', () => {
@@ -1916,7 +1929,7 @@ describe('it should test Elem#', () => {
       strictEqual(children[2], elem2);
       strictEqual(children[3], elem3);
 
-      elem4.remove();
+      new Elem(elem4).remove();
     });
   });
   describe('insertBefore()', () => {
@@ -2002,7 +2015,7 @@ describe('it should test Elem#', () => {
       strictEqual(children[2], elem3);
       strictEqual(children[3], elem5);
 
-      elem4.remove();
+      new Elem(elem4).remove();
     });
   });
   describe('into()', () => {
@@ -2087,7 +2100,7 @@ describe('it should test Elem#', () => {
       } catch (err) {
         done(err);
       } finally {
-        parent.remove();
+        new Elem(parent).remove();
       }
 
       function doneAll() {
@@ -2122,6 +2135,7 @@ describe('it should test Elem#', () => {
       const properWrap = new Elem(proper);
       const brokenWrap = new Elem(broken);
 
+      wrap.into(nativeBody);
       properWrap.ref('/test/images/image.png');
       brokenWrap.ref('/some/broken/image');
 
@@ -2134,12 +2148,13 @@ describe('it should test Elem#', () => {
           strictEqual(properWrap.isBroken(), false);
           strictEqual(brokenWrap.isBroken(), true);
 
+          wrap.remove();
           done();
         })
         .catch(done);
     });
   });
-  describe('isBroken()', () => {
+  describe('isWithinDocument()', () => {
     it('should return false if the element is not within document', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new Elem(elem);
@@ -2193,7 +2208,7 @@ describe('it should test Elem#', () => {
       strictEqual(lastChildren[0], elem2);
       strictEqual(lastChildren[1], elem4);
     });
-    it('should return a wrap of the last children of all elements in the set that match selector  with selector argument', () => {
+    it('should return a wrap of the last children of all elements in the set that match selector with selector argument', () => {
       const parent1 = nativeDocument.createElement('div');
       const parent2 = nativeDocument.createElement('div');
       const parent3 = nativeDocument.createElement('div');
@@ -2398,8 +2413,11 @@ describe('it should test Elem#', () => {
       const wrap = new Elem(elem);
       let times = 0;
 
+      wrap.into(nativeBody);
       wrap.on('click', () => {
         if (++times === 1) {
+          wrap.remove();
+
           done();
 
           return wrap.off('click');
@@ -2416,8 +2434,11 @@ describe('it should test Elem#', () => {
       const wrap = new Elem(elem);
       let times = 0;
 
+      wrap.into(nativeBody);
       wrap.on('click', () => {
         if (++times === 1) {
+          wrap.remove();
+
           done();
 
           return wrap.off('click, contextmenu');
@@ -2435,7 +2456,10 @@ describe('it should test Elem#', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new Elem(elem);
 
+      wrap.into(nativeBody);
       wrap.on('click', () => {
+        wrap.remove();
+
         done();
       });
       wrap.dispatch('click');
@@ -2445,8 +2469,11 @@ describe('it should test Elem#', () => {
       const wrap = new Elem(elem);
       let times = 0;
 
+      wrap.into(nativeBody);
       wrap.on('click, contextmenu', () => {
         if (++times === 2) {
+          wrap.remove();
+
           done();
         }
       });
@@ -2462,10 +2489,13 @@ describe('it should test Elem#', () => {
       const wrap = new Elem(elem);
       const listener = () => {
         if (++times === 2) {
+          wrap.remove();
+
           done();
         }
       };
 
+      wrap.into(nativeBody);
       wrap.on({
         click: listener,
         contextmenu: listener
@@ -2487,8 +2517,11 @@ describe('it should test Elem#', () => {
       elem.appendChild(elem2);
       elem.appendChild(elem3);
 
+      wrap.into(nativeBody);
       wrap.on('click', '.foo', () => {
         if (++times === 2) {
+          wrap.remove();
+
           return done();
         }
 
@@ -2510,6 +2543,8 @@ describe('it should test Elem#', () => {
       const wrap = new Elem(elem);
       const removeListener = wrap.on('click', () => {
         if (++times === 1) {
+          wrap.remove();
+
           done();
 
           return removeListener();
@@ -2518,6 +2553,7 @@ describe('it should test Elem#', () => {
         done(new Error('Not removed'));
       });
 
+      wrap.into(nativeBody);
       wrap
         .dispatch('click')
         .dispatch('click');
@@ -2529,6 +2565,8 @@ describe('it should test Elem#', () => {
       const wrap = new Elem(elem);
       const removeListener = wrap.on('click, contextmenu', () => {
         if (++times === 2) {
+          wrap.remove();
+
           done();
 
           return removeListener('click');
@@ -2541,6 +2579,7 @@ describe('it should test Elem#', () => {
         done(new Error('Not removed'));
       });
 
+      wrap.into(nativeBody);
       wrap
         .dispatch('click')
         .dispatch('contextmenu')
@@ -2571,7 +2610,7 @@ describe('it should test Elem#', () => {
 
       strictEqual(wrap.outerHeight, 215);
 
-      elem.remove();
+      wrap.remove();
     });
   });
   describe('outerWidth', () => {
@@ -2598,7 +2637,7 @@ describe('it should test Elem#', () => {
 
       strictEqual(wrap.outerWidth, 215);
 
-      elem.remove();
+      wrap.remove();
     });
   });
   describe('parent()', () => {
@@ -3048,10 +3087,11 @@ describe('it should test Elem#', () => {
       const elem = nativeDocument.createElement('div');
       const wrap = new Elem(elem);
 
-      elem.style.display = 'inline-block';
-      wrap.hide();
-      elem.style.display = 'inline';
-      wrap.show();
+      wrap
+        .css('display', 'inline-block')
+        .hide()
+        .css('display', 'inline')
+        .show();
 
       strictEqual(elem.style.display, 'inline');
       strictEqual(elem.dwayneData.previousDisplay, '');
@@ -3330,7 +3370,7 @@ describe('it should test Elem#', () => {
     });
   });
   describe('validate()', () => {
-    it('should return a wrap of the parent elements with no arguments', () => {
+    it('should validate inputs and forms', () => {
       const form = nativeDocument.createElement('form');
       const input = nativeDocument.createElement('input');
       const inputRequired = nativeDocument.createElement('input');
@@ -3377,6 +3417,170 @@ describe('it should test Elem#', () => {
 
       strictEqual(errors, null);
     });
+    it('should fire a validate event on inputs', (done) => {
+      const input = nativeDocument.createElement('input');
+      const inputRequired = nativeDocument.createElement('input');
+      const inputWrap = new Elem(input);
+      let times = 0;
+      let error;
+
+      inputRequired.setAttribute('required', '');
+
+      inputWrap.attr({
+        name: 'input1',
+        required: ''
+      });
+
+      inputWrap.on('validate', (e) => {
+        /* eslint indent: 0 */
+        switch (times) {
+          case 0: {
+            try {
+              strictEqual(e.valid, false);
+              strictEqual(e.error.message, inputRequired.validationMessage);
+
+              doneAll();
+            } catch (err) {
+              doneAll(err);
+            }
+
+            return;
+          }
+          case 1: {
+            try {
+              strictEqual(e.valid, true);
+              strictEqual(e.error, null);
+
+              doneAll();
+            } catch (err) {
+              doneAll(err);
+            }
+
+            return;
+          }
+        }
+      });
+
+      inputWrap.validate();
+
+      inputWrap.prop('value', '1');
+
+      inputWrap.validate();
+
+      function doneAll(err) {
+        if (err) {
+          error = err;
+
+          return done(err);
+        }
+
+        if (++times === 2 && !error) {
+          done();
+        }
+      }
+    });
+    it('should fire a validate event on forms', (done) => {
+      const form = nativeDocument.createElement('form');
+      const input1 = nativeDocument.createElement('input');
+      const input2 = nativeDocument.createElement('input');
+      const inputRequired = nativeDocument.createElement('input');
+      const formWrap = new Elem(form);
+      const inputWrap1 = new Elem(input1);
+      const inputWrap2 = new Elem(input2);
+      let times = 0;
+      let error;
+
+      inputRequired.setAttribute('required', '');
+      form.appendChild(input1);
+      form.appendChild(input2);
+
+      inputWrap1.attr({
+        name: 'input1',
+        required: ''
+      });
+
+      inputWrap2.attr({
+        name: 'input2',
+        required: ''
+      });
+
+      inputWrap2.validate((text) => {
+        if (text[0].toLowerCase() === text[0]) {
+          throw new Error('Input must be capitilized.');
+        }
+      });
+
+      formWrap.on('validate', (e) => {
+        if (e.target !== form) {
+          return;
+        }
+
+        switch (times) {
+          case 0: {
+            try {
+              strictEqual(e.valid, false);
+              deepStrictEqual(Object.keys(e.errors), ['input1', 'input2']);
+              strictEqual(e.errors.input1.message, inputRequired.validationMessage);
+              strictEqual(e.errors.input2.message, inputRequired.validationMessage);
+
+              doneAll();
+            } catch (err) {
+              doneAll(err);
+            }
+
+            return;
+          }
+          case 1: {
+            try {
+              strictEqual(e.valid, false);
+              deepStrictEqual(Object.keys(e.errors), ['input2']);
+              strictEqual(e.errors.input2.message, 'Input must be capitilized.');
+
+              doneAll();
+            } catch (err) {
+              doneAll(err);
+            }
+
+            return;
+          }
+          case 2: {
+            try {
+              strictEqual(e.valid, true);
+              strictEqual(e.errors, null);
+
+              doneAll();
+            } catch (err) {
+              doneAll(err);
+            }
+
+            return;
+          }
+        }
+      });
+
+      formWrap.validate();
+
+      inputWrap1.prop('value', '1');
+      inputWrap2.prop('value', 't');
+
+      formWrap.validate();
+
+      inputWrap2.prop('value', 'T');
+
+      formWrap.validate();
+
+      function doneAll(err) {
+        if (err) {
+          error = err;
+
+          return done(err);
+        }
+
+        if (++times === 3 && !error) {
+          done();
+        }
+      }
+    });
   });
 });
 
@@ -3402,7 +3606,7 @@ describe('it should test exported methods from Elem', () => {
       strictEqual(found[0], child1);
       strictEqual(found[1], child3);
 
-      elem.remove();
+      new Elem(elem).remove();
     });
   });
   describe('parseHTML()', () => {
