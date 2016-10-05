@@ -13133,6 +13133,23 @@ var pathSwitcher = switcher('call', function () {
     params: params.$
   };
 });
+var selectorMatchesSwitcher = switcher('call', function (selector) {
+  return function (name) {
+    return name === selector;
+  };
+}).case(isNull, function (selector) {
+  return function (name) {
+    return true;
+  };
+}).case(isRegExp, function (selector) {
+  return function (name) {
+    return selector.test(name);
+  };
+}).case(isArray, function (selector) {
+  return function (name) {
+    return selector.indexOf(name) !== -1;
+  };
+});
 
 var eventPromise = Promise$1.resolve();
 var pushed = void 0;
@@ -13145,6 +13162,9 @@ var defaultState = void 0;
 var currentState = void 0;
 var currentTitle = void 0;
 var currentIcon = void 0;
+var initTitle = void 0;
+var initIcon = void 0;
+var initHTML = void 0;
 
 /**
  * @class Router
@@ -13312,37 +13332,70 @@ var Router = function () {
     }
 
     /**
+     * @method Router.reload
+     * @public
+     * @returns {void}
+     * @description Fires {@link Router#event:beforeLeave}, {@link Router#event:leave}
+     * as usual, then resets router content, page title and icon to initial content
+     * and loads page like if it was the first time.
+     */
+
+  }, {
+    key: 'reload',
+    value: function reload() {
+      eventPromise = eventPromise.then(beforeLeave).then(function () {
+        router.html(initHTML);
+        pageTitle.text(initTitle);
+        pageIcon.ref(initIcon);
+      }).then(beforeLoad).catch(printError);
+    }
+
+    /**
      * @method Router.on
      * @public
      * @listens Router#event
      * @param {String|Object.<String|Listener>} event - Either a event string
      * or an object with event keys and listeners values.
-     * @param {Listener} [listener] - If the first argument is a string it must be a listener function for
-     * specified event.
+     * @param {String|String[]|RegExp} selector - String, array of strings or
+     * a regular expression to filter states by the state name.
+     * @param {Listener} [listener] - If the first argument is a string it must be
+     * a listener function for specified event.
      * @returns {RouterRemoveListeners} Function that can remove listeners that has just been set.
      * @description Method for listening to all events you want. beforeLeave
      */
 
   }, {
     key: 'on',
-    value: function on(event, listener) {
+    value: function on(event) {
       var _this = this;
 
-      if (arguments.length >= 2) {
+      var selector = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+      var listener = arguments[2];
+
+      if (isFunction(selector)) {
+        listener = selector;
+        selector = null;
+      }
+
+      if (isString(event)) {
         event = defineProperty({}, event, listener);
       }
 
       var listeners = this.$$.listeners;
 
       var allListeners = {};
+      var matchesSelector = selectorMatchesSwitcher(selector);
 
       iterate(event, function (listener, event) {
         var array$$1 = listeners[event] || new Arr([]);
+        var newListener = function newListener(e) {
+          if (matchesSelector(e.state && e.state.name)) {
+            listener.call(_this, e);
+          }
+        };
 
-        listener = new Func(listener).bindContext(_this);
-
-        allListeners[event] = listener;
-        (listeners[event] = array$$1).push(listener);
+        allListeners[event] = newListener;
+        (listeners[event] = array$$1).push(newListener);
       });
 
       return function removeEventListeners(event) {
@@ -13770,17 +13823,24 @@ var stopError = new RouterError();
  * @param {Boolean} [push] - If it's need to push state or rather replace it.
  */
 function redirect(newURL, push) {
-  eventPromise = eventPromise.then(function () {
-    return dispatchNewEvent('beforeLeave');
-  }).then(function () {
-    return dispatchNewEvent('leave');
-  }).then(function () {
+  eventPromise = eventPromise.then(beforeLeave).then(function () {
     (currentState ? currentState.base : new Elem([])).hide().html('');
 
     changeHistory(newURL, push);
+  }).then(beforeLoad).catch(printError);
+}
+
+/**
+ * @function beforeLeave
+ * @private
+ * @returns {Promise}
+ */
+function beforeLeave() {
+  return Promise$1.resolve().then(function () {
+    return dispatchNewEvent('beforeLeave');
   }).then(function () {
-    return beforeLoad();
-  }).catch(printError);
+    return dispatchNewEvent('leave');
+  });
 
   function dispatchNewEvent(type) {
     return dispatchEvent(new Super({}).value({
@@ -14219,13 +14279,17 @@ function getListeners() {
 function initialize() {
   if (initialized && !routerLoaded) {
     routerLoaded = true;
-    pageTitle = _find('#dwayne-router-title');
-    pageIcon = _find('#dwayne-router-icon');
+    pageTitle = _find('#dwayne-router-title').first();
+    pageIcon = _find('#dwayne-router-icon').first();
+    router = _find('#dwayne-router').first();
+    initHTML = router.html() || '';
+    initTitle = pageTitle.text() || '';
+    initIcon = pageIcon.ref() || '';
 
     _find('[' + stateAttrName + ']').hide();
 
     defineProperties(MainState, {
-      base: router = _find('#dwayne-router').first()
+      base: router
     });
 
     win.on('click', function (e) {
