@@ -31,8 +31,125 @@ function toStringTag(object) {
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
 } : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
 };
+
+
+
+
+
+var asyncGenerator = function () {
+  function AwaitValue(value) {
+    this.value = value;
+  }
+
+  function AsyncGenerator(gen) {
+    var front, back;
+
+    function send(key, arg) {
+      return new Promise(function (resolve, reject) {
+        var request = {
+          key: key,
+          arg: arg,
+          resolve: resolve,
+          reject: reject,
+          next: null
+        };
+
+        if (back) {
+          back = back.next = request;
+        } else {
+          front = back = request;
+          resume(key, arg);
+        }
+      });
+    }
+
+    function resume(key, arg) {
+      try {
+        var result = gen[key](arg);
+        var value = result.value;
+
+        if (value instanceof AwaitValue) {
+          Promise.resolve(value.value).then(function (arg) {
+            resume("next", arg);
+          }, function (arg) {
+            resume("throw", arg);
+          });
+        } else {
+          settle(result.done ? "return" : "normal", result.value);
+        }
+      } catch (err) {
+        settle("throw", err);
+      }
+    }
+
+    function settle(type, value) {
+      switch (type) {
+        case "return":
+          front.resolve({
+            value: value,
+            done: true
+          });
+          break;
+
+        case "throw":
+          front.reject(value);
+          break;
+
+        default:
+          front.resolve({
+            value: value,
+            done: false
+          });
+          break;
+      }
+
+      front = front.next;
+
+      if (front) {
+        resume(front.key, front.arg);
+      } else {
+        back = null;
+      }
+    }
+
+    this._invoke = send;
+
+    if (typeof gen.return !== "function") {
+      this.return = undefined;
+    }
+  }
+
+  if (typeof Symbol === "function" && Symbol.asyncIterator) {
+    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
+      return this;
+    };
+  }
+
+  AsyncGenerator.prototype.next = function (arg) {
+    return this._invoke("next", arg);
+  };
+
+  AsyncGenerator.prototype.throw = function (arg) {
+    return this._invoke("throw", arg);
+  };
+
+  AsyncGenerator.prototype.return = function (arg) {
+    return this._invoke("return", arg);
+  };
+
+  return {
+    wrap: function (fn) {
+      return function () {
+        return new AsyncGenerator(fn.apply(this, arguments));
+      };
+    },
+    await: function (value) {
+      return new AwaitValue(value);
+    }
+  };
+}();
 
 
 
@@ -81,7 +198,30 @@ var defineProperty = function (obj, key, value) {
   return obj;
 };
 
+var get$1 = function get$1(object, property, receiver) {
+  if (object === null) object = Function.prototype;
+  var desc = Object.getOwnPropertyDescriptor(object, property);
 
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent === null) {
+      return undefined;
+    } else {
+      return get$1(parent, property, receiver);
+    }
+  } else if ("value" in desc) {
+    return desc.value;
+  } else {
+    var getter = desc.get;
+
+    if (getter === undefined) {
+      return undefined;
+    }
+
+    return getter.call(receiver);
+  }
+};
 
 var inherits = function (subClass, superClass) {
   if (typeof superClass !== "function" && superClass !== null) {
@@ -1028,7 +1168,7 @@ function validate(args, options, name) {
  */
 var Alphabet = function () {
   function Alphabet() {
-    var alphabet = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+    var alphabet = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
     classCallCheck(this, Alphabet);
 
     var a = {};
@@ -1328,15 +1468,15 @@ var Switcher = function (_Function) {
   inherits(Switcher, _Function);
 
   function Switcher() {
-    var cases = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-    var mode = arguments.length <= 1 || arguments[1] === undefined ? 'equals' : arguments[1];
+    var cases = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var mode = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'equals';
 
     var _ret;
 
     var defaultValue = arguments[2];
     classCallCheck(this, Switcher);
 
-    var _this = possibleConstructorReturn(this, Object.getPrototypeOf(Switcher).call(this));
+    var _this = possibleConstructorReturn(this, (Switcher.__proto__ || Object.getPrototypeOf(Switcher)).call(this));
 
     if (isString(cases)) {
       if (!isUndefined(arguments[1])) {
@@ -1354,7 +1494,7 @@ var Switcher = function (_Function) {
     });
 
     function switcher(value) {
-      var args = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+      var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
       var _switcher$$$ = switcher.$$;
       var mode = _switcher$$$.mode;
       var def = _switcher$$$.default;
@@ -1780,7 +1920,7 @@ var Super = function () {
   }, {
     key: 'average',
     value: function average() {
-      var callback = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+      var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       validate([callback], ['function||!'], 'Super#average');
 
@@ -1971,7 +2111,7 @@ var Super = function () {
   }, {
     key: 'deepEquals',
     value: function deepEquals() {
-      var object = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+      var object = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       return deepEqual(this.$, object, false);
     }
@@ -2099,7 +2239,7 @@ var Super = function () {
   }, {
     key: 'deepForEach',
     value: function deepForEach(callback) {
-      var n = arguments.length <= 1 || arguments[1] === undefined ? Infinity : arguments[1];
+      var n = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Infinity;
 
       validate([callback, n], ['function', ['numberLike', '>0']], 'Super#deepForEach');
 
@@ -2145,7 +2285,7 @@ var Super = function () {
   }, {
     key: 'deepMap',
     value: function deepMap(callback) {
-      var n = arguments.length <= 1 || arguments[1] === undefined ? Infinity : arguments[1];
+      var n = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Infinity;
 
       validate([callback, n], ['function', ['numberLike', '>0']], 'Super#deepMap');
 
@@ -2171,7 +2311,7 @@ var Super = function () {
   }, {
     key: 'deepReduce',
     value: function deepReduce(callback) {
-      var n = arguments.length <= 1 || arguments[1] === undefined ? Infinity : arguments[1];
+      var n = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Infinity;
       var IV = arguments[2];
 
       validate([callback, n], ['function', ['numberLike', '>0']], 'Super#deepReduce');
@@ -2238,7 +2378,7 @@ var Super = function () {
   }, {
     key: 'deepStrictEquals',
     value: function deepStrictEquals() {
-      var object = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+      var object = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       return deepEqual(this.$, object, true);
     }
@@ -2354,7 +2494,7 @@ var Super = function () {
   }, {
     key: 'every',
     value: function every() {
-      var callback = arguments.length <= 0 || arguments[0] === undefined ? Boolean : arguments[0];
+      var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Boolean;
 
       validate([callback], ['function'], 'Super#every');
 
@@ -2381,7 +2521,7 @@ var Super = function () {
   }, {
     key: 'filter',
     value: function filter() {
-      var callback = arguments.length <= 0 || arguments[0] === undefined ? Boolean : arguments[0];
+      var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Boolean;
 
       validate([callback], ['function'], 'Super#filter');
 
@@ -2751,7 +2891,7 @@ var Super = function () {
   }, {
     key: 'max',
     value: function max() {
-      var callback = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+      var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       validate([callback], ['function||!'], 'Super#max');
 
@@ -2783,7 +2923,7 @@ var Super = function () {
   }, {
     key: 'min',
     value: function min() {
-      var callback = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+      var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       validate([callback], ['function||!'], 'Super#min');
 
@@ -2816,7 +2956,7 @@ var Super = function () {
   }, {
     key: 'object',
     value: function object(callback) {
-      var _object = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+      var _object = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
       validate([callback], ['function'], 'Super#object');
 
@@ -3053,7 +3193,7 @@ var Super = function () {
   }, {
     key: 'some',
     value: function some() {
-      var callback = arguments.length <= 0 || arguments[0] === undefined ? Boolean : arguments[0];
+      var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Boolean;
 
       validate([callback], ['function'], 'Super#some');
 
@@ -3103,7 +3243,7 @@ var Super = function () {
   }, {
     key: 'sum',
     value: function sum() {
-      var callback = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+      var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       validate([callback], ['function||!'], 'Super#sum');
 
@@ -3202,7 +3342,7 @@ var Super = function () {
   }, {
     key: 'word',
     value: function word() {
-      var callback = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+      var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       validate([callback], ['function||!'], 'Super#word');
 
@@ -3663,9 +3803,9 @@ var Arr = function (_Super) {
   inherits(Arr, _Super);
 
   function Arr() {
-    var array = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+    var array = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
     classCallCheck(this, Arr);
-    return possibleConstructorReturn(this, Object.getPrototypeOf(Arr).call(this, toArray$1(array instanceof Arr ? array.$ : array)));
+    return possibleConstructorReturn(this, (Arr.__proto__ || Object.getPrototypeOf(Arr)).call(this, toArray$1(array instanceof Arr ? array.$ : array)));
 
     /**
      * @member Arr#$
@@ -4500,10 +4640,10 @@ var Func = function (_Super) {
   function Func() {
     var _ret;
 
-    var func = arguments.length <= 0 || arguments[0] === undefined ? function () {} : arguments[0];
+    var func = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
     classCallCheck(this, Func);
 
-    var _this = possibleConstructorReturn(this, Object.getPrototypeOf(Func).call(this));
+    var _this = possibleConstructorReturn(this, (Func.__proto__ || Object.getPrototypeOf(Func)).call(this));
 
     function proxy() {
       var _this2 = this,
@@ -4630,7 +4770,7 @@ var Func = function (_Super) {
   createClass(Func, [{
     key: 'after',
     value: function after(middleware) {
-      var afterAll = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+      var afterAll = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
       validate([middleware], ['function'], 'Func#after');
 
@@ -4681,7 +4821,7 @@ var Func = function (_Super) {
   }, {
     key: 'async',
     value: function async() {
-      var condition = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+      var condition = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
       this.$$.sync = !condition;
 
@@ -4708,7 +4848,7 @@ var Func = function (_Super) {
   }, {
     key: 'before',
     value: function before(middleware) {
-      var beforeAll = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+      var beforeAll = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
       validate([middleware], ['function'], 'Func#before');
 
@@ -5169,7 +5309,7 @@ constructors[1].push({
  * [1.2345, 2.789, 3.14].map(method('toFixed', [2])); // ['1.23', '2.79', '3.14']
  */
 function method(method) {
-  var args = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+  var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
   return function (x) {
     return x[method].apply(x, toArray$1(args));
@@ -5225,9 +5365,9 @@ var Num = function (_Super) {
   inherits(Num, _Super);
 
   function Num() {
-    var number = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+    var number = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
     classCallCheck(this, Num);
-    return possibleConstructorReturn(this, Object.getPrototypeOf(Num).call(this, number));
+    return possibleConstructorReturn(this, (Num.__proto__ || Object.getPrototypeOf(Num)).call(this, number));
 
     /**
      * @member Num#$
@@ -5373,7 +5513,7 @@ var Num = function (_Super) {
      * });
      */
     value: function interval(func) {
-      var args = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+      var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
       validate([func], ['function'], 'Num#interval');
 
@@ -5609,7 +5749,7 @@ var Num = function (_Super) {
   }, {
     key: 'toBase',
     value: function toBase() {
-      var base = arguments.length <= 0 || arguments[0] === undefined ? 10 : arguments[0];
+      var base = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 10;
 
       return this.$.toString(base);
     }
@@ -5933,8 +6073,8 @@ constructors[1].push({
  * rand(1, 5); // 4.356763
  */
 function rand() {
-  var start = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
-  var end = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
+  var start = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+  var end = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
 
   return start + (end - start) * Math.random();
 }
@@ -6005,9 +6145,9 @@ var Str = function (_Super) {
   inherits(Str, _Super);
 
   function Str() {
-    var string = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+    var string = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
     classCallCheck(this, Str);
-    return possibleConstructorReturn(this, Object.getPrototypeOf(Str).call(this, string));
+    return possibleConstructorReturn(this, (Str.__proto__ || Object.getPrototypeOf(Str)).call(this, string));
 
     /**
      * @member Str#$
@@ -6226,7 +6366,7 @@ var Str = function (_Super) {
   }, {
     key: 'replace',
     value: function replace(regexp) {
-      var replacer = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+      var replacer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
 
       return new Str(this.$.replace(regexp, replacer));
     }
@@ -6247,7 +6387,7 @@ var Str = function (_Super) {
   }, {
     key: 'replaceString',
     value: function replaceString(string) {
-      var replacer = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+      var replacer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
 
       string = new Super(string).$;
 
@@ -6344,7 +6484,7 @@ var Str = function (_Super) {
   }, {
     key: 'startsWith',
     value: function startsWith(searchString) {
-      var position = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+      var position = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
 
       return this.$.indexOf.apply(this.$, arguments) === position;
     }
@@ -6621,8 +6761,8 @@ function trim(string) {
  * parseJSON('{ "a": "1999-12-31T23:59:59.999Z" }', { dates: true }).$; // { a: Date {...} }
  */
 function parseJSON() {
-  var json = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
-  var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+  var json = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   var callback = arguments[2];
 
   if (arguments.length <= 1) {
@@ -6915,9 +7055,9 @@ var Dat = function (_Super) {
   inherits(Dat, _Super);
 
   function Dat() {
-    var date = arguments.length <= 0 || arguments[0] === undefined ? new Date() : arguments[0];
+    var date = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Date();
     classCallCheck(this, Dat);
-    return possibleConstructorReturn(this, Object.getPrototypeOf(Dat).call(this, date));
+    return possibleConstructorReturn(this, (Dat.__proto__ || Object.getPrototypeOf(Dat)).call(this, date));
 
     /**
      * @member Dat#$
@@ -6996,7 +7136,7 @@ var Dat = function (_Super) {
     value: function format(string) {
       var _this2 = this;
 
-      var prefix = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+      var prefix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
 
       string = new Str(new Super(string).$);
       prefix = String(new Super(prefix).$);
@@ -7043,7 +7183,7 @@ var Dat = function (_Super) {
     value: function formatUTC(string) {
       var _this3 = this;
 
-      var prefix = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+      var prefix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
 
       string = new Str(new Super(string).$);
       prefix = String(new Super(prefix).$);
