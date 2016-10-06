@@ -1,5 +1,5 @@
 import { deepStrictEqual, strictEqual } from 'assert';
-import Func, { noop, self, method } from '../lib/Func';
+import Func, { noop, self, method, prop } from '../lib/Func';
 import Arr from '../lib/Arr';
 import Num, { rand, random } from '../lib/Num';
 
@@ -344,6 +344,16 @@ describe('it should test exported methods from Function', () => {
       strictEqual(noop([]), undefined);
       strictEqual(noop(''), undefined);
       strictEqual(noop(), undefined);
+    });
+  });
+  describe('prop()', () => {
+    it('should be the function returning function returning property of its first argument', () => {
+      const rnd = rand();
+      const unique = {
+        x: rnd
+      };
+
+      strictEqual(prop('x')(unique), rnd);
     });
   });
   describe('self()', () => {

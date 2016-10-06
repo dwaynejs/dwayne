@@ -5577,6 +5577,23 @@ function method(method) {
 function noop() {}
 
 /**
+ * @function prop
+ * @public
+ * @param {String} prop - Property to return.
+ * @returns {Function} Function that returns given property of its first argument.
+ * @description Function that return the function that returns given property of its first argument.
+ *
+ * @example
+ * ['foo', '12', '7890'].map(prop('length')); // [3, 2, 4]
+ */
+function prop$1(prop) {
+  return function (_ref) {
+    var value = _ref[prop];
+    return value;
+  };
+}
+
+/**
  * @function self
  * @public
  * @returns {*} First argument itself.
@@ -12050,8 +12067,8 @@ var Elem = function (_Arr) {
       }
 
       return this.forEach(function (elem, index) {
-        iterate(property, function (value, prop) {
-          elem[prop] = isFunction(value) ? value(elem[prop], elem, index) : value;
+        iterate(property, function (value, prop$$1) {
+          elem[prop$$1] = isFunction(value) ? value(elem[prop$$1], elem, index) : value;
         });
       });
     }
@@ -13636,20 +13653,30 @@ var Router = function () {
 
 
     /**
-     * @member {String|Function} Router.template
-     * @type {String|Function}
+     * @member {Object} Router.templateParams
+     * @type {Object}
      * @public
-     * @description State template. Can be either a static string template
-     * or a generated function from your javascript templates provider.
-     * Not required and defaults to "".
+     * @description State template params (for javascript templates).
+     * During the Router initialization are inherited from the parent state template params.
+     * Not required and defaults to {}.
      */
 
 
     /**
-     * @member {String} Router.stateName
-     * @type {String}
+     * @member {String|RegExp} Router.path
+     * @type {String|RegExp}
      * @public
-     * @description A unique name bound to state. Required.
+     * @description State path relative to the parent state. Must begin with "/" if present.
+     * Not required and defaults to "/".
+     */
+
+
+    /**
+     * @member {Boolean} Router.abstract
+     * @type {Boolean}
+     * @public
+     * @description If the states should be abstract or not. Abstract state cannot be current state.
+     * This field is not required and defaults to false.
      */
 
 
@@ -13728,30 +13755,88 @@ var Router = function () {
 
 
     /**
-     * @member {Object} Router.templateParams
+     * @member {Object} Router.elements
      * @type {Object}
      * @public
-     * @description State template params (for javascript templates).
-     * During the Router initialization are inherited from the parent state template params.
-     * Not required and defaults to {}.
+     * @description State view elements selectors. Before rendering these elements are
+     * found within the rendering state.
+     *
+     * @example
+     * class MyState extends Router {
+     *   static stateName = 'myState';
+     *   static elements = {
+     *     caption: '.caption',
+     *     form: {
+     *       $: '.form',
+     *
+     *       emailInput: 'input[type="email"]',
+     *       passwordInput: 'input[type="password"]'
+     *     },
+     *     container: {
+     *       $: '.container',
+     *
+     *       nestedContainer: {
+     *         $: '.nested-container',
+     *
+     *         content: '.content'
+     *       }
+     *     }
+     *   };
+     *
+     *   onRender() {
+     *     console.log(this.caption); // instance of Elem
+     *     console.log(this.form);    // instance of Elem
+     *     console.log(this.content); // instance of Elem
+     *
+     *     // etc
+     *   }
+     * }
+     *
+     * // this is an equivalent to
+     *
+     * class MyState extends Router {
+     *   static stateName = 'myState';
+     *
+     *   onRender() {
+     *     const { base } = this;
+     *
+     *     this.caption         = base.find('.caption');
+     *     this.form            = base.find('.form');
+     *     this.emailInput      = base.find('.form input[type="email"]');
+     *     this.passwordInput   = base.find('.form input[type="password"]');
+     *     this.container       = base.find('.container');
+     *     this.nestedContainer = base.find('.container .nested-container');
+     *     this.content         = base.find('.container .nested-container .content');
+     *
+     *     // your usual onRender code goes here
+     *   }
+     * }
      */
 
 
     /**
-     * @member {String|RegExp} Router.path
-     * @type {String|RegExp}
+     * @member {String|Function} Router.template
+     * @type {String|Function}
      * @public
-     * @description State path relative to the parent state. Must begin with "/" if present.
-     * Not required and defaults to "/".
+     * @description State template. Can be either a static string template
+     * or a generated function from your javascript templates provider.
+     * Not required and defaults to "".
      */
 
 
     /**
-     * @member {Boolean} Router.abstract
-     * @type {Boolean}
+     * @member {String} Router.stateName
+     * @type {String}
      * @public
-     * @description If the states should be abstract or not. Abstract state cannot be current state.
-     * This field is not required and defaults to false.
+     * @description A unique name bound to state. Required.
+     */
+
+
+    /**
+     * @member {Super} Router.elems
+     * @type {Super}
+     * @protected
+     * @description State elements selectors. Generated during the state registration.
      */
 
 
@@ -13915,11 +14000,13 @@ Router.relativePath = '/';
 Router.relativeURL = '/';
 Router.params = {};
 Router.query = {};
+Router.elems = new Super({});
 Router.abstract = false;
 Router.stateName = null;
 Router.path = '/';
 Router.template = '';
 Router.templateParams = {};
+Router.elements = {};
 Router.encodeParams = true;
 Router.decodeParams = true;
 Router.encodeQuery = true;
@@ -14032,6 +14119,7 @@ function beforeLoad() {
     renderStates.forEach(function (state) {
       var template = state.template;
       var parentTemplateParams = state.templateParams;
+      var elems = state.elems;
 
       var templateParams = new Super(parentTemplateParams).create().assign(ownTemplateParams).$;
 
@@ -14046,9 +14134,13 @@ function beforeLoad() {
 
         base.find('[' + stateAttrName + ']').hide();
 
-        if (state === proto) {
-          newState.base = base;
+        newState.base = base;
 
+        new Super(newState).assign(elems.map(function (selector) {
+          return base.find(selector);
+        }).$);
+
+        if (state === proto) {
           if (!isNull(title) && title !== currentTitle) {
             pageTitle.text(currentTitle = title);
           }
@@ -14603,7 +14695,7 @@ function registerState(state) {
   }
 
   var $state = new Super(state);
-  var path = $state.hasOwn('path') ? state.path : '';
+  var path = $state.hasOwn('path') ? state.path : '/';
 
   var _pathSwitcher = pathSwitcher(path);
 
@@ -14611,6 +14703,33 @@ function registerState(state) {
   var relativePath = _pathSwitcher.path;
   var params = _pathSwitcher.params;
 
+  var elems = new Super({});
+
+  if ($state.hasOwn('elements')) {
+    var elements = state.elements;
+
+
+    new Super(elements).deepForEach(function (value, key, object, tree) {
+      tree = new Arr(tree);
+
+      tree.reverse().shift();
+
+      tree.forEach(function (object, index) {
+        var key = object.key;
+        var value = object.value;
+
+
+        if (key === '$') {
+          return;
+        }
+
+        var nestedSelector = object.selector = String(value.$) || '';
+        var selector = isString(value) ? value : nestedSelector;
+
+        elems.$[key] = tree.slice(0, index).map(prop$1('selector')).push(selector).join(' ');
+      });
+    });
+  }
 
   defineProperties(state, {
     $$: {
@@ -14626,6 +14745,7 @@ function registerState(state) {
     params: params,
     abstract: $state.hasOwn('abstract') && !!state.abstract,
     templateParams: $state.hasOwn('templateParams') ? state.templateParams : {},
+    elems: elems,
     query: {}
   });
 
@@ -14699,6 +14819,7 @@ var statics = Object.freeze({
 	Func: Func,
 	method: method,
 	noop: noop,
+	prop: prop$1,
 	self: self$1,
 	Num: Num,
 	rand: rand,
@@ -14709,6 +14830,7 @@ var statics = Object.freeze({
 	redirectTo: redirectTo,
 	reload: reload,
 	registerState: registerState,
+	get currentState () { return currentState; },
 	Str: Str,
 	parseJSON: parseJSON,
 	Super: Super,
@@ -14725,4 +14847,4 @@ assign$1(D$$1, statics);
 delete D$$1.default;
 delete D$$1.D;
 
-export { D$2 as D, isArray, isArrayLike, isBoolean, isDate, isDateLike, isElement, isFinite, isFunction, isInteger, isIntegerLike, isNaN, isNull, isNullOrUndefined, isNumber, isNumberLike, isObject, isPlainObject, isPrimitive, isRegExp, isString, isSymbol, isUndefined, Alphabet, alphabet, Arr, array, iterate$1 as iterate, BlobObject, blob$1 as blob, Dat, now, date, _find as find, Elem, win, doc, html, body, head$1 as head, parseHTML, px, Fetch, fetch, Func, method, noop, self$1 as self, Num, rand, random, Promise$1 as Promise, _go as go, Router, redirectTo, reload, registerState, Str, parseJSON, Super, Switcher, switcher, when };export default D$$1;
+export { D$2 as D, isArray, isArrayLike, isBoolean, isDate, isDateLike, isElement, isFinite, isFunction, isInteger, isIntegerLike, isNaN, isNull, isNullOrUndefined, isNumber, isNumberLike, isObject, isPlainObject, isPrimitive, isRegExp, isString, isSymbol, isUndefined, Alphabet, alphabet, Arr, array, iterate$1 as iterate, BlobObject, blob$1 as blob, Dat, now, date, _find as find, Elem, win, doc, html, body, head$1 as head, parseHTML, px, Fetch, fetch, Func, method, noop, prop$1 as prop, self$1 as self, Num, rand, random, Promise$1 as Promise, _go as go, Router, redirectTo, reload, registerState, currentState, Str, parseJSON, Super, Switcher, switcher, when };export default D$$1;

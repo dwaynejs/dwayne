@@ -5325,6 +5325,23 @@ function method(method) {
 function noop() {}
 
 /**
+ * @function prop
+ * @public
+ * @param {String} prop - Property to return.
+ * @returns {Function} Function that returns given property of its first argument.
+ * @description Function that return the function that returns given property of its first argument.
+ *
+ * @example
+ * ['foo', '12', '7890'].map(prop('length')); // [3, 2, 4]
+ */
+function prop$1(prop) {
+  return function (_ref) {
+    var value = _ref[prop];
+    return value;
+  };
+}
+
+/**
  * @function self
  * @public
  * @returns {*} First argument itself.
@@ -7566,6 +7583,7 @@ var statics = Object.freeze({
 	Func: Func,
 	method: method,
 	noop: noop,
+	prop: prop$1,
 	self: self$1,
 	Num: Num,
 	rand: rand,
