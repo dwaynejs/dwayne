@@ -13761,8 +13761,11 @@ var Router = function () {
      * @member {Object} Router.elements
      * @type {Object}
      * @public
-     * @description State view elements selectors. Before rendering these elements are
-     * found within the rendering state.
+     * @description State view elements selectors and event listeners.
+     * Before rendering these elements are found within the rendering state
+     * and assigned to the state. Events will be eventually lowercased.
+     * Event listeners are set to the specified events and elements
+     * and already bound to the state. Not required and defaults to {}.
      *
      * @example
      * class MyState extends Router {
@@ -13771,6 +13774,8 @@ var Router = function () {
      *     caption: '.caption',
      *     form: {
      *       $: '.form',
+     *
+     *       $onSubmit: 'onSubmit',
      *
      *       emailInput: 'input[type="email"]',
      *       passwordInput: 'input[type="password"]'
@@ -13781,10 +13786,28 @@ var Router = function () {
      *       nestedContainer: {
      *         $: '.nested-container',
      *
+     *         $onClick: 'onNestedContainerClick',
+     *
      *         content: '.content'
      *       }
      *     }
      *   };
+     *
+     *   logEvent(e) {
+     *     console.log(e);
+     *   }
+     *
+     *   onSubmit(e) {
+     *     this.logEvent(e);
+     *
+     *     console.log('submitting form');
+     *   }
+     *
+     *   onNestedContainerClick(e) {
+     *     this.logEvent(e);
+     *
+     *     console.log('clicked container');
+     *   }
      *
      *   onRender() {
      *     console.log(this.caption); // instance of Elem
@@ -13800,6 +13823,22 @@ var Router = function () {
      * class MyState extends Router {
      *   static stateName = 'myState';
      *
+     *   logEvent(e) {
+     *     console.log(e);
+     *   }
+     *
+     *   onSubmit(e) {
+     *     this.logEvent(e);
+     *
+     *     console.log('submitting form');
+     *   }
+     *
+     *   onNestedContainerClick(e) {
+     *     this.logEvent(e);
+     *
+     *     console.log('clicked container');
+     *   }
+     *
      *   onRender() {
      *     const { base } = this;
      *
@@ -13810,6 +13849,9 @@ var Router = function () {
      *     this.container       = base.find('.container');
      *     this.nestedContainer = base.find('.container .nested-container');
      *     this.content         = base.find('.container .nested-container .content');
+     *
+     *     this.form.on('submit', this.onSubmit.bind(this));
+     *     this.nestedContainer.on('click', this.onNestedContainerClick.bind(this));
      *
      *     // your usual onRender code goes here
      *   }
@@ -14139,8 +14181,21 @@ function beforeLoad() {
 
         newState.base = base;
 
-        new Super(newState).assign(elems.map(function (selector) {
-          return base.find(selector);
+        new Super(newState).assign(elems.map(function (_ref4) {
+          var selector = _ref4.selector;
+          var listeners = _ref4.listeners;
+
+          var elem = base.find(selector);
+
+          listeners.forEach(function (listenerName, event) {
+            var listener = new Func(newState[listenerName]).bindContext(newState);
+
+            if (isFunction(listener)) {
+              elem.on(event, listener);
+            }
+          });
+
+          return elem;
         }).$);
 
         if (state === proto) {
@@ -14170,10 +14225,10 @@ function beforeLoad() {
   function loadStatesByOne() {
     var promise = Promise$1.reject(stopError);
 
-    findStatesByURL().forEach(function (_ref4) {
-      var state = _ref4.state;
-      var params = _ref4.params;
-      var query = _ref4.query;
+    findStatesByURL().forEach(function (_ref5) {
+      var state = _ref5.state;
+      var params = _ref5.params;
+      var query = _ref5.query;
 
       promise = promise.catch(function (err) {
         if (err instanceof RouterError && err.type === 'redirect') {
@@ -14342,8 +14397,8 @@ function findStatesByURL() {
     });
   }, new Arr([]));
 
-  if (eventualStates.every(function (_ref5) {
-    var state = _ref5.state;
+  if (eventualStates.every(function (_ref6) {
+    var state = _ref6.state;
     return state !== defaultState;
   })) {
     eventualStates.push({
@@ -14412,9 +14467,9 @@ function dispatchEvent(event, assigned, renderingState) {
     }
   });
 
-  getListeners(state, type, renderingState).forEach(function (_ref6) {
-    var renderingState = _ref6.renderingState;
-    var listener = _ref6.listener;
+  getListeners(state, type, renderingState).forEach(function (_ref7) {
+    var renderingState = _ref7.renderingState;
+    var listener = _ref7.listener;
 
     promise = promise.then(function () {
       return new Promise$1(function (resolve, reject) {
@@ -14492,9 +14547,9 @@ function getListeners() {
     proto = proto.parent;
   }
 
-  return tree.object(function (listeners, _ref7) {
-    var ownListeners = _ref7.$$.listeners;
-    var proto = _ref7.prototype;
+  return tree.object(function (listeners, _ref8) {
+    var ownListeners = _ref8.$$.listeners;
+    var proto = _ref8.prototype;
 
     if (new Super(proto).hasOwn(listenerName)) {
       listeners.push({
@@ -14684,8 +14739,8 @@ function registerState(state) {
   var stateName = state.stateName;
 
 
-  if (!new Super(state).hasOwn('stateName') || states.find(function (_ref8) {
-    var n = _ref8.stateName;
+  if (!new Super(state).hasOwn('stateName') || states.find(function (_ref9) {
+    var n = _ref9.stateName;
     return n === stateName;
   })) {
     throw new Error('State must have unique stateName! (at registerState)');
@@ -14717,20 +14772,34 @@ function registerState(state) {
 
       tree.reverse().shift();
 
-      tree.forEach(function (object, index) {
-        var key = object.key;
-        var value = object.value;
+      var selectors = tree.map(function (_ref10) {
+        var value = _ref10.value;
+        return String(value.$ || value || '');
+      });
 
+      if (key === '$' || /\$on[\s\S]/.test(key)) {
+        var name = tree.$[tree.length - 2].key;
+        var elem = elems.$[name] = elems.$[name] || {
+          listeners: new Super({})
+        };
 
         if (key === '$') {
-          return;
+          selectors.pop();
+
+          elem.selector = selectors.join(' ');
+        } else {
+          elem.listeners.$[key.replace(/^\$on[\s\S]/, function (match) {
+            return match[3] || '';
+          }).toLowerCase()] = value;
         }
 
-        var nestedSelector = object.selector = String(value.$) || '';
-        var selector = isString(value) ? value : nestedSelector;
+        return;
+      }
 
-        elems.$[key] = tree.slice(0, index).map(prop$1('selector')).push(selector).join(' ');
-      });
+      elems.$[key] = {
+        selector: selectors.join(' '),
+        listeners: new Super({})
+      };
     });
   }
 
@@ -14740,6 +14809,7 @@ function registerState(state) {
     },
 
     stateName: stateName,
+    path: path,
     parent: proto,
     children: new Arr([]),
     template: $state.hasOwn('template') ? state.template : '',
