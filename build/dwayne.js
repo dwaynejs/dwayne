@@ -14591,12 +14591,12 @@ function initialize() {
   });
 
   win.on('click', function (e) {
-    var target = new Elem(e.target);
+    var closestLink = new Elem(e.target).closest('a');
 
-    if (target.name === 'a' && target.attr('target') !== '_blank') {
+    if (closestLink.length && closestLink.attr('target') !== '_blank') {
       e.preventDefault();
 
-      redirect(target.attr('href') || '', true);
+      redirect(closestLink.attr('href') || '', true);
     }
   });
 
