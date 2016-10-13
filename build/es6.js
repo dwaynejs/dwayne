@@ -776,10 +776,17 @@ function D$2(value) {
  */
 function iterate(object, callback) {
   var array = isArrayLike(object);
+  var iteratedKeys = {};
 
   var iterated = 0;
 
   for (var key in object) {
+    if ({}.hasOwnProperty.call(iteratedKeys, key)) {
+      continue;
+    }
+
+    iteratedKeys[key] = true;
+
     if ({}.hasOwnProperty.call(object, key)) {
       if (array && iterated++ >= object.length) {
         break;
