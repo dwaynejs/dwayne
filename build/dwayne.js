@@ -13553,7 +13553,7 @@ var Router = function () {
           });
 
           if (found) {
-            eventListeners.splice(found.key);
+            eventListeners.splice(found.key, 1);
           }
         });
       };
