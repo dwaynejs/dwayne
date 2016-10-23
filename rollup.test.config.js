@@ -50,11 +50,8 @@ module.exports = {
       include: './**/*.js'
     }),
     babel({
-      presets: ['es2015-rollup', 'stage-0'],
       include: './**/*.@(js|pug)',
-      exclude: 'node_modules/**',
-      plugins: ['transform-class-properties'],
-      babelrc: false
+      exclude: 'node_modules/**'
     }),
     inject({
       exclude: './lib/constants/global.js',
