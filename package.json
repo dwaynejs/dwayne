@@ -22,6 +22,7 @@
     "gulp-sourcemaps": "^1.6.0",
     "inherits": "^2.0.3",
     "jsdoc": "^3.4.0",
+    "jsdoc-babel": "^0.2.1",
     "lodash": "^4.14.1",
     "mocha": "^2.4.5",
     "pug-runtime": "^2.0.2",
