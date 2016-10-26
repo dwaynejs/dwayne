@@ -2,7 +2,7 @@ import { strictEqual } from 'assert';
 import global from '../lib/constants/global';
 import {
   isArray, isArrayLike, isBoolean, isDate, isDateLike, isElement, isFinite, isFunction,
-  isInteger, isIntegerLike, isNaN, isNull, isNullOrUndefined, isNumber, isNumberLike,
+  isInteger, isIntegerLike, isNil, isNaN, isNull, isNumber, isNumberLike,
   isObject, isPlainObject, isPrimitive, isRegExp, isString, isSymbol, isUndefined
 } from './../lib/D';
 
@@ -127,12 +127,12 @@ describe('it should test D.', () => {
       strictEqual(isNull(null), true);
     });
   });
-  describe('isNullOrUndefined()', () => {
+  describe('isNil()', () => {
     it('should return true with no arguments', () => {
-      strictEqual(isNullOrUndefined(), true);
+      strictEqual(isNil(), true);
     });
     it('should return true with null argument', () => {
-      strictEqual(isNullOrUndefined(null), true);
+      strictEqual(isNil(null), true);
     });
   });
   describe('isNumber()', () => {
