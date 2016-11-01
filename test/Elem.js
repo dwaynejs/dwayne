@@ -3,7 +3,7 @@ import global from '../lib/constants/global';
 import Elem, { find, px, parseHTML } from '../lib/Elem';
 import Super from '../lib/Super';
 import Num from '../lib/Num';
-import elements from '../lib/constants/elements';
+import { htmlElements } from '../lib/constants';
 
 const nativeDocument = global.document;
 const nativeBody = nativeDocument.body;
@@ -116,6 +116,7 @@ describe('it should test Elem#', () => {
       }
     });
   });
+  // TODO: addComment()
   describe('addHTML()', () => {
     it('should add html to the end', (done) => {
       const elem = [
@@ -743,7 +744,7 @@ describe('it should test Elem#', () => {
     });
   });
   describe('changeRule()', () => {
-    it('should add rule to the first style element in the set', () => {
+    it('should change rule of the first style element in the set', () => {
       const style = nativeDocument.createElement('style');
       const elem = nativeDocument.createElement('div');
       const styleWrap = new Elem(style);
@@ -1091,7 +1092,7 @@ describe('it should test Elem#', () => {
     it('should return wrap of a new element inside context', (done) => {
       let count = 0;
 
-      new Super(elements).forEach((type) => {
+      new Super(htmlElements).forEach((type) => {
         const elem = [
           nativeDocument.createElement('div'),
           nativeDocument.createElement('div'),
@@ -1112,7 +1113,7 @@ describe('it should test Elem#', () => {
         }
 
         function doneAll() {
-          if (++count === elem.length * elements.length) {
+          if (++count === elem.length * htmlElements.length) {
             done();
           }
         }
@@ -1121,7 +1122,7 @@ describe('it should test Elem#', () => {
     it('should use first argument as applied expression', (done) => {
       let count = 0;
 
-      new Super(elements).forEach((type) => {
+      new Super(htmlElements).forEach((type) => {
         const elem = [
           nativeDocument.createElement('div'),
           nativeDocument.createElement('div'),
@@ -1143,13 +1144,15 @@ describe('it should test Elem#', () => {
         }
 
         function doneAll() {
-          if (++count === elem.length * elements.length) {
+          if (++count === elem.length * htmlElements.length) {
             done();
           }
         }
       });
     });
   });
+  // TODO: createComment()
+  // TODO: createText()
   describe('css()', () => {
     it('should return wrap of an object of css properties with no arguments', () => {
       const elem1 = nativeDocument.createElement('div');
@@ -2109,6 +2112,8 @@ describe('it should test Elem#', () => {
         }
       }
     });
+
+    // TODO: test end parameter
   });
   describe('is()', () => {
     it('should return if context matches selector', () => {
@@ -3616,22 +3621,26 @@ describe('it should test exported methods from Elem', () => {
           <div attr="value"></div>
         </div>
         <span class="foo"></span>
+        <!-- comment -->
         <input type="button"/>
       `;
-      const parsed = parseHTML(html);
+      const parsed = parseHTML(html).filter((elem) => new Elem(elem).name !== '#text');
       const parsed0 = parsed.elem(0);
       const parsed1 = parsed.elem(1);
       const parsed2 = parsed.elem(2);
+      const parsed3 = parsed.elem(3);
 
-      strictEqual(parsed.length, 3);
+      strictEqual(parsed.length, 4);
       strictEqual(parsed0.name, 'div');
       strictEqual(parsed0.id(), 'foo');
-      strictEqual(parsed0.children().length, 1);
+      strictEqual(parsed0.children().filter('*').length, 1);
       strictEqual(parsed0.find('div').attr('attr'), 'value');
       strictEqual(parsed1.name, 'span');
       strictEqual(parsed1.class().join(' '), 'foo');
-      strictEqual(parsed2.name, 'input');
-      strictEqual(parsed2.attr('type'), 'button');
+      strictEqual(parsed2.name, '#comment');
+      strictEqual(parsed2.text(), ' comment ');
+      strictEqual(parsed3.name, 'input');
+      strictEqual(parsed3.attr('type'), 'button');
     });
   });
   describe('px()', () => {
