@@ -116,9 +116,70 @@ describe('it should test Elem#', () => {
       }
     });
   });
-  // TODO: addComment()
+  describe('addComment()', () => {
+    it('should add comment to the end with no second argument', (done) => {
+      const elem = [
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div')
+      ];
+      const wrap = new Elem(elem);
+      let count = 0;
+
+      try {
+        wrap
+          .forEach((elem) => {
+            elem.innerHTML = '123';
+          })
+          .addComment('comment')
+          .forEach((elem) => {
+            strictEqual(elem.innerHTML, '123<!--comment-->');
+
+            doneAll();
+          });
+      } catch (err) {
+        done(err);
+      }
+
+      function doneAll() {
+        if (++count === elem.length) {
+          done();
+        }
+      }
+    });
+    it('should add comment to the start with falsey second argument', (done) => {
+      const elem = [
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div')
+      ];
+      const wrap = new Elem(elem);
+      let count = 0;
+
+      try {
+        wrap
+          .forEach((elem) => {
+            elem.innerHTML = '123';
+          })
+          .addComment('comment', false)
+          .forEach((elem) => {
+            strictEqual(elem.innerHTML, '<!--comment-->123');
+
+            doneAll();
+          });
+      } catch (err) {
+        done(err);
+      }
+
+      function doneAll() {
+        if (++count === elem.length) {
+          done();
+        }
+      }
+    });
+  });
   describe('addHTML()', () => {
-    it('should add html to the end', (done) => {
+    it('should add html to the end with no second argument', (done) => {
       const elem = [
         nativeDocument.createElement('div'),
         nativeDocument.createElement('div'),
@@ -148,9 +209,39 @@ describe('it should test Elem#', () => {
         }
       }
     });
+    it('should add html to the start with falsey second argument', (done) => {
+      const elem = [
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div')
+      ];
+      const wrap = new Elem(elem);
+      let count = 0;
+
+      try {
+        wrap
+          .forEach((elem) => {
+            elem.innerHTML = '123';
+          })
+          .addHTML('<div></div>', false)
+          .forEach((elem) => {
+            strictEqual(elem.innerHTML, '<div></div>123');
+
+            doneAll();
+          });
+      } catch (err) {
+        done(err);
+      }
+
+      function doneAll() {
+        if (++count === elem.length) {
+          done();
+        }
+      }
+    });
   });
   describe('addText()', () => {
-    it('should add text to the end', (done) => {
+    it('should add text to the end with no argument', (done) => {
       const elem = [
         nativeDocument.createElement('div'),
         nativeDocument.createElement('div'),
@@ -167,6 +258,36 @@ describe('it should test Elem#', () => {
           .addText('<div></div>')
           .forEach((elem) => {
             strictEqual(elem.innerHTML, '123&lt;div&gt;&lt;/div&gt;');
+
+            doneAll();
+          });
+      } catch (err) {
+        done(err);
+      }
+
+      function doneAll() {
+        if (++count === elem.length) {
+          done();
+        }
+      }
+    });
+    it('should add text to the start with falsey second argument', (done) => {
+      const elem = [
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div')
+      ];
+      const wrap = new Elem(elem);
+      let count = 0;
+
+      try {
+        wrap
+          .forEach((elem) => {
+            elem.innerHTML = '123';
+          })
+          .addText('<div></div>', false)
+          .forEach((elem) => {
+            strictEqual(elem.innerHTML, '&lt;div&gt;&lt;/div&gt;123');
 
             doneAll();
           });
@@ -849,6 +970,45 @@ describe('it should test Elem#', () => {
 
       new Elem(child).remove();
     });
+    it('should support second parameter', () => {
+      const parent = nativeDocument.createElement('div');
+      const elem = [
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div')
+      ];
+      const wrap = new Elem(elem);
+      const parentWrap = new Elem(parent);
+
+      wrap.text((text, elem, index) => index);
+      parentWrap.child(wrap, false);
+
+      const children = parent.childNodes;
+
+      strictEqual(children[0].innerHTML, '0');
+      strictEqual(children[1].innerHTML, '1');
+      strictEqual(children[2].innerHTML, '2');
+    });
+    it('should support second parameter #2', () => {
+      const parent = nativeDocument.createElement('div');
+      const elem = [
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div')
+      ];
+      const wrap = new Elem(elem);
+      const parentWrap = new Elem(parent);
+
+      parent.appendChild(document.createElement('div'));
+      wrap.text((text, elem, index) => index);
+      parentWrap.child(wrap, false);
+
+      const children = parent.childNodes;
+
+      strictEqual(children[0].innerHTML, '0');
+      strictEqual(children[1].innerHTML, '1');
+      strictEqual(children[2].innerHTML, '2');
+    });
   });
   describe('children()', () => {
     it('should return wrap of the children of the first element', () => {
@@ -1087,6 +1247,36 @@ describe('it should test Elem#', () => {
         }
       }
     });
+    it('should treat "#text" and "comment" as special arguments', (done) => {
+      const elem = [
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div')
+      ];
+      const wrap = new Elem(elem);
+      let count = 0;
+
+      try {
+        wrap
+          .createComment('comment')
+          .parent()
+          .createText('123')
+          .parent()
+          .forEach((elem) => {
+            strictEqual(elem.innerHTML, '<!--comment-->123');
+
+            doneAll();
+          });
+      } catch (err) {
+        done(err);
+      }
+
+      function doneAll() {
+        if (++count === elem.length) {
+          done();
+        }
+      }
+    });
   });
   describe('[html-element]()', () => {
     it('should return wrap of a new element inside context', (done) => {
@@ -1151,8 +1341,72 @@ describe('it should test Elem#', () => {
       });
     });
   });
-  // TODO: createComment()
-  // TODO: createText()
+  describe('createComment()', () => {
+    it('should create comment node inside elements', (done) => {
+      const elem = [
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div')
+      ];
+      const wrap = new Elem(elem);
+      let count = 0;
+
+      try {
+        wrap
+          .forEach((elem) => {
+            elem.innerHTML = '123';
+          })
+          .createComment('comment')
+          .parent()
+          .forEach((elem) => {
+            strictEqual(elem.innerHTML, '123<!--comment-->');
+
+            doneAll();
+          });
+      } catch (err) {
+        done(err);
+      }
+
+      function doneAll() {
+        if (++count === elem.length) {
+          done();
+        }
+      }
+    });
+  });
+  describe('createText()', () => {
+    it('should create comment node inside elements', (done) => {
+      const elem = [
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div')
+      ];
+      const wrap = new Elem(elem);
+      let count = 0;
+
+      try {
+        wrap
+          .forEach((elem) => {
+            elem.innerHTML = '123';
+          })
+          .createText('<div>123</div>')
+          .parent()
+          .forEach((elem) => {
+            strictEqual(elem.innerHTML, '123&lt;div&gt;123&lt;/div&gt;');
+
+            doneAll();
+          });
+      } catch (err) {
+        done(err);
+      }
+
+      function doneAll() {
+        if (++count === elem.length) {
+          done();
+        }
+      }
+    });
+  });
   describe('css()', () => {
     it('should return wrap of an object of css properties with no arguments', () => {
       const elem1 = nativeDocument.createElement('div');
@@ -2112,8 +2366,46 @@ describe('it should test Elem#', () => {
         }
       }
     });
+    it('should support second parameter', () => {
+      const parent = nativeDocument.createElement('div');
+      const elem = [
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div')
+      ];
+      const wrap = new Elem(elem);
 
-    // TODO: test end parameter
+      wrap
+        .text((text, elem, index) => index)
+        .into(parent, false);
+
+      const children = parent.childNodes;
+
+      strictEqual(children[0].innerHTML, '0');
+      strictEqual(children[1].innerHTML, '1');
+      strictEqual(children[2].innerHTML, '2');
+    });
+    it('should support second parameter #2', () => {
+      const parent = nativeDocument.createElement('div');
+      const elem = [
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div'),
+        nativeDocument.createElement('div')
+      ];
+      const wrap = new Elem(elem);
+
+      parent.appendChild(document.createElement('div'));
+
+      wrap
+        .text((text, elem, index) => index)
+        .into(parent, false);
+
+      const children = parent.childNodes;
+
+      strictEqual(children[0].innerHTML, '0');
+      strictEqual(children[1].innerHTML, '1');
+      strictEqual(children[2].innerHTML, '2');
+    });
   });
   describe('is()', () => {
     it('should return if context matches selector', () => {
@@ -3624,7 +3916,9 @@ describe('it should test exported methods from Elem', () => {
         <!-- comment -->
         <input type="button"/>
       `;
-      const parsed = parseHTML(html).filter((elem) => new Elem(elem).name !== '#text');
+      const parsed = parseHTML(html)
+        .children()
+        .filter((elem) => new Elem(elem).name !== '#text');
       const parsed0 = parsed.elem(0);
       const parsed1 = parsed.elem(1);
       const parsed2 = parsed.elem(2);

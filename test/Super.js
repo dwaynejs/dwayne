@@ -472,6 +472,7 @@ describe('it should test Super#', () => {
       });
     });
   });
+  // TODO: deepForEachEntry()
   describe('deepFreeze()', () => {
     it('should freeze context', () => {
       const o = {};
