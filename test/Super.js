@@ -472,7 +472,42 @@ describe('it should test Super#', () => {
       });
     });
   });
-  // TODO: deepForEachEntry()
+  describe('deepForEachEntry()', () => {
+    it('should use default Infinity parameter if the depth parameter isn\'t present', () => {
+      const o = {
+        a: 1,
+        b: { c: 2, d: 3 },
+        c: { e: { f: 4, g: 5, h: 6 } }
+      };
+      const wrap = new Super(o);
+      let string = '';
+
+      wrap.deepForEachEntry((value, key) => {
+        if (key && key.length) {
+          string += key;
+        }
+      });
+
+      strictEqual(string, 'abcdcefgh');
+    });
+    it('should support 4th "tree" argument', () => {
+      const o = {
+        a: 1,
+        b: { c: 2, d: 3 },
+        c: { e: { f: 4, g: 5, h: 6 } }
+      };
+      const wrap = new Super(o);
+      let string = '';
+
+      wrap.deepForEachEntry((value, key, object, tree) => {
+        for (let i = tree.length - 2; i >= 0; i--) {
+          string += tree[i].key;
+        }
+      });
+
+      strictEqual(string, 'abbcbdccecefcegceh');
+    });
+  });
   describe('deepFreeze()', () => {
     it('should freeze context', () => {
       const o = {};
