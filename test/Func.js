@@ -1,7 +1,7 @@
 import { deepStrictEqual, strictEqual } from 'assert';
-import Func, { noop, self, method, prop } from '../lib/Func';
-import Arr from '../lib/Arr';
-import Num, { rand, random } from '../lib/Num';
+import { Func, noop, self, method, prop } from '../lib/Func';
+import { Arr } from '../lib/Arr';
+import { Num, rand, random } from '../lib/Num';
 
 function concat() {
   return this + new Arr(arguments).string();

@@ -1,4 +1,9 @@
-require('babel-register')();
+require('babel-register')({
+  presets: ['es2015'],
+  plugins: [
+    'transform-class-properties'
+  ]
+});
 
 require('./D');
 require('./Alphabet');

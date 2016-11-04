@@ -1,5 +1,5 @@
 import { strictEqual } from 'assert';
-import Promise from '../lib/Promise';
+import { Promise } from '../lib/Promise';
 
 describe('it should test Promise#', () => {
   describe('constructor()', () => {

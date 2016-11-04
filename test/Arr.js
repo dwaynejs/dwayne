@@ -1,5 +1,5 @@
 import { deepStrictEqual, notDeepEqual, notEqual, strictEqual } from 'assert';
-import Arr, { array } from '../lib/Arr';
+import { Arr, array } from '../lib/Arr';
 import { isNaN } from '../lib/helpers';
 
 describe('it should test Arr#', () => {

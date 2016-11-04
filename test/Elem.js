@@ -1,8 +1,8 @@
 import { deepStrictEqual, strictEqual } from 'assert';
 import global from '../lib/constants/global';
-import Elem, { find, px, parseHTML } from '../lib/Elem';
-import Super from '../lib/Super';
-import Num from '../lib/Num';
+import { Elem, find, px, parseHTML } from '../lib/Elem';
+import { Super } from '../lib/Super';
+import { Num } from '../lib/Num';
 import { htmlElements } from '../lib/constants';
 
 const nativeDocument = global.document;
@@ -683,8 +683,8 @@ describe('it should test Elem#', () => {
       try {
         wrap
           .forEach((elem) => {
-            elem.setAttribute('attr', '123');
-            elem.setAttribute('contentEditable', '');
+            elem.setAttributeNS(null, 'attr', '123');
+            elem.setAttributeNS(null, 'contentEditable', '');
           })
           .forEach((elem) => {
             strictEqual(new Elem(elem).attr('attr'), '123');

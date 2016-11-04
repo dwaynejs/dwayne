@@ -1,7 +1,7 @@
 import { deepStrictEqual, notEqual, strictEqual } from 'assert';
 import global from '../lib/constants/global';
-import Fetch from '../lib/Fetch';
-import D from '../lib/D';
+import { Fetch } from '../lib/Fetch';
+import { D } from '../lib/D';
 import { parseJSON } from '../lib/Str';
 import { isDate } from '../lib/helpers';
 

@@ -1,5 +1,5 @@
 import { deepEqual, deepStrictEqual, strictEqual } from 'assert';
-import Str, { parseJSON } from '../lib/Str';
+import { Str, parseJSON } from '../lib/Str';
 import { isDate, isString } from '../lib/helpers';
 
 describe('it should test Str#', () => {

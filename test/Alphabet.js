@@ -1,5 +1,5 @@
 import { deepStrictEqual, strictEqual } from 'assert';
-import Alphabet, { alphabet } from '../lib/Alphabet';
+import { Alphabet, alphabet } from '../lib/Alphabet';
 
 describe('it should test Alphabet#', () => {
   describe('add()', () => {

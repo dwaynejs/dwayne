@@ -5,7 +5,6 @@ const { D } = statics;
 
 assign(D, statics);
 
-delete D.default;
 delete D.D;
 
 global.D = D;

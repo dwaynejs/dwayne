@@ -1,5 +1,5 @@
 import { strictEqual } from 'assert';
-import Dat, { now } from '../lib/Dat';
+import { Dat, now } from '../lib/Dat';
 import { random } from '../lib/Num';
 
 describe('it should test Dat#', () => {

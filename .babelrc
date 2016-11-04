@@ -9,7 +9,6 @@
     "stage-0"
   ],
   "plugins": [
-    "transform-class-properties",
-    "external-helpers"
+    "transform-class-properties"
   ]
 }

@@ -1,6 +1,6 @@
 import { deepEqual, strictEqual } from 'assert';
 import { blob } from '../lib/BlobObject';
-import Super from '../lib/Super';
+import { Super } from '../lib/Super';
 
 describe('it should test BlobObject#', () => {
   describe('readAs', () => {

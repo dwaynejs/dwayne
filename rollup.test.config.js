@@ -51,7 +51,8 @@ module.exports = {
     }),
     babel({
       include: './**/*.@(js|pug)',
-      exclude: 'node_modules/**'
+      exclude: 'node_modules/**',
+      plugins: ['external-helpers']
     }),
     inject({
       exclude: './lib/constants/global.js',

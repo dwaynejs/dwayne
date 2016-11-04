@@ -8,7 +8,6 @@ import './Fetch';
 import './Func';
 import './Num';
 import './Promise';
-import './Router';
 import './Str';
 import './Super';
 import './Switcher';
