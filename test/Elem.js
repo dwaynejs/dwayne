@@ -772,8 +772,8 @@ describe('it should test Elem#', () => {
         wrap
           .attr({ attr: '123', contentEditable: '' })
           .forEach((elem) => {
-            strictEqual(elem.getAttribute('attr'), '123');
-            strictEqual(elem.getAttribute('contentEditable'), '');
+            strictEqual(elem.getAttributeNS(null, 'attr'), '123');
+            strictEqual(elem.getAttributeNS(null, 'contentEditable'), '');
 
             doneAll();
           });
