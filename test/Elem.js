@@ -3909,32 +3909,140 @@ describe('it should test exported methods from Elem', () => {
   describe('parseHTML()', () => {
     it('should parse HTML', () => {
       const html = `
-        <div id="foo">
-          <div attr="value"></div>
+        <title  >
+          <span>&dagger;</span><!-- not comment -->
+        </title  >
+        <template>
+          <div>123</div>
+        </template>
+        <style type="text/css">
+          div:after {
+            content: "&dagger;";
+          }
+      
+          span:after {
+            content: "<html>123</html>"
+          }
+      
+          title:after {
+            content: "<!-- not comment -->";
+          }
+        </style>
+        123
+        &dagger;
+        &#8224;
+        &#x2020;
+        <div a="'123'" b="&apos;123&apos;" c="&quot;123&quot;"></div>
+        <script type="text/javascript">
+          var t = '<div>&dagger;</div>';
+      
+          alert(123);
+        </script>
+        <div  a b = 3 c ='123'  d ="456"e="789">
+          <!-- i'm a comment -->
+          1345<
+          <input type = "text">
+          <div>
+            <span>123</span>
+            <self-closing attr="123"/>
+            <i>567</i>
+          </div>
         </div>
-        <span class="foo"></span>
-        <!-- comment -->
-        <input type="button"/>
+        456
       `;
-      const parsed = parseHTML(html)
-        .children()
-        .filter((elem) => new Elem(elem).name !== '#text');
-      const parsed0 = parsed.elem(0);
-      const parsed1 = parsed.elem(1);
-      const parsed2 = parsed.elem(2);
-      const parsed3 = parsed.elem(3);
+      const parsed = parseHTML(html).children();
 
-      strictEqual(parsed.length, 4);
-      strictEqual(parsed0.name, 'div');
-      strictEqual(parsed0.id(), 'foo');
-      strictEqual(parsed0.children().filter('*').length, 1);
-      strictEqual(parsed0.find('div').attr('attr'), 'value');
-      strictEqual(parsed1.name, 'span');
-      strictEqual(parsed1.class().join(' '), 'foo');
-      strictEqual(parsed2.name, '#comment');
-      strictEqual(parsed2.text(), ' comment ');
-      strictEqual(parsed3.name, 'input');
-      strictEqual(parsed3.attr('type'), 'button');
+      /* eslint newline-per-chained-call: 0 */
+      strictEqual(parsed.length, 13);
+      strictEqual(parsed.elem(0).name, '#text');
+      strictEqual(parsed.elem(0).text(), '\n        ');
+      strictEqual(parsed.elem(1).name, 'title');
+      strictEqual(parsed.elem(1).text(), '\n          <span>\u2020</span><!-- not comment -->\n        ');
+      strictEqual(parsed.elem(2).name, '#text');
+      strictEqual(parsed.elem(2).text(), '\n        ');
+      strictEqual(parsed.elem(3).name, 'template');
+      strictEqual(new Elem(parsed.elem(3).prop('content')).children().length, 3);
+      strictEqual(new Elem(parsed.elem(3).prop('content')).child(0).name, '#text');
+      strictEqual(new Elem(parsed.elem(3).prop('content')).child(0).text(), '\n          ');
+      strictEqual(new Elem(parsed.elem(3).prop('content')).child(1).name, 'div');
+      strictEqual(new Elem(parsed.elem(3).prop('content')).child(1).text(), '123');
+      strictEqual(new Elem(parsed.elem(3).prop('content')).child(2).name, '#text');
+      strictEqual(new Elem(parsed.elem(3).prop('content')).child(2).text(), '\n        ');
+      strictEqual(parsed.elem(4).name, '#text');
+      strictEqual(parsed.elem(4).text(), '\n        ');
+      strictEqual(parsed.elem(5).name, 'style');
+      deepStrictEqual(parsed.elem(5).attr().$, { type: 'text/css' });
+      strictEqual(parsed.elem(5).text(), `
+          div:after {
+            content: "&dagger;";
+          }
+      
+          span:after {
+            content: "<html>123</html>"
+          }
+      
+          title:after {
+            content: "<!-- not comment -->";
+          }
+        `);
+      strictEqual(parsed.elem(6).name, '#text');
+      strictEqual(parsed.elem(6).text(), ['', '123', '\u2020', '\u2020', '\u2020', ''].join('\n        '));
+      strictEqual(parsed.elem(7).name, 'div');
+      deepStrictEqual(parsed.elem(7).attr().$, {
+        a: '\'123\'',
+        b: '\'123\'',
+        c: '"123"'
+      });
+      strictEqual(parsed.elem(8).name, '#text');
+      strictEqual(parsed.elem(8).text(), '\n        ');
+      strictEqual(parsed.elem(9).name, 'script');
+      deepStrictEqual(parsed.elem(9).attr().$, { type: 'text/javascript' });
+      strictEqual(parsed.elem(9).text(), `
+          var t = '<div>&dagger;</div>';
+      
+          alert(123);
+        `);
+      strictEqual(parsed.elem(10).name, '#text');
+      strictEqual(parsed.elem(10).text(), '\n        ');
+      strictEqual(parsed.elem(11).name, 'div');
+      deepStrictEqual(parsed.elem(11).attr().$, {
+        a: '',
+        b: '3',
+        c: '123',
+        d: '456',
+        e: '789'
+      });
+      strictEqual(parsed.elem(11).children().length, 7);
+      strictEqual(parsed.elem(11).child(0).name, '#text');
+      strictEqual(parsed.elem(11).child(0).text(), '\n          ');
+      strictEqual(parsed.elem(11).child(1).name, '#comment');
+      strictEqual(parsed.elem(11).child(1).text(), ' i\'m a comment ');
+      strictEqual(parsed.elem(11).child(2).name, '#text');
+      strictEqual(parsed.elem(11).child(2).text(), '\n          1345<\n          ');
+      strictEqual(parsed.elem(11).child(3).name, 'input');
+      deepStrictEqual(parsed.elem(11).child(3).attr().$, { type: 'text' });
+      strictEqual(parsed.elem(11).child(4).name, '#text');
+      strictEqual(parsed.elem(11).child(4).text(), '\n          ');
+      strictEqual(parsed.elem(11).child(5).name, 'div');
+      strictEqual(parsed.elem(11).child(5).children().length, 7);
+      strictEqual(parsed.elem(11).child(5).child(0).name, '#text');
+      strictEqual(parsed.elem(11).child(5).child(0).text(), '\n            ');
+      strictEqual(parsed.elem(11).child(5).child(1).name, 'span');
+      strictEqual(parsed.elem(11).child(5).child(1).text(), '123');
+      strictEqual(parsed.elem(11).child(5).child(2).name, '#text');
+      strictEqual(parsed.elem(11).child(5).child(2).text(), '\n            ');
+      strictEqual(parsed.elem(11).child(5).child(3).name, 'self-closing');
+      deepStrictEqual(parsed.elem(11).child(5).child(3).attr().$, { attr: '123' });
+      strictEqual(parsed.elem(11).child(5).child(4).name, '#text');
+      strictEqual(parsed.elem(11).child(5).child(4).text(), '\n            ');
+      strictEqual(parsed.elem(11).child(5).child(5).name, 'i');
+      strictEqual(parsed.elem(11).child(5).child(5).text(), '567');
+      strictEqual(parsed.elem(11).child(5).child(6).name, '#text');
+      strictEqual(parsed.elem(11).child(5).child(6).text(), '\n          ');
+      strictEqual(parsed.elem(11).child(6).name, '#text');
+      strictEqual(parsed.elem(11).child(6).text(), '\n        ');
+      strictEqual(parsed.elem(12).name, '#text');
+      strictEqual(parsed.elem(12).text(), '\n        456\n      ');
     });
   });
   describe('px()', () => {
