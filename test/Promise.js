@@ -91,6 +91,7 @@ describe('it should test Promise#', () => {
         });
     });
   });
+  // TODO: finally()
   describe('then()', () => {
     it('should return new promise with resolved value', (done) => {
       const unique = new Error();
