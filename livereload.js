@@ -1,7 +1,10 @@
 import io from 'socket.io-client';
 import { find, body, doc, Elem } from './dwayne';
 
-body.css('margin', '0px');
+body.css({
+  margin: '0px',
+  paddingLeft: '100px'
+});
 
 const livereload = find('#livereload');
 const ready = doc.img('$src(/test/images/checkmark.png)');
@@ -23,7 +26,7 @@ new Elem([ready, loading])
         width: '50px',
         height: '50px',
         borderBottomRightRadius: '50px',
-        backgroundColor: 'green'
+        backgroundColor: 'rgba(0,127,0,0.4)'
       })
       .child(ready);
   });
@@ -39,7 +42,7 @@ socket.on('toreload', () => {
 
   livereload
     .css({
-      backgroundColor: 'orange'
+      backgroundColor: 'rgba(255,127,0,0.4)'
     });
 
   ready.replace(loading);
