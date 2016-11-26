@@ -4,6 +4,7 @@ const npm = require('rollup-plugin-node-resolve');
 const cjs = require('rollup-plugin-commonjs');
 const eslint = require('rollup-plugin-eslint');
 const babel = require('rollup-plugin-babel');
+const pug = require('rollup-plugin-pug');
 const inject = require('rollup-plugin-inject');
 
 module.exports = {
@@ -20,6 +21,10 @@ module.exports = {
     npm({
       browser: true,
       preferBuiltins: false
+    }),
+    pug({
+      include: './**/*.pug',
+      inlineFunctions: true
     }),
     cjs({
       include: 'node_modules/**',
