@@ -1,6 +1,35 @@
 'use strict';
 
 /**
+ * @module constants/appliedRegExps
+ * @private
+ * @description Exports different types of syntax for {@link Elem#apply}.
+ */
+
+/**
+ * @callback matchAppliedExprCallback
+ * @param {Elem} elem - D-elem of an element to apply expression to.
+ * @param {String} string - Matched applied name.
+ * @param {String} arg - Argument within the parentheses.
+ */
+
+/**
+ * @type {Object.<String, matchAppliedExprCallback|Object.<String, matchAppliedExprCallback>>}
+ * @description Object of different types of syntax.
+ */
+
+/**
+ * @module constants/elements
+ * @private
+ * @description Exports different canvas methods for {@link Elem} for creating html-elements.
+ */
+
+/**
+ * @const
+ * @type {String[]}
+ */
+
+/**
  * @module constants/constructors
  * @private
  * @description Exports constructors levels.
@@ -11,6 +40,30 @@
  * @type {Array[]}
  */
 var constructors = [[], [], []];
+
+/**
+ * @module constants/elements
+ * @private
+ * @description Exports methods for {@link Elem} for creating html-elements.
+ */
+
+/**
+ * @const
+ * @type {String[]}
+ */
+
+/**
+ * @module constants/regexpSpecialCharacters
+ * @private
+ * @description Exports special characters for RegExp.
+ */
+
+/**
+ * @const
+ * @name module:constants/regexpSpecialCharacters~regexpSpecialCharacters
+ * @type {String[]}
+ */
+var regexpSpecialCharacters = ['.', '+', '*', '?', '(', ')', '[', ']', '{', '}', '<', '>', '^', '$', '!', '=', ':', '-', '|', ',', '\\'];
 
 /**
  * @module helpers/toStringTag
@@ -38,118 +91,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 
 
-var asyncGenerator = function () {
-  function AwaitValue(value) {
-    this.value = value;
-  }
 
-  function AsyncGenerator(gen) {
-    var front, back;
-
-    function send(key, arg) {
-      return new Promise(function (resolve, reject) {
-        var request = {
-          key: key,
-          arg: arg,
-          resolve: resolve,
-          reject: reject,
-          next: null
-        };
-
-        if (back) {
-          back = back.next = request;
-        } else {
-          front = back = request;
-          resume(key, arg);
-        }
-      });
-    }
-
-    function resume(key, arg) {
-      try {
-        var result = gen[key](arg);
-        var value = result.value;
-
-        if (value instanceof AwaitValue) {
-          Promise.resolve(value.value).then(function (arg) {
-            resume("next", arg);
-          }, function (arg) {
-            resume("throw", arg);
-          });
-        } else {
-          settle(result.done ? "return" : "normal", result.value);
-        }
-      } catch (err) {
-        settle("throw", err);
-      }
-    }
-
-    function settle(type, value) {
-      switch (type) {
-        case "return":
-          front.resolve({
-            value: value,
-            done: true
-          });
-          break;
-
-        case "throw":
-          front.reject(value);
-          break;
-
-        default:
-          front.resolve({
-            value: value,
-            done: false
-          });
-          break;
-      }
-
-      front = front.next;
-
-      if (front) {
-        resume(front.key, front.arg);
-      } else {
-        back = null;
-      }
-    }
-
-    this._invoke = send;
-
-    if (typeof gen.return !== "function") {
-      this.return = undefined;
-    }
-  }
-
-  if (typeof Symbol === "function" && Symbol.asyncIterator) {
-    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
-      return this;
-    };
-  }
-
-  AsyncGenerator.prototype.next = function (arg) {
-    return this._invoke("next", arg);
-  };
-
-  AsyncGenerator.prototype.throw = function (arg) {
-    return this._invoke("throw", arg);
-  };
-
-  AsyncGenerator.prototype.return = function (arg) {
-    return this._invoke("return", arg);
-  };
-
-  return {
-    wrap: function (fn) {
-      return function () {
-        return new AsyncGenerator(fn.apply(this, arguments));
-      };
-    },
-    await: function (value) {
-      return new AwaitValue(value);
-    }
-  };
-}();
 
 
 
@@ -499,17 +441,17 @@ function isNull(value) {
 }
 
 /**
- * @function isNullOrUndefined
+ * @function isNil
  * @public
  * @param {*} value - Value to check if it is null or undefined.
  * @returns {Boolean} If the argument is null or undefined or not.
  *
  * @example
- * isNullOrUndefined(null);      // true
- * isNullOrUndefined(undefined); // true
- * isNullOrUndefined(false);     // false
+ * isNil(null);      // true
+ * isNil(undefined); // true
+ * isNil(false);     // false
  */
-function isNullOrUndefined(value) {
+function isNil(value) {
   return value === null || typeof value === 'undefined';
 }
 
@@ -679,6 +621,213 @@ function isUndefined(value) {
 }
 
 /**
+ * @module constants/validateCheckExpressions
+ * @private
+ * @description Exports different types of validate expressions for {@link module:helpers/validate}.
+ */
+
+/**
+ * @callback checkValidityCallback
+ * @private
+ * @param {*} value - Value to check.
+ */
+
+/**
+ * @typedef {Object} validateExpr
+ * @private
+ * @property {String} text - Text of the thrown error.
+ * @property {Error} error - Type of the thrown error.
+ * @property {checkValidityCallback} check - Callback for checking value.
+ */
+
+/**
+ * @type {validateExpr[]}
+ * @private
+ * @description Object of different types of validation.
+ */
+var validateCheckExpressions = {
+  '>0': {
+    check: function check(n) {
+      return n > 0;
+    },
+    text: '$n argument must be positive!',
+    error: RangeError
+  },
+  '>=0': {
+    check: function check(n) {
+      return n >= 0;
+    },
+    text: '$n argument must be non-negative!',
+    error: RangeError
+  },
+  '<0': {
+    check: function check(n) {
+      return n < 0;
+    },
+    text: '$n argument must be negative!',
+    error: RangeError
+  },
+  '<=0': {
+    check: function check(n) {
+      return n <= 0;
+    },
+    text: '$n argument must be non-positive!',
+    error: RangeError
+  },
+  '!!': {
+    check: function check(v) {
+      return !isNil(v);
+    },
+    text: '$n argument must be not null or undefined!',
+    error: TypeError
+  },
+  array: {
+    check: isArray,
+    text: '$n argument must be an array!',
+    error: TypeError
+  },
+  'array||!': {
+    check: function check(a) {
+      return isArray(a) || isNil(a);
+    },
+    text: '$n argument must be an array, or undefined, or null!',
+    error: TypeError
+  },
+  arrayLike: {
+    check: isArrayLike,
+    text: '$n argument must be array-like!',
+    error: TypeError
+  },
+  'arrayLike||!': {
+    check: function check(a) {
+      return isArrayLike(a) || isNil(a);
+    },
+    text: '$n argument must be array-like, or undefined, or null!',
+    error: TypeError
+  },
+  date: {
+    check: isDate,
+    text: '$n argument must be a date!',
+    error: TypeError
+  },
+  'date||!': {
+    check: function check(d) {
+      return isDate(d) || isNil(d);
+    },
+    text: '$n argument must be a date, or undefined, or null!',
+    error: TypeError
+  },
+  dateLike: {
+    check: isDateLike,
+    text: '$n argument must be date-like!',
+    error: TypeError
+  },
+  'dateLike||!': {
+    check: function check(d) {
+      return isDateLike(d) || isNil(d);
+    },
+    text: '$n argument must be date-like, or undefined, or null!',
+    error: TypeError
+  },
+  function: {
+    check: isFunction,
+    text: '$n argument must be a function!',
+    error: TypeError
+  },
+  'function||!': {
+    check: function check(f) {
+      return isFunction(f) || isNil(f);
+    },
+    text: '$n argument must be a function, or undefined, or null!',
+    error: TypeError
+  },
+  int: {
+    check: isInteger,
+    text: '$n argument must be an integer!',
+    error: TypeError
+  },
+  'int||!': {
+    check: function check(i) {
+      return isInteger(i) || isNil(i);
+    },
+    text: '$n argument must be an integer, or undefined, or null!',
+    error: TypeError
+  },
+  intLike: {
+    check: isIntegerLike,
+    text: '$n argument must be integer-like!',
+    error: TypeError
+  },
+  'intLike||!': {
+    check: function check(i) {
+      return isIntegerLike(i) || isNil(i);
+    },
+    text: '$n argument must be integer-like, or undefined, or null!',
+    error: TypeError
+  },
+  number: {
+    check: isNumber,
+    text: '$n argument must be a number!',
+    error: TypeError
+  },
+  'number||!': {
+    check: function check(n) {
+      return isNumber(n) || isNil(n);
+    },
+    text: '$n argument must be a number, or undefined, or null!',
+    error: TypeError
+  },
+  numberLike: {
+    check: isNumberLike,
+    text: '$n argument must be number-like!',
+    error: TypeError
+  },
+  'numberLike||!': {
+    check: function check(n) {
+      return isNumberLike(n) || isNil(n);
+    },
+    text: '$n argument must be number-like, or undefined, or null!',
+    error: TypeError
+  },
+  object: {
+    check: isObject,
+    text: '$n argument must be an object!',
+    error: TypeError
+  },
+  'object||!': {
+    check: function check(o) {
+      return isObject(o) || isNil(o);
+    },
+    text: '$n argument must be an object, or undefined, or null!',
+    error: TypeError
+  },
+  regexp: {
+    check: isRegExp,
+    text: '$n argument must be a regular expression!',
+    error: TypeError
+  },
+  'regexp||!': {
+    check: function check(r) {
+      return isRegExp(r) || isNil(r);
+    },
+    text: '$n argument must be a regular expression, or undefined, or null!',
+    error: TypeError
+  },
+  string: {
+    check: isString,
+    text: '$n argument must be a string!',
+    error: TypeError
+  },
+  'string||!': {
+    check: function check(s) {
+      return isString(s) || isNil(s);
+    },
+    text: '$n argument must be a string, or undefined, or null!',
+    error: TypeError
+  }
+};
+
+/**
  * @module D
  * @private
  * @description Exports D function.
@@ -779,6 +928,10 @@ function iterate(object, callback) {
  * @returns {Object} Target.
  */
 function assign$1(target) {
+  for (var _len = arguments.length, objects = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    objects[_key - 1] = arguments[_key];
+  }
+
   iterate(arguments, function (source, index) {
     if (index) {
       iterate(source, function (value, key) {
@@ -799,6 +952,7 @@ function assign$1(target) {
 /**
  * @callback propertyGeneratorCallback
  * @param {String} name - Name of the property.
+ * @param {Number} i - Index of the array.
  * @returns {*} Generated property.
  */
 
@@ -912,211 +1066,6 @@ function toArray$1(value, createNewArray) {
 }
 
 /**
- * @module constants/validateCheckExpressions
- * @private
- * @description Exports different types of validate expressions for {@link module:helpers/validate}.
- */
-
-/**
- * @callback checkValidityCallback
- * @private
- * @param {*} value - Value to check.
- */
-
-/**
- * @typedef {Object} validateExpr
- * @private
- * @property {String} text - Text of the thrown error.
- * @property {Error} error - Type of the thrown error.
- * @property {checkValidityCallback} check - Callback for checking value.
- */
-
-/**
- * @type {validateExpr[]}
- * @private
- * @description Object of different types of validation.
- */
-var checkExpressions = {
-  '>0': {
-    check: function check(n) {
-      return n > 0;
-    },
-    text: '$n argument must be positive!',
-    error: RangeError
-  },
-  '>=0': {
-    check: function check(n) {
-      return n >= 0;
-    },
-    text: '$n argument must be non-negative!',
-    error: RangeError
-  },
-  '<0': {
-    check: function check(n) {
-      return n < 0;
-    },
-    text: '$n argument must be negative!',
-    error: RangeError
-  },
-  '<=0': {
-    check: function check(n) {
-      return n <= 0;
-    },
-    text: '$n argument must be non-positive!',
-    error: RangeError
-  },
-  '!!': {
-    check: isNullOrUndefined,
-    text: '$n argument must be not null or undefined!',
-    error: TypeError
-  },
-  array: {
-    check: isArray,
-    text: '$n argument must be an array!',
-    error: TypeError
-  },
-  'array||!': {
-    check: function check(a) {
-      return isArray(a) || isNullOrUndefined(a);
-    },
-    text: '$n argument must be an array, or undefined, or null!',
-    error: TypeError
-  },
-  arrayLike: {
-    check: isArrayLike,
-    text: '$n argument must be array-like!',
-    error: TypeError
-  },
-  'arrayLike||!': {
-    check: function check(a) {
-      return isArrayLike(a) || isNullOrUndefined(a);
-    },
-    text: '$n argument must be array-like, or undefined, or null!',
-    error: TypeError
-  },
-  date: {
-    check: isDate,
-    text: '$n argument must be a date!',
-    error: TypeError
-  },
-  'date||!': {
-    check: function check(d) {
-      return isDate(d) || isNullOrUndefined(d);
-    },
-    text: '$n argument must be a date, or undefined, or null!',
-    error: TypeError
-  },
-  dateLike: {
-    check: isDateLike,
-    text: '$n argument must be date-like!',
-    error: TypeError
-  },
-  'dateLike||!': {
-    check: function check(d) {
-      return isDateLike(d) || isNullOrUndefined(d);
-    },
-    text: '$n argument must be date-like, or undefined, or null!',
-    error: TypeError
-  },
-  function: {
-    check: isFunction,
-    text: '$n argument must be a function!',
-    error: TypeError
-  },
-  'function||!': {
-    check: function check(f) {
-      return isFunction(f) || isNullOrUndefined(f);
-    },
-    text: '$n argument must be a function, or undefined, or null!',
-    error: TypeError
-  },
-  int: {
-    check: isInteger,
-    text: '$n argument must be an integer!',
-    error: TypeError
-  },
-  'int||!': {
-    check: function check(i) {
-      return isInteger(i) || isNullOrUndefined(i);
-    },
-    text: '$n argument must be an integer, or undefined, or null!',
-    error: TypeError
-  },
-  intLike: {
-    check: isIntegerLike,
-    text: '$n argument must be integer-like!',
-    error: TypeError
-  },
-  'intLike||!': {
-    check: function check(i) {
-      return isIntegerLike(i) || isNullOrUndefined(i);
-    },
-    text: '$n argument must be integer-like, or undefined, or null!',
-    error: TypeError
-  },
-  number: {
-    check: isNumber,
-    text: '$n argument must be a number!',
-    error: TypeError
-  },
-  'number||!': {
-    check: function check(n) {
-      return isNumber(n) || isNullOrUndefined(n);
-    },
-    text: '$n argument must be a number, or undefined, or null!',
-    error: TypeError
-  },
-  numberLike: {
-    check: isNumberLike,
-    text: '$n argument must be number-like!',
-    error: TypeError
-  },
-  'numberLike||!': {
-    check: function check(n) {
-      return isNumberLike(n) || isNullOrUndefined(n);
-    },
-    text: '$n argument must be number-like, or undefined, or null!',
-    error: TypeError
-  },
-  object: {
-    check: isObject,
-    text: '$n argument must be an object!',
-    error: TypeError
-  },
-  'object||!': {
-    check: function check(o) {
-      return isObject(o) || isNullOrUndefined(o);
-    },
-    text: '$n argument must be an object, or undefined, or null!',
-    error: TypeError
-  },
-  regexp: {
-    check: isRegExp,
-    text: '$n argument must be a regular expression!',
-    error: TypeError
-  },
-  'regexp||!': {
-    check: function check(r) {
-      return isRegExp(r) || isNullOrUndefined(r);
-    },
-    text: '$n argument must be a regular expression, or undefined, or null!',
-    error: TypeError
-  },
-  string: {
-    check: isString,
-    text: '$n argument must be a string!',
-    error: TypeError
-  },
-  'string||!': {
-    check: function check(s) {
-      return isString(s) || isNullOrUndefined(s);
-    },
-    text: '$n argument must be a string, or undefined, or null!',
-    error: TypeError
-  }
-};
-
-/**
  * @module helpers/validate
  * @private
  * @description Exports validate method.
@@ -1140,7 +1089,7 @@ function validate(args, options, name) {
     }
 
     iterate(array, function (checker) {
-      checker = checkExpressions[checker];
+      checker = validateCheckExpressions[checker];
 
       if (!checker.check(args[number])) {
         throw new checker.error(checker.text.replace('$n', numbers[number]) + (name ? ' (at ' + name + ')' : ''));
@@ -1173,6 +1122,7 @@ function validate(args, options, name) {
  * @example
  * new Alphabet(['a', 'b', 'c']);
  */
+
 var Alphabet = function () {
   function Alphabet() {
     var alphabet = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
@@ -1373,7 +1323,7 @@ function check$1(char) {
 function alphabet(string) {
   validate([string], ['string']);
 
-  var ranges = string.split(/([\s\S]\-+[\s\S])?/g);
+  var ranges = string.split(/([\s\S]-+[\s\S])?/g);
   var length = ranges.length;
   var alphabet = [];
 
@@ -1384,11 +1334,11 @@ function alphabet(string) {
       continue;
     }
 
-    if (/\-/.test(range) && !/[\s\S]\-+[\s\S]/.test(range)) {
+    if (/-/.test(range) && !/[\s\S]-+[\s\S]/.test(range)) {
       throw new Error('Wrong part of the string (' + range + ')! (in alphabet)');
     }
 
-    if (/\-/.test(range)) {
+    if (/-/.test(range)) {
       var start = range.charCodeAt(0);
       var end = range.charCodeAt(2);
 
@@ -1502,15 +1452,15 @@ var Switcher = function (_Function) {
 
     function switcher(value) {
       var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-      var _switcher$$$ = switcher.$$;
-      var mode = _switcher$$$.mode;
-      var def = _switcher$$$.default;
-      var cases = _switcher$$$.cases;
+      var _switcher$$$ = switcher.$$,
+          mode = _switcher$$$.mode,
+          def = _switcher$$$.default,
+          cases = _switcher$$$.cases;
 
 
       var ret = iterate(cases, function (_ref) {
-        var val = _ref.value;
-        var Case = _ref.case;
+        var val = _ref.value,
+            Case = _ref.case;
 
         if (mode === 'boolean' && Case ||
         /* eslint eqeqeq: 0 */
@@ -1824,7 +1774,7 @@ var cloneSwitcher = switcher('call', function (object) {
 }).case(function (object) {
   return new Super(object) === object;
 }, function (object) {
-  return new (object.proto().$.constructor)(object);
+  return new (Object.getPrototypeOf(object).constructor)(new Super(object.$).deepClone().$);
 }).case(isElement, function (object, deep) {
   return object.clone(deep);
 }).case(isDate, function (object) {
@@ -2190,7 +2140,7 @@ var Super = function () {
 
       var filtered = _deepFilter(this.$, callback, n, [{ key: null, value: this.$ }]);
 
-      return D$2(isNullOrUndefined(filtered) ? filtered : filtered || {});
+      return D$2(isNil(filtered) ? filtered : filtered || {});
     }
 
     /**
@@ -2253,6 +2203,34 @@ var Super = function () {
       n = Number(n);
 
       _deepForEach(this.$, callback, n, [{ key: null, value: this.$ }]);
+
+      return this;
+    }
+
+    /**
+     * @method Super#deepForEach
+     * @public
+     * @param {DeepIterationCallback} callback - Called on each iteration.
+     * @param {Number} [n = Infinity] - Iteration depth.
+     * @returns {DWrap} Returns this.
+     * @description Method for iterating over any object. Deep analogue of {@link Super#forEach}.
+     * Unlike {@link Super#deepForEach} the callback is called on every value of every object inside
+     *
+     * @example
+     * new Super({ a: 1, b: { c: 2, d: 3 } }).deepForEach((value, key, object) => object[key] = value * value).$;
+     * // { a: 1, b: { c: 4, d: 9 } }
+     */
+
+  }, {
+    key: 'deepForEachEntry',
+    value: function deepForEachEntry(callback) {
+      var n = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Infinity;
+
+      validate([callback, n], ['function', ['numberLike', '>0']], 'Super#deepForEach');
+
+      n = Number(n);
+
+      _deepForEachEntry(this.$, callback, n, [{ key: null, value: this.$ }]);
 
       return this;
     }
@@ -2536,7 +2514,7 @@ var Super = function () {
       var array = isArrayLike(object);
 
       /* eslint no-nested-ternary: 0 */
-      var o = array ? [] : isNullOrUndefined(object) ? object : {};
+      var o = array ? [] : isNil(object) ? object : {};
 
       iterate(object, function (value, key) {
         if (callback(value, key, object)) {
@@ -3085,7 +3063,7 @@ var Super = function () {
     key: 'proto',
     value: function proto(_proto) {
       var object = this.$;
-      var isContextObject = !isNullOrUndefined(object);
+      var isContextObject = !isNil(object);
 
       if (arguments.length) {
         if (isContextObject && (isObject(_proto) || isNull(_proto))) {
@@ -3573,7 +3551,7 @@ function _deepEvery(object, callback, n, tree) {
  */
 function _deepFilter(object, callback, n, tree) {
   var array = isArrayLike(object);
-  var nul = isNullOrUndefined(object);
+  var nul = isNil(object);
   var o = array ? [] : nul ? object : {};
   var end = n === 1;
 
@@ -3647,17 +3625,6 @@ function _deepFind(object, callback, n, tree) {
 }
 
 /**
- * @function deepFreeze
- * @private
- * @param {*} object - Object to freeze.
- * @returns {void}
- */
-function _deepFreeze(object) {
-  Object.freeze(object);
-  iterate(object, _deepFreeze);
-}
-
-/**
  * @function deepForEach
  * @private
  * @param {*} object - Object to iterate over.
@@ -3681,6 +3648,40 @@ function _deepForEach(object, callback, n, tree) {
 }
 
 /**
+ * @function deepForEachEntry
+ * @private
+ * @param {*} object - Object to iterate over.
+ * @param {DeepIterationCallback} callback - Callback that is called on every element.
+ * @param {Number} n - Depth of iteration.
+ * @param {Tree} tree - Tree of { key, value } objects of iteration.
+ * @returns {void}
+ */
+function _deepForEachEntry(object, callback, n, tree) {
+  var end = n === 1;
+
+  iterate(object, function (value, key, object) {
+    var newTree = [{ key: key, value: value }].concat(tree);
+
+    callback(value, key, object, newTree);
+
+    if (!end && !isPrimitive(value)) {
+      _deepForEachEntry(value, callback, n - 1, newTree);
+    }
+  });
+}
+
+/**
+ * @function deepFreeze
+ * @private
+ * @param {*} object - Object to freeze.
+ * @returns {void}
+ */
+function _deepFreeze(object) {
+  Object.freeze(object);
+  iterate(object, _deepFreeze);
+}
+
+/**
  * @function deepMap
  * @private
  * @param {*} object - Object to iterate over.
@@ -3691,7 +3692,7 @@ function _deepForEach(object, callback, n, tree) {
  * @returns {*} New object.
  */
 function _deepMap(object, callback, n, tree) {
-  var o = isArrayLike(object) ? [] : isNullOrUndefined(object) ? object : {};
+  var o = isArrayLike(object) ? [] : isNil(object) ? object : {};
   var end = n === 1;
 
   iterate(object, function (value, key, object) {
@@ -3806,6 +3807,7 @@ constructors[0].push({
  * @example
  * new Arr([1, 2]);
  */
+
 var Arr = function (_Super) {
   inherits(Arr, _Super);
 
@@ -4298,8 +4300,43 @@ function iterate$1(number, callback) {
  * @description Exports Promise class.
  */
 
+/**
+ * @callback onFulfilledOrRejected
+ * @public
+ * @param {*} value - Promise value.
+ * @param {Boolean} success - If the previous promise is fulfilled it's true and false if rejected.
+ */
+
+/**
+ * @callback onRejected
+ * @public
+ * @param {Error|*} err - Promise error.
+ */
+
+/**
+ * @callback onFulfilled
+ * @public
+ * @param {*} value - Promise value.
+ */
+
 var secret = {};
 var iterator = _Symbol.iterator;
+
+/**
+ * @class Promise
+ * @public
+ * @param {Function} executor - Function that takes two arguments: resolve and reject functions.
+ * Call the resolve function when you need to fulfill the promise and call the reject one
+ * when you need to reject it.
+ * @returns {Promise} Instance of Promise.
+ * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Promise
+ * @description Class with almost identical API to
+ * [ES6 Promise]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Promise}.
+ * There is a couple differences: set Promise.onError to a function with which you want to
+ * subscribe to a promise error and set Promise.onUnhandledRejection to a function with which
+ * you want to subscribe to an unhandled error
+ * (defaults to console.error.bind(console, '%s %o', 'Uncaught (in promise)')).
+ */
 
 var Promise$1 = function () {
   function Promise(executor) {
@@ -4376,7 +4413,7 @@ var Promise$1 = function () {
             try {
               resolve(f(value));
             } catch (err) {
-              return reject(err);
+              reject(err);
             }
           } : null;
 
@@ -4407,20 +4444,30 @@ var Promise$1 = function () {
 
     function reject(err) {
       if (hiddenPromise.status === 'pending') {
-        hiddenPromise.status = 'rejected';
-        hiddenPromise.value = err;
+        (function () {
+          hiddenPromise.status = 'rejected';
+          hiddenPromise.value = err;
 
-        for (var i = 0, length = onReject.length; i < length; i++) {
-          hiddenPromise.handled = true;
+          for (var i = 0, length = onReject.length; i < length; i++) {
+            hiddenPromise.handled = true;
 
-          onReject[i](err);
-        }
-
-        setTimeout(function () {
-          if (!hiddenPromise.handled) {
-            console.error('%s %o', 'Uncaught (in promise)', err);
+            onReject[i](err);
           }
-        }, 1);
+
+          var onUnhandledRejection = Promise.onUnhandledRejection,
+              onError = Promise.onError;
+
+
+          if (isFunction(onError)) {
+            onError(err);
+          }
+
+          setTimeout(function () {
+            if (!hiddenPromise.handled && isFunction(onUnhandledRejection)) {
+              onUnhandledRejection(err);
+            }
+          }, 1);
+        })();
       }
     }
 
@@ -4446,14 +4493,77 @@ var Promise$1 = function () {
     }
   }
 
+  /**
+   * @method Promise.all
+   * @param {(Array|Iterable).<Promise|*>} iterable - Iterable object (like array) of promises
+   * or any values.
+   * @returns {Promise} New instance of Promise.
+   * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
+   */
+
+
   createClass(Promise, [{
     key: 'abort',
     value: function abort() {}
+
+    /**
+     * @method Promise#catch
+     * @param {onRejected} onRejected - onRejected callback.
+     * @returns {Promise} New instance of Promise.
+     * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/catch
+     */
+
   }, {
     key: 'catch',
     value: function _catch(onRejected) {
       return this.then(null, onRejected);
     }
+
+    /**
+     * @method Promise#finally
+     * @public
+     * @param {onFulfilledOrRejected} onFulfilledOrRejected - onFulfilledOrRejected callback.
+     * @returns {Promise}
+     * @description Method for catching both fulfilled and rejected promises.
+     *
+     * @example
+     * spinner.show();
+     * fetchData()
+     *   .then((data) => {
+     *     // do something with data
+     *   })
+     *   .catch((err) => {
+     *     // handle error somehow
+     *   })
+     *   .finally(() => {
+     *     spinner.hide();
+     *   });
+     */
+
+  }, {
+    key: 'finally',
+    value: function _finally(onFulfilledOrRejected) {
+      var isFunc = isFunction(onFulfilledOrRejected);
+
+      return this.then(function (value) {
+        return Promise.resolve(isFunc ? onFulfilledOrRejected(value, true) : 0).then(function () {
+          return value;
+        });
+      }, function (err) {
+        return Promise.resolve(isFunc ? onFulfilledOrRejected(err, false) : 0).then(function () {
+          return Promise.reject(err);
+        });
+      });
+    }
+
+    /**
+     * @method Promise#then
+     * @param {onFulfilled} [onFulfilled] - onFulfilled callback.
+     * @param {onRejected} [onRejected] - onRejected callback.
+     * @returns {Promise} New instance of Promise.
+     * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then
+     */
+
   }, {
     key: 'then',
     value: function then(onFulfilled, onRejected) {
@@ -4562,6 +4672,15 @@ var Promise$1 = function () {
         }
       });
     }
+
+    /**
+     * @method Promise.race
+     * @param {(Array|Iterable).<Promise|*>} iterable - Iterable object (like array) of promises
+     * or any values.
+     * @returns {Promise} New instance of Promise.
+     * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/race
+     */
+
   }, {
     key: 'race',
     value: function race(iterable) {
@@ -4583,6 +4702,14 @@ var Promise$1 = function () {
         }
       });
     }
+
+    /**
+     * @method Promise.reject
+     * @param {*} value - Value to reject.
+     * @returns {Promise} New instance of Promise.
+     * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/reject
+     */
+
   }, {
     key: 'reject',
     value: function reject(value) {
@@ -4590,6 +4717,14 @@ var Promise$1 = function () {
         reject(value);
       });
     }
+
+    /**
+     * @method Promise.resolve
+     * @param {Promise|Thenable|*} value - Promise, thenable or any value to resolve.
+     * @returns {Promise} New instance of Promise.
+     * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/resolve
+     */
+
   }, {
     key: 'resolve',
     value: function resolve(value) {
@@ -4604,6 +4739,10 @@ var Promise$1 = function () {
   }]);
   return Promise;
 }();
+
+Promise$1.onError = null;
+Promise$1.onUnhandledRejection = console.error.bind(console, '%s %o', 'Uncaught (in promise)');
+
 
 defineProperties(Promise$1.prototype, defineProperty({}, _Symbol.toStringTag, 'Promise'));
 
@@ -4641,6 +4780,7 @@ defineProperties(Promise$1.prototype, defineProperty({}, _Symbol.toStringTag, 'P
  *
  * func(1, 4, -2, 5); // 5
  */
+
 var Func = function (_Super) {
   inherits(Func, _Super);
 
@@ -4658,14 +4798,14 @@ var Func = function (_Super) {
 
       if (++proxy.$$.called < proxy.$$.canBeCalled) {
         var _ret2 = function () {
-          var _proxy$$$ = proxy.$$;
-          var before = _proxy$$$.before;
-          var after = _proxy$$$.after;
-          var sync = _proxy$$$.sync;
-          var contextLocked = _proxy$$$.contextLocked;
-          var _proxy$$$2 = proxy.$$;
-          var context = _proxy$$$2.context;
-          var args = _proxy$$$2.args;
+          var _proxy$$$ = proxy.$$,
+              before = _proxy$$$.before,
+              after = _proxy$$$.after,
+              sync = _proxy$$$.sync,
+              contextLocked = _proxy$$$.contextLocked;
+          var _proxy$$$2 = proxy.$$,
+              context = _proxy$$$2.context,
+              args = _proxy$$$2.args;
 
           var ret = void 0;
 
@@ -5385,13 +5525,14 @@ var ln10 = Math.LN10;
  * @example
  * const num = new Num(1);
  */
+
 var Num = function (_Super) {
   inherits(Num, _Super);
 
   function Num() {
     var number = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
     classCallCheck(this, Num);
-    return possibleConstructorReturn(this, (Num.__proto__ || Object.getPrototypeOf(Num)).call(this, number));
+    return possibleConstructorReturn(this, (Num.__proto__ || Object.getPrototypeOf(Num)).call(this, +number));
 
     /**
      * @member Num#$
@@ -5546,14 +5687,14 @@ var Num = function (_Super) {
 
       var number = this.$;
 
-      var timeout = void 0;
       var aborted = void 0;
-
-      setTimeout(function interval() {
-        func.apply(null, args);
-
+      var timeout = setTimeout(function interval() {
         if (!aborted) {
-          timeout = setTimeout(interval, number);
+          func.apply(null, args);
+
+          if (!aborted) {
+            timeout = setTimeout(interval, number);
+          }
         }
       }, 0);
 
@@ -6126,19 +6267,6 @@ function random(start, end) {
 }
 
 /**
- * @module constants/regexpSpecialCharacters
- * @private
- * @description Exports special characters for RegExp.
- */
-
-/**
- * @const
- * @name module:constants/regexpSpecialCharacters~regexpSpecialCharacters
- * @type {String[]}
- */
-var regexpSpecialCharacters = ['.', '+', '*', '?', '(', ')', '[', ']', '{', '}', '<', '>', '^', '$', '!', '=', ':', '-', '|', ',', '\\'];
-
-/**
  * @module Str
  * @private
  * @mixin
@@ -6165,13 +6293,14 @@ var regexpSpecialsRegexp = new RegExp(new Super(regexpSpecialCharacters).word(fu
  * @example
  * const s = new Num('1');
  */
+
 var Str = function (_Super) {
   inherits(Str, _Super);
 
   function Str() {
     var string = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
     classCallCheck(this, Str);
-    return possibleConstructorReturn(this, (Str.__proto__ || Object.getPrototypeOf(Str)).call(this, string));
+    return possibleConstructorReturn(this, (Str.__proto__ || Object.getPrototypeOf(Str)).call(this, '' + string));
 
     /**
      * @member Str#$
@@ -6561,7 +6690,7 @@ var Str = function (_Super) {
   }, {
     key: 'toCamelCase',
     value: function toCamelCase() {
-      return new Str(trim(this.$).replace(/[\s\-_\.]+/g, '-').replace(/\-[^\-]/g, function (match) {
+      return new Str(trim(this.$).replace(/[\s\-_.]+/g, '-').replace(/-[^-]/g, function (match) {
         return match[1].toUpperCase();
       }).replace(/^[\S]/, function (match) {
         return match.toLowerCase();
@@ -6582,7 +6711,7 @@ var Str = function (_Super) {
   }, {
     key: 'toCapitalCase',
     value: function toCapitalCase() {
-      return new Str(trim(this.$).replace(/[\s\-_\.]+/g, ' ').replace(/[\S]/g, function (match) {
+      return new Str(trim(this.$).replace(/[\s\-_.]+/g, ' ').replace(/[\S]/g, function (match) {
         return match.toLowerCase() === match ? match : ' ' + match;
       }).replace(/\s[\S]/g, function (match) {
         return match.toUpperCase();
@@ -6605,7 +6734,7 @@ var Str = function (_Super) {
   }, {
     key: 'toDotCase',
     value: function toDotCase() {
-      return new Str(trim(this.$).replace(/[\s\-_\.]+/g, '.').replace(/[^\.]/g, function (match) {
+      return new Str(trim(this.$).replace(/[\s\-_.]+/g, '.').replace(/[^.]/g, function (match) {
         return match.toLowerCase() === match ? match : '.' + match;
       }).replace(/\.+/g, '.').replace(/^\./, '').toLowerCase());
     }
@@ -6624,9 +6753,9 @@ var Str = function (_Super) {
   }, {
     key: 'toHyphenCase',
     value: function toHyphenCase() {
-      return new Str(trim(this.$).replace(/[\s\-_\.]+/g, '-').replace(/[^\-]/g, function (match) {
+      return new Str(trim(this.$).replace(/[\s\-_.]+/g, '-').replace(/[^-]/g, function (match) {
         return match.toLowerCase() === match ? match : '-' + match;
-      }).replace(/\-+/g, '-').replace(/^\-/, '').toLowerCase());
+      }).replace(/-+/g, '-').replace(/^-/, '').toLowerCase());
     }
 
     /**
@@ -6661,7 +6790,7 @@ var Str = function (_Super) {
   }, {
     key: 'toSnakeCase',
     value: function toSnakeCase() {
-      return new Str(trim(this.$).replace(/[\s\-_\.]+/g, '_').replace(/[^_]/g, function (match) {
+      return new Str(trim(this.$).replace(/[\s\-_.]+/g, '_').replace(/[^_]/g, function (match) {
         return match.toLowerCase() === match ? match : '_' + match;
       }).replace(/_+/g, '_').replace(/^_/, '').toLowerCase());
     }
@@ -6680,7 +6809,7 @@ var Str = function (_Super) {
   }, {
     key: 'toSpaceCase',
     value: function toSpaceCase() {
-      return new Str(trim(this.$).replace(/[\s\-_\.]+/g, ' ').replace(/[\S]/g, function (match) {
+      return new Str(trim(this.$).replace(/[\s\-_.]+/g, ' ').replace(/[\S]/g, function (match) {
         return match.toLowerCase() === match ? match : ' ' + match;
       }).replace(/\s+/g, ' ').replace(/^\s/, '').toLowerCase());
     }
@@ -6763,8 +6892,13 @@ var Str = function (_Super) {
 
 defineProperties(Str.prototype, defineProperty({}, _Symbol.toStringTag, 'Str'));
 
+constructors[2].push({
+  check: isString,
+  cls: Str
+});
+
 function trim(string) {
-  return string.replace(/^[\s\-_\.]+|[\s\-_\.]+$/g, '');
+  return string.replace(/^[\s\-_.]+|[\s\-_.]+$/g, '');
 }
 
 /**
@@ -6798,9 +6932,9 @@ function parseJSON() {
     options = {};
   }
 
-  var _options = options;
-  var numbers = _options.numbers;
-  var dates = _options.dates;
+  var _options = options,
+      numbers = _options.numbers,
+      dates = _options.dates;
 
   var parsed = JSON.parse(json, function (key, value) {
     if (dates && /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.\d\d\dZ?$/.test(value)) {
@@ -6814,11 +6948,6 @@ function parseJSON() {
 
   return D$2(parsed);
 }
-
-constructors[2].push({
-  check: isString,
-  cls: Str
-});
 
 /**
  * @module constants/formats
@@ -7569,7 +7698,7 @@ var statics = Object.freeze({
 	isIntegerLike: isIntegerLike,
 	isNaN: isNaN,
 	isNull: isNull,
-	isNullOrUndefined: isNullOrUndefined,
+	isNil: isNil,
 	isNumber: isNumber,
 	isNumberLike: isNumberLike,
 	isObject: isObject,
@@ -7609,7 +7738,6 @@ var D$$1 = D$2;
 
 assign$1(D$$1, statics);
 
-delete D$$1.default;
 delete D$$1.D;
 
 module.exports = D$$1;

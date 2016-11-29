@@ -1,4 +1,418 @@
 /**
+ * @module constants/appliedRegExps
+ * @private
+ * @description Exports different types of syntax for {@link Elem#apply}.
+ */
+
+/**
+ * @callback matchAppliedExprCallback
+ * @param {Elem} elem - D-elem of an element to apply expression to.
+ * @param {String} string - Matched applied name.
+ * @param {String} arg - Argument within the parentheses.
+ */
+
+/**
+ * @type {Object.<String, matchAppliedExprCallback|Object.<String, matchAppliedExprCallback>>}
+ * @description Object of different types of syntax.
+ */
+
+var appliedRegExps = {
+  '#': function _(elem, id) {
+    elem.id(id);
+  },
+  '.': function _(elem, cls) {
+    elem.addClass(cls);
+  },
+  $: function $(elem, attr, value) {
+    elem.attr(attr, value);
+  },
+  '@': function _(elem, prop, value) {
+    elem.css(prop, value);
+  },
+  '&': function _(elem, name, html) {
+    elem.html(html);
+  },
+  '*': function _(elem, name, text) {
+    elem.text(text);
+  },
+
+  '-': {
+    '.': function _(elem, cls) {
+      elem.removeClass(cls);
+    },
+    $: function $(elem, attr) {
+      elem.removeAttr(attr);
+    },
+    '@': function _(elem, prop) {
+      elem.removeCSS(prop);
+    }
+  }
+};
+
+/**
+ * @module constants/elements
+ * @private
+ * @description Exports different canvas methods for {@link Elem} for creating html-elements.
+ */
+
+/**
+ * @const
+ * @type {String[]}
+ */
+var canvasGetMethods = [
+/**
+ * @member {Function} Elem#createImageData
+ * @type {Function}
+ * @param {...*} args
+ * @returns {ImageData|void}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/createImageData
+ */
+'createImageData',
+
+/**
+ * @member {Function} Elem#createLinearGradient
+ * @type {Function}
+ * @param {...*} args
+ * @returns {CanvasGradient|void}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/createLinearGradient
+ */
+'createLinearGradient',
+
+/**
+ * @member {Function} Elem#createPattern
+ * @type {Function}
+ * @param {...*} args
+ * @returns {CanvasPattern|void}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/createPattern
+ */
+'createPattern',
+
+/**
+ * @member {Function} Elem#createRadialGradient
+ * @type {Function}
+ * @param {...*} args
+ * @returns {CanvasGradient|void}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/createRadialGradient
+ */
+'createRadialGradient',
+
+/**
+ * @member {Function} Elem#getImageData
+ * @type {Function}
+ * @param {...*} args
+ * @returns {ImageData|void}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/getImageData
+ */
+'getImageData',
+
+/**
+ * @member {Function} Elem#getLineDash
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Number[]|void}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/getLineDash
+ */
+'getLineDash',
+
+/**
+ * @member {Function} Elem#isPointInPath
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Boolean|void}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/isPointInPath
+ */
+'isPointInPath',
+
+/**
+ * @member {Function} Elem#isPointInStroke
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Boolean|void}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/isPointInStroke
+ */
+'isPointInStroke',
+
+/**
+ * @member {Function} Elem#measureText
+ * @type {Function}
+ * @param {...*} args
+ * @returns {TextMetrics|void}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/measureText
+ */
+'measureText'];
+
+var canvasRestMethods = [
+/**
+ * @member {Function} Elem#arc
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/arc
+ */
+'arc',
+
+/**
+ * @member {Function} Elem#arcTo
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/arcTo
+ */
+'arcTo',
+
+/**
+ * @member {Function} Elem#beginPath
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/beginPath
+ */
+'beginPath',
+
+/**
+ * @member {Function} Elem#bezierCurveTo
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/bezierCurveTo
+ */
+'bezierCurveTo',
+
+/**
+ * @member {Function} Elem#clearRect
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/clearRect
+ */
+'clearRect',
+
+/**
+ * @member {Function} Elem#clip
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/clip
+ */
+'clip',
+
+/**
+ * @member {Function} Elem#closePath
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/closePath
+ */
+'closePath',
+
+/**
+ * @member {Function} Elem#drawFocusIfNeeded
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/drawFocusIfNeeded
+ */
+'drawFocusIfNeeded',
+
+/**
+ * @member {Function} Elem#drawImage
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/drawImage
+ */
+'drawImage',
+
+/**
+ * @member {Function} Elem#ellipse
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/ellipse
+ */
+'ellipse',
+
+/**
+ * @member {Function} Elem#fill
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/fill
+ */
+'fill',
+
+/**
+ * @member {Function} Elem#fillRect
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/fillRect
+ */
+'fillRect',
+
+/**
+ * @member {Function} Elem#fillText
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/fillText
+ */
+'fillText',
+
+/**
+ * @member {Function} Elem#lineTo
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineTo
+ */
+'lineTo',
+
+/**
+ * @member {Function} Elem#moveTo
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/moveTo
+ */
+'moveTo',
+
+/**
+ * @member {Function} Elem#putImageData
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/putImageData
+ */
+'putImageData',
+
+/**
+ * @member {Function} Elem#quadraticCurveTo
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/quadraticCurveTo
+ */
+'quadraticCurveTo',
+
+/**
+ * @member {Function} Elem#rect
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/rect
+ */
+'rect',
+
+/**
+ * @member {Function} Elem#resetTransform
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/resetTransform
+ */
+'resetTransform',
+
+/**
+ * @member {Function} Elem#restore
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/restore
+ */
+'restore',
+
+/**
+ * @member {Function} Elem#rotate
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/rotate
+ */
+'rotate',
+
+/**
+ * @member {Function} Elem#save
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/save
+ */
+'save',
+
+/**
+ * @member {Function} Elem#scale
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/scale
+ */
+'scale',
+
+/**
+ * @member {Function} Elem#setLineDash
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/setLineDash
+ */
+'setLineDash',
+
+/**
+ * @member {Function} Elem#setTransform
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/setTransform
+ */
+'setTransform',
+
+/**
+ * @member {Function} Elem#stroke
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/stroke
+ */
+'stroke',
+
+/**
+ * @member {Function} Elem#strokeRect
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/strokeRect
+ */
+'strokeRect',
+
+/**
+ * @member {Function} Elem#strokeText
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/strokeText
+ */
+'strokeText',
+
+/**
+ * @member {Function} Elem#transform
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/transform
+ */
+'transform',
+
+/**
+ * @member {Function} Elem#translate
+ * @type {Function}
+ * @param {...*} args
+ * @returns {Elem}
+ * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/translate
+ */
+'translate'];
+
+/**
  * @module constants/constructors
  * @private
  * @description Exports constructors levels.
@@ -9,6 +423,1596 @@
  * @type {Array[]}
  */
 var constructors = [[], [], []];
+
+/**
+ * @module constants/elements
+ * @private
+ * @description Exports methods for {@link Elem} for creating html-elements.
+ */
+
+/**
+ * @const
+ * @type {String[]}
+ */
+var htmlElements = [
+/**
+ * @member {Function} Elem#a
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'a',
+
+/**
+ * @member {Function} Elem#abbr
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'abbr',
+
+/**
+ * @member {Function} Elem#address
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'address',
+
+/**
+ * @member {Function} Elem#area
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'area',
+
+/**
+ * @member {Function} Elem#article
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'article',
+
+/**
+ * @member {Function} Elem#audio
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'audio',
+
+/**
+ * @member {Function} Elem#b
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'b',
+
+/**
+ * @member {Function} Elem#base
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'base',
+
+/**
+ * @member {Function} Elem#bdi
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'bdi',
+
+/**
+ * @member {Function} Elem#bdo
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'bdo',
+
+/**
+ * @member {Function} Elem#blockquote
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'blockquote',
+
+/**
+ * @member {Function} Elem#body
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'body',
+
+/**
+ * @member {Function} Elem#br
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'br',
+
+/**
+ * @member {Function} Elem#button
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'button',
+
+/**
+ * @member {Function} Elem#canvas
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'canvas',
+
+/**
+ * @member {Function} Elem#caption
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'caption',
+
+/**
+ * @member {Function} Elem#cite
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'cite',
+
+/**
+ * @member {Function} Elem#code
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'code',
+
+/**
+ * @member {Function} Elem#col
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'col',
+
+/**
+ * @member {Function} Elem#colgroup
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'colgroup',
+
+/**
+ * @member {Function} Elem#content
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'content',
+
+/**
+ * @member {Function} Elem#datalist
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'datalist',
+
+/**
+ * @member {Function} Elem#dd
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'dd',
+
+/**
+ * @member {Function} Elem#del
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'del',
+
+/**
+ * @member {Function} Elem#details
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'details',
+
+/**
+ * @member {Function} Elem#dfn
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'dfn',
+
+/**
+ * @member {Function} Elem#dialog
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'dialog',
+
+/**
+ * @member {Function} Elem#div
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'div',
+
+/**
+ * @member {Function} Elem#dl
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'dl',
+
+/**
+ * @member {Function} Elem#dt
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'dt',
+
+/**
+ * @member {Function} Elem#element
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'element',
+
+/**
+ * @member {Function} Elem#em
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'em',
+
+/**
+ * @member {Function} Elem#embed
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'embed',
+
+/**
+ * @member {Function} Elem#fieldset
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'fieldset',
+
+/**
+ * @member {Function} Elem#figcaption
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'figcaption',
+
+/**
+ * @member {Function} Elem#figure
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'figure',
+
+/**
+ * @member {Function} Elem#footer
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'footer',
+
+/**
+ * @member {Function} Elem#form
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'form',
+
+/**
+ * @member {Function} Elem#h1
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'h1',
+
+/**
+ * @member {Function} Elem#h2
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'h2',
+
+/**
+ * @member {Function} Elem#h3
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'h3',
+
+/**
+ * @member {Function} Elem#h4
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'h4',
+
+/**
+ * @member {Function} Elem#h5
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'h5',
+
+/**
+ * @member {Function} Elem#h6
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'h6',
+
+/**
+ * @member {Function} Elem#head
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'head',
+
+/**
+ * @member {Function} Elem#header
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'header',
+
+/**
+ * @member {Function} Elem#hgroup
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'hgroup',
+
+/**
+ * @member {Function} Elem#hr
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'hr',
+
+/**
+ * @member {Function} Elem#i
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'i',
+
+/**
+ * @member {Function} Elem#iframe
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'iframe',
+
+/**
+ * @member {Function} Elem#img
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'img',
+
+/**
+ * @member {Function} Elem#input
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'input',
+
+/**
+ * @member {Function} Elem#ins
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'ins',
+
+/**
+ * @member {Function} Elem#kbd
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'kbd',
+
+/**
+ * @member {Function} Elem#label
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'label',
+
+/**
+ * @member {Function} Elem#legend
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'legend',
+
+/**
+ * @member {Function} Elem#li
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'li',
+
+/**
+ * @member {Function} Elem#link
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'link',
+
+/**
+ * @member {Function} Elem#main
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'main',
+
+/**
+ * @member {Function} Elem#mark
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'mark',
+
+/**
+ * @member {Function} Elem#menu
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'menu',
+
+/**
+ * @member {Function} Elem#menuitem
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'menuitem',
+
+/**
+ * @member {Function} Elem#meta
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'meta',
+
+/**
+ * @member {Function} Elem#meter
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'meter',
+
+/**
+ * @member {Function} Elem#nav
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'nav',
+
+/**
+ * @member {Function} Elem#noscript
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'noscript',
+
+/**
+ * @member {Function} Elem#ol
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'ol',
+
+/**
+ * @member {Function} Elem#optgroup
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'optgroup',
+
+/**
+ * @member {Function} Elem#option
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'option',
+
+/**
+ * @member {Function} Elem#output
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'output',
+
+/**
+ * @member {Function} Elem#p
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'p',
+
+/**
+ * @member {Function} Elem#param
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'param',
+
+/**
+ * @member {Function} Elem#pre
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'pre',
+
+/**
+ * @member {Function} Elem#progress
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'progress',
+
+/**
+ * @member {Function} Elem#q
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'q',
+
+/**
+ * @member {Function} Elem#rp
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'rp',
+
+/**
+ * @member {Function} Elem#rt
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'rt',
+
+/**
+ * @member {Function} Elem#rtc
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'rtc',
+
+/**
+ * @member {Function} Elem#ruby
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'ruby',
+
+/**
+ * @member {Function} Elem#s
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'s',
+
+/**
+ * @member {Function} Elem#samp
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'samp',
+
+/**
+ * @member {Function} Elem#script
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'script',
+
+/**
+ * @member {Function} Elem#section
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'section',
+
+/**
+ * @member {Function} Elem#select
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'select',
+
+/**
+ * @member {Function} Elem#shadow
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'shadow',
+
+/**
+ * @member {Function} Elem#small
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'small',
+
+/**
+ * @member {Function} Elem#source
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'source',
+
+/**
+ * @member {Function} Elem#span
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'span',
+
+/**
+ * @member {Function} Elem#strong
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'strong',
+
+/**
+ * @member {Function} Elem#style
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'style',
+
+/**
+ * @member {Function} Elem#sub
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'sub',
+
+/**
+ * @member {Function} Elem#summary
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'summary',
+
+/**
+ * @member {Function} Elem#sup
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'sup',
+
+/**
+ * @member {Function} Elem#table
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'table',
+
+/**
+ * @member {Function} Elem#tbody
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'tbody',
+
+/**
+ * @member {Function} Elem#td
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'td',
+
+/**
+ * @member {Function} Elem#template
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'template',
+
+/**
+ * @member {Function} Elem#textarea
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'textarea',
+
+/**
+ * @member {Function} Elem#tfoot
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'tfoot',
+
+/**
+ * @member {Function} Elem#th
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'th',
+
+/**
+ * @member {Function} Elem#thead
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'thead',
+
+/**
+ * @member {Function} Elem#time
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'time',
+
+/**
+ * @member {Function} Elem#title
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'title',
+
+/**
+ * @member {Function} Elem#tr
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'tr',
+
+/**
+ * @member {Function} Elem#track
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'track',
+
+/**
+ * @member {Function} Elem#u
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'u',
+
+/**
+ * @member {Function} Elem#ul
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'ul',
+
+/**
+ * @member {Function} Elem#var
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'var',
+
+/**
+ * @member {Function} Elem#video
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'video',
+
+/**
+ * @member {Function} Elem#wbr
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'wbr'];
+
+var svgElements = [
+/**
+ * @member {Function} Elem#altGlyph
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'altGlyph',
+
+/**
+ * @member {Function} Elem#altGlyphDef
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'altGlyphDef',
+
+/**
+ * @member {Function} Elem#altGlyphItem
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'altGlyphItem',
+
+/**
+ * @member {Function} Elem#animate
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'animate',
+
+/**
+ * @member {Function} Elem#animateColor
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'animateColor',
+
+/**
+ * @member {Function} Elem#animateMotion
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'animateMotion',
+
+/**
+ * @member {Function} Elem#animateTransform
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'animateTransform',
+
+/**
+ * @member {Function} Elem#circle
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'circle',
+
+/**
+ * @member {Function} Elem#clipPath
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'clipPath',
+
+/**
+ * @member {Function} Elem#colorProfile
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'color-profile',
+
+/**
+ * @member {Function} Elem#cursor
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'cursor',
+
+/**
+ * @member {Function} Elem#defs
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'defs',
+
+/**
+ * @member {Function} Elem#desc
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'desc',
+
+/**
+ * @member {Function} Elem#discard
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'discard',
+
+/**
+ * @member {Function} Elem#ellipse
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'ellipse',
+
+/**
+ * @member {Function} Elem#feBlend
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feBlend',
+
+/**
+ * @member {Function} Elem#feColorMatrix
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feColorMatrix',
+
+/**
+ * @member {Function} Elem#feComponentTransfer
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feComponentTransfer',
+
+/**
+ * @member {Function} Elem#feComposite
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feComposite',
+
+/**
+ * @member {Function} Elem#feConvolveMatrix
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feConvolveMatrix',
+
+/**
+ * @member {Function} Elem#feDiffuseLighting
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feDiffuseLighting',
+
+/**
+ * @member {Function} Elem#feDisplacementMap
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feDisplacementMap',
+
+/**
+ * @member {Function} Elem#feDistantLight
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feDistantLight',
+
+/**
+ * @member {Function} Elem#feDropShadow
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feDropShadow',
+
+/**
+ * @member {Function} Elem#feFlood
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feFlood',
+
+/**
+ * @member {Function} Elem#feFuncA
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feFuncA',
+
+/**
+ * @member {Function} Elem#feFuncB
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feFuncB',
+
+/**
+ * @member {Function} Elem#feFuncG
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feFuncG',
+
+/**
+ * @member {Function} Elem#feFuncR
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feFuncR',
+
+/**
+ * @member {Function} Elem#feGaussianBlur
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feGaussianBlur',
+
+/**
+ * @member {Function} Elem#feImage
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feImage',
+
+/**
+ * @member {Function} Elem#feMerge
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feMerge',
+
+/**
+ * @member {Function} Elem#feMergeNode
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feMergeNode',
+
+/**
+ * @member {Function} Elem#feMorphology
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feMorphology',
+
+/**
+ * @member {Function} Elem#feOffset
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feOffset',
+
+/**
+ * @member {Function} Elem#fePointLight
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'fePointLight',
+
+/**
+ * @member {Function} Elem#feSpecularLighting
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feSpecularLighting',
+
+/**
+ * @member {Function} Elem#feSpotLight
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feSpotLight',
+
+/**
+ * @member {Function} Elem#feTile
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feTile',
+
+/**
+ * @member {Function} Elem#feTurbulence
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'feTurbulence',
+
+/**
+ * @member {Function} Elem#font
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'font',
+
+/**
+ * @member {Function} Elem#fontFace
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'font-face',
+
+/**
+ * @member {Function} Elem#fontFaceFormat
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'font-face-format',
+
+/**
+ * @member {Function} Elem#fontFaceName
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'font-face-name',
+
+/**
+ * @member {Function} Elem#fontFaceSrc
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'font-face-src',
+
+/**
+ * @member {Function} Elem#fontFaceUri
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'font-face-uri',
+
+/**
+ * @member {Function} Elem#foreignObject
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'foreignObject',
+
+/**
+ * @member {Function} Elem#g
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'g',
+
+/**
+ * @member {Function} Elem#glyph
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'glyph',
+
+/**
+ * @member {Function} Elem#glyphRef
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'glyphRef',
+
+/**
+ * @member {Function} Elem#hatch
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'hatch',
+
+/**
+ * @member {Function} Elem#hatchpath
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'hatchpath',
+
+/**
+ * @member {Function} Elem#hkern
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'hkern',
+
+/**
+ * @member {Function} Elem#image
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'image',
+
+/**
+ * @member {Function} Elem#line
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'line',
+
+/**
+ * @member {Function} Elem#linearGradient
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'linearGradient',
+
+/**
+ * @member {Function} Elem#marker
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'marker',
+
+/**
+ * @member {Function} Elem#mask
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'mask',
+
+/**
+ * @member {Function} Elem#mesh
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'mesh',
+
+/**
+ * @member {Function} Elem#meshgradient
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'meshgradient',
+
+/**
+ * @member {Function} Elem#meshpatch
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'meshpatch',
+
+/**
+ * @member {Function} Elem#meshrow
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'meshrow',
+
+/**
+ * @member {Function} Elem#metadata
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'metadata',
+
+/**
+ * @member {Function} Elem#missingGlyph
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'missing-glyph',
+
+/**
+ * @member {Function} Elem#mpath
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'mpath',
+
+/**
+ * @member {Function} Elem#path
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'path',
+
+/**
+ * @member {Function} Elem#pattern
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'pattern',
+
+/**
+ * @member {Function} Elem#polygon
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'polygon',
+
+/**
+ * @member {Function} Elem#polyline
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'polyline',
+
+/**
+ * @member {Function} Elem#radialGradient
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'radialGradient',
+
+/**
+ * @member {Function} Elem#rect
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'rect',
+
+/**
+ * @member {Function} Elem#set
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'set',
+
+/**
+ * @member {Function} Elem#solidcolor
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'solidcolor',
+
+/**
+ * @member {Function} Elem#stop
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'stop',
+
+/**
+ * @member {Function} Elem#style
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'style',
+
+/**
+ * @member {Function} Elem#svg
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'svg',
+
+/**
+ * @member {Function} Elem#switch
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'switch',
+
+/**
+ * @member {Function} Elem#symbol
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'symbol',
+
+/**
+ * @member {Function} Elem#textPath
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'textPath',
+
+/**
+ * @member {Function} Elem#tref
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'tref',
+
+/**
+ * @member {Function} Elem#tspan
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'tspan',
+
+/**
+ * @member {Function} Elem#unknown
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'unknown',
+
+/**
+ * @member {Function} Elem#use
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'use',
+
+/**
+ * @member {Function} Elem#view
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'view',
+
+/**
+ * @member {Function} Elem#vkern
+ * @type {Function}
+ * @param {...String} appliedExpressions
+ * @returns {Elem}
+ */
+'vkern'];
+
+var voidElements = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
+
+var htmlAllowedTagSymbols = '[a-z][a-z\\d\\-_.:!@#\\$%\\^&*()\\[\\]{}\\\\=\'"]*';
+var htmlAllowedAttrSymbols = '[^\\u0000-\\u0020\\s"\'>/=]+';
+
+/**
+ * @module constants/regexpSpecialCharacters
+ * @private
+ * @description Exports special characters for RegExp.
+ */
+
+/**
+ * @const
+ * @name module:constants/regexpSpecialCharacters~regexpSpecialCharacters
+ * @type {String[]}
+ */
+var regexpSpecialCharacters = ['.', '+', '*', '?', '(', ')', '[', ']', '{', '}', '<', '>', '^', '$', '!', '=', ':', '-', '|', ',', '\\'];
 
 /**
  * @module helpers/toStringTag
@@ -36,118 +2040,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 
 
-var asyncGenerator = function () {
-  function AwaitValue(value) {
-    this.value = value;
-  }
 
-  function AsyncGenerator(gen) {
-    var front, back;
-
-    function send(key, arg) {
-      return new Promise(function (resolve, reject) {
-        var request = {
-          key: key,
-          arg: arg,
-          resolve: resolve,
-          reject: reject,
-          next: null
-        };
-
-        if (back) {
-          back = back.next = request;
-        } else {
-          front = back = request;
-          resume(key, arg);
-        }
-      });
-    }
-
-    function resume(key, arg) {
-      try {
-        var result = gen[key](arg);
-        var value = result.value;
-
-        if (value instanceof AwaitValue) {
-          Promise.resolve(value.value).then(function (arg) {
-            resume("next", arg);
-          }, function (arg) {
-            resume("throw", arg);
-          });
-        } else {
-          settle(result.done ? "return" : "normal", result.value);
-        }
-      } catch (err) {
-        settle("throw", err);
-      }
-    }
-
-    function settle(type, value) {
-      switch (type) {
-        case "return":
-          front.resolve({
-            value: value,
-            done: true
-          });
-          break;
-
-        case "throw":
-          front.reject(value);
-          break;
-
-        default:
-          front.resolve({
-            value: value,
-            done: false
-          });
-          break;
-      }
-
-      front = front.next;
-
-      if (front) {
-        resume(front.key, front.arg);
-      } else {
-        back = null;
-      }
-    }
-
-    this._invoke = send;
-
-    if (typeof gen.return !== "function") {
-      this.return = undefined;
-    }
-  }
-
-  if (typeof Symbol === "function" && Symbol.asyncIterator) {
-    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
-      return this;
-    };
-  }
-
-  AsyncGenerator.prototype.next = function (arg) {
-    return this._invoke("next", arg);
-  };
-
-  AsyncGenerator.prototype.throw = function (arg) {
-    return this._invoke("throw", arg);
-  };
-
-  AsyncGenerator.prototype.return = function (arg) {
-    return this._invoke("return", arg);
-  };
-
-  return {
-    wrap: function (fn) {
-      return function () {
-        return new AsyncGenerator(fn.apply(this, arguments));
-      };
-    },
-    await: function (value) {
-      return new AwaitValue(value);
-    }
-  };
-}();
 
 
 
@@ -194,6 +2087,20 @@ var defineProperty = function (obj, key, value) {
   }
 
   return obj;
+};
+
+var _extends = Object.assign || function (target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i];
+
+    for (var key in source) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
+        target[key] = source[key];
+      }
+    }
+  }
+
+  return target;
 };
 
 var get$1 = function get$1(object, property, receiver) {
@@ -245,7 +2152,17 @@ var inherits = function (subClass, superClass) {
 
 
 
+var objectWithoutProperties = function (obj, keys) {
+  var target = {};
 
+  for (var i in obj) {
+    if (keys.indexOf(i) >= 0) continue;
+    if (!Object.prototype.hasOwnProperty.call(obj, i)) continue;
+    target[i] = obj[i];
+  }
+
+  return target;
+};
 
 var possibleConstructorReturn = function (self, call) {
   if (!self) {
@@ -316,6 +2233,28 @@ var slicedToArray = function () {
     }
   };
 }();
+
+
+
+
+
+
+
+
+
+
+
+
+
+var toConsumableArray = function (arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
+};
 
 /**
  * @module helpers/checkTypes
@@ -535,17 +2474,17 @@ function isNull(value) {
 }
 
 /**
- * @function isNullOrUndefined
+ * @function isNil
  * @public
  * @param {*} value - Value to check if it is null or undefined.
  * @returns {Boolean} If the argument is null or undefined or not.
  *
  * @example
- * isNullOrUndefined(null);      // true
- * isNullOrUndefined(undefined); // true
- * isNullOrUndefined(false);     // false
+ * isNil(null);      // true
+ * isNil(undefined); // true
+ * isNil(false);     // false
  */
-function isNullOrUndefined(value) {
+function isNil(value) {
   return value === null || typeof value === 'undefined';
 }
 
@@ -715,6 +2654,213 @@ function isUndefined(value) {
 }
 
 /**
+ * @module constants/validateCheckExpressions
+ * @private
+ * @description Exports different types of validate expressions for {@link module:helpers/validate}.
+ */
+
+/**
+ * @callback checkValidityCallback
+ * @private
+ * @param {*} value - Value to check.
+ */
+
+/**
+ * @typedef {Object} validateExpr
+ * @private
+ * @property {String} text - Text of the thrown error.
+ * @property {Error} error - Type of the thrown error.
+ * @property {checkValidityCallback} check - Callback for checking value.
+ */
+
+/**
+ * @type {validateExpr[]}
+ * @private
+ * @description Object of different types of validation.
+ */
+var validateCheckExpressions = {
+  '>0': {
+    check: function check(n) {
+      return n > 0;
+    },
+    text: '$n argument must be positive!',
+    error: RangeError
+  },
+  '>=0': {
+    check: function check(n) {
+      return n >= 0;
+    },
+    text: '$n argument must be non-negative!',
+    error: RangeError
+  },
+  '<0': {
+    check: function check(n) {
+      return n < 0;
+    },
+    text: '$n argument must be negative!',
+    error: RangeError
+  },
+  '<=0': {
+    check: function check(n) {
+      return n <= 0;
+    },
+    text: '$n argument must be non-positive!',
+    error: RangeError
+  },
+  '!!': {
+    check: function check(v) {
+      return !isNil(v);
+    },
+    text: '$n argument must be not null or undefined!',
+    error: TypeError
+  },
+  array: {
+    check: isArray,
+    text: '$n argument must be an array!',
+    error: TypeError
+  },
+  'array||!': {
+    check: function check(a) {
+      return isArray(a) || isNil(a);
+    },
+    text: '$n argument must be an array, or undefined, or null!',
+    error: TypeError
+  },
+  arrayLike: {
+    check: isArrayLike,
+    text: '$n argument must be array-like!',
+    error: TypeError
+  },
+  'arrayLike||!': {
+    check: function check(a) {
+      return isArrayLike(a) || isNil(a);
+    },
+    text: '$n argument must be array-like, or undefined, or null!',
+    error: TypeError
+  },
+  date: {
+    check: isDate,
+    text: '$n argument must be a date!',
+    error: TypeError
+  },
+  'date||!': {
+    check: function check(d) {
+      return isDate(d) || isNil(d);
+    },
+    text: '$n argument must be a date, or undefined, or null!',
+    error: TypeError
+  },
+  dateLike: {
+    check: isDateLike,
+    text: '$n argument must be date-like!',
+    error: TypeError
+  },
+  'dateLike||!': {
+    check: function check(d) {
+      return isDateLike(d) || isNil(d);
+    },
+    text: '$n argument must be date-like, or undefined, or null!',
+    error: TypeError
+  },
+  function: {
+    check: isFunction,
+    text: '$n argument must be a function!',
+    error: TypeError
+  },
+  'function||!': {
+    check: function check(f) {
+      return isFunction(f) || isNil(f);
+    },
+    text: '$n argument must be a function, or undefined, or null!',
+    error: TypeError
+  },
+  int: {
+    check: isInteger,
+    text: '$n argument must be an integer!',
+    error: TypeError
+  },
+  'int||!': {
+    check: function check(i) {
+      return isInteger(i) || isNil(i);
+    },
+    text: '$n argument must be an integer, or undefined, or null!',
+    error: TypeError
+  },
+  intLike: {
+    check: isIntegerLike,
+    text: '$n argument must be integer-like!',
+    error: TypeError
+  },
+  'intLike||!': {
+    check: function check(i) {
+      return isIntegerLike(i) || isNil(i);
+    },
+    text: '$n argument must be integer-like, or undefined, or null!',
+    error: TypeError
+  },
+  number: {
+    check: isNumber,
+    text: '$n argument must be a number!',
+    error: TypeError
+  },
+  'number||!': {
+    check: function check(n) {
+      return isNumber(n) || isNil(n);
+    },
+    text: '$n argument must be a number, or undefined, or null!',
+    error: TypeError
+  },
+  numberLike: {
+    check: isNumberLike,
+    text: '$n argument must be number-like!',
+    error: TypeError
+  },
+  'numberLike||!': {
+    check: function check(n) {
+      return isNumberLike(n) || isNil(n);
+    },
+    text: '$n argument must be number-like, or undefined, or null!',
+    error: TypeError
+  },
+  object: {
+    check: isObject,
+    text: '$n argument must be an object!',
+    error: TypeError
+  },
+  'object||!': {
+    check: function check(o) {
+      return isObject(o) || isNil(o);
+    },
+    text: '$n argument must be an object, or undefined, or null!',
+    error: TypeError
+  },
+  regexp: {
+    check: isRegExp,
+    text: '$n argument must be a regular expression!',
+    error: TypeError
+  },
+  'regexp||!': {
+    check: function check(r) {
+      return isRegExp(r) || isNil(r);
+    },
+    text: '$n argument must be a regular expression, or undefined, or null!',
+    error: TypeError
+  },
+  string: {
+    check: isString,
+    text: '$n argument must be a string!',
+    error: TypeError
+  },
+  'string||!': {
+    check: function check(s) {
+      return isString(s) || isNil(s);
+    },
+    text: '$n argument must be a string, or undefined, or null!',
+    error: TypeError
+  }
+};
+
+/**
  * @module D
  * @private
  * @description Exports D function.
@@ -815,6 +2961,10 @@ function iterate(object, callback) {
  * @returns {Object} Target.
  */
 function assign$1(target) {
+  for (var _len = arguments.length, objects = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    objects[_key - 1] = arguments[_key];
+  }
+
   iterate(arguments, function (source, index) {
     if (index) {
       iterate(source, function (value, key) {
@@ -835,6 +2985,7 @@ function assign$1(target) {
 /**
  * @callback propertyGeneratorCallback
  * @param {String} name - Name of the property.
+ * @param {Number} i - Index of the array.
  * @returns {*} Generated property.
  */
 
@@ -847,9 +2998,9 @@ function assign$1(target) {
  * @description Function for dynamic creating properties based on name of the method.
  */
 function dynamicDefineProperties(target, properties, propertyGenerator) {
-  iterate(properties, function (name) {
+  iterate(properties, function (name, i) {
     Object.defineProperty(target, name, {
-      value: propertyGenerator(name),
+      value: propertyGenerator(name, i),
       writable: true,
       enumerable: false,
       configurable: true
@@ -957,211 +3108,6 @@ function toArray$1(value, createNewArray) {
 }
 
 /**
- * @module constants/validateCheckExpressions
- * @private
- * @description Exports different types of validate expressions for {@link module:helpers/validate}.
- */
-
-/**
- * @callback checkValidityCallback
- * @private
- * @param {*} value - Value to check.
- */
-
-/**
- * @typedef {Object} validateExpr
- * @private
- * @property {String} text - Text of the thrown error.
- * @property {Error} error - Type of the thrown error.
- * @property {checkValidityCallback} check - Callback for checking value.
- */
-
-/**
- * @type {validateExpr[]}
- * @private
- * @description Object of different types of validation.
- */
-var checkExpressions = {
-  '>0': {
-    check: function check(n) {
-      return n > 0;
-    },
-    text: '$n argument must be positive!',
-    error: RangeError
-  },
-  '>=0': {
-    check: function check(n) {
-      return n >= 0;
-    },
-    text: '$n argument must be non-negative!',
-    error: RangeError
-  },
-  '<0': {
-    check: function check(n) {
-      return n < 0;
-    },
-    text: '$n argument must be negative!',
-    error: RangeError
-  },
-  '<=0': {
-    check: function check(n) {
-      return n <= 0;
-    },
-    text: '$n argument must be non-positive!',
-    error: RangeError
-  },
-  '!!': {
-    check: isNullOrUndefined,
-    text: '$n argument must be not null or undefined!',
-    error: TypeError
-  },
-  array: {
-    check: isArray,
-    text: '$n argument must be an array!',
-    error: TypeError
-  },
-  'array||!': {
-    check: function check(a) {
-      return isArray(a) || isNullOrUndefined(a);
-    },
-    text: '$n argument must be an array, or undefined, or null!',
-    error: TypeError
-  },
-  arrayLike: {
-    check: isArrayLike,
-    text: '$n argument must be array-like!',
-    error: TypeError
-  },
-  'arrayLike||!': {
-    check: function check(a) {
-      return isArrayLike(a) || isNullOrUndefined(a);
-    },
-    text: '$n argument must be array-like, or undefined, or null!',
-    error: TypeError
-  },
-  date: {
-    check: isDate,
-    text: '$n argument must be a date!',
-    error: TypeError
-  },
-  'date||!': {
-    check: function check(d) {
-      return isDate(d) || isNullOrUndefined(d);
-    },
-    text: '$n argument must be a date, or undefined, or null!',
-    error: TypeError
-  },
-  dateLike: {
-    check: isDateLike,
-    text: '$n argument must be date-like!',
-    error: TypeError
-  },
-  'dateLike||!': {
-    check: function check(d) {
-      return isDateLike(d) || isNullOrUndefined(d);
-    },
-    text: '$n argument must be date-like, or undefined, or null!',
-    error: TypeError
-  },
-  function: {
-    check: isFunction,
-    text: '$n argument must be a function!',
-    error: TypeError
-  },
-  'function||!': {
-    check: function check(f) {
-      return isFunction(f) || isNullOrUndefined(f);
-    },
-    text: '$n argument must be a function, or undefined, or null!',
-    error: TypeError
-  },
-  int: {
-    check: isInteger,
-    text: '$n argument must be an integer!',
-    error: TypeError
-  },
-  'int||!': {
-    check: function check(i) {
-      return isInteger(i) || isNullOrUndefined(i);
-    },
-    text: '$n argument must be an integer, or undefined, or null!',
-    error: TypeError
-  },
-  intLike: {
-    check: isIntegerLike,
-    text: '$n argument must be integer-like!',
-    error: TypeError
-  },
-  'intLike||!': {
-    check: function check(i) {
-      return isIntegerLike(i) || isNullOrUndefined(i);
-    },
-    text: '$n argument must be integer-like, or undefined, or null!',
-    error: TypeError
-  },
-  number: {
-    check: isNumber,
-    text: '$n argument must be a number!',
-    error: TypeError
-  },
-  'number||!': {
-    check: function check(n) {
-      return isNumber(n) || isNullOrUndefined(n);
-    },
-    text: '$n argument must be a number, or undefined, or null!',
-    error: TypeError
-  },
-  numberLike: {
-    check: isNumberLike,
-    text: '$n argument must be number-like!',
-    error: TypeError
-  },
-  'numberLike||!': {
-    check: function check(n) {
-      return isNumberLike(n) || isNullOrUndefined(n);
-    },
-    text: '$n argument must be number-like, or undefined, or null!',
-    error: TypeError
-  },
-  object: {
-    check: isObject,
-    text: '$n argument must be an object!',
-    error: TypeError
-  },
-  'object||!': {
-    check: function check(o) {
-      return isObject(o) || isNullOrUndefined(o);
-    },
-    text: '$n argument must be an object, or undefined, or null!',
-    error: TypeError
-  },
-  regexp: {
-    check: isRegExp,
-    text: '$n argument must be a regular expression!',
-    error: TypeError
-  },
-  'regexp||!': {
-    check: function check(r) {
-      return isRegExp(r) || isNullOrUndefined(r);
-    },
-    text: '$n argument must be a regular expression, or undefined, or null!',
-    error: TypeError
-  },
-  string: {
-    check: isString,
-    text: '$n argument must be a string!',
-    error: TypeError
-  },
-  'string||!': {
-    check: function check(s) {
-      return isString(s) || isNullOrUndefined(s);
-    },
-    text: '$n argument must be a string, or undefined, or null!',
-    error: TypeError
-  }
-};
-
-/**
  * @module helpers/validate
  * @private
  * @description Exports validate method.
@@ -1185,7 +3131,7 @@ function validate$1(args, options, name) {
     }
 
     iterate(array, function (checker) {
-      checker = checkExpressions[checker];
+      checker = validateCheckExpressions[checker];
 
       if (!checker.check(args[number])) {
         throw new checker.error(checker.text.replace('$n', numbers[number]) + (name ? ' (at ' + name + ')' : ''));
@@ -1218,6 +3164,7 @@ function validate$1(args, options, name) {
  * @example
  * new Alphabet(['a', 'b', 'c']);
  */
+
 var Alphabet = function () {
   function Alphabet() {
     var alphabet = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
@@ -1418,7 +3365,7 @@ function check$1(char) {
 function alphabet(string) {
   validate$1([string], ['string']);
 
-  var ranges = string.split(/([\s\S]\-+[\s\S])?/g);
+  var ranges = string.split(/([\s\S]-+[\s\S])?/g);
   var length = ranges.length;
   var alphabet = [];
 
@@ -1429,11 +3376,11 @@ function alphabet(string) {
       continue;
     }
 
-    if (/\-/.test(range) && !/[\s\S]\-+[\s\S]/.test(range)) {
+    if (/-/.test(range) && !/[\s\S]-+[\s\S]/.test(range)) {
       throw new Error('Wrong part of the string (' + range + ')! (in alphabet)');
     }
 
-    if (/\-/.test(range)) {
+    if (/-/.test(range)) {
       var start = range.charCodeAt(0);
       var end = range.charCodeAt(2);
 
@@ -1547,15 +3494,15 @@ var Switcher = function (_Function) {
 
     function switcher(value) {
       var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-      var _switcher$$$ = switcher.$$;
-      var mode = _switcher$$$.mode;
-      var def = _switcher$$$.default;
-      var cases = _switcher$$$.cases;
+      var _switcher$$$ = switcher.$$,
+          mode = _switcher$$$.mode,
+          def = _switcher$$$.default,
+          cases = _switcher$$$.cases;
 
 
       var ret = iterate(cases, function (_ref) {
-        var val = _ref.value;
-        var Case = _ref.case;
+        var val = _ref.value,
+            Case = _ref.case;
 
         if (mode === 'boolean' && Case ||
         /* eslint eqeqeq: 0 */
@@ -1869,7 +3816,7 @@ var cloneSwitcher = switcher('call', function (object) {
 }).case(function (object) {
   return new Super(object) === object;
 }, function (object) {
-  return new (object.proto().$.constructor)(object);
+  return new (Object.getPrototypeOf(object).constructor)(new Super(object.$).deepClone().$);
 }).case(isElement, function (object, deep) {
   return object.clone(deep);
 }).case(isDate, function (object) {
@@ -2235,7 +4182,7 @@ var Super = function () {
 
       var filtered = _deepFilter(this.$, callback, n, [{ key: null, value: this.$ }]);
 
-      return D$2(isNullOrUndefined(filtered) ? filtered : filtered || {});
+      return D$2(isNil(filtered) ? filtered : filtered || {});
     }
 
     /**
@@ -2298,6 +4245,34 @@ var Super = function () {
       n = Number(n);
 
       _deepForEach(this.$, callback, n, [{ key: null, value: this.$ }]);
+
+      return this;
+    }
+
+    /**
+     * @method Super#deepForEach
+     * @public
+     * @param {DeepIterationCallback} callback - Called on each iteration.
+     * @param {Number} [n = Infinity] - Iteration depth.
+     * @returns {DWrap} Returns this.
+     * @description Method for iterating over any object. Deep analogue of {@link Super#forEach}.
+     * Unlike {@link Super#deepForEach} the callback is called on every value of every object inside
+     *
+     * @example
+     * new Super({ a: 1, b: { c: 2, d: 3 } }).deepForEach((value, key, object) => object[key] = value * value).$;
+     * // { a: 1, b: { c: 4, d: 9 } }
+     */
+
+  }, {
+    key: 'deepForEachEntry',
+    value: function deepForEachEntry(callback) {
+      var n = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Infinity;
+
+      validate$1([callback, n], ['function', ['numberLike', '>0']], 'Super#deepForEach');
+
+      n = Number(n);
+
+      _deepForEachEntry(this.$, callback, n, [{ key: null, value: this.$ }]);
 
       return this;
     }
@@ -2581,7 +4556,7 @@ var Super = function () {
       var array = isArrayLike(object);
 
       /* eslint no-nested-ternary: 0 */
-      var o = array ? [] : isNullOrUndefined(object) ? object : {};
+      var o = array ? [] : isNil(object) ? object : {};
 
       iterate(object, function (value, key) {
         if (callback(value, key, object)) {
@@ -3130,7 +5105,7 @@ var Super = function () {
     key: 'proto',
     value: function proto(_proto) {
       var object = this.$;
-      var isContextObject = !isNullOrUndefined(object);
+      var isContextObject = !isNil(object);
 
       if (arguments.length) {
         if (isContextObject && (isObject(_proto) || isNull(_proto))) {
@@ -3618,7 +5593,7 @@ function _deepEvery(object, callback, n, tree) {
  */
 function _deepFilter(object, callback, n, tree) {
   var array = isArrayLike(object);
-  var nul = isNullOrUndefined(object);
+  var nul = isNil(object);
   var o = array ? [] : nul ? object : {};
   var end = n === 1;
 
@@ -3692,17 +5667,6 @@ function _deepFind(object, callback, n, tree) {
 }
 
 /**
- * @function deepFreeze
- * @private
- * @param {*} object - Object to freeze.
- * @returns {void}
- */
-function _deepFreeze(object) {
-  Object.freeze(object);
-  iterate(object, _deepFreeze);
-}
-
-/**
  * @function deepForEach
  * @private
  * @param {*} object - Object to iterate over.
@@ -3726,6 +5690,40 @@ function _deepForEach(object, callback, n, tree) {
 }
 
 /**
+ * @function deepForEachEntry
+ * @private
+ * @param {*} object - Object to iterate over.
+ * @param {DeepIterationCallback} callback - Callback that is called on every element.
+ * @param {Number} n - Depth of iteration.
+ * @param {Tree} tree - Tree of { key, value } objects of iteration.
+ * @returns {void}
+ */
+function _deepForEachEntry(object, callback, n, tree) {
+  var end = n === 1;
+
+  iterate(object, function (value, key, object) {
+    var newTree = [{ key: key, value: value }].concat(tree);
+
+    callback(value, key, object, newTree);
+
+    if (!end && !isPrimitive(value)) {
+      _deepForEachEntry(value, callback, n - 1, newTree);
+    }
+  });
+}
+
+/**
+ * @function deepFreeze
+ * @private
+ * @param {*} object - Object to freeze.
+ * @returns {void}
+ */
+function _deepFreeze(object) {
+  Object.freeze(object);
+  iterate(object, _deepFreeze);
+}
+
+/**
  * @function deepMap
  * @private
  * @param {*} object - Object to iterate over.
@@ -3736,7 +5734,7 @@ function _deepForEach(object, callback, n, tree) {
  * @returns {*} New object.
  */
 function _deepMap(object, callback, n, tree) {
-  var o = isArrayLike(object) ? [] : isNullOrUndefined(object) ? object : {};
+  var o = isArrayLike(object) ? [] : isNil(object) ? object : {};
   var end = n === 1;
 
   iterate(object, function (value, key, object) {
@@ -3851,6 +5849,7 @@ constructors[0].push({
  * @example
  * new Arr([1, 2]);
  */
+
 var Arr = function (_Super) {
   inherits(Arr, _Super);
 
@@ -4343,8 +6342,43 @@ function iterate$1(number, callback) {
  * @description Exports Promise class.
  */
 
+/**
+ * @callback onFulfilledOrRejected
+ * @public
+ * @param {*} value - Promise value.
+ * @param {Boolean} success - If the previous promise is fulfilled it's true and false if rejected.
+ */
+
+/**
+ * @callback onRejected
+ * @public
+ * @param {Error|*} err - Promise error.
+ */
+
+/**
+ * @callback onFulfilled
+ * @public
+ * @param {*} value - Promise value.
+ */
+
 var secret = {};
 var iterator = _Symbol.iterator;
+
+/**
+ * @class Promise
+ * @public
+ * @param {Function} executor - Function that takes two arguments: resolve and reject functions.
+ * Call the resolve function when you need to fulfill the promise and call the reject one
+ * when you need to reject it.
+ * @returns {Promise} Instance of Promise.
+ * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Promise
+ * @description Class with almost identical API to
+ * [ES6 Promise]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Promise}.
+ * There is a couple differences: set Promise.onError to a function with which you want to
+ * subscribe to a promise error and set Promise.onUnhandledRejection to a function with which
+ * you want to subscribe to an unhandled error
+ * (defaults to console.error.bind(console, '%s %o', 'Uncaught (in promise)')).
+ */
 
 var Promise$1 = function () {
   function Promise(executor) {
@@ -4421,7 +6455,7 @@ var Promise$1 = function () {
             try {
               resolve(f(value));
             } catch (err) {
-              return reject(err);
+              reject(err);
             }
           } : null;
 
@@ -4452,20 +6486,30 @@ var Promise$1 = function () {
 
     function reject(err) {
       if (hiddenPromise.status === 'pending') {
-        hiddenPromise.status = 'rejected';
-        hiddenPromise.value = err;
+        (function () {
+          hiddenPromise.status = 'rejected';
+          hiddenPromise.value = err;
 
-        for (var i = 0, length = onReject.length; i < length; i++) {
-          hiddenPromise.handled = true;
+          for (var i = 0, length = onReject.length; i < length; i++) {
+            hiddenPromise.handled = true;
 
-          onReject[i](err);
-        }
-
-        setTimeout(function () {
-          if (!hiddenPromise.handled) {
-            console.error('%s %o', 'Uncaught (in promise)', err);
+            onReject[i](err);
           }
-        }, 1);
+
+          var onUnhandledRejection = Promise.onUnhandledRejection,
+              onError = Promise.onError;
+
+
+          if (isFunction(onError)) {
+            onError(err);
+          }
+
+          setTimeout(function () {
+            if (!hiddenPromise.handled && isFunction(onUnhandledRejection)) {
+              onUnhandledRejection(err);
+            }
+          }, 1);
+        })();
       }
     }
 
@@ -4491,14 +6535,77 @@ var Promise$1 = function () {
     }
   }
 
+  /**
+   * @method Promise.all
+   * @param {(Array|Iterable).<Promise|*>} iterable - Iterable object (like array) of promises
+   * or any values.
+   * @returns {Promise} New instance of Promise.
+   * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
+   */
+
+
   createClass(Promise, [{
     key: 'abort',
     value: function abort() {}
+
+    /**
+     * @method Promise#catch
+     * @param {onRejected} onRejected - onRejected callback.
+     * @returns {Promise} New instance of Promise.
+     * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/catch
+     */
+
   }, {
     key: 'catch',
     value: function _catch(onRejected) {
       return this.then(null, onRejected);
     }
+
+    /**
+     * @method Promise#finally
+     * @public
+     * @param {onFulfilledOrRejected} onFulfilledOrRejected - onFulfilledOrRejected callback.
+     * @returns {Promise}
+     * @description Method for catching both fulfilled and rejected promises.
+     *
+     * @example
+     * spinner.show();
+     * fetchData()
+     *   .then((data) => {
+     *     // do something with data
+     *   })
+     *   .catch((err) => {
+     *     // handle error somehow
+     *   })
+     *   .finally(() => {
+     *     spinner.hide();
+     *   });
+     */
+
+  }, {
+    key: 'finally',
+    value: function _finally(onFulfilledOrRejected) {
+      var isFunc = isFunction(onFulfilledOrRejected);
+
+      return this.then(function (value) {
+        return Promise.resolve(isFunc ? onFulfilledOrRejected(value, true) : 0).then(function () {
+          return value;
+        });
+      }, function (err) {
+        return Promise.resolve(isFunc ? onFulfilledOrRejected(err, false) : 0).then(function () {
+          return Promise.reject(err);
+        });
+      });
+    }
+
+    /**
+     * @method Promise#then
+     * @param {onFulfilled} [onFulfilled] - onFulfilled callback.
+     * @param {onRejected} [onRejected] - onRejected callback.
+     * @returns {Promise} New instance of Promise.
+     * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then
+     */
+
   }, {
     key: 'then',
     value: function then(onFulfilled, onRejected) {
@@ -4607,6 +6714,15 @@ var Promise$1 = function () {
         }
       });
     }
+
+    /**
+     * @method Promise.race
+     * @param {(Array|Iterable).<Promise|*>} iterable - Iterable object (like array) of promises
+     * or any values.
+     * @returns {Promise} New instance of Promise.
+     * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/race
+     */
+
   }, {
     key: 'race',
     value: function race(iterable) {
@@ -4628,6 +6744,14 @@ var Promise$1 = function () {
         }
       });
     }
+
+    /**
+     * @method Promise.reject
+     * @param {*} value - Value to reject.
+     * @returns {Promise} New instance of Promise.
+     * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/reject
+     */
+
   }, {
     key: 'reject',
     value: function reject(value) {
@@ -4635,6 +6759,14 @@ var Promise$1 = function () {
         reject(value);
       });
     }
+
+    /**
+     * @method Promise.resolve
+     * @param {Promise|Thenable|*} value - Promise, thenable or any value to resolve.
+     * @returns {Promise} New instance of Promise.
+     * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/resolve
+     */
+
   }, {
     key: 'resolve',
     value: function resolve(value) {
@@ -4649,6 +6781,10 @@ var Promise$1 = function () {
   }]);
   return Promise;
 }();
+
+Promise$1.onError = null;
+Promise$1.onUnhandledRejection = console.error.bind(console, '%s %o', 'Uncaught (in promise)');
+
 
 defineProperties(Promise$1.prototype, defineProperty({}, _Symbol.toStringTag, 'Promise'));
 
@@ -4893,6 +7029,7 @@ function blob$1(blobParts) {
  *
  * func(1, 4, -2, 5); // 5
  */
+
 var Func = function (_Super) {
   inherits(Func, _Super);
 
@@ -4910,14 +7047,14 @@ var Func = function (_Super) {
 
       if (++proxy.$$.called < proxy.$$.canBeCalled) {
         var _ret2 = function () {
-          var _proxy$$$ = proxy.$$;
-          var before = _proxy$$$.before;
-          var after = _proxy$$$.after;
-          var sync = _proxy$$$.sync;
-          var contextLocked = _proxy$$$.contextLocked;
-          var _proxy$$$2 = proxy.$$;
-          var context = _proxy$$$2.context;
-          var args = _proxy$$$2.args;
+          var _proxy$$$ = proxy.$$,
+              before = _proxy$$$.before,
+              after = _proxy$$$.after,
+              sync = _proxy$$$.sync,
+              contextLocked = _proxy$$$.contextLocked;
+          var _proxy$$$2 = proxy.$$,
+              context = _proxy$$$2.context,
+              args = _proxy$$$2.args;
 
           var ret = void 0;
 
@@ -5615,6 +7752,6237 @@ function self$1() {
 }
 
 /**
+ * @module Str
+ * @private
+ * @mixin
+ * @description Exports Str class.
+ */
+
+var htmlSpecials = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;'
+};
+var regexpSpecialsRegexp = new RegExp(new Super(regexpSpecialCharacters).word(function (x) {
+  return '\\' + x + '|';
+}).replace(/\|$/, ''), 'g');
+
+/**
+ * @class Str
+ * @extends Super
+ * @public
+ * @param {String} [string = ''] - A string to wrap.
+ * @returns {Str} Instance of Str.
+ * @description Wrap of a string.
+ *
+ * @example
+ * const s = new Num('1');
+ */
+
+var Str = function (_Super) {
+  inherits(Str, _Super);
+
+  function Str() {
+    var string = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+    classCallCheck(this, Str);
+    return possibleConstructorReturn(this, (Str.__proto__ || Object.getPrototypeOf(Str)).call(this, '' + string));
+
+    /**
+     * @member Str#$
+     * @type {String}
+     * @public
+     * @description Original string.
+     */
+  }
+
+  /**
+   * @method Str#capitalizeFirst
+   * @public
+   * @returns {Str} Capitalized string.
+   * @description Method capitalizing the first symbol.
+   *
+   * @example
+   * new Str('foo').capitalizeFirst().$; // 'Foo'
+   */
+
+
+  createClass(Str, [{
+    key: 'capitalizeFirst',
+    value: function capitalizeFirst() {
+      var string = this.$;
+
+      return new Str(string.slice(0, 1).toUpperCase() + string.slice(1));
+    }
+
+    /**
+     * @method Str#endsWith
+     * @public
+     * @param {String} searchString - See the link.
+     * @param {Number} [position = string.length] - See the link.
+     * @returns {Boolean} If the string ends with the argument string.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith
+     * @description Synonym for
+     * [String#endsWith]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith}.
+     */
+
+  }, {
+    key: 'endsWith',
+    value: function endsWith(searchString, position) {
+      if (arguments.length < 2) {
+        position = this.$.length;
+      }
+
+      return this.slice(0, position).revert().startsWith(new Str(searchString).revert().$);
+    }
+
+    /**
+     * @method Str#escapeHTML
+     * @public
+     * @returns {Str} New instance of Str.
+     * @description Methods escaping "&", "<" and ">" symbols.
+     *
+     * @example
+     * new Str('"1 < 2" & "7 > 4" are true expressions.').escapeHTML().$;
+     * // '"1 &lt; 2" &amp "7 &gt; 2" are true expressions.'
+     */
+
+  }, {
+    key: 'escapeHTML',
+    value: function escapeHTML() {
+      var string = this.$;
+
+      iterate(htmlSpecials, function (escaped, symbol) {
+        string = string.replace(new RegExp(symbol, 'g'), escaped);
+      });
+
+      return new Str(string);
+    }
+
+    /**
+     * @method Str#escapeRegExp
+     * @public
+     * @returns {Str} New instance of Str.
+     * @description Method escaping RegExp special characters.
+     *
+     * @example
+     * new Str('(213.98 - [] {})').escapeRegExp().$; // '\(213\.98 \- \[\] \{\}\)'
+     */
+
+  }, {
+    key: 'escapeRegExp',
+    value: function escapeRegExp() {
+      return this.replace(regexpSpecialsRegexp, '\\$&');
+    }
+
+    /**
+     * @method Str#in
+     * @public
+     * @param {*} object - Object to check the string as a property in.
+     * @returns {Boolean} If it is in the object or not.
+     * @description Returns string in object.
+     *
+     * @example
+     * new Str('a').in({ a: 1 }); // true
+     * new Str('toFixed').in(1);  // false
+     * new Str('a').in(null);     // false
+     */
+
+  }, {
+    key: 'in',
+    value: function _in(object) {
+      if (!isObject(object)) {
+        return false;
+      }
+
+      return this.$ in object;
+    }
+
+    /**
+     * @method Str#indexOf
+     * @public
+     * @param {String} searchValue - See the link.
+     * @param {Number} [fromIndex = 0] - See the link.
+     * @returns {Number} Found index or -1.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/indexOf
+     * @description Synonym for
+     * [String#indexOf]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/indexOf}.
+     */
+
+  }, {
+    key: 'indexOf',
+    value: function indexOf(searchValue, fromIndex) {
+      return this.$.indexOf.apply(this.$, arguments);
+    }
+
+    /**
+     * @method Str#lastIndexOf
+     * @public
+     * @param {String} searchValue - See the link.
+     * @param {Number} [fromIndex = string.length] - See the link.
+     * @returns {Number} Found index or -1.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/lastIndexOf
+     * @description Synonym for
+     * [String#lastIndexOf]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/lastIndexOf}.
+     */
+
+  }, {
+    key: 'lastIndexOf',
+    value: function lastIndexOf(searchValue, fromIndex) {
+      return this.$.lastIndexOf.apply(this.$, arguments);
+    }
+
+    /**
+     * @member Str#length
+     * @type {Number}
+     * @public
+     * @readonly
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/length
+     * @description Synonym for
+     * [String#length]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/length}.
+     */
+
+  }, {
+    key: 'match',
+
+
+    /**
+     * @method Str#match
+     * @public
+     * @returns {Arr|Super} D-Wrap of found match.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/match
+     * @description Synonym for
+     * [String#match]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/match}.
+     */
+    value: function match(regexp) {
+      return D$2(this.$.match.apply(this.$, arguments));
+    }
+
+    /**
+     * @method Str#repeat
+     * @public
+     * @param {Integer} times - Times to repeat the string.
+     * @returns {Str} New instance of Str.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/repeat
+     * @description Synonym for
+     * [String#repeat]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/repeat}.
+     *
+     * @example
+     * new Str('123').repeat(2).$; // '123123'
+     * new Str('123').repeat(0).$; // ''
+     */
+
+  }, {
+    key: 'repeat',
+    value: function repeat(times) {
+      validate$1([times], [['intLike', '>=0']], 'Str#repeat');
+
+      times = +times;
+
+      var string = this.$;
+
+      var s = '';
+
+      for (var i = 0; i < times; i++) {
+        s += string;
+      }
+
+      return new Str(s);
+    }
+
+    /**
+     * @method Str#replace
+     * @public
+     * @param {RegExp|String} regexp - See the link.
+     * @param {String|Function} [replacer = ''] - See the link.
+     * @returns {Str} New instance of Str.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/replace
+     * @description Synonym for
+     * [String#replace]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/replace}
+     * besides that replacer has a default value of ''.
+     */
+
+  }, {
+    key: 'replace',
+    value: function replace(regexp) {
+      var replacer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+      return new Str(this.$.replace(regexp, replacer));
+    }
+
+    /**
+     * @method Str#replaceString
+     * @public
+     * @param {String} string - String to replace.
+     * @param {String} [replacer = ''] - String to replace with.
+     * @returns {Str} New instance of Str.
+     * @description Method for global string replaceing.
+     *
+     * @example
+     * new Str('123123').replaceString('1', '4').$; // '423423'
+     * new Str('123123').replaceString('1').$;      // '2323'
+     */
+
+  }, {
+    key: 'replaceString',
+    value: function replaceString(string) {
+      var replacer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+      string = new Super(string).$;
+
+      validate$1([string], ['string'], 'Str#replaceString');
+
+      return new Str(this.$.split(string).join(replacer));
+    }
+
+    /**
+     * @method Str#revert
+     * @public
+     * @returns {Str} New instance of string.
+     * @description Method for reverting a string.
+     *
+     * @example
+     * new Str('1234').revert().$; // '4321'
+     */
+
+  }, {
+    key: 'revert',
+    value: function revert() {
+      var string = this.$;
+      var str = '';
+
+      for (var i = string.length - 1; i >= 0; i--) {
+        str += string[i];
+      }
+
+      return new Str(str);
+    }
+
+    /**
+     * @method Str#search
+     * @public
+     * @param {RegExp} regexp - See the link.
+     * @returns {Number} Index of the first match, if found, and -1 if not.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/search
+     * @description Synonym for
+     * [String#search]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/search}.
+     */
+
+  }, {
+    key: 'search',
+    value: function search(regexp) {
+      validate$1([regexp], ['regexp']);
+
+      return this.$.search.apply(this.$, arguments);
+    }
+
+    /**
+     * @method Str#slice
+     * @public
+     * @param {Number} [beginSlice = 0] - See the link.
+     * @param {Number} [endSlice = string.length] - See the link.
+     * @returns {Str} New instance of Str.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/slice
+     * @description Synonym for
+     * [String#slice]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/slice}.
+     */
+
+  }, {
+    key: 'slice',
+    value: function slice(beginSlice, endSlice) {
+      return new Str(this.$.slice.apply(this.$, arguments));
+    }
+
+    /**
+     * @method Str#split
+     * @public
+     * @param {RegExp|String} [separator] - See the link.
+     * @returns {Arr|Super} D-Wrap of the array.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/split
+     * @description Synonym for
+     * [String#split]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/split}.
+     */
+
+  }, {
+    key: 'split',
+    value: function split(separator) {
+      return D$2(this.$.split.apply(this.$, arguments));
+    }
+
+    /**
+     * @method Str#startsWith
+     * @public
+     * @param {String} searchString - See the link.
+     * @param {Number} [position = 0] - See the link.
+     * @returns {Boolean} If the string ends with the argument string.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith
+     * @description Synonym for
+     * [String#startsWith]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith}.
+     */
+
+  }, {
+    key: 'startsWith',
+    value: function startsWith(searchString) {
+      var position = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+      return this.$.indexOf.apply(this.$, arguments) === position;
+    }
+
+    /**
+     * @method Str#substr
+     * @public
+     * @param {Number} [start = 0] - See the link.
+     * @param {Number} [length = string.length] - See the link.
+     * @returns {Str} New instance of Str.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/substr
+     * @description Synonym for
+     * [String#substr]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/substr}.
+     */
+
+  }, {
+    key: 'substr',
+    value: function substr(start, length) {
+      return new Str(this.$.substr.apply(this.$, arguments));
+    }
+
+    /**
+     * @method Str#substring
+     * @public
+     * @param {Number} [indexStart = 0] - See the link.
+     * @param {Number} [indexEnd = string.length] - See the link.
+     * @returns {Str} New instance of Str.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/substring
+     * @description Synonym for
+     * [String#substring]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/substring}.
+     */
+
+  }, {
+    key: 'substring',
+    value: function substring(indexStart, indexEnd) {
+      return new Str(this.$.substring.apply(this.$, arguments));
+    }
+
+    /**
+     * @method Str#toCamelCase
+     * @public
+     * @returns {Str} New instance of Str.
+     * @description Removes following regexp /\s\-_\./ making the string camel cased.
+     *
+     * @example
+     * new Str('spinal-case').toCamelCase().$;  // 'spinalCase'
+     * new Str('_snake_case_').toCamelCase().$; // 'snakeCase'
+     */
+
+  }, {
+    key: 'toCamelCase',
+    value: function toCamelCase() {
+      return new Str(trim(this.$).replace(/[\s\-_.]+/g, '-').replace(/-[^-]/g, function (match) {
+        return match[1].toUpperCase();
+      }).replace(/^[\S]/, function (match) {
+        return match.toLowerCase();
+      }));
+    }
+
+    /**
+     * @method Str#toCapitalCase
+     * @public
+     * @returns {Str} New instance of Str.
+     * @description Removes following regexp /\-_\./ making the string capital letter cased.
+     *
+     * @example
+     * new Str('spinal-case').toCapitalCase().$;  // 'Spinal Case'
+     * new Str('_snake_case_').toCapitalCase().$; // 'Snake Case'
+     */
+
+  }, {
+    key: 'toCapitalCase',
+    value: function toCapitalCase() {
+      return new Str(trim(this.$).replace(/[\s\-_.]+/g, ' ').replace(/[\S]/g, function (match) {
+        return match.toLowerCase() === match ? match : ' ' + match;
+      }).replace(/\s[\S]/g, function (match) {
+        return match.toUpperCase();
+      }).replace(/\s+/g, ' ').replace(/^\s/, '').replace(/^[\S]/, function (match) {
+        return match.toUpperCase();
+      }));
+    }
+
+    /**
+     * @method Str#toDotCase
+     * @public
+     * @returns {Str} New instance of Str.
+     * @description Removes following regexp /\-_\./ making the string dot cased.
+     *
+     * @example
+     * new Str('spinal-case').toDotCase().$;  // 'spinal.case'
+     * new Str('_snake_case_').toDotCase().$; // 'snake.case'
+     */
+
+  }, {
+    key: 'toDotCase',
+    value: function toDotCase() {
+      return new Str(trim(this.$).replace(/[\s\-_.]+/g, '.').replace(/[^.]/g, function (match) {
+        return match.toLowerCase() === match ? match : '.' + match;
+      }).replace(/\.+/g, '.').replace(/^\./, '').toLowerCase());
+    }
+
+    /**
+     * @method Str#toHyphenCase
+     * @public
+     * @returns {Str} New instance of Str.
+     * @description Removes following regexp /\s\-_\./ making the string camel cased.
+     *
+     * @example
+     * new Str('camelCase').toSpinalCase().$;    // 'camel-case'
+     * new Str('_snake_case_').toSpinalCase().$; // 'snake-case'
+     */
+
+  }, {
+    key: 'toHyphenCase',
+    value: function toHyphenCase() {
+      return new Str(trim(this.$).replace(/[\s\-_.]+/g, '-').replace(/[^-]/g, function (match) {
+        return match.toLowerCase() === match ? match : '-' + match;
+      }).replace(/-+/g, '-').replace(/^-/, '').toLowerCase());
+    }
+
+    /**
+     * @method Str#toLowerCase
+     * @public
+     * @returns {Str} New instance of Str.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/toLowerCase
+     * @description Synonym for
+     * [String#toLowerCase]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/toLowerCase}.
+     *
+     * @example
+     * new Str('UPPER-CASE').toLowerCase().$;  // 'upper-case'
+     */
+
+  }, {
+    key: 'toLowerCase',
+    value: function toLowerCase() {
+      return new Str(this.$.toLowerCase());
+    }
+
+    /**
+     * @method Str#toSnakeCase
+     * @public
+     * @returns {Str} New instance of Str.
+     * @description Removes following regexp /\s\-\./ making the string spinal cased.
+     *
+     * @example
+     * new Str('spinal-case').toSnakeCase().$; // 'spinal_case'
+     * new Str('camelCase').toSnakeCase().$;   // 'camel_case'
+     */
+
+  }, {
+    key: 'toSnakeCase',
+    value: function toSnakeCase() {
+      return new Str(trim(this.$).replace(/[\s\-_.]+/g, '_').replace(/[^_]/g, function (match) {
+        return match.toLowerCase() === match ? match : '_' + match;
+      }).replace(/_+/g, '_').replace(/^_/, '').toLowerCase());
+    }
+
+    /**
+     * @method Str#toSpaceCase
+     * @public
+     * @returns {Str} New instance of Str.
+     * @description Removes following regexp /\-_\./ making the string space cased.
+     *
+     * @example
+     * new Str('spinal-case').toSpaceCase().$;  // 'spinal case'
+     * new Str('_snake_case_').toSpaceCase().$; // 'snake case'
+     */
+
+  }, {
+    key: 'toSpaceCase',
+    value: function toSpaceCase() {
+      return new Str(trim(this.$).replace(/[\s\-_.]+/g, ' ').replace(/[\S]/g, function (match) {
+        return match.toLowerCase() === match ? match : ' ' + match;
+      }).replace(/\s+/g, ' ').replace(/^\s/, '').toLowerCase());
+    }
+  }, {
+    key: 'toString',
+    value: function toString() {
+      return this.$;
+    }
+
+    /**
+     * @method Str#toUpperCase
+     * @public
+     * @returns {Str} New instance of Str.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/toUpperCase
+     * @description Synonym for
+     * [String#toUpperCase]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/toUpperCase}.
+     *
+     * @example
+     * new Str('lower-case').toUpperCase().$;  // 'LOWER-CASE'
+     */
+
+  }, {
+    key: 'toUpperCase',
+    value: function toUpperCase() {
+      return new Str(this.$.toUpperCase());
+    }
+
+    /**
+     * @method Str#trim
+     * @public
+     * @returns {Str} New instance of Str.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/trim
+     * @description Synonym for
+     * [String#trim]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/trim}.
+     */
+
+  }, {
+    key: 'trim',
+    value: function trim() {
+      return new Str(this.$.replace(/^[\s\ufeff\u00a0]+|[\s\ufeff\u00a0]+$/g, ''));
+    }
+
+    /**
+     * @method Str#trimLeft
+     * @public
+     * @returns {Str} New instance of Str.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/trimLeft
+     * @description Synonym for
+     * [String#trimLeft]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/trimLeft}.
+     */
+
+  }, {
+    key: 'trimLeft',
+    value: function trimLeft() {
+      return new Str(this.$.replace(/^[\s\ufeff\u00a0]+/, ''));
+    }
+
+    /**
+     * @method Str#trimRight
+     * @public
+     * @returns {Str} New instance of Str.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/trimRight
+     * @description Synonym for
+     * [String#trimRight]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/trimRight}.
+     */
+
+  }, {
+    key: 'trimRight',
+    value: function trimRight() {
+      return new Str(this.$.replace(/[\s\ufeff\u00a0]+$/, ''));
+    }
+  }, {
+    key: 'length',
+    get: function get() {
+      return this.$.length;
+    }
+  }]);
+  return Str;
+}(Super);
+
+defineProperties(Str.prototype, defineProperty({}, _Symbol.toStringTag, 'Str'));
+
+constructors[2].push({
+  check: isString,
+  cls: Str
+});
+
+function trim(string) {
+  return string.replace(/^[\s\-_.]+|[\s\-_.]+$/g, '');
+}
+
+/**
+ * @function parseJSON
+ * @public
+ * @param {String} [json = null] - String to parse.
+ * @param {Object} [options] - Options.
+ * @param {Boolean|*} [options.numbers] - If it is needed to parse number-like strings as numbers.
+ * @param {Boolean|*} [options.dates] - If it is needed to parse date-like string as dates.
+ * Date-like string is considered to match ^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.\d\d\dZ?$
+ * @param {JSONCallback} [callback] - Callback that called on every iteration.
+ * @returns {DWrap} D-Wrap of found match.
+ * @description Method for parsing json.
+ *
+ * @example
+ * parseJSON('{ "a": 1 }').$;                                           // { a: 1 }
+ * parseJSON('{ "a": "1" }', { numbers: true }).$;                      // { numbers: true }
+ * parseJSON('{ "a": "1999-12-31T23:59:59.999Z" }', { dates: true }).$; // { a: Date {...} }
+ */
+function parseJSON() {
+  var json = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var callback = arguments[2];
+
+  if (arguments.length <= 1) {
+    return D$2(JSON.parse(json));
+  }
+
+  if (isFunction(options)) {
+    callback = options;
+    options = {};
+  }
+
+  var _options = options,
+      numbers = _options.numbers,
+      dates = _options.dates;
+
+  var parsed = JSON.parse(json, function (key, value) {
+    if (dates && /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.\d\d\dZ?$/.test(value)) {
+      value = new Date(value);
+    } else if (numbers && isNumberLike(value) && isString(value)) {
+      value = Number(value);
+    }
+
+    return callback ? callback.apply(this, arguments) : value;
+  });
+
+  return D$2(parsed);
+}
+
+/**
+ * @module helpers/markupToJSON
+ * @private
+ * @description Exports markupToJSON method.
+ */
+
+/**
+ * @typedef {Object} MarkupElement
+ * @property {'comment'|'text'|'element'} type - Type of the node.
+ * @property {MarkupElement} parent - Type of the node.
+ * @property {Object.<String, String>} attrs - Node attributes
+ * @property {MarkupElement[]} children - Node children.
+ */
+
+var submitString = 'Please, submit an issue at https://github.com/dwaynejs/dwayne/issues.';
+var NODE_REGEX_SET = new Super({
+  'tag-open': new RegExp('<(' + htmlAllowedTagSymbols + ')\\s*', 'i'),
+  'tag-close': constructCloseTagRegExp(htmlAllowedTagSymbols),
+  comment: /<!--((?:-[^\->]|[^\->])(?:-?[^-])*[^-]?|)-->/
+});
+var TAG_OPEN_CLOSE = /^(\/?)>/;
+// const ATTRIBUTE = /^([^\u0000-\u0020\s"'>\/=]+)(?:\s*=\s*('[^']*'|"[^"]*"|[^\s"'`<>=]+))?\s*/;
+var ATTRIBUTE = new RegExp('^(' + htmlAllowedAttrSymbols + ')(?:\\s*=\\s*(\'[^\']*\'|"[^"]*"|[^\\s"\'`<>=]+))?\\s*');
+var div = document.createElement('div');
+var nodeSwitcher = switcher('strictEquals', function (elem) {
+  return elem;
+}).case('tag-open', function (elem, node) {
+  var _node = node,
+      name = _node.value,
+      selfClosing = _node.selfClosing;
+
+
+  node = {
+    name: name,
+    attrs: new Super(node.attrs).map(function (value) {
+      return parseCharacterData(value);
+    }).$,
+    parent: elem,
+    children: new Arr([])
+  };
+
+  elem.children.push(node);
+
+  if (!selfClosing && voidElements.indexOf(name) === -1) {
+    elem = node;
+  }
+
+  return elem;
+}).case('tag-close', function (elem, node) {
+  if (elem.name === node.value) {
+    elem = elem.parent;
+  }
+
+  return elem;
+}).case(['comment', 'text'], function (elem, node, collapseWhiteSpace, type) {
+  var element = {
+    name: '#' + type,
+    parent: elem,
+    value: node.value
+  };
+
+  if (type === 'text' && elem.name !== 'script' && elem.name !== 'style') {
+    element.value = parseCharacterData(element.value);
+
+    if (collapseWhiteSpace) {
+      element.value = new Str(element.value).trim().$;
+    }
+  }
+
+  if (!collapseWhiteSpace || !/^\s*$/.test(element.value)) {
+    elem.children.push(element);
+  }
+
+  return elem;
+});
+var rawTextSwitcher = switcher('strictEquals', false).case(['title', 'textarea', 'style', 'script'], true);
+
+var InternalParsingError = function InternalParsingError(index) {
+  classCallCheck(this, InternalParsingError);
+
+  this.index = index;
+};
+
+var ParsingError = function (_Error) {
+  inherits(ParsingError, _Error);
+
+  function ParsingError() {
+    var _ref;
+
+    var _temp, _this, _ret;
+
+    classCallCheck(this, ParsingError);
+
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = ParsingError.__proto__ || Object.getPrototypeOf(ParsingError)).call.apply(_ref, [this].concat(args))), _this), _this.type = 'PARSING_ERROR', _temp), possibleConstructorReturn(_this, _ret);
+  }
+
+  return ParsingError;
+}(Error);
+
+/**
+ * @function markupToJSON
+ * @private
+ * @param {String} markup - Markup to parse to JSON.
+ * @param {Boolean} [collapseWhiteSpace = false] - If the whitespace should be collapsed.
+ * @returns {Arr.<MarkupElement>} Markup elements array.
+ * @description Function for parsing html and xml to JSON.
+ */
+
+
+var markupToJSON = (function (markup, collapseWhiteSpace) {
+  collapseWhiteSpace = !!collapseWhiteSpace;
+
+  var elements = new Arr([]);
+  var startMarkup = markup;
+  var found = void 0;
+  var globalIndex = 0;
+  var elem = {
+    name: null,
+    children: elements
+  };
+
+  while (markup.length) {
+    try {
+      found = find$1(markup, elem);
+    } catch (err) {
+      if (!(err instanceof InternalParsingError)) {
+        throwUnexpectedError();
+      }
+
+      throw new ParsingError('Parsing error near index ' + nearString(startMarkup, globalIndex + err.index));
+    }
+
+    var _found = found,
+        type = _found.type,
+        attrs = _found.attrs,
+        selfClosing = _found.selfClosing,
+        index = _found.index,
+        value = _found.value;
+
+
+    globalIndex += index;
+
+    if (!index) {
+      throwUnexpectedError();
+    }
+
+    var node = {
+      type: type,
+      value: value
+    };
+
+    if (type === 'tag-open') {
+      node.attrs = attrs;
+      node.selfClosing = selfClosing;
+    }
+
+    elem = nodeSwitcher(node.type, [elem, node, collapseWhiteSpace]);
+
+    markup = markup.slice(index);
+  }
+
+  return elements;
+
+  function throwUnexpectedError() {
+    throw new ParsingError('Unexpected parsing error near index ' + nearString(startMarkup, globalIndex) + '. ' + submitString);
+  }
+});
+
+function find$1(markup, elem) {
+  var name = elem.name;
+
+  var matches = void 0;
+
+  if (rawTextSwitcher(name)) {
+    matches = new Super({
+      'tag-close': markup.match(constructCloseTagRegExp(name))
+    });
+  } else {
+    matches = NODE_REGEX_SET.map(function (regex) {
+      return markup.match(regex);
+    });
+  }
+
+  var match = void 0;
+
+  if (match = matches.find(function (match) {
+    return match && match.index === 0;
+  })) {
+    var returning = {
+      type: match.key,
+      index: match.value[0].length,
+      value: match.value[1]
+    };
+    var attrs = {};
+
+    if (match.key === 'tag-open') {
+      var startMarkup = markup;
+      var closeMatch = void 0;
+
+      returning.selfClosing = false;
+      returning.attrs = attrs;
+
+      while ((markup = startMarkup.slice(returning.index)) && !(closeMatch = markup.match(TAG_OPEN_CLOSE))) {
+        var attr = markup.match(ATTRIBUTE);
+
+        if (!attr) {
+          returning.index += 1;
+
+          continue;
+        }
+
+        attrs[attr[1]] = (attr[2] || '').replace(/^("|')|("|')$/g, '');
+        returning.index += attr[0].length;
+      }
+
+      if (closeMatch) {
+        returning.index += closeMatch[0].length;
+        returning.selfClosing = !!closeMatch[1];
+      }
+    }
+
+    return returning;
+  }
+
+  var _matches$min = matches.min(function (match) {
+    return match ? match.index : NaN;
+  }),
+      index = _matches$min.value;
+
+  if (index === Infinity) {
+    index = markup.length;
+  }
+
+  return {
+    type: 'text',
+    index: index,
+    value: markup.slice(0, index)
+  };
+}
+
+function constructCloseTagRegExp(tagName) {
+  return new RegExp('</(' + tagName + ')\\s*>', 'i');
+}
+
+function nearString(markup, index) {
+  return index + ' (~~~ "' + markup.slice(index, index + 15) + '" ~~~, the string itself is "' + markup + '")';
+}
+
+function parseCharacterData(string) {
+  return string.replace(/&(\w+|#x?\d+);/g, function (match) {
+    div.innerHTML = match;
+
+    return div.textContent || div.innerText;
+  });
+}
+
+/**
+ * @module Elem
+ * @private
+ * @mixin
+ * @description Exports Elem class.
+ */
+
+/**
+ * @typedef {String} ElemEventString
+ * @public
+ * @description A string containing events separated by a comma with zero or more spaces or just spaces.
+ */
+
+/**
+ * @callback ElemValueCallback
+ * @public
+ * @param {String} value - Old value.
+ * @param {Elem} elem - Current element.
+ * @param {Number} index - Index in the set of the elements.
+ */
+
+/**
+ * @callback ElemSetOfCallback
+ * @public
+ * @param {Element} created - Created element.
+ * @param {*} value - Value of the iterated element in the object.
+ * @param {Key} key - Key of the iterated element in the object.
+ * @param {*} object - Object that is iterated over.
+ * @param {Element} elem - Current element.
+ * @param {Number} index - Index of the current element.
+ */
+
+/**
+ * @callback ValidateCallback
+ * @public
+ * @param {*} value - Element value.
+ * @param {Element} elem - Element to validate.
+ * @param {Number} index - Index of the element.
+ */
+
+/**
+ * @callback CtxCallback
+ * @public
+ * @param {CanvasRenderingContext2D} ctx - Canvas rendering context.
+ */
+
+/**
+ * @callback ElemListener
+ * @public
+ * @param {Event} e - Fired event.
+ * @param {Element} elem - Element on which the listener was called.
+ * @param {Number} index - Index of the element on which the listener was called.
+ */
+
+/**
+ * @callback ElemRemoveListeners
+ * @public
+ * @param {...ElemEventString} events - If at least one argument present only removes event listeners specified
+ * by the events in the arguments.
+ */
+
+var nativeDocument = global$1.document;
+var emptyDiv = nativeDocument.createElement('div');
+var eventSeparator = /(,| ) */;
+var textProperty = new Super(Node.prototype).propertyDescriptor('textContent') ? 'textContent' : 'innerText';
+var classes = {};
+var attrs = {};
+var windowsDwayneData = new Arr([]);
+var inputElements = 'input, select, textarea, datalist, keygen, output';
+var click$1 = method('click');
+var svgNS$1 = 'http://www.w3.org/2000/svg';
+var xmlNS = 'http://www.w3.org/2000/xmlns/';
+var xlinkNS = 'http://www.w3.org/1999/xlink';
+var xhtmlNS = 'http://www.w3.org/1999/xhtml';
+var typeSwitcher = switcher('call', function (elem, type) {
+  var ns = type === 'svg' ? svgNS$1 : elem.prop('namespaceURI') || nativeDocument.documentElement.namespaceURI || xhtmlNS;
+
+  return nativeDocument.createElementNS(ns, type);
+}).case(function (type) {
+  return type === '#comment';
+}, function () {
+  return nativeDocument.createComment('');
+}).case(function (type) {
+  return type === '#text';
+}, function () {
+  return nativeDocument.createTextNode('');
+});
+var refSwitcher = switcher('strictEquals', 'href').case(['img', 'script', 'iframe', 'audio', 'video'], 'src').case('form', 'action');
+var filterSwitcher = switcher('call', function (selector) {
+  return selector;
+}).case(isString, function (selector) {
+  return function (elem) {
+    return new Elem(elem).is(selector);
+  };
+}).case([isArray, isElem], function (elems) {
+  elems = new Arr(elems);
+
+  return function (elem) {
+    return elems.indexOf(elem) !== -1;
+  };
+});
+var innerSwitcher = switcher('strictEquals', 0).case('padding-box', function (paddings) {
+  return paddings;
+}).case('border-box', function (paddings, borders) {
+  return paddings + borders;
+});
+var outerSwitcher = switcher('strictEquals', function (borders, paddings) {
+  return borders + paddings;
+}).case('padding-box', function (borders) {
+  return borders;
+}).case('border-box', 0);
+var attrNSSwitcher = switcher('call', null).case(function (attr) {
+  return attr === 'xmlns' || attr === 'xmlns:xlink';
+}, function (elem) {
+  return elem.name === 'svg' ? xmlNS : null;
+}).case(function (attr) {
+  return (/^xlink:\w/.test(attr)
+  );
+}, function (elem) {
+  return elem.closest('svg').length ? xlinkNS : null;
+});
+
+/**
+ * @class Elem
+ * @extends Arr
+ * @public
+ * @param {Element|Element[]} [elem = []] - An element or an array of elements to wrap.
+ * @returns {Elem} Instance of Elem.
+ * @description Wrap of an elements set. Also has all methods from from
+ * [CanvasRenderingContext2D]{@link https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D}.
+ * Getters methods return the same as methods from CanvasRenderingContext2D and the rest return this.
+ * Work for the first canvas element in the set.
+ *
+ * @example
+ * new Elem(document.body);
+ * new Elem(document.querySelectorAll('.cls'));
+ * new Elem(document.getElementsByClassName('cls'));
+ */
+
+var Elem = function (_Arr) {
+  inherits(Elem, _Arr);
+
+  function Elem() {
+    var elem = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+    classCallCheck(this, Elem);
+
+    var _this = possibleConstructorReturn(this, (Elem.__proto__ || Object.getPrototypeOf(Elem)).call(this, function () {
+      var element = elem;
+
+      if (isArrayLike(element) && (isWindow(element) || isHTMLDocument(element) || isDocumentFragment(element) || isElement(element) || isCommentOrText(element) || isStyleRule(element))) {
+        element = [element];
+      }
+
+      return new Arr(toArray$1(new Super(element).$, true)).object(function (elems, elem) {
+        if (elems.indexOf(elem) === -1 && (isElement(elem) || isWindow(elem) || isHTMLDocument(elem) || isDocumentFragment(elem) || isCommentOrText(elem) || isStyleRule(elem))) {
+          return elems.push(elem);
+        }
+
+        if (isElem(elem)) {
+          elems.push.apply(elems, elem.$);
+        }
+      }, []).$;
+    }()));
+
+    _this.$$ = elem;
+
+    _this.forEach(addDwayneData);
+
+    /**
+     * @member {Array.<Node|Window>} Elem#$
+     * @type {Array.<Node|Window>}
+     * @public
+     * @description Constructed element set.
+     */
+
+    /**
+     * @member {*} Elem#$$
+     * @type {*}
+     * @public
+     * @description Initial element set.
+     */
+    return _this;
+  }
+
+  /**
+   * @method Elem#add
+   * @public
+   * @param {...(String|Elem|Element|Element[])} elements - Each argument is a selector, or Elem, or Element, or array of Elements.
+   * @returns {Elem} Returns this.
+   * @description Method for adding new elements to the set.
+   *
+   * @example
+   * elem1.find('.cls1')
+   *   .add(elem2.find('.cls2'))
+   *   .hide();
+   */
+
+
+  createClass(Elem, [{
+    key: 'add',
+    value: function add() {
+      var _this2 = this;
+
+      for (var _len = arguments.length, elements = Array(_len), _key = 0; _key < _len; _key++) {
+        elements[_key] = arguments[_key];
+      }
+
+      iterate(arguments, function (elem) {
+        toFind(elem).forEach(function (elem) {
+          if (_this2.indexOf(elem) === -1) {
+            _this2.push(elem);
+          }
+        });
+      });
+
+      return this;
+    }
+
+    /**
+     * @method Elem#addClass
+     * @public
+     * @param {...String} classes - Classes to add.
+     * @returns {Elem} Returns this.
+     * @description Method for adding classes to the all the elements in the set.
+     *
+     * @example
+     * elem.addClass('red', 'round');
+     */
+
+  }, {
+    key: 'addClass',
+    value: function addClass() {
+      var _arguments = arguments;
+
+      for (var _len2 = arguments.length, classes = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        classes[_key2] = arguments[_key2];
+      }
+
+      return this.forEach(function (elem) {
+        var list = elem.classList;
+
+        iterate(isElement(elem) && _arguments, function (cls) {
+          return list.add(cls);
+        });
+      });
+    }
+
+    /**
+     * @method Elem#addComment
+     * @public
+     * @param {String} text - Text of comment to add.
+     * @param {Boolean} end - If the comment should be inserted to the end. If false it's inserted to the start.
+     * @returns {Elem} Returns this.
+     * @description Method for adding comment to all the elements in the set.
+     *
+     * @example
+     * elem.addHTML('<div>1</div>');
+     */
+
+  }, {
+    key: 'addComment',
+    value: function addComment(text) {
+      var end = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+      return this.forEach(function (elem) {
+        if (isElement(elem)) {
+          elem.insertAdjacentHTML(end ? 'beforeend' : 'afterbegin', '<!--' + text + '-->');
+        }
+      });
+    }
+
+    /**
+     * @method Elem#addHTML
+     * @public
+     * @param {String} html - HTML to add.
+     * @param {Boolean} end - If the HTML should be inserted to the end. If false it's inserted to the start.
+     * @returns {Elem} Returns this.
+     * @description Method for adding HTML to all the elements in the set.
+     *
+     * @example
+     * elem.addHTML('<div>1</div>');
+     */
+
+  }, {
+    key: 'addHTML',
+    value: function addHTML(html) {
+      var end = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+      return this.forEach(function (elem) {
+        if (isElement(elem)) {
+          elem.insertAdjacentHTML(end ? 'beforeend' : 'afterbegin', html);
+        }
+      });
+    }
+
+    /**
+     * @method Elem#addRule
+     * @public
+     * @param {String} name - Name of the rule.
+     * @param {String} selector - Selector for the rule
+     * @param {Object.<String, String>} style - Style for the selector.
+     * @returns {Elem} Returns this.
+     * @description Method for adding css styles into the first style tag in the set.
+     * Note: style element should be inside the document.
+     *
+     * @example
+     * style.addRule('img-size', 'img.square', {
+     *   width: '40px !important',
+     *   height: '40px !important'
+     * });
+     */
+
+  }, {
+    key: 'addRule',
+    value: function addRule(name, selector, style) {
+      this.some(function (elem) {
+        if (getName(elem) === 'style') {
+          var sheet = elem.sheet;
+          var length = sheet.cssRules.length;
+
+          var rules = new Super(style).word(function (value, property) {
+            return new Str(property).toHyphenCase() + ': ' + value + ';\n';
+          });
+
+          sheet.insertRule(selector + ' {' + (rules && '\n') + rules + '}', length);
+          sheet.cssRules[length].dwayneData = { name: name };
+
+          return true;
+        }
+      });
+
+      return this;
+    }
+
+    /**
+     * @method Elem#addText
+     * @public
+     * @param {String} text - Text to add.
+     * @param {Boolean} end - If the text should be inserted to the end. If false it's inserted to the start.
+     * @returns {Elem} Returns this.
+     * @description Method for adding text to all the elements in the set.
+     *
+     * @example
+     * elem.addText('123');
+     */
+
+  }, {
+    key: 'addText',
+    value: function addText(text) {
+      var end = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+      return this.forEach(function (elem) {
+        new Elem(nativeDocument.createTextNode(text)).into(elem, end);
+      });
+    }
+
+    /**
+     * @method Elem#apply
+     * @public
+     * @param {...String} strings - Strings to apply.
+     * @returns {Elem} Returns this.
+     * @description Method that is a shorthand for many other methods.
+     * All shorthands can be separated with space and written within one string.
+     *
+     * @example
+     * elem.apply(
+     *   '#id .c1 .c2 @border(1px solid black) $disabled $attr(some value) *(Click me!)'
+     * );
+     * // shorthand for
+     * // elem
+     * //   .id('id')
+     * //   .addClass('c1', 'c2')
+     * //   .css('border', '1px solid black')
+     * //   .attr({
+     * //     attr, 'some value'
+     * //     disabled: ''
+     * //   })
+     * //   .text('Click me!');
+     * // There is a full list of possible types of syntax below...
+     *
+     * elem.apply('#id');                    // shorthand for elem.id('id');
+     * elem.apply('.c1 .c2');                // shorthand for elem.addClass('c1', 'c2');
+     * elem.apply('-.c1 -.c2');              // shorthand for elem.removeClass('c1', 'c2');
+     * elem.apply('-@float -@display');      // shorthand for elem.removeCSS('float', 'display');
+     * elem.apply('-$a1 -$a2');              // shorthand for elem.removeAttr('a1', 'a2');
+     * elem.apply('*(some text)');           // shorthand for elem.text('some text');
+     * elem.apply('&(<div>1</div>)');        // shorthand for elem.html('<div>1</div>');
+     * elem.apply('@float(right)');          // shorthand for elem.css('float', 'right');
+     * elem.apply('@transform(scale(5px))'); // shorthand for elem.css('transform', 'scale(5px)');
+     * elem.apply('@margin(2px 2px)');       // shorthand for elem.css('margin', '2px 2px');
+     * elem.apply('@marginLeft(2px)');       // shorthand for elem.css('marginLeft', '2px 2px');
+     * elem.apply('@margin-left(2px)');      // shorthand for elem.css('margin-left', '2px 2px');
+     * elem.apply('$attr(some value)');      // shorthand for elem.attr('attr', 'some value');
+     * elem.apply('$attr');                  // shorthand for elem.attr('attr', '');
+     */
+
+  }, {
+    key: 'apply',
+    value: function apply() {
+      var _this3 = this;
+
+      for (var _len3 = arguments.length, strings = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+        strings[_key3] = arguments[_key3];
+      }
+
+      var applied = void 0;
+      var setApplied = void 0;
+      var callback = void 0;
+      var name = void 0;
+      var np1 = void 0;
+      var slice = void 0;
+
+      new Str(new Arr(arguments).join(' ')).split(/(\s+)/).forEach(function (string) {
+        if (!applied) {
+          np1 = string.slice(0, 1);
+          callback = appliedRegExps[np1];
+          slice = 1;
+
+          if (callback && !isFunction(callback)) {
+            callback = callback[string.slice(1, 2)];
+            slice = 2;
+          }
+
+          if (/^\s+$/.test(string) || !callback) {
+            return;
+          }
+
+          name = string.slice(slice).match(/^[^()]+/);
+
+          if (!name && np1 !== '*' && np1 !== '&') {
+            return;
+          }
+
+          applied = {
+            name: name ? name[0] : '',
+            args: string.slice(slice + (name ? name[0] : '').length),
+            callback: callback
+          };
+
+          setApplied = true;
+        }
+
+        if (!setApplied) {
+          applied.args += string;
+        }
+
+        if (!applied.args || /^\([\s\S]+\)$/.test(applied.args)) {
+          applied.callback(_this3, applied.name, applied.args.replace(/^\(|\)$/g, ''));
+          applied = null;
+        }
+
+        setApplied = false;
+      });
+
+      return this;
+    }
+
+    /**
+     * @method Elem#attr
+     * @public
+     * @param {String|Object.<String, String|ElemValueCallback>} [attr] - Name of the attribute to get or
+     * an object of the format { [attrName]: value, ... } to set attributes.
+     * @param {String|ElemValueCallback} [value] - If the first argument is a string
+     * it should be a value to set for that attribute.
+     * @returns {Super|String|Elem} If no arguments passed, D-Wrap of attributes of the first element in the set
+     * returned, if 1 string argument is passed the value of the attribute of the first element in the set
+     * returned otherwise returns this.
+     * @description Method for getting/setting attributes.
+     *
+     * @example
+     * elem.attr('attr1', 'value1'); // attribute attr1 set to 'value1' and this returned
+     * elem.attr('attr1');           // 'value1'
+     * elem.attr({
+     *   attr1: 'value3',            // attribute attr1 set to 'value3'
+     *   attr2: 'value2'             // attribute attr2 set to 'value2'
+     * });                           // this returned
+     * elem.attr().$;                // { attr1: 'value3', attr2: 'value2' }
+     */
+
+  }, {
+    key: 'attr',
+    value: function attr(_attr, value) {
+      var elem = getElem(this);
+
+      if (!arguments.length) {
+        return new Super(elem.attributes).object(function (o, attr) {
+          o[attr.name] = attr.value;
+        });
+      }
+
+      if (arguments.length <= 1 && isString(_attr)) {
+        var ns = attrNSSwitcher(_attr, [new Elem(elem)]);
+
+        return isNull(ns) ? elem.getAttribute(_attr) : elem.getAttributeNS(ns, _attr);
+      }
+
+      if (arguments.length >= 2) {
+        _attr = defineProperty({}, _attr, value);
+      }
+
+      return this.forEach(function (elem, index) {
+        if (!isElement(elem)) {
+          return;
+        }
+
+        new Super(_attr).forEach(function (value, key) {
+          value = isFunction(value) ? value(new Elem(elem).attr(key), elem, index) : value;
+
+          if (isNil(value)) {
+            return new Elem(elem).removeAttr(key);
+          }
+
+          var ns = attrNSSwitcher(key, [new Elem(elem)]);
+
+          if (isNull(ns)) {
+            elem.setAttribute(key, value);
+          } else {
+            elem.setAttributeNS(ns, key, value);
+          }
+        });
+      });
+    }
+
+    /**
+     * @method Elem#blob
+     * @public
+     * @param {Object} [options = {}] - Options that are passed into {@link blob}.
+     * @returns {Promise.<BlobObject>} New instance of promise.
+     * @description Returns a {@link BlobObject} Promise. Works with image or canvas first element.
+     *
+     * @example
+     * image.blob().then((blob) => console.log(blob));  // BlobObject
+     * canvas.blob().then((blob) => console.log(blob)); // BlobObject
+     */
+
+  }, {
+    key: 'blob',
+    value: function blob() {
+      var _this4 = this;
+
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      return new Promise$1(function (resolve, reject) {
+        var elem = _this4.first();
+        var name = elem.name;
+
+
+        if (name !== 'img' && name !== 'canvas') {
+          reject(new Error('First element in the set isn\'t an image or a canvas! (Elem#blob)'));
+        }
+
+        if (name === 'canvas') {
+          return resolve(elem);
+        }
+
+        elem.load().then(function () {
+          if (elem.isBroken()) {
+            return reject(new Error('The image is broken! (Elem#blob)'));
+          }
+
+          var canvas = new Elem(nativeDocument).canvas();
+          var width = elem.width();
+          var height = elem.height();
+
+          canvas.width(width).height(height).drawImage(elem.$[0], 0, 0);
+
+          resolve(canvas);
+        });
+      }).then(function (canvas) {
+        var dataURL = canvas.dataURL();
+        var byteString = atob(dataURL.split(',')[1]);
+        var length = byteString.length;
+        var ab = new ArrayBuffer(length);
+        var ia = new Uint8Array(ab);
+
+        iterate$1(length, function (i) {
+          ia[i] = byteString.charCodeAt(i);
+        });
+
+        return blob$1(ab, options);
+      });
+    }
+
+    /**
+     * @method Elem#blur
+     * @returns {Elem} Returns this.
+     * @see https://developer.mozilla.org/en/docs/Web/API/HTMLElement/blur
+     * @description Synonym for
+     * [HTMLElement#blur]{@link https://developer.mozilla.org/en/docs/Web/API/HTMLElement/blur}.
+     */
+
+  }, {
+    key: 'blur',
+    value: function blur() {
+      return this.forEach(function (elem) {
+        if (isElement(elem)) {
+          elem.blur();
+        }
+      });
+    }
+
+    /**
+     * @method Elem#calcCSS
+     * @param {String} [pseudo] - See the link.
+     * @returns {CSSStyleDeclaration} See the link.
+     * @see https://developer.mozilla.org/en/docs/Web/API/Window/getComputedStyle
+     * @description Synonym for
+     * [getComputedStyle]{@link https://developer.mozilla.org/en/docs/Web/API/Window/getComputedStyle}.
+     * Returns computed style for the first element in the set or undefined.
+     */
+
+  }, {
+    key: 'calcCSS',
+    value: function calcCSS() {
+      var pseudo = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+      return getComputedStyle(getElem(this), pseudo);
+    }
+
+    /**
+     * @method Elem#changeRule
+     * @public
+     * @param {String} name - Name of the rule.
+     * @param {Object.<String, String>} style - Style for the selector.
+     * @returns {Elem} Returns this.
+     * @description Method for changing css styles in the first style tag in the set.
+     * Note: style element should be inside the document.
+     *
+     * @example
+     * style.changeRule('img-size', {
+     *   width: '50px !important',
+     *   height: '50px !important'
+     * });
+     */
+
+  }, {
+    key: 'changeRule',
+    value: function changeRule(name, style) {
+      this.some(function (elem) {
+        if (getName(elem) === 'style') {
+          var _ref = new Arr(elem.sheet.cssRules).find(function (rule) {
+            return rule.dwayneData && rule.dwayneData.name === name;
+          }) || {},
+              rule = _ref.value;
+
+          if (rule) {
+            new Elem(rule).css(style);
+
+            return true;
+          }
+        }
+      });
+
+      return this;
+    }
+
+    /**
+     * @method Elem#child
+     * @public
+     * @param {Number|String|Elem|Element|Element[]} element - If the argument is a number a wrap of the set of the children
+     * of this index of each element in the set returned otherwise an element to put into this element, a collection
+     * or a selector of it.
+     * @param {Boolean} end - If the elements should be inserted to the end. If false they are inserted to the start.
+     * @returns {Elem} Returns a wrap of children or inserted elements.
+     * @description Method is similar to
+     * [Node#appendChild]{@link https://developer.mozilla.org/en/docs/Web/API/Node/appendChild}.
+     *
+     * @example
+     * const child = elem.child(1);
+     *
+     * elem.child(elem2);
+     * elem.child(document.getElementById('id'));
+     * elem.child('#id div.c1');
+     */
+
+  }, {
+    key: 'child',
+    value: function child(element) {
+      var end = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+      if (isInteger(element) && element >= 0) {
+        return this.children().elem(element);
+      }
+
+      return toFind(element).into(this, end);
+    }
+
+    /**
+     * @method Elem#children
+     * @public
+     * @returns {Elem} D-Wrap of the children of the first element in the set.
+     * @description Method for getting element's children.
+     *
+     * @example
+     * const children = elem.children();
+     */
+
+  }, {
+    key: 'children',
+    value: function children() {
+      return new Elem(this.length ? this.$[0].childNodes : []);
+    }
+
+    /**
+     * @method Elem#class
+     * @public
+     * @param {String} [cls] - If it's present it has to contain class attribute to set.
+     * @returns {Arr|Elem} If the argument is present this returned otherwise a wrap of the classes array returned.
+     * @description Method for getting/setting classes.
+     *
+     * @example
+     * elem.class('c1 c2'); // class set to 'c1 c2'
+     * elem.class().$;      // ['c1', 'c2']
+     */
+
+  }, {
+    key: 'class',
+    value: function _class(cls) {
+      if (!arguments.length) {
+        return new Arr(getElem(this).className.split(' '));
+      }
+
+      return this.forEach(function (elem) {
+        if (isElement(elem)) {
+          elem.className = cls;
+        }
+      });
+    }
+
+    /**
+     * @method Elem#click
+     * @returns {Elem} Returns this.
+     * @see https://developer.mozilla.org/en/docs/Web/API/HTMLElement/click
+     * @description Synonym for
+     * [HTMLElement#click]{@link https://developer.mozilla.org/en/docs/Web/API/HTMLElement/click}.
+     */
+
+  }, {
+    key: 'click',
+    value: function click$1() {
+      return this.forEach(function (elem) {
+        if (isElement(elem)) {
+          elem.click();
+        }
+      });
+    }
+
+    /**
+     * @method Elem#clone
+     * @public
+     * @param {Boolean|*} [deep = false] - See thee link.
+     * @returns {Elem} New instance of Elem.
+     * @see https://developer.mozilla.org/en/docs/Web/API/Node/cloneNode
+     * @description Synonym for
+     * [Node#cloneNode]{@link https://developer.mozilla.org/en/docs/Web/API/Node/cloneNode}.
+     */
+
+  }, {
+    key: 'clone',
+    value: function clone() {
+      var deep = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+      return this.object(function (elems, elem) {
+        elems.add(elem.cloneNode(!!deep));
+      }, new Elem());
+    }
+
+    /**
+     * @method Elem#closest
+     * @public
+     * @param {String} selector - See the link.
+     * @returns {Elem} Set of the closest elements.
+     * @description Synonym for
+     * [Element#closest]{@link https://developer.mozilla.org/en/docs/Web/API/Element/closest}.
+     */
+
+  }, {
+    key: 'closest',
+    value: function closest(selector) {
+      return this.object(function (elems, elem) {
+        while (elem) {
+          if (new Elem(elem).is(selector)) {
+            return elems.add(elem);
+          }
+
+          elem = elem.parentNode;
+        }
+      }, new Elem());
+    }
+
+    /**
+     * @method Elem#contains
+     * @public
+     * @param {String|Elem|Element} element - Element to find out if it's within the first element
+     * in the set or a selector of it.
+     * @returns {Boolean} Returns if the argument within this element.
+     * @description Method is extension for
+     * [Node#contains]{@link https://developer.mozilla.org/en/docs/Web/API/Node/contains}.
+     *
+     * @example
+     * elem1.contains(elem2);   // true|false
+     * elem.contains(selector); // true|false
+     */
+
+  }, {
+    key: 'contains',
+    value: function contains(element) {
+      element = toFind(element);
+
+      return getElem(this).contains(getElem(element));
+    }
+
+    /**
+     * @method Elem#create
+     * @public
+     * @param {String} type - Type of created element. If type is "#text" a text node is created.
+     * If type is "#comment" a comment node is created.
+     * @param {...String} appliedExpressions - Strings that are passed into {@link Elem#apply}.
+     * @returns {Elem} New instance of Elem - wrap of the created elements.
+     * @description Method for creating elements inside this element.
+     * If this element is not an Element the element is just created.
+     *
+     * @example
+     * elem.create('div', '#id .c1 .c2 *Some text*');
+     *
+     * // also there are shorthands for almost every HTML-element
+     * elem.div();
+     * elem.input('$type(checkbox) $name(country)');
+     */
+
+  }, {
+    key: 'create',
+    value: function create(type) {
+      for (var _len4 = arguments.length, appliedExpressions = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
+        appliedExpressions[_key4 - 1] = arguments[_key4];
+      }
+
+      return this.object(function (elems, elem) {
+        var element = new Elem(typeSwitcher(type, [new Elem(elem)]));
+
+        element.into(elem);
+
+        elems.add(element.apply.apply(element, appliedExpressions));
+      }, new Elem());
+    }
+
+    /**
+     * @method Elem#createComment
+     * @public
+     * @param {String} text - Text of the comment.
+     * @returns {Elem} New instance of Elem - wrap of the created comments.
+     * @description Method for creating comments inside this element.
+     * If this element is not an Element the comment is just created.
+     *
+     * @example
+     * elem.createComment('comment');
+     */
+
+  }, {
+    key: 'createComment',
+    value: function createComment(text) {
+      return this.create('#comment').text(text);
+    }
+
+    /**
+     * @method Elem#createText
+     * @public
+     * @param {String} text - Text.
+     * @returns {Elem} New instance of Elem - wrap of the created text nodes.
+     * @description Method for creating text nodes inside this element.
+     * If this element is not an Element the text node is just created.
+     *
+     * @example
+     * elem.createText('text');
+     */
+
+  }, {
+    key: 'createText',
+    value: function createText(text) {
+      return this.create('#text').text(text);
+    }
+
+    /**
+     * @method Elem#css
+     * @public
+     * @param {String|Object.<String, String|ElemValueCallback>} [property] - Name of the property to get or
+     * an object of the format { [property]: value, ... } to set styles.
+     * @param {String|ElemValueCallback} [value] - If the first argument is a string it should be a value to set for that property.
+     * @returns {Super|String|Elem} If no arguments passed, D-Wrap of css styles of the element returned,
+     * if 1 string argument is passed the value of the property returned otherwise returns this.
+     * @description Method for getting/setting styles. Supports !important.
+     *
+     * @example
+     * elem.css('display', 'none'); // display set to 'none' and this returned
+     * elem.css('display');         // 'none'
+     * elem.css({
+     *   display: 'inline',         // display set to 'inline'
+     *   cursor: 'pointer'          // cursor set to 'pointer'
+     * });                          // this returned
+     * elem.css().$;                // { display: 'none', cursor: 'pointer' }
+     */
+
+  }, {
+    key: 'css',
+    value: function css(property, value) {
+      var style = getElem(this).style;
+
+      if (isStyleRule(this.$[0])) {
+        style = this.$[0].style;
+      }
+
+      if (!arguments.length) {
+        return new Str(style.cssText).split(/; ?/).object(function (o, value) {
+          if (value) {
+            property = value.split(/: /);
+
+            o[new Str(property[0]).toCamelCase().$] = property[1];
+          }
+        });
+      }
+
+      if (arguments.length <= 1 && isString(property)) {
+        property = new Str(property).toHyphenCase().$;
+
+        return style.getPropertyValue(property) + (style.getPropertyPriority(property) ? ' !important' : '');
+      }
+
+      if (arguments.length >= 2) {
+        property = defineProperty({}, property, value);
+      }
+
+      return this.forEach(function (elem, index) {
+        if (!isElement(elem) && !isStyleRule(elem)) {
+          return;
+        }
+
+        new Super(property).forEach(function (value, property) {
+          property = new Str(property).toHyphenCase().$;
+
+          if (isFunction(value)) {
+            value = value(new Elem(elem).css(property), elem, index);
+          }
+
+          elem.style.removeProperty(property);
+          elem.style.setProperty(property, value.replace(/ ?!important$/, ''), /!important$/.test(value) ? 'important' : '');
+        });
+      });
+    }
+
+    /**
+     * @method Elem#ctx
+     * @public
+     * @param {String|Object|CtxCallback} [property] - If present and object
+     * it's assigned to the canvas rendering context, if function
+     * it's called with canvas rendering context argument, if string
+     * the value from the second argument is used for assigning
+     * this property to canvas rendering context and if not present
+     * canvas rendering context returned.
+     * @param {*} [value] - See the property argument.
+     * @returns {CanvasRenderingContext2D|Elem}
+     * @description Rendering context of the first canvas in the set.
+     *
+     * @example
+     * canvas.ctx; // CanvasRenderingContext2D
+     */
+
+  }, {
+    key: 'ctx',
+    value: function ctx(property, value) {
+      var ctx = void 0;
+
+      this.some(function (elem) {
+        if (getName(elem) === 'canvas') {
+          ctx = elem.dwayneData.ctx;
+
+          return true;
+        }
+      });
+
+      if (!arguments.length) {
+        return ctx;
+      }
+
+      if (!ctx) {
+        return this;
+      }
+
+      if (isFunction(property)) {
+        property(ctx);
+      } else {
+        if (arguments.length >= 2) {
+          property = defineProperty({}, property, value);
+        }
+
+        assign$1(ctx, property);
+      }
+
+      return this;
+    }
+
+    /**
+     * @method Elem#data
+     * @public
+     * @param {String|Object.<String, String|ElemValueCallback>} [key] - Name of the data attribute (without data- prefix)
+     * to get or an object of the format { [attrName]: value, ... } to set attributes.
+     * @param {String|ElemValueCallback} [value] - If the first argument is a string it should be a value to set for that attribute.
+     * @returns {Super|String|Elem} If no arguments passed, D-Wrap of dataset of the element returned,
+     * if 1 string argument is passed the value of the data attribute returned otherwise returns this.
+     * @description Method for getting/setting data attributes. See
+     * [HTMLElement#dataset]{@link https://developer.mozilla.org/en/docs/Web/API/HTMLElement/dataset}.
+     *
+     * @example
+     * elem.data('someKey1', 'value'); // attribute data-some-key1 set to 'value1' and this returned
+     * elem.data('someKey1');          // 'value1'
+     * elem.data({
+     *   someKey1: 'value3',           // attribute data-some-key1 set to 'value3'
+     *   someKey2: 'value2'            // attribute data-some-key2 set to 'value2'
+     * });                             // this returned
+     * elem.data().$;                  // { someKey1: 'value3', someKey2: 'value2' }
+     */
+
+  }, {
+    key: 'data',
+    value: function data(key, value) {
+      var dataset = getElem(this).dataset;
+
+      if (!arguments.length) {
+        return new Super(dataset).object(function (o, value, key) {
+          o[key] = value;
+        });
+      }
+
+      if (arguments.length === 1 && isString(key)) {
+        return dataset[key];
+      }
+
+      if (arguments.length >= 2) {
+        key = defineProperty({}, key, value);
+      }
+
+      return this.forEach(function (elem, index) {
+        if (!isElement(elem)) {
+          return;
+        }
+
+        iterate(key, function (value, key) {
+          elem.dataset[key] = isFunction(value) ? value(elem.dataset[key], elem, index) : value;
+        });
+      });
+    }
+
+    /**
+     * @method Elem#dataURL
+     * @param {String} [type = 'image/png'] - See the link
+     * @param {Number} [encoderOptions = 0.92] - See the link.
+     * @returns {String} Data URL for the first canvas element in the set.
+     * @see https://developer.mozilla.org/en/docs/Web/API/HTMLCanvasElement/toDataURL
+     * @description Synonym for
+     * [HTMLCanvasElement#toDataURL]{@link https://developer.mozilla.org/en/docs/Web/API/HTMLCanvasElement/toDataURL}.
+     *
+     * @example
+     * canvas.dataURL();
+     */
+
+  }, {
+    key: 'dataURL',
+    value: function dataURL(type, encoderOptions) {
+      var ctx = this.ctx();
+
+      if (!ctx) {
+        return '';
+      }
+
+      return ctx.canvas.toDataURL.apply(ctx.canvas, arguments);
+    }
+
+    /**
+     * @method Elem#deleteRule
+     * @public
+     * @param {String} name - Name of the rule.
+     * @returns {Elem} Returns this.
+     * @description Method for deleting css styles in a style tag.
+     * Note: style element should be inside the document.
+     *
+     * @example
+     * style.deleteRule('img-size');
+     */
+
+  }, {
+    key: 'deleteRule',
+    value: function deleteRule(name) {
+      this.some(function (elem) {
+        if (getName(elem) === 'style') {
+          var rule = new Arr(elem.sheet.cssRules).find(function (rule) {
+            return rule.dwayneData && rule.dwayneData.name === name;
+          });
+
+          if (rule) {
+            elem.sheet.deleteRule(rule.key);
+
+            return true;
+          }
+        }
+      });
+
+      return this;
+    }
+
+    /**
+     * @method Elem#dispatch
+     * @public
+     * @param {String|Event} event - Event or a string (new Event(event) is created).
+     * @param {Object} [eventInit = {}] - See the link.
+     * @param {Boolean} [eventInit.bubbles = true] - See the link.
+     * @param {Boolean} [eventInit.cancelable = true] - See the link.
+     * @param {Object} [details = {}] - Object that is assigned to the event.
+     * @returns {Elem} Returns this.
+     * @see https://developer.mozilla.org/en/docs/Web/API/Event/Event
+     * @description Synonym for
+     * [EventTarget#dispatchEvent]{@link https://developer.mozilla.org/en/docs/Web/API/EventTarget/dispatchEvent}.
+     *
+     * @example
+     * elem.dispatch('click');
+     * elem.dispatch('click', { bubbles: false, cancellable: false });
+     * elem.dispatch(new CustomEvent('custom-event'));
+     */
+
+  }, {
+    key: 'dispatch',
+    value: function dispatch(event) {
+      var eventInit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      var details = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+      var _ref2 = eventInit || {},
+          _ref2$bubbles = _ref2.bubbles,
+          bubbles = _ref2$bubbles === undefined ? true : _ref2$bubbles,
+          _ref2$cancelable = _ref2.cancelable,
+          cancelable = _ref2$cancelable === undefined ? true : _ref2$cancelable;
+
+      var finalEvent = event;
+
+      if (!/Event$/.test(toStringTag(finalEvent))) {
+        try {
+          finalEvent = new Event(finalEvent, { bubbles: bubbles, cancelable: cancelable });
+        } catch (err) {
+          finalEvent = nativeDocument.createEvent('Event');
+          finalEvent.initEvent(event, bubbles, cancelable);
+        }
+
+        assign$1(finalEvent, details);
+      }
+
+      return this.forEach(function (elem) {
+        if (isElement(elem)) {
+          elem.dispatchEvent(finalEvent);
+        }
+      });
+    }
+
+    /**
+     * @method Elem#elem
+     * @public
+     * @param {Number} [index = 0] - Index of the element of the set to get. Negative index means elem.length + index.
+     * @returns {Elem} New instance of Elem.
+     *
+     * @example
+     * elem.elem(1); // a wrap of the element in the set that has index 1
+     * elem.elem();  // a wrap of the element in the set that has index 0
+     */
+
+  }, {
+    key: 'elem',
+    value: function elem() {
+      var index = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+
+      if (index < 0) {
+        index = this.length + index;
+      }
+
+      return new Elem(this.$[index]);
+    }
+
+    /**
+     * @method Elem#filter
+     * @public
+     * @param {String|Function|Element[]|Elem} [selector = Boolean] - If it's a string the method filters elements with the selector
+     * otherwise super.filter is called.
+     * @returns {Elem} New instance of Elem.
+     * @description Method for filtering elements.
+     *
+     * @example
+     * elem.filter((elem) => new Elem(elem).closest('.parent'));
+     * elem.filter(elemsInArray);
+     * elem.filter(elemsInElem);
+     * elem.filter('.child');
+     */
+
+  }, {
+    key: 'filter',
+    value: function filter() {
+      var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Boolean;
+
+      return new Elem(get$1(Elem.prototype.__proto__ || Object.getPrototypeOf(Elem.prototype), 'filter', this).call(this, filterSwitcher(selector)));
+    }
+
+    /**
+     * @method Elem#find
+     * @public
+     * @param {String|Function} selector - Selector to find.
+     * @returns {Elem|{ key: Key, value: * }|null} New instance of Elem if selector is a string
+     * otherwise super.find is called.
+     * @description Synonym for
+     * [Element#querySelectorAll]{@link https://developer.mozilla.org/en/docs/Web/API/Element/querySelectorAll}.
+     */
+
+  }, {
+    key: 'find',
+    value: function find(selector) {
+      if (!isString(selector)) {
+        return get$1(Elem.prototype.__proto__ || Object.getPrototypeOf(Elem.prototype), 'find', this).call(this, selector);
+      }
+
+      return this.object(function (elems, elem) {
+        elems.add(_find(selector, elem));
+      }, new Elem());
+    }
+
+    /**
+     * @method Elem#first
+     * @public
+     * @returns {Elem} New instance of Elem.
+     * @description Synonym for elem.elem(0).
+     */
+
+  }, {
+    key: 'first',
+    value: function first() {
+      return this.elem(0);
+    }
+
+    /**
+     * @method Elem#firstChild
+     * @public
+     * @param {String} [selector = null] - If present, finds first child in every elem that matches the selector.
+     * If not, finds first child of each element in the set.
+     * @returns {Elem} New instance of Elem.
+     * @description Method for finding first children of each element in the set.
+     *
+     * @example
+     * elem.first();       // finds first child of each element in the elem set
+     * elem.first('.foo'); // find first child that has foo class of each element in the set
+     */
+
+  }, {
+    key: 'firstChild',
+    value: function firstChild() {
+      var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+      return this.object(function (elems, elem) {
+        var _ref3 = new Elem(elem).children().find(function (elem) {
+          return new Elem(elem).is(selector);
+        }) || {},
+            found = _ref3.value;
+
+        elems.add(found);
+      }, new Elem());
+    }
+
+    /**
+     * @method Elem#focus
+     * @returns {Elem} Returns this.
+     * @see https://developer.mozilla.org/en/docs/Web/API/HTMLElement/focus
+     * @description Synonym for
+     * [HTMLElement#focus]{@link https://developer.mozilla.org/en/docs/Web/API/HTMLElement/focus}.
+     */
+
+  }, {
+    key: 'focus',
+    value: function focus() {
+      return this.forEach(function (elem) {
+        if (isElement(elem)) {
+          elem.focus();
+        }
+      });
+    }
+
+    /**
+     * @method Elem#getRule
+     * @public
+     * @param {String} name - Name of the rule.
+     * @returns {{ selector: (String|void), rules: Object }} Set of the css rules.
+     * @description Method for getting set of the rules under the name.
+     * Note: style element should be inside the document.
+     *
+     * @example
+     * style.addRule('img-size', 'img.square', {
+     *   width: '40px',
+     *   height: '40px'
+     * });
+     * style.getRule('img-size');
+     * // {
+     * //   selector: 'img.square',
+     * //   rules: {
+     * //     width: '40px',
+     * //     height: '40px'
+     * //   }
+     * // }
+     */
+
+  }, {
+    key: 'getRule',
+    value: function getRule(name) {
+      var found = {
+        selector: undefined,
+        rules: {}
+      };
+
+      this.some(function (elem) {
+        if (getName(elem) === 'style') {
+          var _ref4 = new Arr(elem.sheet.cssRules).find(function (rule) {
+            return rule.dwayneData && rule.dwayneData.name === name;
+          }) || {},
+              rule = _ref4.value;
+
+          if (rule) {
+            found = {
+              selector: rule.selectorText,
+              rules: new Elem(rule).css().$
+            };
+
+            return true;
+          }
+        }
+      });
+
+      return found;
+    }
+
+    /**
+     * @method Elem#hasAttr
+     * @public
+     * @param {String} attr - Name of the attribute.
+     * @returns {Boolean} If the first element in the set has the attribute.
+     * @description Method that returns if the first element in the set has the attribute or not.
+     *
+     * @example
+     * elem.attr('attr', 'value').hasAttr('attr'); // true
+     * elem.removeAttr('attr').hasAttr('attr');    // false
+     */
+
+  }, {
+    key: 'hasAttr',
+    value: function hasAttr(attr) {
+      var elem = getElem(this);
+      var ns = attrNSSwitcher(attr, [new Elem(elem)]);
+
+      return isNull(ns) ? elem.hasAttribute(attr) : elem.hasAttributeNS(ns, attr);
+    }
+
+    /**
+     * @method Elem#hasClass
+     * @public
+     * @param {String} cls - Name of the class.
+     * @returns {Boolean} If the first element in the set has the class.
+     * @description Method that returns if the first element in the set has the class or not.
+     *
+     * @example
+     * elem.addClass('cls').hasClass('cls');    // true
+     * elem.removeClass('cls').hasClass('cls'); // false
+     */
+
+  }, {
+    key: 'hasClass',
+    value: function hasClass(cls) {
+      return getElem(this).classList.contains(cls);
+    }
+
+    /**
+     * @method Elem#height
+     * @public
+     * @param {*|ElemValueCallback} [height] - Height to set.
+     * @returns {Elem|String} If no arguments passed height of the first element in the set returned.
+     * Otherwise all elements heights in the set are set to the height argument.
+     * @description Gets or sets height.
+     *
+     * @example
+     * elem.height(123);
+     * elem.height(); // 123
+     */
+
+  }, {
+    key: 'height',
+    value: function height(_height) {
+      return this.prop.apply(this, new Arr(arguments).unshift('height').$);
+    }
+
+    /**
+     * @method Elem#hide
+     * @public
+     * @returns {Elem} Returns this.
+     * @description Hides all elements in the set.
+     *
+     * @example
+     * elem.hide();
+     */
+
+  }, {
+    key: 'hide',
+    value: function hide() {
+      return this.forEach(function (elem) {
+        elem = new Elem(elem);
+
+        var currentDisplay = elem.css('display');
+
+        if (currentDisplay.indexOf('none')) {
+          elem.prop('dwayneData').previousDisplay = currentDisplay;
+        }
+
+        elem.css('display', 'none !important');
+      });
+    }
+
+    /**
+     * @method Elem#html
+     * @public
+     * @param {String|ElemValueCallback|*} [html] - HTML to write instead of current HTML.
+     * @returns {Elem|String} If no arguments passed HTML of the first element in the set returned.
+     * Otherwise all elements HTML in the set are set to the html argument.
+     * @description Gets or sets HTML.
+     *
+     * @example
+     * elem.html('<div>1</div>');
+     * elem.html(); // '<div>1</div>'
+     */
+
+  }, {
+    key: 'html',
+    value: function html(_html) {
+      if (!arguments.length) {
+        return getElem(this).innerHTML;
+      }
+
+      return this.forEach(function (elem, index) {
+        if (isElement(elem)) {
+          elem.innerHTML = isFunction(_html) ? _html(elem.innerHTML, elem, index) : _html;
+        }
+      });
+    }
+
+    /**
+     * @method Elem#id
+     * @public
+     * @param {String|*} [id] - Id to set.
+     * @returns {Elem|String} If no arguments passed id of the first element in the set returned.
+     * Otherwise all elements ids in the set are set to the id argument.
+     * @description Gets id or sets ids.
+     *
+     * @example
+     * elem.id('unique');
+     * elem.id(); // 'unique'
+     */
+
+  }, {
+    key: 'id',
+    value: function id(_id) {
+      if (!arguments.length) {
+        return getElem(this).id;
+      }
+
+      return this.forEach(function (elem) {
+        if (isElement(elem)) {
+          elem.id = _id;
+        }
+      });
+    }
+
+    /**
+     * @member {Number} Elem#innerHeight
+     * @type {Number}
+     * @public
+     * @readonly
+     * @description Getter for finding how much height content of the first element can be.
+     *
+     * @example
+     * elem.css({
+     *   boxSizing: 'border-box',
+     *   height: '200px',
+     *   paddingTop: '2px',
+     *   paddingBottom: '3px',
+     *   borderTop: '1px solid black',
+     *   borderBottom: '4px solid black'
+     * }).innerHeight; // 190
+     * elem
+     *   .css('box-sizing', 'content-box')
+     *   .innerHeight; // 200
+     * elem
+     *   .css('box-sizing', 'padding-box')
+     *   .innerHeight; // 195
+     */
+
+  }, {
+    key: 'insertAfter',
+
+
+    /**
+     * @method Elem#insertAfter
+     * @public
+     * @param {String|Elem|Element} element - Element to insert this element after or a selector of it.
+     * @returns {Elem} Returns this.
+     * @description Puts the elements from the set after the element specified by the argument.
+     * The elements remain in the same order.
+     *
+     * @example
+     * elem.insertAfter(elem2);
+     * elem.insertAfter(document.getElementById('id'));
+     * elem.insertAfter('#id div.c1');
+     */
+    value: function insertAfter(element) {
+      element = toFind(element).first();
+
+      var parent = element.parent();
+
+      if (!parent.length) {
+        return this;
+      }
+
+      element = element.next().$[0];
+      parent = parent.$[0];
+
+      return this.forEach(function (elem) {
+        if (element) {
+          parent.insertBefore(elem, element);
+        } else {
+          parent.appendChild(elem);
+        }
+      });
+    }
+
+    /**
+     * @method Elem#insertBefore
+     * @public
+     * @param {String|Elem|Element} element - Element to insert this element before or a selector of it.
+     * @returns {Elem} Returns this.
+     * @description Puts the elements from the set before the element specified by the argument.
+     * The elements remain in the same order.
+     *
+     * @example
+     * elem.insertBefore(elem2);
+     * elem.insertBefore(document.getElementById('id'));
+     * elem.insertBefore('#id div.c1');
+     */
+
+  }, {
+    key: 'insertBefore',
+    value: function insertBefore(element) {
+      element = toFind(element).first();
+
+      var parent = element.parent();
+
+      if (!parent.length) {
+        return this;
+      }
+
+      element = element.$[0];
+      parent = parent.$[0];
+
+      return this.forEach(function (elem) {
+        parent.insertBefore(elem, element);
+      });
+    }
+
+    /**
+     * @method Elem#into
+     * @public
+     * @param {String|Elem|Element} element - Element to put this elements into or a selector of it.
+     * @param {Boolean} end - If the elements should be inserted to the end. If false they are inserted to the start.
+     * @returns {Elem} Returns this.
+     * @description Method is similar to
+     * [Node#appendChild]{@link https://developer.mozilla.org/en/docs/Web/API/Node/appendChild}.
+     *
+     * @example
+     * elem.into(elem2);
+     * elem.into(document.getElementById('id'));
+     * elem.into('#id div.c1');
+     */
+
+  }, {
+    key: 'into',
+    value: function into(element) {
+      var end = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+      element = toFind(element).$[0];
+
+      if (!element || isWindow(element) || isHTMLDocument(element) || isCommentOrText(element)) {
+        return this;
+      }
+
+      if (!end && element.firstChild) {
+        return this.slice().reverse().forEach(function (elem) {
+          element.insertBefore(elem, element.firstChild);
+        });
+      }
+
+      return this.forEach(function (elem) {
+        element.appendChild(elem);
+      });
+    }
+
+    /**
+     * @method Elem#is
+     * @public
+     * @param {String} selector
+     * @returns {Boolean} If the first element in the set matches the selector.
+     * If the selector is undefined or null always returns true. If it's not for not elements
+     * entries returns false.
+     * @description Synonym for
+     * [Element#matches]{@link https://developer.mozilla.org/en/docs/Web/API/Element/matches}.
+     *
+     * @example
+     * elem.addClass('cls');
+     * elem.is('.cls');         // true
+     *
+     * elem.removeClass('cls');
+     * elem.is('.cls');         // false
+     */
+
+  }, {
+    key: 'is',
+    value: function is(selector) {
+      if (isNull(selector)) {
+        return true;
+      }
+
+      var elem = getElem(this);
+      var matches = elem.matches || elem.matchesSelector || elem.webkitMatchesSelector || elem.mozMatchesSelector || elem.msMatchesSelector || elem.oMatchesSelector;
+
+      if (!isElement(this.$[0])) {
+        return false;
+      }
+
+      try {
+        return matches.call(elem, selector);
+      } catch (err) {
+        console.error('Selector \'' + selector + '\' is not a valid selector (Elem#is)');
+
+        return false;
+      }
+    }
+
+    /**
+     * @method Elem#isBroken
+     * @public
+     * @returns {Boolean} If the first image in the set is broken.
+     * @description Returns if the first element in the set is broken. Not image and not loaded image is considered proper.
+     *
+     * @example
+     * const img = elem.img().on({
+     *   'load': onload,
+     *   'error': onload
+     * });
+     *
+     * onload = () => {
+     *   console.log(img.isBroken()); // true
+     * };
+     *
+     * img.ref('/some/non-existent/site/not-found.png');
+     */
+
+  }, {
+    key: 'isBroken',
+    value: function isBroken() {
+      var isBroken = false;
+
+      this.some(function (elem) {
+        if (getName(elem) === 'img') {
+          isBroken = !!(elem.complete && (!elem.naturalWidth || !elem.naturalHeight));
+
+          return true;
+        }
+      });
+
+      return isBroken;
+    }
+
+    /**
+     * @method Elem#isWithinDocument
+     * @public
+     * @returns {Boolean} Returns if the first element in the set is within the document or not.
+     * @description Returns if the first element in the set is within the document or not.
+     *
+     * @example
+     * new Elem(document.body).isWithinDocument();  // true
+     * new Elem(document).div().isWithinDocument(); // false
+     */
+
+  }, {
+    key: 'isWithinDocument',
+    value: function isWithinDocument() {
+      return this.first().closest('html').length !== 0;
+    }
+
+    /**
+     * @method Elem#last
+     * @public
+     * @returns {Elem} New instance of Elem.
+     * @description Synonym for elem.elem(-1).
+     */
+
+  }, {
+    key: 'last',
+    value: function last() {
+      return this.elem(-1);
+    }
+
+    /**
+     * @method Elem#lastChild
+     * @public
+     * @param {String} [selector = null] - If present, finds last child in every elem that matches the selector.
+     * If not, finds last child of each element in the set.
+     * @returns {Elem} New instance of Elem.
+     * @description Method for finding last children of each element in the set.
+     *
+     * @example
+     * elem.last();       // finds last child of each element in the elem set
+     * elem.last('.foo'); // find last child that has 'foo' class of each element in the set
+     */
+
+  }, {
+    key: 'lastChild',
+    value: function lastChild() {
+      var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+      return this.object(function (elems, elem) {
+        var _ref5 = new Elem(elem).children().reverse().find(function (elem) {
+          return new Elem(elem).is(selector);
+        }) || {},
+            found = _ref5.value;
+
+        elems.add(found);
+      }, new Elem());
+    }
+
+    /**
+     * @method Elem#load
+     * @public
+     * @returns {Promise.<{ proper: Elem, broken: Elem }>} Promise with broken and proper images.
+     * @description Loads each image in the set and puts it to the proper or broken array.
+     *
+     * @example
+     * images.load().then(({ broken }) => {
+     *   broken.filter('img').ref('/fallback.png');
+     * });
+     */
+
+  }, {
+    key: 'load',
+    value: function load() {
+      var images = {
+        proper: new Elem(),
+        broken: new Elem()
+      };
+
+      return Promise$1.all(this.filter(function (elem) {
+        return getName(elem) === 'img';
+      }).map(function (elem) {
+        var $elem = new Elem(elem);
+
+        if (elem.complete) {
+          images[$elem.isBroken() ? 'broken' : 'proper'].push(elem);
+
+          return;
+        }
+
+        return new Promise$1(function (resolve) {
+          var removeListeners = $elem.on({
+            load: function load() {
+              images.proper.add(elem);
+
+              removeListeners();
+              resolve();
+            },
+            error: function error() {
+              images.broken.add(elem);
+
+              removeListeners();
+              resolve();
+            }
+          });
+        });
+      }).$).then(function () {
+        return images;
+      });
+    }
+
+    /**
+     * @method Elem#moveAttr
+     * @public
+     * @param {String} attr - Attribute to move to the first element.
+     * @param {String} [value = ''] - Value to set for the attribute. If not set attribute of the previous element or '' used.
+     * @returns {Elem} Returns this.
+     * @description Method for moving an attribute from previous element to the next one (first element in this set).
+     *
+     * @example
+     * elem1.moveAttr('attr', 'value');     // attribute 'attr' set to 'value' on elem1
+     * elem2.moveAttr('attr');              // attribute 'attr' removed from elem1. set to 'value' on elem2
+     * elem3.moveAttr('attr', 'new value'); // attribute 'attr' removed from elem2. set to 'new value' on elem3
+     */
+
+  }, {
+    key: 'moveAttr',
+    value: function moveAttr(attr) {
+      var value = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+      var prev = attrs[attr];
+      var elem = this.elem();
+
+      if (prev && elem.length) {
+        if (arguments.length < 2) {
+          value = prev.attr(attr);
+        }
+
+        prev.removeAttr(attr);
+      }
+
+      if (elem.length) {
+        attrs[attr] = elem.attr(attr, value);
+      }
+
+      return this;
+    }
+
+    /**
+     * @method Elem#moveClass
+     * @public
+     * @param {String} cls - Class to move to the first element.
+     * @returns {Elem} Returns this.
+     * @description Method for moving a class from previous element to the next one (first element in this set).
+     *
+     * @example
+     * elem1.moveClass('cls'); // class 'cls' added to elem1
+     * elem2.moveClass('cls'); // class 'cls' removed from elem1. added to elem1
+     */
+
+  }, {
+    key: 'moveClass',
+    value: function moveClass(cls) {
+      var prev = classes[cls];
+      var elem = this.elem();
+
+      if (prev && elem.length) {
+        prev.removeClass(cls);
+      }
+
+      if (elem.length) {
+        classes[cls] = elem.addClass(cls);
+      }
+
+      return this;
+    }
+
+    /**
+     * @member {String} Elem#name
+     * @type {String}
+     * @public
+     * @readonly
+     * @description nodeName (lowercased) of the first element in the set.
+     *
+     * @example
+     * const elem1 = elem.create('div');
+     * elem1.name // 'div'
+     */
+
+  }, {
+    key: 'next',
+
+
+    /**
+     * @method Elem#next
+     * @public
+     * @param {String} [selector = null] - If present, finds next element to every elem that matches the selector.
+     * If not, finds next element to each element in the set.
+     * @returns {Elem} New instance of Elem.
+     * @description Method for finding next element to each element in the set.
+     *
+     * @example
+     * elem.next();       // finds next element to each element in the set
+     * elem.next('.foo'); // finds next element to each element that has 'foo' class
+     */
+    value: function next() {
+      var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+      return this.object(function (elems, elem) {
+        /* eslint no-cond-assign: 0 */
+        while (elem = elem.nextSibling) {
+          if (new Elem(elem).is(selector)) {
+            return elems.add(elem);
+          }
+        }
+      }, new Elem());
+    }
+
+    /**
+     * @method Elem#off
+     * @public
+     * @param {...ElemEventString} events - Events to remove.
+     * @returns {Elem} Returns this.
+     * @description Method that removes all the listeners from each element in the set specified by the events arguments.
+     *
+     * @example
+     * elem.off('click');
+     * elem.off('click, input');
+     * elem.off('click, input', 'focus');
+     */
+
+  }, {
+    key: 'off',
+    value: function off() {
+      var _arguments2 = arguments;
+
+      for (var _len5 = arguments.length, events = Array(_len5), _key6 = 0; _key6 < _len5; _key6++) {
+        events[_key6] = arguments[_key6];
+      }
+
+      return this.forEach(function (elem) {
+        var listeners = elem.dwayneData.listeners;
+
+
+        iterate(_arguments2, function (event) {
+          iterate(event.split(eventSeparator), function (event) {
+            (listeners[event] || new Super()).forEach(function (_ref6) {
+              var removeListener = _ref6.removeListener;
+              return removeListener();
+            });
+          });
+        });
+      });
+    }
+
+    /**
+     * @method Elem#on
+     * @public
+     * @param {ElemEventString|Object.<ElemEventString|ElemListener>} event - Either a {@link ElemEventString} string
+     * or an object with event keys (a key is also ElemEventString) and listeners values.
+     * @param {String} [selector = null] - Selector to filter event targets.
+     * @param {ElemListener} [listener] - If the first argument is a string it must be a listener function for
+     * specified event(s).
+     * @returns {ElemRemoveListeners} Function that takes optional event argument.
+     * @description Adds event listeners for all the elements in the set.
+     * For debugging: If you need to know what listeners are in work (and what selectors filter targets)
+     * you can look at the base property of the only dwayne listener that listens for the event
+     * and find all working listeners in listener.base.dwayneData.listeners[event].$.
+     *
+     * @example
+     * elem.on(
+     *   'change, input',
+     *   'input, select, textarea, datalist, keygen, output',
+     *   (e, elem, index) => console.log(elem.value)
+     * );
+     * elem.on(
+     *   'change, input',
+     *   (e, elem, index) => console.log(elem.value)
+     * );
+     * elem.on(
+     *   {
+     *     'change, input': (e, elem, index) => console.log(elem.value),
+     *     'blur': () => console.log('blur')
+     *   },
+     *   'input, select, textarea, datalist, keygen, output'
+     * );
+     *
+     * const removeListeners = elem.on({
+     *   'change, input': (e, elem, index) => console.log(elem.value),
+     *   'blur': () => console.log('blur')
+     * });
+     *
+     * removeListeners('click');
+     * removeListeners('blur, change');
+     * removeListeners('blur, change', 'input');
+     * removeListeners();
+     */
+
+  }, {
+    key: 'on',
+    value: function on(event) {
+      var selector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      var listener = arguments[2];
+
+      var allListeners = new Super({});
+
+      if (isFunction(selector)) {
+        listener = selector;
+        selector = null;
+      }
+
+      if (isString(event)) {
+        event = defineProperty({}, event, listener);
+      }
+
+      event = new Super(event).object(function (listeners, listener, event) {
+        iterate(event.split(eventSeparator), function (event) {
+          listeners[event] = listener;
+        });
+      });
+
+      this.forEach(function (elem) {
+        if (!isElement(elem) && !isWindow(elem) && !isHTMLDocument(elem)) {
+          return;
+        }
+
+        var _ref7 = (windowsDwayneData.find(function (_ref8) {
+          var element = _ref8.element;
+          return element === elem;
+        }) || {}).value || elem.dwayneData,
+            listeners = _ref7.listeners;
+
+        event.forEach(function (listener, event) {
+          var removeEventListeners = listeners[event] = listeners[event] || new Super({}).define('index', {
+            value: 0,
+            configurable: true,
+            writable: true
+          });
+          var index = removeEventListeners.prop('index');
+
+          if (!removeEventListeners.has('listener')) {
+            var newListener = function newListener(e) {
+              removeEventListeners.forEach(function (_ref9) {
+                var selector = _ref9.selector,
+                    listener = _ref9.listener;
+
+                if (new Elem(e.target).is(selector)) {
+                  listener.call(elem, e, elem, index);
+                }
+              });
+            };
+
+            newListener.base = elem;
+
+            elem.addEventListener(event, newListener, false);
+            removeEventListeners.define('listener', {
+              value: newListener,
+              configurable: true,
+              writable: true
+            });
+          }
+
+          var removeListener = function removeListener() {
+            removeEventListeners.delete(index);
+
+            if (!removeEventListeners.count) {
+              elem.removeEventListener(event, removeEventListeners.prop('listener'), false);
+              removeEventListeners.delete('listener');
+            }
+          };
+
+          allListeners.prop(event, (allListeners.prop(event) || new Arr()).push(removeListener));
+
+          removeEventListeners.assign(defineProperty({
+            index: index + 1
+          }, index, {
+            selector: selector,
+            listener: listener,
+            removeListener: removeListener
+          }));
+        });
+      });
+
+      return function removeEventListeners(event) {
+        if (arguments.length) {
+          iterate(arguments, function (event) {
+            iterate(event.split(eventSeparator), function (event) {
+              if (allListeners.has(event)) {
+                allListeners.prop(event).forEach(function (removeListener) {
+                  return removeListener();
+                });
+                allListeners.delete(event);
+              }
+            });
+          });
+
+          return;
+        }
+
+        allListeners.forEach(function (removeListeners) {
+          removeListeners.forEach(function (removeListener) {
+            return removeListener();
+          });
+        });
+      };
+    }
+
+    /**
+     * @member {Number} Elem#outerHeight
+     * @type {Number}
+     * @public
+     * @readonly
+     * @description Getter for finding how much height the element actually is.
+     *
+     * @example
+     * elem.css({
+     *   boxSizing: 'border-box',
+     *   height: '200px',
+     *   paddingTop: '2px',
+     *   paddingBottom: '3px',
+     *   borderTop: '1px solid black',
+     *   borderBottom: '4px solid black'
+     *   marginTop: '0px',
+     *   marginBottom: '5px'
+     * }).outerHeight; // 205
+     * elem
+     *   .css('box-sizing', 'content-box')
+     *   .outerHeight; // 215
+     * elem
+     *   .css('box-sizing', 'padding-box')
+     *   .outerHeight; // 210
+     */
+
+  }, {
+    key: 'parent',
+
+
+    /**
+     * @method Elem#parent
+     * @public
+     * @returns {Elem} New instance of Elem.
+     * @description Method returns wrap of the set of the parent elements of each element in the set.
+     */
+    value: function parent() {
+      return this.object(function (elems, elem) {
+        return elems.add(elem.parentNode);
+      }, new Elem());
+    }
+
+    /**
+     * @method Elem#parentTree
+     * @public
+     * @returns {Elem} New instance of Elem.
+     * @description Returns wrap of all parents of each element in the set.
+     *
+     * @example
+     * elem.parentTree(); // Elem
+     */
+
+  }, {
+    key: 'parentTree',
+    value: function parentTree() {
+      return this.object(function (elems, elem) {
+        while (elem = elem.parentNode) {
+          elems.add(elem);
+        }
+      }, new Elem());
+    }
+
+    /**
+     * @method Elem#prev
+     * @public
+     * @param {String} [selector = null] - If present, finds previous element to every elem that matches the selector.
+     * If not, finds previous element to each element in the set.
+     * @returns {Elem} New instance of Elem.
+     * @description Method for finding previous element to each element in the set.
+     *
+     * @example
+     * elem.next();       // finds previous element to each element in the set
+     * elem.next('.foo'); // finds previous element to each element that has 'foo' class
+     */
+
+  }, {
+    key: 'prev',
+    value: function prev() {
+      var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+      return this.object(function (elems, elem) {
+        /* eslint no-cond-assign: 0 */
+        while (elem = elem.previousSibling) {
+          if (new Elem(elem).is(selector)) {
+            return elems.add(elem);
+          }
+        }
+      }, new Elem());
+    }
+
+    /**
+     * @method Elem#prop
+     * @public
+     * @param {String|Object.<String, ElemValueCallback|*>} property - Either a string of a property or an assigned object.
+     * @param {ElemValueCallback|*} [value] - If a property parameter is a string
+     * this has to be an assigned value if it's present.
+     * @returns {Elem|*} Returns this if it's setter or a value if getter.
+     * @description Method that is either a property getter for the first element in the set
+     * or a setter for every element in the set.
+     *
+     * @example
+     * elem.prop('draggable', false);
+     * elem.prop('draggable'); // false
+     */
+
+  }, {
+    key: 'prop',
+    value: function prop(property, value) {
+      if (arguments.length <= 1 && isString(property)) {
+        return this.$[0] ? this.$[0][property] : undefined;
+      }
+
+      if (arguments.length >= 2) {
+        property = defineProperty({}, property, value);
+      }
+
+      return this.forEach(function (elem, index) {
+        iterate(property, function (value, prop$$1) {
+          elem[prop$$1] = isFunction(value) ? value(elem[prop$$1], elem, index) : value;
+        });
+      });
+    }
+
+    /**
+     * @method Elem#ref
+     * @public
+     * @param {String|ElemValueCallback} [link] - If it's present link to a resource.
+     * @returns {Elem|String} If the link argument isn't present it's a getter of the 'src' attribute
+     * for the one of following elements: img, script, iframe, audio, video; of the 'action' attribute
+     * for a form element and of the 'href' attribute for the rest. If it's present it's a setter
+     * of the same attribute for all the element in the set.
+     * @description Method for getting resources links and setting them.
+     *
+     * @example
+     * elem.ref('/some/cool/image.png');
+     * elem.ref(); // '/some/cool/image.png'
+     */
+
+  }, {
+    key: 'ref',
+    value: function ref(link) {
+      if (!arguments.length) {
+        return this.attr(refSwitcher(this.name));
+      }
+
+      return this.forEach(function (elem) {
+        elem = new Elem(elem);
+
+        elem.attr(refSwitcher(elem.name), link);
+      });
+    }
+
+    /**
+     * @method Elem#remove
+     * @public
+     * @returns {Elem} Returns this.
+     * @description Removes all the elements from the set from the document.
+     * Note: it doesn't remove them from the set so watch out for the memory leaks.
+     *
+     * @example
+     * elem.remove();
+     */
+
+  }, {
+    key: 'remove',
+    value: function remove() {
+      return this.forEach(function (elem) {
+        var parent = elem.parentNode;
+
+        if (parent) {
+          parent.removeChild(elem);
+        }
+      });
+    }
+
+    /**
+     * @method Elem#removeAttr
+     * @public
+     * @param {...String} attributes - Attributes to remove.
+     * @returns {Elem} Returns this.
+     * @description Removes all the attributes from arguments from all the elements in the set.
+     *
+     * @example
+     * elem.removeAttr('foo', 'bar', 'baz');
+     */
+
+  }, {
+    key: 'removeAttr',
+    value: function removeAttr() {
+      var _arguments3 = arguments;
+
+      for (var _len6 = arguments.length, attributes = Array(_len6), _key7 = 0; _key7 < _len6; _key7++) {
+        attributes[_key7] = arguments[_key7];
+      }
+
+      return this.forEach(function (elem) {
+        if (!isElement(elem)) {
+          return;
+        }
+
+        iterate(_arguments3, function (attr) {
+          var ns = attrNSSwitcher(attr, [new Elem(elem)]);
+
+          if (isNull(ns)) {
+            elem.removeAttribute(attr);
+          } else {
+            elem.removeAttributeNS(ns, attr);
+          }
+        });
+      });
+    }
+
+    /**
+     * @method Elem#removeClass
+     * @public
+     * @param {...String} classes - Classes to remove.
+     * @returns {Elem} Returns this.
+     * @description Removes all the classes from arguments from all the elements in the set.
+     *
+     * @example
+     * elem.removeClass('foo', 'bar', 'baz');
+     */
+
+  }, {
+    key: 'removeClass',
+    value: function removeClass() {
+      var _arguments4 = arguments;
+
+      for (var _len7 = arguments.length, classes = Array(_len7), _key8 = 0; _key8 < _len7; _key8++) {
+        classes[_key8] = arguments[_key8];
+      }
+
+      return this.forEach(function (elem) {
+        var list = elem.classList;
+
+        iterate(isElement(elem) && _arguments4, function (cls) {
+          return list.remove(cls);
+        });
+      });
+    }
+
+    /**
+     * @method Elem#removeCSS
+     * @public
+     * @param {...String} props - CSS properties to remove.
+     * @returns {Elem} Returns this.
+     * @description Removes all the CSS properties from arguments from all the elements in the set.
+     *
+     * @example
+     * elem.removeCSS('display', 'position', 'margin');
+     */
+
+  }, {
+    key: 'removeCSS',
+    value: function removeCSS() {
+      var _arguments5 = arguments;
+
+      for (var _len8 = arguments.length, props = Array(_len8), _key9 = 0; _key9 < _len8; _key9++) {
+        props[_key9] = arguments[_key9];
+      }
+
+      return this.forEach(function (elem) {
+        if (!isElement(elem)) {
+          return;
+        }
+
+        iterate(_arguments5, function (css) {
+          elem.style.removeProperty(css);
+        });
+      });
+    }
+
+    /**
+     * @method Elem#replace
+     * @public
+     * @param {String|Elem|Element} element - Element to replace the first element in the set
+     * with a set of elements specified by the argument (Element, set of elements or a selector of them).
+     * @returns {Elem} Returns this.
+     * @description Method is similar to
+     * [Node#replaceChild]{@link https://developer.mozilla.org/en/docs/Web/API/Node/replaceChild}.
+     *
+     * @example
+     * elem.replace(elem2);
+     * elem.replace(document.getElementById('id'));
+     * elem.replace('#id div.c1');
+     */
+
+  }, {
+    key: 'replace',
+    value: function replace(element) {
+      element = toFind(element);
+
+      var parent = this.first().parent();
+
+      if (!parent.length) {
+        return this;
+      }
+
+      var elem = parent;
+      var method$$1 = 'into';
+      var next = this.next().first().$[0];
+      var prev = this.prev().first().$[0];
+
+      if (next) {
+        elem = next;
+        method$$1 = 'insertBefore';
+      } else if (prev) {
+        elem = prev;
+        method$$1 = 'insertAfter';
+      }
+
+      this.first().remove();
+
+      element[method$$1](elem);
+    }
+
+    /**
+     * @method Elem#setOf
+     * @public
+     * @param {String} type - HTML element type.
+     * @param {Number|Object|Array.<*>} iterator - A number (how many elements to create inside each element),
+     * an object or an array to iterate over.
+     * @param {ElemSetOfCallback} callback
+     * @returns {Elem} New instance of Elem.
+     * @description Function for creating set of elements inside each element in the set based on an array or an object.
+     *
+     * @example
+     * table.setOf('tr', [[1, 2], [3, 4], [5, 6]], (row, array) => {
+     *   D(row).setOf('td', array, (col, number) => {
+     *     D(col).text(number);
+     *   });
+     * });
+     */
+
+  }, {
+    key: 'setOf',
+    value: function setOf(type, iterator, callback) {
+      validate$1({ 2: callback }, { 2: ['function'] }, 'Elem#setOf');
+
+      iterator = new Super(iterator).$;
+
+      if (isNumber(iterator)) {
+        try {
+          validate$1({ 1: iterator }, { 1: ['intLike', '>=0'] }, 'Elem#setOf');
+        } catch (e) {
+          throw new Error('2nd argument must be either or non-negative integer, or object! (at Elem#setOf)');
+        }
+
+        iterator = array(iterator).$;
+      }
+
+      return this.object(function (elems, elem, index) {
+        iterate(iterator, function (value, key) {
+          var created = new Elem(elem).create(type);
+
+          callback(created.$[0], value, key, iterator, elem, index);
+
+          elems.add(created);
+        });
+      }, new Elem());
+    }
+
+    /**
+     * @method Elem#show
+     * @public
+     * @returns {Elem} Returns this.
+     * @description Shows all elements in the set.
+     * If an element was hidden using {@link Elem#hide} previous display is set.
+     *
+     * @example
+     * elem.show();
+     */
+
+  }, {
+    key: 'show',
+    value: function show() {
+      return this.forEach(function (elem) {
+        var _elem = elem,
+            dwayneData = _elem.dwayneData;
+
+
+        elem = new Elem(elem);
+
+        if (elem.css('display').indexOf('none') === 0) {
+          elem.css('display', dwayneData.previousDisplay);
+        }
+
+        dwayneData.previousDisplay = '';
+      });
+    }
+
+    /**
+     * @method Elem#text
+     * @public
+     * @param {String|ElemValueCallback|*} [text] - Text to write instead of current text.
+     * @returns {Elem|String} If no arguments passed text of the first element in the set returned.
+     * Otherwise all elements texts in the set are set to the text argument.
+     * @description Gets or sets text.
+     *
+     * @example
+     * elem.text('123');
+     * elem.text(); // '123'
+     */
+
+  }, {
+    key: 'text',
+    value: function text(_text) {
+      if (!arguments.length) {
+        return this.prop(textProperty);
+      }
+
+      return this.forEach(function (elem, index) {
+        var txt = elem[textProperty];
+
+        new Elem(elem).prop(textProperty, isFunction(_text) ? _text(txt, elem, index) : _text);
+      });
+    }
+
+    /**
+     * @method Elem#toggleAttr
+     * @public
+     * @param {String} attr - Attribute to toggle.
+     * @param {Boolean|*} [condition] - If present and the condition is truthy method adds the attribute
+     * with the '' value and if falsey method removes the attribute. If not present method adds
+     * the attribute if it doesn't exist and removes if it does.
+     * @returns {Elem} Returns this.
+     * @description Method for toggling attributes.
+     *
+     * @example
+     * elem.toggleAttr('attr');
+     * elem.toggleAttr('attr', someCondition);
+     */
+
+  }, {
+    key: 'toggleAttr',
+    value: function toggleAttr(attr, condition) {
+      var _arguments6 = arguments;
+
+      return this.forEach(function (elem) {
+        elem = new Elem(elem);
+
+        if (_arguments6.length < 2 ? !elem.hasAttr(attr) : condition) {
+          elem.attr(attr, '');
+        } else {
+          elem.removeAttr(attr);
+        }
+      });
+    }
+
+    /**
+     * @method Elem#toggleAttr
+     * @public
+     * @param {String} cls - Class to toggle.
+     * @param {Boolean|*} [condition] - If present and the condition is truthy method adds the class
+     * and if falsey method removes the class. If not present method adds
+     * the class if it doesn't exist and removes if it does.
+     * @returns {Elem} Returns this.
+     * @description Method for toggling classes.
+     *
+     * @example
+     * elem.toggleClass('cls');
+     * elem.toggleClass('cls', someCondition);
+     */
+
+  }, {
+    key: 'toggleClass',
+    value: function toggleClass(cls, condition) {
+      return (arguments.length < 2 ? !this.hasClass(cls) : condition) ? this.addClass(cls) : this.removeClass(cls);
+    }
+  }, {
+    key: 'up',
+
+
+    /**
+     * @method Elem#up
+     * @public
+     * @param {Integer} [level = 1] - What level up along the tree should be the parent.
+     * @returns {Elem} New instance of Elem.
+     * @description Creates a collection of parents of level &lt;level&gt;.
+     *
+     * @example
+     * elem.up();
+     * elem.up(2);
+     */
+    value: function up() {
+      var level = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+
+      validate$1([level], [['intLike', '>=0']], 'Elem#up');
+
+      level = Number(level);
+
+      return this.object(function (elems, elem) {
+        var n = level;
+
+        while (n-- && elem) {
+          elem = elem.parentNode;
+        }
+
+        elems.add(elem);
+      }, new Elem());
+    }
+
+    /**
+     * @method Elem#validate
+     * @public
+     * @param {ValidateCallback} [validator] - If present, function that validates inputs.
+     * @returns {Elem|Object.<String, Error|*>|null}
+     * If a callback argument provided returns this. If no arguments provided returns either an object
+     * with input names keys and errors values or null if no errors found.
+     * @description If a callback argument provided adds it to the element validators list.
+     * If no arguments provided validates every input element in the set with its own functions.
+     * If an element is a form it validates all input elements inside it. After the validation
+     * fires 'validate' event with 'valid' and 'error' (if form it's errors) properties.
+     *
+     * @example
+     * form.on('input change', 'input', (value, input) => {
+     *   input = D(input);
+     *
+     *   if (Number(value) % 3) {
+     *     input.addClass('invalid');
+     *
+     *     throw new Error('The value should be divided by 3!');
+     *   }
+     *
+     *   input.removeClass('invalid');
+     * });
+     */
+
+  }, {
+    key: 'validate',
+    value: function validate(validator) {
+      validate$1([validator], ['function||!'], 'Elem#validate');
+
+      if (validator) {
+        return this.forEach(function (_ref10) {
+          var dwayneData = _ref10.dwayneData;
+
+          dwayneData.validators.push(validator);
+        });
+      }
+
+      var errors = new Super({ errors: null });
+
+      this.filter(inputElements + ', form').forEach(function (elem, index) {
+        if (getName(elem) === 'form') {
+          var _ret = function () {
+            var formErrors = { errors: null };
+            var form = new Elem(elem);
+            var inputs = form.find(inputElements);
+
+            inputs.forEach(function (input, index) {
+              validatorWrap(input, index, formErrors);
+            });
+
+            errors.deepAssign(formErrors);
+
+            formErrors = formErrors.errors;
+
+            form.dispatch('validate', {}, {
+              valid: !formErrors,
+              errors: formErrors
+            });
+
+            return {
+              v: inputs.forEach(function (input) {
+                var inputError = (formErrors || {})[input.name];
+
+                new Elem(input).dispatch('validate', {}, {
+                  valid: !inputError,
+                  error: inputError || null
+                });
+              })
+            };
+          }();
+
+          if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+        }
+
+        var inputError = { errors: null };
+
+        validatorWrap(elem, index, inputError);
+        errors.deepAssign(inputError);
+
+        inputError = (inputError.errors || {})[elem.name];
+
+        new Elem(elem).dispatch('validate', {}, {
+          valid: !inputError,
+          error: inputError || null
+        });
+      });
+
+      function validatorWrap(input, index, errors) {
+        try {
+          if (input.validity && !input.validity.valid) {
+            throw new Error(input.validationMessage);
+          }
+
+          input.dwayneData.validators.forEach(function (validator) {
+            validator(input.value, input, index);
+          });
+        } catch (err) {
+          (errors.errors = errors.errors || {})[input.name] = err;
+        }
+      }
+
+      if (errors.every(function (error) {
+        return isNull(error);
+      })) {
+        return null;
+      }
+
+      return errors.$.errors;
+    }
+
+    /**
+     * @method Elem#width
+     * @public
+     * @param {*|ElemValueCallback} [width] - Width to set.
+     * @returns {Elem|String} If no arguments passed width of the first element in the set returned.
+     * Otherwise all elements widths in the set are set to the width argument.
+     * @description Gets or sets width.
+     *
+     * @example
+     * elem.width(123);
+     * elem.width(); // 123
+     */
+
+  }, {
+    key: 'width',
+    value: function width(_width) {
+      return this.prop.apply(this, new Arr(arguments).unshift('width').$);
+    }
+  }, {
+    key: 'innerHeight',
+    get: function get() {
+      var elem = this.$[0];
+
+      if (isWindow(elem)) {
+        return elem.innerHeight;
+      }
+
+      var _calcCSS = this.calcCSS(),
+          borderTopWidth = _calcCSS.borderTopWidth,
+          borderBottomWidth = _calcCSS.borderBottomWidth,
+          boxSizing = _calcCSS.boxSizing,
+          height = _calcCSS.height,
+          paddingTop = _calcCSS.paddingTop,
+          paddingBottom = _calcCSS.paddingBottom;
+
+      var borders = px(borderTopWidth) + px(borderBottomWidth);
+      var paddings = px(paddingTop) + px(paddingBottom);
+
+      return px(height) - innerSwitcher(boxSizing, [paddings, borders]);
+    }
+
+    /**
+     * @member {Number} Elem#innerWidth
+     * @type {Number}
+     * @public
+     * @readonly
+     * @description Getter for finding how much width content of the first element can be.
+     *
+     * @example
+     * elem.css({
+     *   boxSizing: 'border-box',
+     *   width: '200px',
+     *   paddingLeft: '2px',
+     *   paddingRight: '3px',
+     *   borderLeft: '1px solid black',
+     *   borderRight: '4px solid black'
+     * }).innerWidth; // 190
+     * elem
+     *   .css('box-sizing', 'content-box')
+     *   .innerWidth; // 200
+     * elem
+     *   .css('box-sizing', 'padding-box')
+     *   .innerWidth; // 195
+     */
+
+  }, {
+    key: 'innerWidth',
+    get: function get() {
+      var elem = this.$[0];
+
+      if (isWindow(elem)) {
+        return elem.innerWidth;
+      }
+
+      var _calcCSS2 = this.calcCSS(),
+          borderLeftWidth = _calcCSS2.borderLeftWidth,
+          borderRightWidth = _calcCSS2.borderRightWidth,
+          boxSizing = _calcCSS2.boxSizing,
+          paddingLeft = _calcCSS2.paddingLeft,
+          paddingRight = _calcCSS2.paddingRight,
+          width = _calcCSS2.width;
+
+      var borders = px(borderLeftWidth) + px(borderRightWidth);
+      var paddings = px(paddingLeft) + px(paddingRight);
+
+      return px(width) - innerSwitcher(boxSizing, [paddings, borders]);
+    }
+  }, {
+    key: 'name',
+    get: function get() {
+      return getName(this.$[0]);
+    }
+  }, {
+    key: 'outerHeight',
+    get: function get() {
+      var elem = this.$[0];
+
+      if (isWindow(elem)) {
+        return elem.outerHeight;
+      }
+
+      var _calcCSS3 = this.calcCSS(),
+          borderTopWidth = _calcCSS3.borderTopWidth,
+          borderBottomWidth = _calcCSS3.borderBottomWidth,
+          boxSizing = _calcCSS3.boxSizing,
+          height = _calcCSS3.height,
+          marginTop = _calcCSS3.marginTop,
+          marginBottom = _calcCSS3.marginBottom,
+          paddingTop = _calcCSS3.paddingTop,
+          paddingBottom = _calcCSS3.paddingBottom;
+
+      var borders = px(borderTopWidth) + px(borderBottomWidth);
+      var paddings = px(paddingTop) + px(paddingBottom);
+
+      return px(height) + px(marginTop) + px(marginBottom) + outerSwitcher(boxSizing, [borders, paddings]);
+    }
+
+    /**
+     * @member {Number} Elem#outerWidth
+     * @type {Number}
+     * @public
+     * @readonly
+     * @description Getter for finding how much width the element actually is.
+     *
+     * @example
+     * elem.css({
+     *   boxSizing: 'border-box',
+     *   width: '200px',
+     *   paddingLeft: '2px',
+     *   paddingRight: '3px',
+     *   borderLeft: '1px solid black',
+     *   borderRight: '4px solid black'
+     *   marginLeft: '0px',
+     *   marginRight: '5px'
+     * }).outerWidth; // 205
+     * elem
+     *   .css('box-sizing', 'content-box')
+     *   .outerWidth; // 215
+     * elem
+     *   .css('box-sizing', 'padding-box')
+     *   .outerWidth; // 210
+     */
+
+  }, {
+    key: 'outerWidth',
+    get: function get() {
+      var elem = this.$[0];
+
+      if (isWindow(elem)) {
+        return elem.outerWidth;
+      }
+
+      var _calcCSS4 = this.calcCSS(),
+          borderLeftWidth = _calcCSS4.borderLeftWidth,
+          borderRightWidth = _calcCSS4.borderRightWidth,
+          boxSizing = _calcCSS4.boxSizing,
+          marginLeft = _calcCSS4.marginLeft,
+          marginRight = _calcCSS4.marginRight,
+          paddingLeft = _calcCSS4.paddingLeft,
+          paddingRight = _calcCSS4.paddingRight,
+          width = _calcCSS4.width;
+
+      var borders = px(borderLeftWidth) + px(borderRightWidth);
+      var paddings = px(paddingLeft) + px(paddingRight);
+
+      return px(width) + px(marginLeft) + px(marginRight) + outerSwitcher(boxSizing, [borders, paddings]);
+    }
+  }, {
+    key: 'toStringTag',
+    get: function get() {
+      return toStringTag(this.$$);
+    }
+  }]);
+  return Elem;
+}(Arr);
+
+defineProperties(Elem.prototype, defineProperty({}, _Symbol.toStringTag, 'Elem'));
+
+/**
+ * @const {Elem} win
+ * @type {Elem}
+ * @public
+ * @description Elem instance of window.
+ */
+var win = new Elem(global$1);
+
+/**
+ * @const {Elem} doc
+ * @type {Elem}
+ * @public
+ * @description Elem instance of document.
+ */
+var doc = new Elem(nativeDocument);
+
+/**
+ * @const {Elem} html
+ * @type {Elem}
+ * @public
+ * @description Elem instance of document.documentElement.
+ */
+var html = new Elem(nativeDocument.documentElement);
+
+/**
+ * @const {Elem} body
+ * @type {Elem}
+ * @public
+ * @description Elem instance of document.body.
+ */
+var body = new Elem(nativeDocument.body);
+
+/**
+ * @const {Elem} head
+ * @type {Elem}
+ * @public
+ * @description Elem instance of document.head.
+ */
+var head$1 = new Elem(nativeDocument.head);
+
+var elements = new Arr(htmlElements).concat(svgElements).$;
+var props = new Arr(elements).map(function (type) {
+  return new Str(type).toCamelCase().$;
+}).$;
+
+dynamicDefineProperties(Elem.prototype, props, function (elem, i) {
+  return function () {
+    return this.create.apply(this, new Arr(arguments).unshift(elements[i]).$);
+  };
+});
+
+dynamicDefineProperties(Elem.prototype, canvasGetMethods, function (method$$1) {
+  return function () {
+    var ctx = this.ctx();
+
+    if (ctx) {
+      return ctx[method$$1].apply(ctx, arguments);
+    }
+  };
+});
+
+dynamicDefineProperties(Elem.prototype, canvasRestMethods, function (method$$1) {
+  return function () {
+    var ctx = this.ctx();
+
+    if (ctx) {
+      ctx[method$$1].apply(ctx, arguments);
+    }
+
+    return this;
+  };
+});
+
+/**
+ * @function toFind
+ * @private
+ * @param {Element|Elem|String} elem - Element, selector of Elements or Elem.
+ * @returns {Elem} Instance of Elem.
+ */
+function toFind(elem) {
+  if (isElem(elem)) {
+    return elem;
+  }
+
+  if (isString(elem)) {
+    elem = _find(elem);
+  }
+
+  return new Elem(elem);
+}
+
+/**
+ * @function isElem
+ * @private
+ * @param {*} value - Value to check if it's Elem.
+ * @returns {Boolean} If the value is Elem.
+ * @description Returns if the value is Elem or not.
+ */
+function isElem(value) {
+  return value instanceof Elem;
+}
+
+/**
+ * @function isWindow
+ * @private
+ * @param {*} value - Value to check if it's Window.
+ * @returns {Boolean} If the value is Window.
+ * @description Returns if the value is Window or not.
+ */
+function isWindow(value) {
+  return toStringTag(value) === 'Window';
+}
+
+/**
+ * @function isHTMLDocument
+ * @private
+ * @param {*} value - Value to check if it's HTMLDocument.
+ * @returns {Boolean} If the value is HTMLDocument.
+ * @description Returns if the value is HTMLDocument or not.
+ */
+function isHTMLDocument(value) {
+  return toStringTag(value) === 'HTMLDocument';
+}
+
+/**
+ * @function isDocumentFragment
+ * @private
+ * @param {*} value - Value to check if it's a DocumentFragment.
+ * @returns {Boolean} If the value is a DocumentFragment.
+ * @description Returns if the value is a DocumentFragment or not.
+ */
+function isDocumentFragment(value) {
+  return toStringTag(value) === 'DocumentFragment';
+}
+
+/**
+ * @function isStyleRule
+ * @private
+ * @param {*} value - Value to check if it's a style rule.
+ * @returns {Boolean} If the value is a style rule.
+ * @description Returns if the value is a style rule or not.
+ */
+function isStyleRule(value) {
+  return toStringTag(value) === 'CSSStyleRule';
+}
+
+/**
+ * @function
+ * @private
+ * @param {*} value - Value to check if it's Comment or Text.
+ * @returns {Boolean} If the value is HTMLDocument.
+ * @description Returns if the value is Comment or Text or not.
+ */
+function isCommentOrText(value) {
+  var tag = toStringTag(value);
+
+  return tag === 'Comment' || tag === 'Text';
+}
+
+/**
+ * @function getElem
+ * @private
+ * @param {Elem} elem - Element to check.
+ * @returns {Element} The argument or a fallback if needed.
+ */
+function getElem(elem) {
+  return isElement(elem.$[0]) ? elem.$[0] : emptyDiv;
+}
+
+/**
+ * @function getName
+ * @private
+ * @param {Element} [elem] - Element which name is needed to know.
+ * @returns {String} Element name.
+ */
+function getName(elem) {
+  return elem && elem.nodeName && elem.nodeName.toLowerCase() || '';
+}
+
+/**
+ * @function addDwayneData
+ * @private
+ * @param {Element} elem - Element to add dwayneData to.
+ * @returns {void}
+ */
+function addDwayneData(elem) {
+  if (!{}.hasOwnProperty.call(elem, 'dwayneData') && !isWindow(elem)) {
+    /**
+     * @member Element#dwayneData
+     * @type {Object}
+     * @protected
+     * @property {String} previousDisplay - Parameter used for hiding/showing elements.
+     * @property {Object.<String, Super>} removeListeners - Parameter used for remove event listeners.
+     * @property {CanvasRenderingContext2D} [ctx] - Canvas rendering context.
+     * @property {Arr} validators - Validators assigned to element.
+     * @description D data.
+     */
+    Object.defineProperty(elem, 'dwayneData', {
+      value: {
+        previousDisplay: '',
+        listeners: {},
+        ctx: getName(elem) === 'canvas' && elem.getContext('2d'),
+        validators: new Arr([])
+      }
+    });
+  } else if (isWindow(elem) && !windowsDwayneData.some(function (_ref11) {
+    var element = _ref11.element;
+    return element === elem;
+  })) {
+    windowsDwayneData.push({
+      element: elem,
+      listeners: {}
+    });
+  }
+}
+
+constructors[2].push({
+  check: function check(elem) {
+    return isElement(elem) || isWindow(elem) || isHTMLDocument(elem) || isCommentOrText(elem) || isDocumentFragment(elem) || /^(HTMLCollection|NodeList)$/.test(toStringTag(elem));
+  },
+  cls: Elem
+});
+
+/**
+ * @function find
+ * @public
+ * @param {String} selector - Selector to find.
+ * @param {Element} [base = document] - Base to find in.
+ * @returns {Elem} New instance of Elem.
+ * @description Synonym for
+ * [Document#querySelectorAll]{@link https://developer.mozilla.org/en/docs/Web/API/Document/querySelectorAll}.
+ */
+function _find(selector) {
+  var base = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : nativeDocument;
+
+  return new Elem(isElement(base) || isHTMLDocument(base) ? base.querySelectorAll(String(selector)) : []);
+}
+
+/**
+ * @function parseHTML
+ * @public
+ * @param {String} html - HTML to parse.
+ * @param {Boolean} [collapseWhiteSpace = false] - If the whitespace should be
+ * collapsed during the parsing.
+ * @returns {Elem} New instance of Elem.
+ * @description Parses HTML and returns a wrap of #document-fragment containing the contents.
+ *
+ * @example
+ * parseHTML('<div>123</div>'); // Elem
+ */
+function parseHTML(html, collapseWhiteSpace) {
+  var json = markupToJSON(html, collapseWhiteSpace);
+  var template = doc.template();
+  var elem = new Elem(template.$[0].content);
+
+  json.forEach(function forEachNode(node) {
+    var name = node.name,
+        attrs = node.attrs,
+        value = node.value,
+        parent = node.parent,
+        children = node.children;
+
+
+    var parentNode = parent.elem || elem;
+    var element = parentNode.create(name);
+
+    node.elem = element;
+
+    if (value) {
+      element.text(value);
+    }
+
+    if (attrs) {
+      element.attr(attrs);
+    }
+
+    if (name === 'template') {
+      node.elem = new Elem(element.prop('content'));
+    }
+
+    if (children) {
+      children.forEach(forEachNode);
+    }
+  });
+
+  return new Elem(elem);
+}
+
+/**
+ * @function px
+ * @public
+ * @param {String|Number} size - String containing pixels value or a number.
+ * @returns {Number} Number of pixels.
+ * @description Function for parsing pixel strings.
+ *
+ * @example
+ * px('0px');  // 0
+ * px('42px'); // 42
+ */
+function px(size) {
+  return Number(String(size).replace(/px$/, ''));
+}
+
+function registerDBlock(Block) {
+  var DBlock = function (_Block) {
+    inherits(DBlock, _Block);
+
+    function DBlock() {
+      var _ref;
+
+      var _temp, _this, _ret;
+
+      classCallCheck(this, DBlock);
+
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = DBlock.__proto__ || Object.getPrototypeOf(DBlock)).call.apply(_ref, [this].concat(args))), _this), _this.elems = null, _temp), possibleConstructorReturn(_this, _ret);
+    }
+
+    createClass(DBlock, [{
+      key: 'afterConstruct',
+      value: function afterConstruct() {
+        var children = this.$$.parent.children;
+        var name = this.args.name;
+
+        var found = void 0;
+
+        if (name) {
+          found = children.find(function (_ref2) {
+            var nodeName = _ref2.name;
+            return nodeName === 'd-block-' + name;
+          });
+
+          if (found && found.value.children.length) {
+            this.elems = found.value.children;
+          }
+        } else {
+          this.elems = children;
+        }
+      }
+    }]);
+    return DBlock;
+  }(Block);
+
+  DBlock.template = '<d-elements value="{elems}" />';
+
+
+  return {
+    name: 'd-block',
+    value: DBlock
+  };
+}
+
+function registerDEach(Block, createBlock) {
+  var DEach = function (_Block) {
+    inherits(DEach, _Block);
+
+    function DEach(opts) {
+      classCallCheck(this, DEach);
+
+      var _this = possibleConstructorReturn(this, (DEach.__proto__ || Object.getPrototypeOf(DEach)).call(this, opts));
+
+      var _this$args = _this.args,
+          _this$args$item = _this$args.item,
+          itemName = _this$args$item === undefined ? '$item' : _this$args$item,
+          _this$args$index = _this$args.index,
+          indexName = _this$args$index === undefined ? '$index' : _this$args$index;
+
+
+      assign$1(_this.$$, {
+        uids: new Super({}),
+        items: new Arr([]),
+        UID: String(_this.args.uid),
+        itemName: itemName,
+        indexName: indexName
+      });
+      return _this;
+    }
+
+    createClass(DEach, [{
+      key: 'afterRender',
+      value: function afterRender() {
+        var _this2 = this;
+
+        this.constructValues(this.args.set);
+        this.watchArgs('set', function (set$$1) {
+          _this2.constructValues(set$$1);
+        });
+      }
+    }, {
+      key: 'constructValues',
+      value: function constructValues(set$$1) {
+        var _this3 = this;
+
+        var _$$ = this.$$,
+            _$$$elems = _$$.elems,
+            start = _$$$elems.start,
+            parentElem = _$$$elems.parent,
+            uids = _$$.uids,
+            parent = _$$.parent,
+            scope = _$$.scope,
+            itemName = _$$.itemName,
+            indexName = _$$.indexName,
+            UID = _$$.UID;
+        var children = this.children;
+
+        var $uids = uids.$;
+        var newKeys = {};
+        var newUIDs = {};
+
+        new Super(set$$1).forEach(function (item, index) {
+          scope[itemName] = item;
+          scope[indexName] = index;
+
+          var uid = parent.$$.evaluate(String(UID), null, null, false, false, _this3);
+
+          newKeys[uid] = newKeys[uid] || {};
+          newKeys[uid][index] = true;
+          newUIDs[index] = uid;
+        });
+
+        scope[itemName] = null;
+        scope[indexName] = null;
+
+        uids.forEach(function (items, uid) {
+          if (!newKeys[uid]) {
+            items.forEach(function (Item) {
+              Item.remove();
+            });
+
+            return;
+          }
+
+          items.splice(Object.keys(newKeys[uid]).length).forEach(function (Item) {
+            Item.remove();
+          });
+        });
+
+        var after = start;
+
+        new Super(set$$1).forEach(function (item, index) {
+          var uid = newUIDs[index];
+          var block = void 0;
+
+          if ($uids[uid] && $uids[uid].length) {
+            block = newKeys[uid][index] = uids.$[uid].shift();
+            block.$$.scope[indexName] = index;
+            block.$$.scope[itemName] = item;
+          } else {
+            block = newKeys[uid][index] = createBlock({
+              node: {
+                itemName: itemName,
+                indexName: indexName,
+                item: item,
+                index: index,
+                name: '#d-item',
+                block: parent,
+                children: children
+              },
+              after: after,
+              parent: parentElem,
+              parentBlock: _this3,
+              parentScope: parent
+            });
+          }
+
+          var _block$$$$elems = block.$$.elems,
+              start = _block$$$$elems.start,
+              end = _block$$$$elems.end;
+
+
+          if (start.prev().$[0] !== after.$[0]) {
+            var content = block.$$.elems.content;
+
+
+            new Elem([start, content, end]).insertAfter(after);
+          }
+
+          after = end;
+        });
+
+        this.$$.uids = new Super(newKeys).map(function (items) {
+          return new Super(items).values();
+        });
+      }
+    }]);
+    return DEach;
+  }(Block);
+
+  return {
+    name: 'd-each',
+    value: DEach
+  };
+}
+
+function registerDElements(Block, createBlock) {
+  var DElements = function (_Block) {
+    inherits(DElements, _Block);
+
+    function DElements() {
+      classCallCheck(this, DElements);
+      return possibleConstructorReturn(this, (DElements.__proto__ || Object.getPrototypeOf(DElements)).apply(this, arguments));
+    }
+
+    createClass(DElements, [{
+      key: 'afterConstruct',
+      value: function afterConstruct() {
+        var _this2 = this;
+
+        this.watchArgs('value', function (value) {
+          var _$$ = _this2.$$,
+              children = _$$.children,
+              mixins = _$$.mixins,
+              watchersToRemove = _$$.watchersToRemove,
+              _$$$elems = _$$.elems,
+              start = _$$$elems.start,
+              content = _$$$elems.content,
+              parent = _$$$elems.parent;
+
+          var after = start;
+
+          children.forEach(function (child) {
+            child.remove(true);
+          });
+          mixins.forEach(function (mixin) {
+            mixin.remove(true);
+          });
+          content.remove();
+
+          _this2.$$.children = new Arr([]);
+          _this2.$$.mixins = new Arr([]);
+          _this2.$$.watchersToRemove = watchersToRemove.filter(function (_ref) {
+            var watchers = _ref.watchers,
+                watcher = _ref.watcher,
+                forDElements = _ref.forDElements;
+
+            if (forDElements) {
+              return true;
+            }
+
+            var index = watchers.indexOf(watcher);
+
+            if (index !== -1) {
+              watchers.splice(index, 1);
+            }
+          });
+
+          var newContent = new Elem();
+
+          new Arr(value || []).forEach(function (child) {
+            var block = createBlock({
+              node: child,
+              after: after,
+              parent: parent,
+              parentBlock: _this2,
+              parentScope: _this2
+            });
+
+            if (block instanceof Block) {
+              var elems = block.$$.elems;
+
+
+              after = elems.end;
+
+              newContent.add(elems.start, elems.content, elems.end);
+            } else {
+              after = block;
+
+              newContent.add(block);
+            }
+          });
+
+          _this2.$$.elems.content = newContent;
+        });
+      }
+    }]);
+    return DElements;
+  }(Block);
+
+  return {
+    name: 'd-elements',
+    value: DElements
+  };
+}
+
+function registerDIf(Block) {
+  var DIf = function (_Block) {
+    inherits(DIf, _Block);
+
+    function DIf() {
+      var _ref;
+
+      var _temp, _this, _ret;
+
+      classCallCheck(this, DIf);
+
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = DIf.__proto__ || Object.getPrototypeOf(DIf)).call.apply(_ref, [this].concat(args))), _this), _this.index = Infinity, _this.elems = null, _this.values = _this.children.map(function (child, i) {
+        var name = child.name,
+            attrs = child.attrs,
+            children = child.children;
+
+        var cond = _this.evaluateAndWatch(name === 'd-else' ? '{true}' : attrs.if || '{true}', function (newValue) {
+          if (!!newValue === _this.values.$[i]) {
+            return;
+          }
+
+          _this.values.$[i] = !!newValue;
+
+          if (i > _this.index) {
+            return;
+          }
+
+          if (i < _this.index) {
+            _this.index = i;
+            _this.elems = children;
+
+            return;
+          }
+
+          var found = _this.values.find(Boolean);
+
+          if (found) {
+            _this.index = found.key;
+            _this.elems = _this.children.$[found.key].children;
+          } else {
+            _this.index = Infinity;
+            _this.elems = null;
+          }
+        });
+
+        if (cond && _this.index === Infinity) {
+          _this.index = i;
+          _this.elems = children;
+        }
+
+        return cond;
+      }), _temp), possibleConstructorReturn(_this, _ret);
+    }
+
+    return DIf;
+  }(Block);
+
+  DIf.template = '<d-elements value="{elems}"/>';
+
+
+  return {
+    name: 'd-if',
+    value: DIf
+  };
+}
+
+function registerDItem(Block) {
+  var DItem = function (_Block) {
+    inherits(DItem, _Block);
+
+    function DItem() {
+      classCallCheck(this, DItem);
+      return possibleConstructorReturn(this, (DItem.__proto__ || Object.getPrototypeOf(DItem)).apply(this, arguments));
+    }
+
+    return DItem;
+  }(Block);
+
+  DItem.template = '<d-elements value="{children}"/>';
+
+
+  return {
+    name: '#d-item',
+    value: DItem
+  };
+}
+
+function registerDSwitch(Block) {
+  var DSwitch = function (_Block) {
+    inherits(DSwitch, _Block);
+
+    function DSwitch(opts) {
+      classCallCheck(this, DSwitch);
+
+      var _this = possibleConstructorReturn(this, (DSwitch.__proto__ || Object.getPrototypeOf(DSwitch)).call(this, opts));
+
+      _this.index = Infinity;
+      _this.elems = null;
+      var args = _this.args,
+          value = _this.args.value;
+
+      var wasDefault = void 0;
+
+      _this.values = _this.children.object(function (values, child, i) {
+        var name = child.name,
+            attrs = child.attrs,
+            children = child.children;
+
+
+        if (wasDefault) {
+          return;
+        }
+
+        if (name !== 'd-case' && name !== 'd-default') {
+          return;
+        }
+
+        if (name === 'd-default') {
+          wasDefault = true;
+        }
+
+        var val = void 0;
+
+        if (name === 'd-default') {
+          val = args.value;
+        } else {
+          val = _this.evaluateAndWatch(attrs.if || '{undefined}', function (newValue) {
+            if (_this.equals(_this.values.$[i].value, newValue)) {
+              return;
+            }
+
+            _this.values.$[i].value = newValue;
+
+            if (i > _this.index) {
+              return;
+            }
+
+            if (i < _this.index) {
+              _this.index = i;
+              _this.elems = children;
+
+              return;
+            }
+
+            var found = _this.values.find(function (_ref) {
+              var value = _ref.value;
+              return _this.equals(value, args.value);
+            });
+
+            if (found) {
+              _this.index = found.key;
+              _this.elems = found.value.children;
+            } else {
+              _this.index = Infinity;
+              _this.elems = null;
+            }
+          });
+        }
+
+        if (_this.equals(val, value) && _this.index === Infinity) {
+          _this.index = i;
+          _this.elems = children;
+        }
+
+        values.push({
+          name: name,
+          children: children,
+          value: val
+        });
+      }, new Arr([]));
+      return _this;
+    }
+
+    createClass(DSwitch, [{
+      key: 'afterConstruct',
+      value: function afterConstruct() {
+        var _this2 = this;
+
+        this.watchArgs('value', function (newValue) {
+          _this2.index = Infinity;
+          _this2.values.forEach(function (_ref2, i) {
+            var name = _ref2.name,
+                value = _ref2.value,
+                children = _ref2.children;
+
+            var val = name === 'd-default' ? newValue : value;
+
+            if (_this2.equals(val, newValue) && _this2.index === Infinity) {
+              _this2.index = i;
+              _this2.elems = children;
+            }
+          });
+        });
+      }
+    }, {
+      key: 'equals',
+      value: function equals(value1, value2) {
+        return new Super(value1).equals(value2);
+      }
+    }]);
+    return DSwitch;
+  }(Block);
+
+  DSwitch.template = '<d-elements value="{elems}"/>';
+
+
+  return {
+    name: 'd-switch',
+    value: DSwitch
+  };
+}
+
+function registerDText(Block) {
+  var DText = function (_Block) {
+    inherits(DText, _Block);
+
+    function DText() {
+      var _ref;
+
+      var _temp, _this, _ret;
+
+      classCallCheck(this, DText);
+
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = DText.__proto__ || Object.getPrototypeOf(DText)).call.apply(_ref, [this].concat(args))), _this), _this.text = '', _temp), possibleConstructorReturn(_this, _ret);
+    }
+
+    createClass(DText, [{
+      key: 'afterConstruct',
+      value: function afterConstruct() {
+        var _this2 = this;
+
+        this.text = isNil(this.args.value) ? '' : this.args.value;
+
+        this.watchArgs('value', function (newValue) {
+          _this2.text = isNil(newValue) ? '' : newValue;
+        });
+      }
+    }]);
+    return DText;
+  }(Block);
+
+  DText.template = '<d-elements value="{[{ name: \'#text\', value: text }]}"/>';
+
+
+  return {
+    name: 'd-text',
+    value: DText
+  };
+}
+
+
+
+var Blocks = Object.freeze({
+	registerDBlock: registerDBlock,
+	registerDEach: registerDEach,
+	registerDElements: registerDElements,
+	registerDIf: registerDIf,
+	registerDItem: registerDItem,
+	registerDSwitch: registerDSwitch,
+	registerDText: registerDText
+});
+
+function registerDAttr(Mixin) {
+  var DAttr = function (_Mixin) {
+    inherits(DAttr, _Mixin);
+
+    function DAttr() {
+      classCallCheck(this, DAttr);
+      return possibleConstructorReturn(this, (DAttr.__proto__ || Object.getPrototypeOf(DAttr)).apply(this, arguments));
+    }
+
+    createClass(DAttr, [{
+      key: 'afterUpdate',
+      value: function afterUpdate(newValue, oldValue) {
+        var elem = this.elem;
+
+
+        newValue = new Super(newValue).$;
+
+        new Super(oldValue).forEach(function (value, prop) {
+          if (!newValue[prop]) {
+            elem.removeAttr(prop);
+          }
+        });
+        elem.attr(newValue);
+      }
+    }]);
+    return DAttr;
+  }(Mixin);
+
+  return {
+    name: 'd-attr',
+    value: DAttr
+  };
+}
+
+function registerDBind(Mixin) {
+  var DBind = function (_Mixin) {
+    inherits(DBind, _Mixin);
+
+    function DBind() {
+      classCallCheck(this, DBind);
+      return possibleConstructorReturn(this, (DBind.__proto__ || Object.getPrototypeOf(DBind)).apply(this, arguments));
+    }
+
+    createClass(DBind, [{
+      key: 'afterUpdate',
+      value: function afterUpdate(value) {
+        if (this.off) {
+          this.off();
+        }
+
+        if (!isFunction(value)) {
+          return;
+        }
+
+        this.off = this.elem.on(this.match[0], value);
+      }
+    }]);
+    return DBind;
+  }(Mixin);
+
+  return {
+    name: 'd-bind',
+    value: DBind
+  };
+}
+
+function registerDClass(Mixin) {
+  var DClass = function (_Mixin) {
+    inherits(DClass, _Mixin);
+
+    function DClass() {
+      classCallCheck(this, DClass);
+      return possibleConstructorReturn(this, (DClass.__proto__ || Object.getPrototypeOf(DClass)).apply(this, arguments));
+    }
+
+    createClass(DClass, [{
+      key: 'afterUpdate',
+      value: function afterUpdate(newValue, oldValue) {
+        var elem = this.elem;
+
+
+        newValue = new Super(newValue).$;
+        oldValue = new Super(oldValue).$;
+
+        if (isArray(newValue)) {
+          iterate(oldValue, function (cls) {
+            if (isString(cls) && !newValue[cls]) {
+              elem.removeClass(cls);
+            }
+          });
+          iterate(newValue, function (cls) {
+            if (isString(cls)) {
+              elem.addClass(cls);
+            }
+          });
+        } else if (isString(newValue)) {
+          elem.class(newValue);
+        } else if (isObject(newValue)) {
+          iterate(oldValue, function (val, cls) {
+            if (val && !newValue[cls]) {
+              elem.removeClass(cls);
+            }
+          });
+          iterate(newValue, function (val, cls) {
+            if (val) {
+              elem.addClass(cls);
+            }
+          });
+        } else if (isString(oldValue)) {
+          elem.class('');
+        } else if (isArray(oldValue)) {
+          iterate(oldValue, function (cls) {
+            if (isString(cls)) {
+              elem.removeClass(cls);
+            }
+          });
+        } else if (isObject(oldValue)) {
+          iterate(oldValue, function (val, cls) {
+            if (val) {
+              elem.removeClass(cls);
+            }
+          });
+        }
+      }
+    }]);
+    return DClass;
+  }(Mixin);
+
+  return {
+    name: 'd-class',
+    value: DClass
+  };
+}
+
+function registerDElem(Mixin) {
+  var DElem = function (_Mixin) {
+    inherits(DElem, _Mixin);
+
+    function DElem() {
+      classCallCheck(this, DElem);
+      return possibleConstructorReturn(this, (DElem.__proto__ || Object.getPrototypeOf(DElem)).apply(this, arguments));
+    }
+
+    createClass(DElem, [{
+      key: 'afterUpdate',
+      value: function afterUpdate(newValue, oldValue) {
+        var parent = this.$$.parent;
+
+
+        if (newValue !== oldValue && isString(oldValue)) {
+          delete parent[oldValue];
+        }
+
+        if (isString(newValue)) {
+          parent[newValue] = this.elem;
+        }
+      }
+    }]);
+    return DElem;
+  }(Mixin);
+
+  return {
+    name: 'd-elem',
+    value: DElem
+  };
+}
+
+function registerDHide(Mixin) {
+  var DHide = function (_Mixin) {
+    inherits(DHide, _Mixin);
+
+    function DHide() {
+      classCallCheck(this, DHide);
+      return possibleConstructorReturn(this, (DHide.__proto__ || Object.getPrototypeOf(DHide)).apply(this, arguments));
+    }
+
+    createClass(DHide, [{
+      key: 'afterUpdate',
+      value: function afterUpdate(value) {
+        var elem = this.elem;
+
+
+        if (value) {
+          elem.hide();
+        } else {
+          elem.show();
+        }
+      }
+    }]);
+    return DHide;
+  }(Mixin);
+
+  return {
+    name: 'd-hide',
+    value: DHide
+  };
+}
+
+function registerDOn(Mixin) {
+  var DOn = function (_Mixin) {
+    inherits(DOn, _Mixin);
+
+    function DOn(opts) {
+      classCallCheck(this, DOn);
+
+      var _this = possibleConstructorReturn(this, (DOn.__proto__ || Object.getPrototypeOf(DOn)).call(this, opts));
+
+      _this.elem.on(_this.match[0], function () {
+        _this.evaluateOnce();
+      });
+      return _this;
+    }
+
+    return DOn;
+  }(Mixin);
+
+  DOn.evaluate = false;
+
+
+  return {
+    name: 'd-on',
+    value: DOn
+  };
+}
+
+function registerDShow(Mixin) {
+  var DShow = function (_Mixin) {
+    inherits(DShow, _Mixin);
+
+    function DShow() {
+      classCallCheck(this, DShow);
+      return possibleConstructorReturn(this, (DShow.__proto__ || Object.getPrototypeOf(DShow)).apply(this, arguments));
+    }
+
+    createClass(DShow, [{
+      key: 'afterUpdate',
+      value: function afterUpdate(value) {
+        var elem = this.elem;
+
+
+        if (value) {
+          elem.show();
+        } else {
+          elem.hide();
+        }
+      }
+    }]);
+    return DShow;
+  }(Mixin);
+
+  return {
+    name: 'd-show',
+    value: DShow
+  };
+}
+
+function registerDStyle(Mixin) {
+  var DStyle = function (_Mixin) {
+    inherits(DStyle, _Mixin);
+
+    function DStyle() {
+      classCallCheck(this, DStyle);
+      return possibleConstructorReturn(this, (DStyle.__proto__ || Object.getPrototypeOf(DStyle)).apply(this, arguments));
+    }
+
+    createClass(DStyle, [{
+      key: 'afterUpdate',
+      value: function afterUpdate(newValue, oldValue) {
+        var elem = this.elem;
+
+
+        newValue = new Super(newValue).$;
+
+        new Super(oldValue).forEach(function (value, prop) {
+          if (!newValue[prop]) {
+            elem.removeCSS(prop);
+          }
+        });
+        elem.css(newValue);
+      }
+    }]);
+    return DStyle;
+  }(Mixin);
+
+  return {
+    name: 'd-style',
+    value: DStyle
+  };
+}
+
+function registerDText$1(Mixin) {
+  var DText = function (_Mixin) {
+    inherits(DText, _Mixin);
+
+    function DText() {
+      classCallCheck(this, DText);
+      return possibleConstructorReturn(this, (DText.__proto__ || Object.getPrototypeOf(DText)).apply(this, arguments));
+    }
+
+    createClass(DText, [{
+      key: 'afterUpdate',
+      value: function afterUpdate(value) {
+        this.elem.text(isNil(value) ? '' : '' + value);
+      }
+    }]);
+    return DText;
+  }(Mixin);
+
+  return {
+    name: 'd-text',
+    value: DText
+  };
+}
+
+function registerDValidate(Mixin) {
+  var DValidate = function (_Mixin) {
+    inherits(DValidate, _Mixin);
+
+    function DValidate(opts) {
+      classCallCheck(this, DValidate);
+
+      var _this = possibleConstructorReturn(this, (DValidate.__proto__ || Object.getPrototypeOf(DValidate)).call(this, opts));
+
+      var elem = _this.elem;
+
+      var validator = _this.evaluateOnce();
+
+      if (isFunction(validator)) {
+        elem.validate(validator);
+      }
+      return _this;
+    }
+
+    return DValidate;
+  }(Mixin);
+
+  DValidate.evaluate = false;
+
+
+  return {
+    name: 'd-validate',
+    value: DValidate
+  };
+}
+
+var propSwitcher = switcher('strictEquals', function (type, elem) {
+  return elem.hasAttr('contenteditable') || elem.hasAttr('contentEditable') ? 'text' : 'value';
+}).case('input', function (type) {
+  if (type === 'file') {
+    return 'files';
+  }
+
+  return type === 'radio' || type === 'checkbox' ? 'checked' : 'value';
+});
+var setValueSwitcher = switcher('strictEquals', function (value) {
+  return value;
+}).case('input', function (value, type, inputValue) {
+  if (type !== 'radio' && type !== 'checkbox') {
+    return value;
+  }
+
+  if (type === 'radio') {
+    return value === inputValue;
+  }
+
+  return value.indexOf(inputValue) !== -1;
+});
+var getValueSwitcher = switcher('strictEquals', function (value) {
+  return value;
+}).case('input', function (value, type, inputValue, values) {
+  if (type !== 'radio' && type !== 'checkbox') {
+    return value;
+  }
+
+  if (type === 'radio') {
+    return value ? inputValue : null;
+  }
+
+  if (value) {
+    if (values) {
+      return values.indexOf(inputValue) === -1 ? new Arr(values).concat(inputValue).$ : values;
+    }
+
+    return [inputValue];
+  }
+
+  if (!isArray(values)) {
+    return [];
+  }
+
+  var index = values.indexOf(inputValue);
+
+  if (index !== -1) {
+    return [].concat(toConsumableArray(new Arr(values).slice(0, index).$), toConsumableArray(new Arr(values).slice(index + 1).$));
+  }
+
+  return values;
+});
+var listenerSwitcher = switcher('strictEquals', 'input').case('select', 'change').case('input', function (type) {
+  return type === 'radio' || type === 'checkbox' || type === 'color' || type === 'file' ? 'change' : 'input';
+});
+
+function registerDValue(Mixin) {
+  var DValue = function (_Mixin) {
+    inherits(DValue, _Mixin);
+
+    function DValue(opts) {
+      classCallCheck(this, DValue);
+
+      var _this = possibleConstructorReturn(this, (DValue.__proto__ || Object.getPrototypeOf(DValue)).call(this, opts));
+
+      var _this$$$ = _this.$$,
+          _value = _this$$$._value,
+          parent = _this$$$.parent,
+          elem = _this.elem;
+
+      var type = elem.prop('type');
+
+      _this.prop = propSwitcher(elem.name, [type, elem]);
+      _this.type = type;
+
+      var initialScopeValue = parent.$$.evaluate('{' + _value + '}', function (newValue) {
+        _this.setProp(newValue);
+      }, _this);
+      var initialElemValue = _this.getProp(initialScopeValue);
+
+      if (isNil(initialScopeValue) || type === 'checkbox') {
+        parent[_value] = initialElemValue;
+      } else {
+        _this.setProp(initialScopeValue);
+      }
+
+      elem.on(listenerSwitcher(elem.name, [type]), function (e) {
+        if (e.target === elem.$[0]) {
+          parent[_value] = _this.getProp(parent[_value]);
+        }
+      });
+      return _this;
+    }
+
+    createClass(DValue, [{
+      key: 'setProp',
+      value: function setProp(value) {
+        var elem = this.elem,
+            prop = this.prop,
+            type = this.type;
+
+
+        if (prop === 'text') {
+          elem.text(value);
+        } else {
+          elem.prop(prop, setValueSwitcher(elem.name, [value, type, elem.$[0].value]));
+        }
+      }
+    }, {
+      key: 'getProp',
+      value: function getProp(values) {
+        var elem = this.elem,
+            prop = this.prop,
+            type = this.type;
+
+
+        return prop === 'text' ? elem.text() : getValueSwitcher(elem.name, [elem.prop(prop), type, elem.$[0].value, values]);
+      }
+    }]);
+    return DValue;
+  }(Mixin);
+
+  DValue.evaluate = false;
+
+
+  return {
+    name: 'd-value',
+    value: DValue
+  };
+}
+
+
+
+var Mixins = Object.freeze({
+	registerDAttr: registerDAttr,
+	registerDBind: registerDBind,
+	registerDClass: registerDClass,
+	registerDElem: registerDElem,
+	registerDHide: registerDHide,
+	registerDOn: registerDOn,
+	registerDShow: registerDShow,
+	registerDStyle: registerDStyle,
+	registerDText: registerDText$1,
+	registerDValidate: registerDValidate,
+	registerDValue: registerDValue
+});
+
+/**
+ * @module Block
+ * @private
+ * @mixin
+ * @description Exports Block class.
+ */
+
+/**
+ * @callback Watcher
+ * @param {*} newValue - New value.
+ * @param {*} oldValue - Old value.
+ */
+
+var blocks = Object.create(null);
+var mixins = Object.create(null);
+var isPrototypeOf = {}.isPrototypeOf;
+var tagName = new RegExp('^' + htmlAllowedTagSymbols + '$', 'i');
+var attrName = new RegExp('^' + htmlAllowedAttrSymbols + '$');
+var expressionRegExp = /^\{[\s\S]+\}$/;
+var _global$1 = global$1;
+var document$1 = _global$1.document;
+
+var svgNS = 'http://www.w3.org/2000/svg';
+var onEvalError = void 0;
+var evalMode = void 0;
+var getting = void 0;
+
+/**
+ * @class Block
+ * @public
+ * @param {Object} opts - Element options.
+ * @returns {Block} Instance of Block.
+ * @description Class for dynamic templating.
+ *
+ * @example
+ * import { D, Block, initApp, registerBlock } from 'dwayne';
+ *
+ * class App extends Block {
+ *   static template = '<Hello text="{text}"/>';
+ *
+ *   constructor(args, children) {
+ *     super(args, children);
+ *
+ *     this.text = 'world (0)';
+ *     this.times = 0;
+ *
+ *     this.setInterval();
+ *   }
+ *
+ *   setInterval() {
+ *     D(1000).interval(() => {
+ *       this.text = `world (${ ++this.times })`;
+ *     });
+ *   }
+ * }
+ *
+ * class Hello extends Block {
+ *   static template = 'Hello, <d-text value="{args.text}"/>!';
+ * }
+ *
+ * Block.App = App;
+ * Block.Hello = Hello;
+ *
+ * initApp();
+ */
+
+var Block = function () {
+  createClass(Block, null, [{
+    key: 'onEvalError',
+
+    /**
+     * @member {Boolean} [Block.collapseWhiteSpace = true]
+     * @type {Boolean}
+     * @public
+     * @description If the whitespace between html elements and
+     * in the start and the end inside the tag should be omitted during parsing.
+     */
+    get: function get() {
+      return onEvalError;
+    }
+
+    /**
+     * @member {Object} [Block.defaultArgs = true]
+     * @type {Object}
+     * @public
+     * @description Provide default args if that args may not appear in the args
+     * (using "d-rest") but you use them in your template and want them to be watched.
+     */
+    ,
+    set: function set(listener) {
+      if (isFunction(listener)) {
+        onEvalError = listener;
+      } else {
+        onEvalError = null;
+      }
+    }
+  }]);
+
+  function Block(opts) {
+    var _this = this;
+
+    classCallCheck(this, Block);
+    var name = opts.name,
+        originalArgs = opts.args,
+        children = opts.children,
+        block = opts.block,
+        parent = opts.parent,
+        parentBlock = opts.parentBlock,
+        parentScope = opts.parentScope;
+
+    var watchersToRemove = new Arr([]);
+
+    Object.defineProperties(this, {
+      /**
+       * @member {Block} Block#$
+       * @type {Block}
+       * @public
+       * @description This.
+       */
+      $: {
+        value: this
+      },
+
+      /**
+       * @member {Object} Block#$$
+       * @type {Object}
+       * @protected
+       * @property {Object} args - Private args scope.
+       * @property {Arr} children - Child blocks.
+       * @property {Arr} mixins - Child mixins.
+       * @property {Object} elems - Elements connected to the block.
+       * @property {Elem} elems.parent - Parent element.
+       * @property {Elem} elems.start - Start comment block.
+       * @property {Elem} elems.end - End comment block.
+       * @property {Elem} elems.content - Content elements.
+       * @property {Function} evaluate - Evaluate function.
+       * @property {Object} global - Private global scope.
+       * @property {Object} locals - Private locals scope.
+       * @property {Arr} watchersToRemove - Watchers to remove before removing element.
+       */
+      $$: {
+        value: {
+          name: name,
+          parent: parentScope,
+          parentBlock: parentBlock,
+          children: new Arr([]),
+          mixins: new Arr([]),
+          Block: block,
+          elems: {
+            start: doc.createComment(' ' + name + ': start '),
+            end: doc.createComment(' ' + name + ': end '),
+            content: new Elem(),
+            parent: parent
+          },
+          watchersToRemove: watchersToRemove,
+          evaluate: function evaluate(expression, onChange, instance, forDElements, forDItem, forDEach) {
+            if (!expressionRegExp.test(expression)) {
+              return expression;
+            }
+
+            forDElements = !!forDElements;
+            forDItem = !!forDItem;
+            expression = expression.replace(/^\{|\}$/g, '');
+
+            var store = name === '#d-item' && !forDItem || forDEach ? (forDEach || _this).$$.scope : _this;
+
+            /* eslint no-new-func: 0 */
+
+            var _ref = instance ? instance.$$ : {},
+                watchersToRemove = _ref.watchersToRemove;
+
+            var func = new Function('', 'with(document.DwayneStore){$$.expr=eval("$$.expr="+$$.expr);return $$.expr}');
+
+            return evaluate.call(_this);
+
+            function evaluate() {
+              var _this2 = this;
+
+              var result = void 0;
+
+              if (onChange) {
+                evalMode = true;
+                getting = new Arr([]);
+              }
+
+              store.$$.expr = expression;
+              document$1.DwayneStore = store;
+
+              try {
+                result = func();
+              } catch (err) {
+                if (onEvalError) {
+                  onEvalError(err);
+                }
+              }
+
+              if (onChange) {
+                (function () {
+                  var localWatchers = new Arr([]);
+
+                  getting.forEach(function (watchers) {
+                    var watcher = function watcher() {
+                      var newResult = evaluate.call(_this2);
+
+                      if (newResult !== result) {
+                        onChange(newResult, result);
+                      }
+                    };
+                    var watcherBlock = {
+                      forDElements: forDElements,
+                      watcher: watcher,
+                      watchers: watchers
+                    };
+
+                    watcher.onRemove = function () {
+                      localWatchers.forEach(function (watcherBlock) {
+                        var localWatcher = watcherBlock.watcher,
+                            watchers = watcherBlock.watchers;
+
+                        var index1 = watchersToRemove.indexOf(watcherBlock);
+
+                        if (index1 !== -1) {
+                          watchersToRemove.splice(index1, 1);
+                        }
+
+                        if (watcher !== localWatcher) {
+                          var index2 = watchers.indexOf(watcher);
+
+                          if (index2 !== -1) {
+                            watchers.splice(index2, 1);
+                          }
+                        }
+                      });
+                    };
+
+                    localWatchers.push(watcherBlock);
+                    watchersToRemove.push(watcherBlock);
+                    watchers.push(watcher);
+                  });
+
+                  evalMode = false;
+                  getting = new Arr([]);
+                })();
+              }
+
+              store.$$.expr = null;
+              document$1.DwayneStore = null;
+
+              return result;
+            }
+          }
+        }
+      }
+    });
+
+    var args = new Super(originalArgs).map(function (value, arg) {
+      if (name === 'd-each' && (arg === 'item' || arg === 'index' || arg === 'uid')) {
+        return value;
+      }
+
+      var forDElements = name === 'd-elements' && arg === 'value';
+
+      return parentScope.$$.evaluate(value, function (value) {
+        _this.args[arg] = value;
+      }, _this, forDElements, forDElements && parentBlock.$$.name === '#d-item');
+    }).$;
+
+    this.args = args;
+    this.children = children || new Arr([]);
+    this.global = Object.create(parentScope ? Object.create(parentScope.global) : null);
+
+    this.$$.elems.start.$[0].DwayneBlock = this;
+    this.$$.elems.end.$[0].DwayneBlock = this;
+
+    if (parentBlock) {
+      parentBlock.$$.children.push(this);
+    }
+  }
+
+  createClass(Block, [{
+    key: 'afterConstruct',
+    value: function afterConstruct() {}
+  }, {
+    key: 'afterRender',
+    value: function afterRender() {}
+  }, {
+    key: 'beforeRemove',
+    value: function beforeRemove() {}
+  }, {
+    key: 'evaluateAndWatch',
+    value: function evaluateAndWatch(expression, callback) {
+      return this.$$.parent.$$.evaluate(expression, callback, this);
+    }
+  }, {
+    key: 'evaluateOnce',
+    value: function evaluateOnce(expression) {
+      return this.$$.parent.$$.evaluate(expression);
+    }
+
+    /**
+     * @method Block#remove
+     * @public
+     * @description Method fot forcing the block to be removed. Calls
+     * remove method for all of its child blocks and calls beforeRemove function.
+     */
+
+  }, {
+    key: 'remove',
+    value: function remove(isParentSignal) {
+      var _$$ = this.$$,
+          parentBlock = _$$.parentBlock,
+          children = _$$.children,
+          mixins = _$$.mixins,
+          _$$$elems = _$$.elems,
+          start = _$$$elems.start,
+          content = _$$$elems.content,
+          end = _$$$elems.end,
+          watchersToRemove = _$$.watchersToRemove;
+
+
+      removeWatchers(watchersToRemove);
+
+      children.forEach(function (child) {
+        child.remove(true);
+      });
+
+      mixins.forEach(function (mixin) {
+        mixin.remove(true);
+      });
+
+      try {
+        this.beforeRemove();
+      } catch (err) {
+        console.error('Uncaught error in beforeRemove:', err);
+      }
+
+      if (!isParentSignal && parentBlock) {
+        var index = parentBlock.$$.children.indexOf(this);
+
+        if (index !== -1) {
+          parentBlock.$$.children.splice(index, 1);
+        }
+      }
+
+      new Elem([start, content, end]).remove();
+    }
+
+    /**
+     * @method Block#watchArgs
+     * @public
+     * @param {String} arg - Arg to watch.
+     * @param {Watcher} watcher - Called when watched arg is changed.
+     */
+
+  }, {
+    key: 'watchArgs',
+    value: function watchArgs(arg, watcher) {
+      validate$1([arg, watcher], ['string', 'function'], 'Block#watchArgs');
+
+      if (!this.$$.args[arg]) {
+        constructPublicScope(this.args, defineProperty({}, arg, this.args[arg]), this.$$.args);
+      }
+
+      this.$$.args[arg].watchers.perm.push(watcher);
+    }
+
+    /**
+     * @method Block#watchGlobal
+     * @public
+     * @param {String} global - Global variable to watch.
+     * @param {Watcher} watcher - Called when watched global is changed.
+     */
+
+  }, {
+    key: 'watchGlobal',
+    value: function watchGlobal(global, watcher) {
+      validate$1([global, watcher], ['string', 'function'], 'Block#watchArgs');
+
+      if (!this.$$.global[global]) {
+        constructPublicScope(this.global, defineProperty({}, global, this.global[global]), this.$$.global);
+      }
+
+      this.$$.global[global].watchers.perm.push(watcher);
+    }
+
+    /**
+     * @method Block#watchLocals
+     * @public
+     * @param {String} local - Local variable to watch.
+     * @param {Watcher} watcher - Called when watched local is changed.
+     */
+
+  }, {
+    key: 'watchLocals',
+    value: function watchLocals(local, watcher) {
+      validate$1([local, watcher], ['string', 'function'], 'Block#watchLocals');
+
+      if (!this.$$.locals[local]) {
+        constructPublicScope(this, defineProperty({}, local, this[local]), this.$$.locals);
+      }
+
+      this.$$.locals[local].watchers.perm.push(watcher);
+    }
+  }]);
+  return Block;
+}();
+
+Block.collapseWhiteSpace = true;
+Block.defaultArgs = {};
+
+
+registerBuiltIns(Blocks, Block);
+
+var Mixin = function () {
+  function Mixin(opts) {
+    var _this3 = this;
+
+    classCallCheck(this, Mixin);
+    var value = opts.value,
+        elem = opts.elem,
+        match = opts.match,
+        parentBlock = opts.parentBlock,
+        parentScope = opts.parentScope;
+
+
+    Object.defineProperties(this, {
+      $$: {
+        value: {
+          _value: value,
+          parent: parentScope,
+          parentBlock: parentBlock,
+          watchersToRemove: new Arr([])
+        }
+      }
+    });
+
+    this.match = new Arr(match).slice(1).$;
+    this.elem = elem;
+
+    if (new Super(this).proto().$.constructor.evaluate) {
+      this.value = this.evaluateAndWatch(function (newValue, oldValue) {
+        _this3.value = newValue;
+
+        try {
+          _this3.afterUpdate(newValue, oldValue);
+        } catch (err) {
+          console.error('Uncaught error in ' + name + '#onUpdate:', err);
+        }
+      });
+
+      this.afterUpdate(this.value);
+    }
+
+    if (parentBlock) {
+      parentBlock.$$.mixins.push(this);
+    }
+  }
+
+  createClass(Mixin, [{
+    key: 'afterUpdate',
+    value: function afterUpdate() {}
+  }, {
+    key: 'beforeRemove',
+    value: function beforeRemove() {}
+  }, {
+    key: 'evaluateAndWatch',
+    value: function evaluateAndWatch(callback) {
+      var _$$2 = this.$$,
+          _value = _$$2._value,
+          parent = _$$2.parent;
+
+
+      return parent.$$.evaluate(_value, callback, this);
+    }
+  }, {
+    key: 'evaluateOnce',
+    value: function evaluateOnce() {
+      var _$$3 = this.$$,
+          _value = _$$3._value,
+          parent = _$$3.parent;
+
+
+      return parent.$$.evaluate(_value);
+    }
+
+    /**
+     * @method Mixin#remove
+     * @public
+     * @description Method fot forcing the mixin to be removed.
+     */
+
+  }, {
+    key: 'remove',
+    value: function remove(isParentSignal) {
+      var _$$4 = this.$$,
+          parentBlock = _$$4.parentBlock,
+          watchersToRemove = _$$4.watchersToRemove;
+
+
+      removeWatchers(watchersToRemove);
+
+      try {
+        this.beforeRemove();
+      } catch (err) {
+        console.error('Uncaught error in beforeRemove:', err);
+      }
+
+      if (!isParentSignal && parentBlock) {
+        var index = parentBlock.$$.mixins.indexOf(this);
+
+        if (index !== -1) {
+          parentBlock.$$.mixins.splice(index, 1);
+        }
+      }
+    }
+  }]);
+  return Mixin;
+}();
+
+Mixin.evaluate = true;
+
+
+registerBuiltIns(Mixins, Mixin);
+
+function initApp() {
+  var root = _find('d-root').first();
+
+  if (!root.length) {
+    throw new Error('No d-root element is found! (initApp)');
+  }
+
+  registerBlocks(Block, blocks);
+
+  iterate(Mixin, function (Mixin, name) {
+    if (name === 'evaluate') {
+      return;
+    }
+
+    if (!isFunction(Mixin)) {
+      console.warn('The "' + name + '" mixin is not a function and will not be registered (initApp)');
+
+      return;
+    }
+
+    if (!attrName.test(name)) {
+      console.warn('Name "' + name + '" is not allowed for mixins so the mixin will not be registered (initApp)');
+
+      return;
+    }
+
+    if (!isInstanceOfMixin(Mixin)) {
+      console.warn('The "' + name + '" mixin does not extend Mixin and will not be registered (initApp)');
+
+      return;
+    }
+
+    mixins[name] = Mixin;
+
+    defineProperties(Mixin, {
+      _match: new RegExp('^' + name + '(?:-([\\s\\S]+))?$')
+    });
+  });
+
+  var block = root.attr('block');
+
+  if (!blocks[block]) {
+    throw new Error('No "' + block + '" block is registered! (initApp)');
+  }
+
+  var replacement = doc.createComment(' d-root: start ');
+  var parent = root.parent();
+
+  replacement.add(doc.createComment(' d-root: end '));
+
+  root.replace(replacement);
+
+  createBlock({
+    node: {
+      name: block,
+      attrs: {},
+      children: new Arr([])
+    },
+    after: replacement.first(),
+    parent: parent
+  });
+}
+
+function registerBlocks(Block, blocks) {
+  iterate(Block, function (Block, name) {
+    if (name === 'collapseWhiteSpace' || name === 'defaultArgs' || name === 'template') {
+      return;
+    }
+
+    if (!isFunction(Block)) {
+      console.warn('The "' + name + '" block is not a function and will not be registered (initApp)');
+
+      return;
+    }
+
+    if (!tagName.test(name) && name !== '#d-item') {
+      console.warn('Name "' + name + '" is not allowed for blocks so the block will not be registered (initApp)');
+
+      return;
+    }
+
+    if (!isInstanceOfBlock(Block)) {
+      console.warn('The "' + name + '" block does not extend Block and will not be registered (initApp)');
+
+      return;
+    }
+
+    var children = Object.create(blocks);
+
+    blocks[name] = {
+      block: Block,
+      html: deepCloneChildren(markupToJSON('' + (Block.template || ''), Block.collapseWhiteSpace)),
+      children: children
+    };
+
+    registerBlocks(Block, children);
+  });
+}
+
+function registerBuiltIns(set$$1, proto) {
+  iterate(set$$1, function (register) {
+    var _register = register(proto, createBlock),
+        name = _register.name,
+        value = _register.value;
+
+    Object.defineProperty(proto, name, {
+      value: value,
+      enumerable: true
+    });
+  });
+}
+
+function createBlock(_ref2) {
+  var node = _ref2.node,
+      after = _ref2.after,
+      parent = _ref2.parent,
+      parentBlock = _ref2.parentBlock,
+      parentScope = _ref2.parentScope;
+
+  parentScope = node && node.block || parentScope;
+
+  var name = node && node.name || 'UnknownBlock';
+  var args = node && node.attrs || {};
+  var children = node && node.children || new Arr([]);
+  var elem = parent.prop('namespaceURI') === svgNS ? doc.svg() : new Elem(doc.template().$[0].content);
+  var localBlocks = parentScope ? parentScope.$$.Block.children : blocks;
+  var constructor = node && node.name && localBlocks[node.name] ? localBlocks[node.name].block : null;
+  var dBlockMatch = void 0;
+
+  if (!children.length && (dBlockMatch = name.match(/^d-block-([\s\S]+)$/) || name === 'd-block')) {
+    constructor = blocks['d-block'];
+
+    args.name = dBlockMatch ? dBlockMatch[1] : null;
+  }
+
+  if (!constructor) {
+    var _ret2 = function () {
+      var value = node.value,
+          children = node.children;
+
+
+      if (name === '#text' && expressionRegExp.test(value)) {
+        return {
+          v: createBlock({
+            node: {
+              name: 'd-text',
+              attrs: { value: value },
+              children: new Arr([]),
+              block: parentScope
+            },
+            after: after,
+            parent: parent,
+            parentBlock: parentBlock,
+            parentScope: parentScope
+          })
+        };
+      }
+
+      var element = elem.create(name);
+      var currentMixins = new Arr([]);
+
+      var attrs = new Super(args).object(function (object, value, attr) {
+        var match = iterate(mixins, function (Mixin, name) {
+          var match = attr.match(Mixin._match);
+
+          if (match) {
+            return {
+              match: match,
+              name: name
+            };
+          }
+        });
+
+        if (match) {
+          currentMixins.push({
+            name: match.name,
+            match: match.match,
+            value: value,
+            elem: element,
+            parentBlock: parentBlock,
+            parentScope: parentScope
+          });
+
+          return;
+        }
+
+        object[attr] = parentScope.$$.evaluate(value, function (value) {
+          element.attr(attr, value);
+        }, parentBlock);
+      }).$;
+
+      if (!isNil(value)) {
+        element.text(value);
+      }
+
+      if (attrs) {
+        element.attr(attrs);
+      }
+
+      if (after.length) {
+        element.insertAfter(after);
+      } else {
+        element.into(parent);
+      }
+
+      after = new Elem();
+
+      if (children) {
+        transformDIfChildren(children).forEach(function (child) {
+          var block = createBlock({
+            node: child,
+            after: after,
+            parent: element,
+            parentBlock: parentBlock,
+            parentScope: parentScope
+          });
+
+          if (block instanceof Block) {
+            after = block.$$.elems.end;
+          } else {
+            after = block;
+          }
+        });
+      }
+
+      currentMixins.forEach(function (opts) {
+        createMixin(opts);
+      });
+
+      return {
+        v: element
+      };
+    }();
+
+    if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
+  }
+
+  var block = node && node.name ? localBlocks[node.name] : null;
+  var blockInstance = new constructor({
+    name: name,
+    args: args,
+    children: children,
+    block: block,
+    parent: parent,
+    parentBlock: parentBlock,
+    parentScope: parentScope
+  });
+
+  Object.defineProperties(blockInstance, {
+    args: {
+      value: blockInstance.args
+    },
+    global: {
+      value: blockInstance.global
+    }
+  });
+
+  var html$$1 = name === 'd-elements' ? new Arr(blockInstance.args.value || []) : deepCloneChildren(block.html, blockInstance);
+
+  if (name === 'd-elements' && parentBlock.$$.name === '#d-item') {
+    html$$1 = deepCloneChildren(html$$1, parentBlock);
+  }
+
+  var $$ = blockInstance.$$,
+      Args = blockInstance.args,
+      global = blockInstance.global,
+      locals = objectWithoutProperties(blockInstance, ['$$', 'args', 'global']);
+
+  var eventualArgs = _extends({}, constructor.defaultArgs, Args);
+
+  delete locals.$;
+  delete locals.$$;
+
+  $$.args = constructPrivateScope(eventualArgs);
+  $$.locals = constructPrivateScope(locals);
+  $$.global = constructPrivateScope(global, 'global', parentScope);
+
+  if (name === '#d-item') {
+    var _scopeValues;
+
+    var scopeValues = (_scopeValues = {}, defineProperty(_scopeValues, node.itemName, node.item), defineProperty(_scopeValues, node.indexName, node.index), _scopeValues);
+    var _parent = blockInstance;
+    var scope = parentScope;
+    var DItemFound = void 0;
+
+    while (!DItemFound && (_parent = _parent.$$.parentBlock)) {
+      DItemFound = _parent.$$.name === '#d-item';
+    }
+
+    if (DItemFound) {
+      scope = _parent.$$.scope;
+    }
+
+    $$.Block = parentScope.$$.Block;
+    $$.privateScope = constructPrivateScope(scopeValues);
+    constructPublicScope($$.scope = Object.create(scope), scopeValues, $$.privateScope);
+  }
+
+  if (name === 'd-each') {
+    $$.scope = Object.create(parentScope);
+  }
+
+  constructPublicScope(Args, eventualArgs, $$.args);
+  constructPublicScope(global, global, $$.global);
+  constructPublicScope(blockInstance, locals, $$.locals);
+
+  try {
+    blockInstance.afterConstruct();
+  } catch (err) {
+    console.error('Uncaught error in ' + name + '#afterConstruct:', err);
+  }
+
+  var elems = new Elem([$$.elems.start, $$.elems.end]);
+
+  if (after.length) {
+    elems.insertAfter(after);
+  } else {
+    elems.into(parent);
+  }
+
+  after = $$.elems.start;
+
+  // console.log(blockInstance);
+
+  transformDIfChildren(html$$1).forEach(function (child) {
+    var block = createBlock({
+      node: child,
+      after: after,
+      parent: parent,
+      parentBlock: blockInstance,
+      parentScope: parentScope
+    });
+
+    if (block instanceof Block) {
+      var _elems = block.$$.elems;
+
+
+      after = _elems.end;
+
+      $$.elems.content.add(_elems.start, _elems.content, _elems.end);
+    } else {
+      after = block;
+
+      $$.elems.content.add(block);
+    }
+  });
+
+  try {
+    blockInstance.afterRender();
+  } catch (err) {
+    console.error('Uncaught error in ' + name + '#afterRender:', err);
+  }
+
+  return blockInstance;
+}
+
+function createMixin(_ref3) {
+  var name = _ref3.name,
+      value = _ref3.value,
+      match = _ref3.match,
+      elem = _ref3.elem,
+      parentBlock = _ref3.parentBlock,
+      parentScope = _ref3.parentScope;
+
+  var Mixin = mixins[name];
+
+  new Mixin({
+    value: value,
+    match: match,
+    elem: elem,
+    parentBlock: parentBlock,
+    parentScope: parentScope
+  });
+}
+
+function deepCloneChildren(children, block) {
+  return new Arr(children || []).map(function (child) {
+    var name = child.name,
+        attrs = child.attrs,
+        value = child.value,
+        children = child.children;
+
+    var newChild = {
+      name: name,
+      value: value,
+      attrs: _extends({}, attrs)
+    };
+
+    if (block) {
+      newChild.block = block;
+    }
+
+    if (children) {
+      newChild.children = deepCloneChildren(children, block);
+    }
+
+    return newChild;
+  });
+}
+
+function transformDIfChildren(children) {
+  return new Arr(children || []).concat({}).object(function (object, child) {
+    var name = child.name;
+    var html$$1 = object.html,
+        ifElse = object.ifElse;
+
+
+    if (name !== 'd-else-if' && name !== 'd-else') {
+      if (ifElse) {
+        html$$1.push({
+          name: 'd-if',
+          block: ifElse.$[0].block,
+          children: ifElse
+        });
+
+        object.ifElse = null;
+      }
+
+      if (name === 'd-if') {
+        object.ifElse = new Arr([child]);
+      } else if (!isUndefined(name)) {
+        html$$1.push(child);
+      }
+    } else {
+      (ifElse || html$$1).push(child);
+
+      if (name === 'd-else' && ifElse) {
+        html$$1.push({
+          name: 'd-if',
+          block: ifElse.$[0].block,
+          children: ifElse
+        });
+
+        object.ifElse = null;
+      }
+    }
+  }, {
+    html: new Arr([]),
+    ifElse: null
+  }).$.html;
+}
+
+function isInstanceOfBlock(block) {
+  return isPrototypeOf.call(Block, block) && isPrototypeOf.call(Block.prototype, block.prototype);
+}
+
+function isInstanceOfMixin(mixin) {
+  return isPrototypeOf.call(Mixin, mixin) && isPrototypeOf.call(Mixin.prototype, mixin.prototype);
+}
+
+function removeWatchers(watchersToRemove) {
+  watchersToRemove.forEach(function (_ref4) {
+    var watcher = _ref4.watcher,
+        watchers = _ref4.watchers;
+
+    var index = watchers.indexOf(watcher);
+
+    if (index !== -1) {
+      watchers.splice(index, 1);
+    }
+  });
+}
+
+function constructPrivateScope(object, type, parentScope) {
+  var scope = {};
+
+  if (type === 'global') {
+    scope = Object.create(parentScope ? parentScope.$$.global : null);
+  }
+
+  return new Super(object).object(function (scope, value, key) {
+    scope[key] = {
+      value: value,
+      watchers: {
+        temp: new Arr([]),
+        perm: new Arr([])
+      }
+    };
+  }, scope).$;
+}
+
+function constructPublicScope(scope, scopeValues, privateScope) {
+  new Super(scope).define(new Super(scopeValues).map(function (value, key) {
+    var scope = privateScope[key];
+
+    return {
+      get: function get() {
+        if (evalMode) {
+          if (getting.indexOf(scope.watchers.temp) === -1) {
+            getting.push(scope.watchers.temp);
+          }
+        }
+
+        return scope.value;
+      },
+      set: function set(value) {
+        if (value === scope.value) {
+          return;
+        }
+
+        var oldTempWatchers = scope.watchers.temp;
+        var oldValue = scope.value;
+
+        scope.watchers.temp = new Arr([]);
+        scope.value = value;
+
+        oldTempWatchers.forEach(function (watcher) {
+          watcher.onRemove();
+          watcher();
+        });
+        scope.watchers.perm.forEach(function (watcher) {
+          watcher(value, oldValue);
+        });
+      }
+    };
+  }).$);
+}
+
+function wrap(Block) {
+  var middlewares = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+  return new Arr(middlewares).reduce(function (Block, middleware) {
+    if (!isFunction(middleware)) {
+      return Block;
+    }
+
+    var block = middleware(Block);
+
+    return isInstanceOfBlock(block) ? block : Block;
+  }, Block);
+}
+
+/**
  * @module Num
  * @private
  * @mixin
@@ -5637,13 +14005,14 @@ var ln10 = Math.LN10;
  * @example
  * const num = new Num(1);
  */
+
 var Num = function (_Super) {
   inherits(Num, _Super);
 
   function Num() {
     var number = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
     classCallCheck(this, Num);
-    return possibleConstructorReturn(this, (Num.__proto__ || Object.getPrototypeOf(Num)).call(this, number));
+    return possibleConstructorReturn(this, (Num.__proto__ || Object.getPrototypeOf(Num)).call(this, +number));
 
     /**
      * @member Num#$
@@ -5798,14 +14167,14 @@ var Num = function (_Super) {
 
       var number = this.$;
 
-      var timeout = void 0;
       var aborted = void 0;
-
-      setTimeout(function interval() {
-        func.apply(null, args);
-
+      var timeout = setTimeout(function interval() {
         if (!aborted) {
-          timeout = setTimeout(interval, number);
+          func.apply(null, args);
+
+          if (!aborted) {
+            timeout = setTimeout(interval, number);
+          }
         }
       }, 0);
 
@@ -6376,701 +14745,6 @@ function random(start, end) {
 
   return Math.floor(rand(start, end + 1));
 }
-
-/**
- * @module constants/regexpSpecialCharacters
- * @private
- * @description Exports special characters for RegExp.
- */
-
-/**
- * @const
- * @name module:constants/regexpSpecialCharacters~regexpSpecialCharacters
- * @type {String[]}
- */
-var regexpSpecialCharacters = ['.', '+', '*', '?', '(', ')', '[', ']', '{', '}', '<', '>', '^', '$', '!', '=', ':', '-', '|', ',', '\\'];
-
-/**
- * @module Str
- * @private
- * @mixin
- * @description Exports Str class.
- */
-
-var htmlSpecials = {
-  '&': '&amp;',
-  '<': '&lt;',
-  '>': '&gt;'
-};
-var regexpSpecialsRegexp = new RegExp(new Super(regexpSpecialCharacters).word(function (x) {
-  return '\\' + x + '|';
-}).replace(/\|$/, ''), 'g');
-
-/**
- * @class Str
- * @extends Super
- * @public
- * @param {String} [string = ''] - A string to wrap.
- * @returns {Str} Instance of Str.
- * @description Wrap of a string.
- *
- * @example
- * const s = new Num('1');
- */
-var Str = function (_Super) {
-  inherits(Str, _Super);
-
-  function Str() {
-    var string = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-    classCallCheck(this, Str);
-    return possibleConstructorReturn(this, (Str.__proto__ || Object.getPrototypeOf(Str)).call(this, string));
-
-    /**
-     * @member Str#$
-     * @type {String}
-     * @public
-     * @description Original string.
-     */
-  }
-
-  /**
-   * @method Str#capitalizeFirst
-   * @public
-   * @returns {Str} Capitalized string.
-   * @description Method capitalizing the first symbol.
-   *
-   * @example
-   * new Str('foo').capitalizeFirst().$; // 'Foo'
-   */
-
-
-  createClass(Str, [{
-    key: 'capitalizeFirst',
-    value: function capitalizeFirst() {
-      var string = this.$;
-
-      return new Str(string.slice(0, 1).toUpperCase() + string.slice(1));
-    }
-
-    /**
-     * @method Str#endsWith
-     * @public
-     * @param {String} searchString - See the link.
-     * @param {Number} [position = string.length] - See the link.
-     * @returns {Boolean} If the string ends with the argument string.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith
-     * @description Synonym for
-     * [String#endsWith]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith}.
-     */
-
-  }, {
-    key: 'endsWith',
-    value: function endsWith(searchString, position) {
-      if (arguments.length < 2) {
-        position = this.$.length;
-      }
-
-      return this.slice(0, position).revert().startsWith(new Str(searchString).revert().$);
-    }
-
-    /**
-     * @method Str#escapeHTML
-     * @public
-     * @returns {Str} New instance of Str.
-     * @description Methods escaping "&", "<" and ">" symbols.
-     *
-     * @example
-     * new Str('"1 < 2" & "7 > 4" are true expressions.').escapeHTML().$;
-     * // '"1 &lt; 2" &amp "7 &gt; 2" are true expressions.'
-     */
-
-  }, {
-    key: 'escapeHTML',
-    value: function escapeHTML() {
-      var string = this.$;
-
-      iterate(htmlSpecials, function (escaped, symbol) {
-        string = string.replace(new RegExp(symbol, 'g'), escaped);
-      });
-
-      return new Str(string);
-    }
-
-    /**
-     * @method Str#escapeRegExp
-     * @public
-     * @returns {Str} New instance of Str.
-     * @description Method escaping RegExp special characters.
-     *
-     * @example
-     * new Str('(213.98 - [] {})').escapeRegExp().$; // '\(213\.98 \- \[\] \{\}\)'
-     */
-
-  }, {
-    key: 'escapeRegExp',
-    value: function escapeRegExp() {
-      return this.replace(regexpSpecialsRegexp, '\\$&');
-    }
-
-    /**
-     * @method Str#in
-     * @public
-     * @param {*} object - Object to check the string as a property in.
-     * @returns {Boolean} If it is in the object or not.
-     * @description Returns string in object.
-     *
-     * @example
-     * new Str('a').in({ a: 1 }); // true
-     * new Str('toFixed').in(1);  // false
-     * new Str('a').in(null);     // false
-     */
-
-  }, {
-    key: 'in',
-    value: function _in(object) {
-      if (!isObject(object)) {
-        return false;
-      }
-
-      return this.$ in object;
-    }
-
-    /**
-     * @method Str#indexOf
-     * @public
-     * @param {String} searchValue - See the link.
-     * @param {Number} [fromIndex = 0] - See the link.
-     * @returns {Number} Found index or -1.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/indexOf
-     * @description Synonym for
-     * [String#indexOf]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/indexOf}.
-     */
-
-  }, {
-    key: 'indexOf',
-    value: function indexOf(searchValue, fromIndex) {
-      return this.$.indexOf.apply(this.$, arguments);
-    }
-
-    /**
-     * @method Str#lastIndexOf
-     * @public
-     * @param {String} searchValue - See the link.
-     * @param {Number} [fromIndex = string.length] - See the link.
-     * @returns {Number} Found index or -1.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/lastIndexOf
-     * @description Synonym for
-     * [String#lastIndexOf]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/lastIndexOf}.
-     */
-
-  }, {
-    key: 'lastIndexOf',
-    value: function lastIndexOf(searchValue, fromIndex) {
-      return this.$.lastIndexOf.apply(this.$, arguments);
-    }
-
-    /**
-     * @member Str#length
-     * @type {Number}
-     * @public
-     * @readonly
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/length
-     * @description Synonym for
-     * [String#length]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/length}.
-     */
-
-  }, {
-    key: 'match',
-
-
-    /**
-     * @method Str#match
-     * @public
-     * @returns {Arr|Super} D-Wrap of found match.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/match
-     * @description Synonym for
-     * [String#match]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/match}.
-     */
-    value: function match(regexp) {
-      return D$2(this.$.match.apply(this.$, arguments));
-    }
-
-    /**
-     * @method Str#repeat
-     * @public
-     * @param {Integer} times - Times to repeat the string.
-     * @returns {Str} New instance of Str.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/repeat
-     * @description Synonym for
-     * [String#repeat]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/repeat}.
-     *
-     * @example
-     * new Str('123').repeat(2).$; // '123123'
-     * new Str('123').repeat(0).$; // ''
-     */
-
-  }, {
-    key: 'repeat',
-    value: function repeat(times) {
-      validate$1([times], [['intLike', '>=0']], 'Str#repeat');
-
-      times = +times;
-
-      var string = this.$;
-
-      var s = '';
-
-      for (var i = 0; i < times; i++) {
-        s += string;
-      }
-
-      return new Str(s);
-    }
-
-    /**
-     * @method Str#replace
-     * @public
-     * @param {RegExp|String} regexp - See the link.
-     * @param {String|Function} [replacer = ''] - See the link.
-     * @returns {Str} New instance of Str.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/replace
-     * @description Synonym for
-     * [String#replace]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/replace}
-     * besides that replacer has a default value of ''.
-     */
-
-  }, {
-    key: 'replace',
-    value: function replace(regexp) {
-      var replacer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-
-      return new Str(this.$.replace(regexp, replacer));
-    }
-
-    /**
-     * @method Str#replaceString
-     * @public
-     * @param {String} string - String to replace.
-     * @param {String} [replacer = ''] - String to replace with.
-     * @returns {Str} New instance of Str.
-     * @description Method for global string replaceing.
-     *
-     * @example
-     * new Str('123123').replaceString('1', '4').$; // '423423'
-     * new Str('123123').replaceString('1').$;      // '2323'
-     */
-
-  }, {
-    key: 'replaceString',
-    value: function replaceString(string) {
-      var replacer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-
-      string = new Super(string).$;
-
-      validate$1([string], ['string'], 'Str#replaceString');
-
-      return new Str(this.$.split(string).join(replacer));
-    }
-
-    /**
-     * @method Str#revert
-     * @public
-     * @returns {Str} New instance of string.
-     * @description Method for reverting a string.
-     *
-     * @example
-     * new Str('1234').revert().$; // '4321'
-     */
-
-  }, {
-    key: 'revert',
-    value: function revert() {
-      var string = this.$;
-      var str = '';
-
-      for (var i = string.length - 1; i >= 0; i--) {
-        str += string[i];
-      }
-
-      return new Str(str);
-    }
-
-    /**
-     * @method Str#search
-     * @public
-     * @param {RegExp} regexp - See the link.
-     * @returns {Number} Index of the first match, if found, and -1 if not.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/search
-     * @description Synonym for
-     * [String#search]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/search}.
-     */
-
-  }, {
-    key: 'search',
-    value: function search(regexp) {
-      validate$1([regexp], ['regexp']);
-
-      return this.$.search.apply(this.$, arguments);
-    }
-
-    /**
-     * @method Str#slice
-     * @public
-     * @param {Number} [beginSlice = 0] - See the link.
-     * @param {Number} [endSlice = string.length] - See the link.
-     * @returns {Str} New instance of Str.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/slice
-     * @description Synonym for
-     * [String#slice]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/slice}.
-     */
-
-  }, {
-    key: 'slice',
-    value: function slice(beginSlice, endSlice) {
-      return new Str(this.$.slice.apply(this.$, arguments));
-    }
-
-    /**
-     * @method Str#split
-     * @public
-     * @param {RegExp|String} [separator] - See the link.
-     * @returns {Arr|Super} D-Wrap of the array.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/split
-     * @description Synonym for
-     * [String#split]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/split}.
-     */
-
-  }, {
-    key: 'split',
-    value: function split(separator) {
-      return D$2(this.$.split.apply(this.$, arguments));
-    }
-
-    /**
-     * @method Str#startsWith
-     * @public
-     * @param {String} searchString - See the link.
-     * @param {Number} [position = 0] - See the link.
-     * @returns {Boolean} If the string ends with the argument string.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith
-     * @description Synonym for
-     * [String#startsWith]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith}.
-     */
-
-  }, {
-    key: 'startsWith',
-    value: function startsWith(searchString) {
-      var position = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-
-      return this.$.indexOf.apply(this.$, arguments) === position;
-    }
-
-    /**
-     * @method Str#substr
-     * @public
-     * @param {Number} [start = 0] - See the link.
-     * @param {Number} [length = string.length] - See the link.
-     * @returns {Str} New instance of Str.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/substr
-     * @description Synonym for
-     * [String#substr]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/substr}.
-     */
-
-  }, {
-    key: 'substr',
-    value: function substr(start, length) {
-      return new Str(this.$.substr.apply(this.$, arguments));
-    }
-
-    /**
-     * @method Str#substring
-     * @public
-     * @param {Number} [indexStart = 0] - See the link.
-     * @param {Number} [indexEnd = string.length] - See the link.
-     * @returns {Str} New instance of Str.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/substring
-     * @description Synonym for
-     * [String#substring]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/substring}.
-     */
-
-  }, {
-    key: 'substring',
-    value: function substring(indexStart, indexEnd) {
-      return new Str(this.$.substring.apply(this.$, arguments));
-    }
-
-    /**
-     * @method Str#toCamelCase
-     * @public
-     * @returns {Str} New instance of Str.
-     * @description Removes following regexp /\s\-_\./ making the string camel cased.
-     *
-     * @example
-     * new Str('spinal-case').toCamelCase().$;  // 'spinalCase'
-     * new Str('_snake_case_').toCamelCase().$; // 'snakeCase'
-     */
-
-  }, {
-    key: 'toCamelCase',
-    value: function toCamelCase() {
-      return new Str(trim(this.$).replace(/[\s\-_\.]+/g, '-').replace(/\-[^\-]/g, function (match) {
-        return match[1].toUpperCase();
-      }).replace(/^[\S]/, function (match) {
-        return match.toLowerCase();
-      }));
-    }
-
-    /**
-     * @method Str#toCapitalCase
-     * @public
-     * @returns {Str} New instance of Str.
-     * @description Removes following regexp /\-_\./ making the string capital letter cased.
-     *
-     * @example
-     * new Str('spinal-case').toCapitalCase().$;  // 'Spinal Case'
-     * new Str('_snake_case_').toCapitalCase().$; // 'Snake Case'
-     */
-
-  }, {
-    key: 'toCapitalCase',
-    value: function toCapitalCase() {
-      return new Str(trim(this.$).replace(/[\s\-_\.]+/g, ' ').replace(/[\S]/g, function (match) {
-        return match.toLowerCase() === match ? match : ' ' + match;
-      }).replace(/\s[\S]/g, function (match) {
-        return match.toUpperCase();
-      }).replace(/\s+/g, ' ').replace(/^\s/, '').replace(/^[\S]/, function (match) {
-        return match.toUpperCase();
-      }));
-    }
-
-    /**
-     * @method Str#toDotCase
-     * @public
-     * @returns {Str} New instance of Str.
-     * @description Removes following regexp /\-_\./ making the string dot cased.
-     *
-     * @example
-     * new Str('spinal-case').toDotCase().$;  // 'spinal.case'
-     * new Str('_snake_case_').toDotCase().$; // 'snake.case'
-     */
-
-  }, {
-    key: 'toDotCase',
-    value: function toDotCase() {
-      return new Str(trim(this.$).replace(/[\s\-_\.]+/g, '.').replace(/[^\.]/g, function (match) {
-        return match.toLowerCase() === match ? match : '.' + match;
-      }).replace(/\.+/g, '.').replace(/^\./, '').toLowerCase());
-    }
-
-    /**
-     * @method Str#toHyphenCase
-     * @public
-     * @returns {Str} New instance of Str.
-     * @description Removes following regexp /\s\-_\./ making the string camel cased.
-     *
-     * @example
-     * new Str('camelCase').toSpinalCase().$;    // 'camel-case'
-     * new Str('_snake_case_').toSpinalCase().$; // 'snake-case'
-     */
-
-  }, {
-    key: 'toHyphenCase',
-    value: function toHyphenCase() {
-      return new Str(trim(this.$).replace(/[\s\-_\.]+/g, '-').replace(/[^\-]/g, function (match) {
-        return match.toLowerCase() === match ? match : '-' + match;
-      }).replace(/\-+/g, '-').replace(/^\-/, '').toLowerCase());
-    }
-
-    /**
-     * @method Str#toLowerCase
-     * @public
-     * @returns {Str} New instance of Str.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/toLowerCase
-     * @description Synonym for
-     * [String#toLowerCase]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/toLowerCase}.
-     *
-     * @example
-     * new Str('UPPER-CASE').toLowerCase().$;  // 'upper-case'
-     */
-
-  }, {
-    key: 'toLowerCase',
-    value: function toLowerCase() {
-      return new Str(this.$.toLowerCase());
-    }
-
-    /**
-     * @method Str#toSnakeCase
-     * @public
-     * @returns {Str} New instance of Str.
-     * @description Removes following regexp /\s\-\./ making the string spinal cased.
-     *
-     * @example
-     * new Str('spinal-case').toSnakeCase().$; // 'spinal_case'
-     * new Str('camelCase').toSnakeCase().$;   // 'camel_case'
-     */
-
-  }, {
-    key: 'toSnakeCase',
-    value: function toSnakeCase() {
-      return new Str(trim(this.$).replace(/[\s\-_\.]+/g, '_').replace(/[^_]/g, function (match) {
-        return match.toLowerCase() === match ? match : '_' + match;
-      }).replace(/_+/g, '_').replace(/^_/, '').toLowerCase());
-    }
-
-    /**
-     * @method Str#toSpaceCase
-     * @public
-     * @returns {Str} New instance of Str.
-     * @description Removes following regexp /\-_\./ making the string space cased.
-     *
-     * @example
-     * new Str('spinal-case').toSpaceCase().$;  // 'spinal case'
-     * new Str('_snake_case_').toSpaceCase().$; // 'snake case'
-     */
-
-  }, {
-    key: 'toSpaceCase',
-    value: function toSpaceCase() {
-      return new Str(trim(this.$).replace(/[\s\-_\.]+/g, ' ').replace(/[\S]/g, function (match) {
-        return match.toLowerCase() === match ? match : ' ' + match;
-      }).replace(/\s+/g, ' ').replace(/^\s/, '').toLowerCase());
-    }
-  }, {
-    key: 'toString',
-    value: function toString() {
-      return this.$;
-    }
-
-    /**
-     * @method Str#toUpperCase
-     * @public
-     * @returns {Str} New instance of Str.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/toUpperCase
-     * @description Synonym for
-     * [String#toUpperCase]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/toUpperCase}.
-     *
-     * @example
-     * new Str('lower-case').toUpperCase().$;  // 'LOWER-CASE'
-     */
-
-  }, {
-    key: 'toUpperCase',
-    value: function toUpperCase() {
-      return new Str(this.$.toUpperCase());
-    }
-
-    /**
-     * @method Str#trim
-     * @public
-     * @returns {Str} New instance of Str.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/trim
-     * @description Synonym for
-     * [String#trim]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/trim}.
-     */
-
-  }, {
-    key: 'trim',
-    value: function trim() {
-      return new Str(this.$.replace(/^[\s\ufeff\u00a0]+|[\s\ufeff\u00a0]+$/g, ''));
-    }
-
-    /**
-     * @method Str#trimLeft
-     * @public
-     * @returns {Str} New instance of Str.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/trimLeft
-     * @description Synonym for
-     * [String#trimLeft]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/trimLeft}.
-     */
-
-  }, {
-    key: 'trimLeft',
-    value: function trimLeft() {
-      return new Str(this.$.replace(/^[\s\ufeff\u00a0]+/, ''));
-    }
-
-    /**
-     * @method Str#trimRight
-     * @public
-     * @returns {Str} New instance of Str.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/trimRight
-     * @description Synonym for
-     * [String#trimRight]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/trimRight}.
-     */
-
-  }, {
-    key: 'trimRight',
-    value: function trimRight() {
-      return new Str(this.$.replace(/[\s\ufeff\u00a0]+$/, ''));
-    }
-  }, {
-    key: 'length',
-    get: function get() {
-      return this.$.length;
-    }
-  }]);
-  return Str;
-}(Super);
-
-defineProperties(Str.prototype, defineProperty({}, _Symbol.toStringTag, 'Str'));
-
-function trim(string) {
-  return string.replace(/^[\s\-_\.]+|[\s\-_\.]+$/g, '');
-}
-
-/**
- * @function parseJSON
- * @public
- * @param {String} [json = null] - String to parse.
- * @param {Object} [options] - Options.
- * @param {Boolean|*} [options.numbers] - If it is needed to parse number-like strings as numbers.
- * @param {Boolean|*} [options.dates] - If it is needed to parse date-like string as dates.
- * Date-like string is considered to match ^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.\d\d\dZ?$
- * @param {JSONCallback} [callback] - Callback that called on every iteration.
- * @returns {DWrap} D-Wrap of found match.
- * @description Method for parsing json.
- *
- * @example
- * parseJSON('{ "a": 1 }').$;                                           // { a: 1 }
- * parseJSON('{ "a": "1" }', { numbers: true }).$;                      // { numbers: true }
- * parseJSON('{ "a": "1999-12-31T23:59:59.999Z" }', { dates: true }).$; // { a: Date {...} }
- */
-function parseJSON() {
-  var json = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  var callback = arguments[2];
-
-  if (arguments.length <= 1) {
-    return D$2(JSON.parse(json));
-  }
-
-  if (isFunction(options)) {
-    callback = options;
-    options = {};
-  }
-
-  var _options = options;
-  var numbers = _options.numbers;
-  var dates = _options.dates;
-
-  var parsed = JSON.parse(json, function (key, value) {
-    if (dates && /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.\d\d\dZ?$/.test(value)) {
-      value = new Date(value);
-    } else if (numbers && isNumberLike(value) && isString(value)) {
-      value = Number(value);
-    }
-
-    return callback ? callback.apply(this, arguments) : value;
-  });
-
-  return D$2(parsed);
-}
-
-constructors[2].push({
-  check: isString,
-  cls: Str
-});
 
 /**
  * @module constants/formats
@@ -7815,7 +15489,7 @@ function date(date) {
  * @type {RegExp}
  * @description Absolute URL pattern.
  */
-var absoluteURLRegexp = /^(([a-z][a-z\d\+\-\.]*:)?\/\/|data:[a-z]+\/[a-z]+;base64,)/i;
+var absoluteURLRegexp = /^(([a-z][a-z\d+\-.]*:)?\/\/|data:[a-z]+\/[a-z]+;base64,)/i;
 var querySwitcher = switcher('call', function () {
   return new Arr([]);
 }).case(isArray, function (prefix, query) {
@@ -7870,10 +15544,10 @@ var querySwitcher = switcher('call', function () {
 var constructURL = (function (baseURL, url, params, query) {
   var hash = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : '';
   var encodeOptions = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {};
-  var _encodeOptions$params = encodeOptions.params;
-  var encodeParams = _encodeOptions$params === undefined ? true : _encodeOptions$params;
-  var _encodeOptions$query = encodeOptions.query;
-  var encodeQuery = _encodeOptions$query === undefined ? true : _encodeOptions$query;
+  var _encodeOptions$params = encodeOptions.params,
+      encodeParams = _encodeOptions$params === undefined ? true : _encodeOptions$params,
+      _encodeOptions$query = encodeOptions.query,
+      encodeQuery = _encodeOptions$query === undefined ? true : _encodeOptions$query;
 
   var URL = isAbsolute(url) ? url : String(baseURL).replace(/\/+$/, '') + '/' + String(url).replace(/^\/+/, '');
 
@@ -7885,8 +15559,8 @@ var constructURL = (function (baseURL, url, params, query) {
 
   if (queryParams.length) {
     URL += (URL.indexOf('?') === -1 ? '?' : '&') + queryParams.map(function (_ref) {
-      var param = _ref.param;
-      var value = _ref.value;
+      var param = _ref.param,
+          value = _ref.value;
       return encode(param, encodeQuery) + '=' + encode(value, encodeQuery);
     }).join('&');
   }
@@ -8086,6 +15760,7 @@ var uploadMethods = new Arr(['post', 'put']);
  *   console.log(res);
  * });
  */
+
 var Fetch = function (_Function) {
   inherits(Fetch, _Function);
 
@@ -8558,18 +16233,18 @@ var Fetch = function (_Function) {
 
       promise = promise.then(function () {
         return new Promise$1(function (resolve, reject) {
-          var after = conf.after;
-          var _conf$auth = conf.auth;
-          var username = _conf$auth.username;
-          var password = _conf$auth.password;
-          var data = conf.data;
-          var headers = conf.headers;
-          var method = conf.method;
-          var onprogress = conf.onprogress;
-          var responseType = conf.responseType;
-          var timeout = conf.timeout;
-          var url = conf.url;
-          var withCredentials = conf.withCredentials;
+          var after = conf.after,
+              _conf$auth = conf.auth,
+              username = _conf$auth.username,
+              password = _conf$auth.password,
+              data = conf.data,
+              headers = conf.headers,
+              method = conf.method,
+              onprogress = conf.onprogress,
+              responseType = conf.responseType,
+              timeout = conf.timeout,
+              url = conf.url,
+              withCredentials = conf.withCredentials;
 
 
           xhr = new XMLHttpRequest();
@@ -8686,13 +16361,13 @@ defineProperties(Fetch.prototype, defineProperty({}, _Symbol.toStringTag, 'Fetch
  * @description Built-in before middleware for url, data, method, headers construction.
  */
 function fetchBeforeMiddleware(config) {
-  var baseURL = config.baseURL;
-  var data = config.data;
-  var headers = config.headers;
-  var method = config.method;
-  var params = config.params;
-  var query = config.query;
-  var url = config.url;
+  var baseURL = config.baseURL,
+      data = config.data,
+      headers = config.headers,
+      method = config.method,
+      params = config.params,
+      query = config.query,
+      url = config.url;
 
   var METHOD = method.toUpperCase();
 
@@ -8715,4281 +16390,18 @@ function fetchBeforeMiddleware(config) {
 var fetch = new Fetch();
 
 /**
- * @module constants/appliedRegExps
- * @private
- * @description Exports different types of syntax for {@link Elem#apply}.
- */
-
-/**
- * @callback matchAppliedExprCallback
- * @param {Elem} elem - D-elem of an element to apply expression to.
- * @param {String} string - Matched applied name.
- * @param {String} arg - Argument within the parentheses.
- */
-
-/**
- * @type {Object.<String, matchAppliedExprCallback|Object.<String, matchAppliedExprCallback>>}
- * @description Object of different types of syntax.
- */
-
-var appliedRegExps = {
-  '#': function _(elem, id) {
-    elem.id(id);
-  },
-  '.': function _(elem, cls) {
-    elem.addClass(cls);
-  },
-  $: function $(elem, attr, value) {
-    elem.attr(attr, value);
-  },
-  '@': function _(elem, prop, value) {
-    elem.css(prop, value);
-  },
-  '&': function _(elem, name, html) {
-    elem.html(html);
-  },
-  '*': function _(elem, name, text) {
-    elem.text(text);
-  },
-
-  '-': {
-    '.': function _(elem, cls) {
-      elem.removeClass(cls);
-    },
-    $: function $(elem, attr) {
-      elem.removeAttr(attr);
-    },
-    '@': function _(elem, prop) {
-      elem.removeCSS(prop);
-    }
-  }
-};
-
-/**
- * @module constants/elements
- * @private
- * @description Exports methods for {@link Elem} for creating html-elements.
- */
-
-/**
- * @const
- * @type {String[]}
- */
-var elements = [
-/**
- * @member {Function} Elem#a
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'a',
-
-/**
- * @member {Function} Elem#abbr
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'abbr',
-
-/**
- * @member {Function} Elem#address
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'address',
-
-/**
- * @member {Function} Elem#area
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'area',
-
-/**
- * @member {Function} Elem#article
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'article',
-
-/**
- * @member {Function} Elem#audio
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'audio',
-
-/**
- * @member {Function} Elem#b
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'b',
-
-/**
- * @member {Function} Elem#base
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'base',
-
-/**
- * @member {Function} Elem#bdi
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'bdi',
-
-/**
- * @member {Function} Elem#bdo
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'bdo',
-
-/**
- * @member {Function} Elem#blockquote
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'blockquote',
-
-/**
- * @member {Function} Elem#body
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'body',
-
-/**
- * @member {Function} Elem#br
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'br',
-
-/**
- * @member {Function} Elem#button
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'button',
-
-/**
- * @member {Function} Elem#canvas
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'canvas',
-
-/**
- * @member {Function} Elem#caption
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'caption',
-
-/**
- * @member {Function} Elem#cite
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'cite',
-
-/**
- * @member {Function} Elem#code
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'code',
-
-/**
- * @member {Function} Elem#col
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'col',
-
-/**
- * @member {Function} Elem#colgroup
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'colgroup',
-
-/**
- * @member {Function} Elem#content
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'content',
-
-/**
- * @member {Function} Elem#datalist
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'datalist',
-
-/**
- * @member {Function} Elem#dd
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'dd',
-
-/**
- * @member {Function} Elem#del
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'del',
-
-/**
- * @member {Function} Elem#details
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'details',
-
-/**
- * @member {Function} Elem#dfn
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'dfn',
-
-/**
- * @member {Function} Elem#dialog
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'dialog',
-
-/**
- * @member {Function} Elem#div
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'div',
-
-/**
- * @member {Function} Elem#dl
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'dl',
-
-/**
- * @member {Function} Elem#dt
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'dt',
-
-/**
- * @member {Function} Elem#element
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'element',
-
-/**
- * @member {Function} Elem#em
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'em',
-
-/**
- * @member {Function} Elem#embed
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'embed',
-
-/**
- * @member {Function} Elem#fieldset
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'fieldset',
-
-/**
- * @member {Function} Elem#figcaption
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'figcaption',
-
-/**
- * @member {Function} Elem#figure
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'figure',
-
-/**
- * @member {Function} Elem#footer
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'footer',
-
-/**
- * @member {Function} Elem#form
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'form',
-
-/**
- * @member {Function} Elem#h1
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'h1',
-
-/**
- * @member {Function} Elem#h2
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'h2',
-
-/**
- * @member {Function} Elem#h3
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'h3',
-
-/**
- * @member {Function} Elem#h4
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'h4',
-
-/**
- * @member {Function} Elem#h5
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'h5',
-
-/**
- * @member {Function} Elem#h6
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'h6',
-
-/**
- * @member {Function} Elem#head
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'head',
-
-/**
- * @member {Function} Elem#header
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'header',
-
-/**
- * @member {Function} Elem#hgroup
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'hgroup',
-
-/**
- * @member {Function} Elem#hr
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'hr',
-
-/**
- * @member {Function} Elem#i
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'i',
-
-/**
- * @member {Function} Elem#iframe
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'iframe',
-
-/**
- * @member {Function} Elem#img
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'img',
-
-/**
- * @member {Function} Elem#input
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'input',
-
-/**
- * @member {Function} Elem#ins
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'ins',
-
-/**
- * @member {Function} Elem#kbd
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'kbd',
-
-/**
- * @member {Function} Elem#label
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'label',
-
-/**
- * @member {Function} Elem#legend
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'legend',
-
-/**
- * @member {Function} Elem#li
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'li',
-
-/**
- * @member {Function} Elem#link
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'link',
-
-/**
- * @member {Function} Elem#main
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'main',
-
-/**
- * @member {Function} Elem#mark
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'mark',
-
-/**
- * @member {Function} Elem#menu
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'menu',
-
-/**
- * @member {Function} Elem#menuitem
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'menuitem',
-
-/**
- * @member {Function} Elem#meta
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'meta',
-
-/**
- * @member {Function} Elem#meter
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'meter',
-
-/**
- * @member {Function} Elem#nav
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'nav',
-
-/**
- * @member {Function} Elem#noscript
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'noscript',
-
-/**
- * @member {Function} Elem#null
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'null',
-
-/**
- * @member {Function} Elem#ol
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'ol',
-
-/**
- * @member {Function} Elem#optgroup
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'optgroup',
-
-/**
- * @member {Function} Elem#option
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'option',
-
-/**
- * @member {Function} Elem#output
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'output',
-
-/**
- * @member {Function} Elem#p
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'p',
-
-/**
- * @member {Function} Elem#param
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'param',
-
-/**
- * @member {Function} Elem#pre
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'pre',
-
-/**
- * @member {Function} Elem#progress
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'progress',
-
-/**
- * @member {Function} Elem#q
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'q',
-
-/**
- * @member {Function} Elem#rp
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'rp',
-
-/**
- * @member {Function} Elem#rt
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'rt',
-
-/**
- * @member {Function} Elem#rtc
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'rtc',
-
-/**
- * @member {Function} Elem#ruby
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'ruby',
-
-/**
- * @member {Function} Elem#s
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'s',
-
-/**
- * @member {Function} Elem#samp
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'samp',
-
-/**
- * @member {Function} Elem#script
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'script',
-
-/**
- * @member {Function} Elem#section
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'section',
-
-/**
- * @member {Function} Elem#select
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'select',
-
-/**
- * @member {Function} Elem#shadow
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'shadow',
-
-/**
- * @member {Function} Elem#small
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'small',
-
-/**
- * @member {Function} Elem#source
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'source',
-
-/**
- * @member {Function} Elem#span
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'span',
-
-/**
- * @member {Function} Elem#strong
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'strong',
-
-/**
- * @member {Function} Elem#style
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'style',
-
-/**
- * @member {Function} Elem#sub
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'sub',
-
-/**
- * @member {Function} Elem#summary
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'summary',
-
-/**
- * @member {Function} Elem#sup
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'sup',
-
-/**
- * @member {Function} Elem#table
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'table',
-
-/**
- * @member {Function} Elem#tbody
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'tbody',
-
-/**
- * @member {Function} Elem#td
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'td',
-
-/**
- * @member {Function} Elem#template
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'template',
-
-/**
- * @member {Function} Elem#textarea
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'textarea',
-
-/**
- * @member {Function} Elem#tfoot
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'tfoot',
-
-/**
- * @member {Function} Elem#th
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'th',
-
-/**
- * @member {Function} Elem#thead
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'thead',
-
-/**
- * @member {Function} Elem#time
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'time',
-
-/**
- * @member {Function} Elem#title
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'title',
-
-/**
- * @member {Function} Elem#tr
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'tr',
-
-/**
- * @member {Function} Elem#track
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'track',
-
-/**
- * @member {Function} Elem#u
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'u',
-
-/**
- * @member {Function} Elem#ul
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'ul',
-
-/**
- * @member {Function} Elem#var
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'var',
-
-/**
- * @member {Function} Elem#video
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'video',
-
-/**
- * @member {Function} Elem#wbr
- * @type {Function}
- * @param {...String} appliedExpressions
- * @returns {Elem}
- */
-'wbr'];
-
-/**
- * @module constants/elements
- * @private
- * @description Exports different canvas methods for {@link Elem} for creating html-elements.
- */
-
-/**
- * @const
- * @type {String[]}
- */
-var canvasGetMethods = [
-/**
- * @member {Function} Elem#createImageData
- * @type {Function}
- * @param {...*} args
- * @returns {ImageData|void}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/createImageData
- */
-'createImageData',
-
-/**
- * @member {Function} Elem#createLinearGradient
- * @type {Function}
- * @param {...*} args
- * @returns {CanvasGradient|void}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/createLinearGradient
- */
-'createLinearGradient',
-
-/**
- * @member {Function} Elem#createPattern
- * @type {Function}
- * @param {...*} args
- * @returns {CanvasPattern|void}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/createPattern
- */
-'createPattern',
-
-/**
- * @member {Function} Elem#createRadialGradient
- * @type {Function}
- * @param {...*} args
- * @returns {CanvasGradient|void}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/createRadialGradient
- */
-'createRadialGradient',
-
-/**
- * @member {Function} Elem#getImageData
- * @type {Function}
- * @param {...*} args
- * @returns {ImageData|void}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/getImageData
- */
-'getImageData',
-
-/**
- * @member {Function} Elem#getLineDash
- * @type {Function}
- * @param {...*} args
- * @returns {Number[]|void}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/getLineDash
- */
-'getLineDash',
-
-/**
- * @member {Function} Elem#isPointInPath
- * @type {Function}
- * @param {...*} args
- * @returns {Boolean|void}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/isPointInPath
- */
-'isPointInPath',
-
-/**
- * @member {Function} Elem#isPointInStroke
- * @type {Function}
- * @param {...*} args
- * @returns {Boolean|void}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/isPointInStroke
- */
-'isPointInStroke',
-
-/**
- * @member {Function} Elem#measureText
- * @type {Function}
- * @param {...*} args
- * @returns {TextMetrics|void}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/measureText
- */
-'measureText'];
-
-var canvasRestMethods = [
-/**
- * @member {Function} Elem#arc
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/arc
- */
-'arc',
-
-/**
- * @member {Function} Elem#arcTo
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/arcTo
- */
-'arcTo',
-
-/**
- * @member {Function} Elem#beginPath
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/beginPath
- */
-'beginPath',
-
-/**
- * @member {Function} Elem#bezierCurveTo
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/bezierCurveTo
- */
-'bezierCurveTo',
-
-/**
- * @member {Function} Elem#clearRect
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/clearRect
- */
-'clearRect',
-
-/**
- * @member {Function} Elem#clip
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/clip
- */
-'clip',
-
-/**
- * @member {Function} Elem#closePath
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/closePath
- */
-'closePath',
-
-/**
- * @member {Function} Elem#drawFocusIfNeeded
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/drawFocusIfNeeded
- */
-'drawFocusIfNeeded',
-
-/**
- * @member {Function} Elem#drawImage
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/drawImage
- */
-'drawImage',
-
-/**
- * @member {Function} Elem#ellipse
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/ellipse
- */
-'ellipse',
-
-/**
- * @member {Function} Elem#fill
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/fill
- */
-'fill',
-
-/**
- * @member {Function} Elem#fillRect
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/fillRect
- */
-'fillRect',
-
-/**
- * @member {Function} Elem#fillText
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/fillText
- */
-'fillText',
-
-/**
- * @member {Function} Elem#lineTo
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineTo
- */
-'lineTo',
-
-/**
- * @member {Function} Elem#moveTo
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/moveTo
- */
-'moveTo',
-
-/**
- * @member {Function} Elem#putImageData
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/putImageData
- */
-'putImageData',
-
-/**
- * @member {Function} Elem#quadraticCurveTo
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/quadraticCurveTo
- */
-'quadraticCurveTo',
-
-/**
- * @member {Function} Elem#rect
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/rect
- */
-'rect',
-
-/**
- * @member {Function} Elem#resetTransform
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/resetTransform
- */
-'resetTransform',
-
-/**
- * @member {Function} Elem#restore
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/restore
- */
-'restore',
-
-/**
- * @member {Function} Elem#rotate
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/rotate
- */
-'rotate',
-
-/**
- * @member {Function} Elem#save
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/save
- */
-'save',
-
-/**
- * @member {Function} Elem#scale
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/scale
- */
-'scale',
-
-/**
- * @member {Function} Elem#setLineDash
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/setLineDash
- */
-'setLineDash',
-
-/**
- * @member {Function} Elem#setTransform
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/setTransform
- */
-'setTransform',
-
-/**
- * @member {Function} Elem#stroke
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/stroke
- */
-'stroke',
-
-/**
- * @member {Function} Elem#strokeRect
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/strokeRect
- */
-'strokeRect',
-
-/**
- * @member {Function} Elem#strokeText
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/strokeText
- */
-'strokeText',
-
-/**
- * @member {Function} Elem#transform
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/transform
- */
-'transform',
-
-/**
- * @member {Function} Elem#translate
- * @type {Function}
- * @param {...*} args
- * @returns {Elem}
- * @see https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/translate
- */
-'translate'];
-
-/**
- * @module Elem
- * @private
- * @mixin
- * @description Exports Elem class.
- */
-
-/**
- * @typedef {String} ElemEventString
- * @public
- * @description A string containing events separated by a comma with zero or more spaces or just spaces.
- */
-
-/**
- * @callback ElemValueCallback
- * @public
- * @param {String} value - Old value.
- * @param {Elem} elem - Current element.
- * @param {Number} index - Index in the set of the elements.
- */
-
-/**
- * @callback ElemSetOfCallback
- * @public
- * @param {Element} created - Created element.
- * @param {*} value - Value of the iterated element in the object.
- * @param {Key} key - Key of the iterated element in the object.
- * @param {*} object - Object that is iterated over.
- * @param {Element} elem - Current element.
- * @param {Number} index - Index of the current element.
- */
-
-/**
- * @callback ValidateCallback
- * @public
- * @param {*} value - Element value.
- * @param {Element} elem - Element to validate.
- * @param {Number} index - Index of the element.
- */
-
-/**
- * @callback CtxCallback
- * @public
- * @param {CanvasRenderingContext2D} ctx - Canvas rendering context.
- */
-
-/**
- * @callback ElemListener
- * @public
- * @param {Event} e - Fired event.
- * @param {Element} elem - Element on which the listener was called.
- * @param {Number} index - Index of the element on which the listener was called.
- */
-
-/**
- * @callback ElemRemoveListeners
- * @public
- * @param {...ElemEventString} events - If at least one argument present only removes event listeners specified
- * by the events in the arguments.
- */
-
-var nativeDocument = global$1.document;
-var emptyDiv = nativeDocument.createElement('div');
-var eventSeparator = /, *| +/;
-var textProperty = new Super(Node.prototype).propertyDescriptor('textContent') ? 'textContent' : 'innerText';
-var classes = {};
-var attrs = {};
-var windowsDwayneData = new Arr([]);
-var inputElements = 'input, select, textarea, datalist, keygen, output';
-var dataURLFetch = new Fetch({ responseType: 'arraybuffer' });
-var _click = method('click');
-var refSwitcher = switcher('strictEquals', 'href').case(['img', 'script', 'iframe', 'audio', 'video'], 'src').case('form', 'action');
-var filterSwitcher = switcher('call', function (selector) {
-  return selector;
-}).case(isString, function (selector) {
-  return function (elem) {
-    return new Elem(elem).is(selector);
-  };
-}).case([isArray, isElem], function (elems) {
-  elems = new Arr(elems);
-
-  return function (elem) {
-    return elems.indexOf(elem) !== -1;
-  };
-});
-var innerSwitcher = switcher('strictEquals', 0).case('padding-box', function (paddings) {
-  return paddings;
-}).case('border-box', function (paddings, borders) {
-  return paddings + borders;
-});
-var outerSwitcher = switcher('strictEquals', function (borders, paddings) {
-  return borders + paddings;
-}).case('padding-box', function (borders) {
-  return borders;
-}).case('border-box', 0);
-
-/**
- * @class Elem
- * @extends Arr
- * @public
- * @param {Element|Element[]} [elem = []] - An element or an array of elements to wrap.
- * @returns {Elem} Instance of Elem.
- * @description Wrap of an elements set. Also has all methods from from
- * [CanvasRenderingContext2D]{@link https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D}.
- * Getters methods return the same as methods from CanvasRenderingContext2D and the rest return this.
- * Work for the first canvas element in the set.
- *
- * @example
- * new Elem(document.body);
- * new Elem(document.querySelectorAll('.cls'));
- * new Elem(document.getElementsByClassName('cls'));
- */
-
-var Elem = function (_Arr) {
-  inherits(Elem, _Arr);
-
-  function Elem() {
-    var elem = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-    classCallCheck(this, Elem);
-
-    var _this = possibleConstructorReturn(this, (Elem.__proto__ || Object.getPrototypeOf(Elem)).call(this, function () {
-      var element = elem;
-
-      if (isArrayLike(element) && (isWindow(element) || isHTMLDocument(element) || isElement(element))) {
-        element = [element];
-      }
-
-      return new Arr(toArray$1(new Super(element).$, true)).object(function (elems, elem) {
-        if ((isElement(elem) || isWindow(elem) || isHTMLDocument(elem) || toStringTag(elem) === 'CSSStyleRule') && elems.indexOf(elem) === -1) {
-          return elems.push(elem);
-        }
-
-        if (isElem(elem)) {
-          elems.push.apply(elems, elem.$);
-        }
-      }, []).$;
-    }()));
-
-    _this.$$ = elem;
-
-    _this.forEach(addDwayneData);
-
-    /**
-     * @member {Element[]} Elem#$
-     * @type {Element[]}
-     * @public
-     * @description Constructed element set.
-     */
-
-    /**
-     * @member {*} Elem#$$
-     * @type {*}
-     * @public
-     * @description Initial element set.
-     */
-    return _this;
-  }
-
-  /**
-   * @method Elem#add
-   * @public
-   * @param {...(String|Elem|Element|Element[])} elements - Each argument is a selector, or Elem, or Element, or array of Elements.
-   * @returns {Elem} Returns this.
-   * @description Method for adding new elements to the set.
-   *
-   * @example
-   *
-   */
-
-
-  createClass(Elem, [{
-    key: 'add',
-    value: function add() {
-      var _this2 = this;
-
-      for (var _len = arguments.length, elements$$1 = Array(_len), _key = 0; _key < _len; _key++) {
-        elements$$1[_key] = arguments[_key];
-      }
-
-      iterate(arguments, function (elem) {
-        toFind(elem).forEach(function (elem) {
-          if (_this2.indexOf(elem) === -1) {
-            _this2.push(elem);
-          }
-        });
-      });
-
-      return this;
-    }
-
-    /**
-     * @method Elem#addClass
-     * @public
-     * @param {...String} classes - Classes to add.
-     * @returns {Elem} Returns this.
-     * @description Method for adding classes to the all the elements in the set.
-     *
-     * @example
-     * elem.addClass('red', 'round');
-     */
-
-  }, {
-    key: 'addClass',
-    value: function addClass() {
-      var _arguments = arguments;
-
-      for (var _len2 = arguments.length, classes = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        classes[_key2] = arguments[_key2];
-      }
-
-      return this.forEach(function (elem) {
-        var list = elem.classList;
-
-        iterate(_arguments, function (cls) {
-          return list.add(cls);
-        });
-      });
-    }
-
-    /**
-     * @method Elem#addHTML
-     * @public
-     * @param {String} html - HTML to add.
-     * @returns {Elem} Returns this.
-     * @description Method for adding HTML to the all elements in the set.
-     *
-     * @example
-     * elem.addHTML('&lt;div&gt;1&lt;/div&gt;');
-     */
-
-  }, {
-    key: 'addHTML',
-    value: function addHTML(html) {
-      return this.forEach(function (elem) {
-        elem.innerHTML += html;
-      });
-    }
-
-    /**
-     * @method Elem#addRule
-     * @public
-     * @param {String} name - Name of the rule.
-     * @param {String} selector - Selector for the rule
-     * @param {Object.<String, String>} style - Style for the selector.
-     * @returns {Elem} Returns this.
-     * @description Method for adding css styles into the first style tag in the set.
-     * Note: style element should be inside the document.
-     *
-     * @example
-     * style.addRule('img-size', 'img.square', {
-     *   width: '40px !important',
-     *   height: '40px !important'
-     * });
-     */
-
-  }, {
-    key: 'addRule',
-    value: function addRule(name, selector, style) {
-      this.some(function (elem) {
-        if (getName(elem) === 'style') {
-          var sheet = elem.sheet;
-          var length = sheet.cssRules.length;
-
-          var rules = new Super(style).word(function (value, property) {
-            return new Str(property).toHyphenCase() + ': ' + value + ';\n';
-          });
-
-          sheet.insertRule(selector + ' {' + (rules && '\n') + rules + '}', length);
-          sheet.cssRules[length].dwayneData = { name: name };
-
-          return true;
-        }
-      });
-
-      return this;
-    }
-
-    /**
-     * @method Elem#addText
-     * @public
-     * @param {String} text - Text to add.
-     * @returns {Elem} Returns this.
-     * @description Method for adding text to the all elements in the set.
-     *
-     * @example
-     * elem.addText('123');
-     */
-
-  }, {
-    key: 'addText',
-    value: function addText(text) {
-      return this.forEach(function (elem) {
-        elem.appendChild(nativeDocument.createTextNode(text));
-      });
-    }
-
-    /**
-     * @method Elem#apply
-     * @public
-     * @param {...String} strings - Strings to apply.
-     * @returns {Elem} Returns this.
-     * @description Method that is a shorthand for many other methods.
-     * All shorthands can be separated with space and written within one string.
-     *
-     * @example
-     * elem.apply(
-     *   '#id .c1 .c2 @border(1px solid black) $disabled $attr(some value) *(Click me!)'
-     * );
-     * // shorthand for
-     * // elem
-     * //   .id('id')
-     * //   .addClass('c1', 'c2')
-     * //   .border('1px solid black')
-     * //   .disabled()
-     * //   .attr('attr', 'some value')
-     * //   .text('Click me!');
-     * // There is a full list of possible types of syntax below...
-     *
-     * elem.apply('#id');                         // shorthand for elem.id('id');
-     * elem.apply('.c1 .c2');                     // shorthand for elem.addClass('c1', 'c2');
-     * elem.apply('-.c1 -.c2');                   // shorthand for elem.removeClass('c1', 'c2');
-     * elem.apply('-@float -@display');           // shorthand for elem.removeCSS('float', 'display');
-     * elem.apply('-$a1 -$a2');                   // shorthand for elem.removeAttr('a1', 'a2');
-     * elem.apply('*(some text)');                // shorthand for elem.text('set text');
-     * elem.apply('&(&lt;div&gt;1&lt;/div&gt;)'); // shorthand for elem.html('&lt;div&gt;1&lt;/div&gt;');
-     * elem.apply('@float(right)');               // shorthand for elem.css('float', 'right');
-     * elem.apply('@transform(scale(5px))');      // shorthand for elem.css('float', 'right');
-     * elem.apply('@margin(2px 2px)');            // shorthand for elem.css('margin', '2px 2px');
-     * elem.apply('@marginLeft(2px)');            // shorthand for elem.css('marginLeft', '2px 2px');
-     * elem.apply('@margin-left(2px)');           // shorthand for elem.css('margin-left', '2px 2px');
-     * elem.apply('$attr(some value)');           // shorthand for elem.attr('attr', 'some value');
-     * elem.apply('$attr');                       // shorthand for elem.attr('attr', '');
-     */
-
-  }, {
-    key: 'apply',
-    value: function apply() {
-      var _this3 = this;
-
-      for (var _len3 = arguments.length, strings = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-        strings[_key3] = arguments[_key3];
-      }
-
-      var applied = void 0;
-      var setApplied = void 0;
-      var callback = void 0;
-      var name = void 0;
-      var np1 = void 0;
-      var slice = void 0;
-
-      new Str(new Arr(arguments).join(' ')).split(/(\s+)/).forEach(function (string) {
-        if (!applied) {
-          np1 = string.slice(0, 1);
-          callback = appliedRegExps[np1];
-          slice = 1;
-
-          if (callback && !isFunction(callback)) {
-            callback = callback[string.slice(1, 2)];
-            slice = 2;
-          }
-
-          if (/^\s+$/.test(string) || !callback) {
-            return;
-          }
-
-          name = string.slice(slice).match(/^[^()]+/);
-
-          if (!name && np1 !== '*' && np1 !== '&') {
-            return;
-          }
-
-          applied = {
-            name: name ? name[0] : '',
-            args: string.slice(slice + (name ? name[0] : '').length),
-            callback: callback
-          };
-
-          setApplied = true;
-        }
-
-        if (!setApplied) {
-          applied.args += string;
-        }
-
-        if (!applied.args || /^\([\s\S]+\)$/.test(applied.args)) {
-          applied.callback(_this3, applied.name, applied.args.replace(/^\(|\)$/g, ''));
-          applied = null;
-        }
-
-        setApplied = false;
-      });
-
-      return this;
-    }
-
-    /**
-     * @method Elem#attr
-     * @public
-     * @param {String|Object.<String, String|ElemValueCallback>} [attr] - Name of the attribute to get or
-     * an object of the format { [attrName]: value, ... } to set attributes.
-     * @param {String|ElemValueCallback} [value] - If the first argument is a string
-     * it should be a value to set for that attribute.
-     * @returns {Super|String|Elem} If no arguments passed, D-Wrap of attributes of the first element in the set
-     * returned, if 1 string argument is passed the value of the attribute of the first element in the set
-     * returned otherwise returns this.
-     * @description Method for getting/setting attributes.
-     *
-     * @example
-     * elem.attr('attr1', 'value1'); // attribute attr1 set to 'value1' and this returned
-     * elem.attr('attr1');           // 'value1'
-     * elem.attr({
-     *   attr1: 'value3',            // attribute attr1 set to 'value3'
-     *   attr2: 'value2'             // attribute attr2 set to 'value2'
-     * });                           // this returned
-     * elem.attr().$;                // { attr1: 'value3', attr2: 'value2' }
-     */
-
-  }, {
-    key: 'attr',
-    value: function attr(_attr, value) {
-      var elem = getElem(this);
-
-      if (!arguments.length) {
-        return new Super(elem.attributes).object(function (o, attr) {
-          o[attr.name] = attr.value;
-        });
-      }
-
-      if (arguments.length <= 1 && isString(_attr)) {
-        return elem.getAttribute(_attr);
-      }
-
-      if (arguments.length >= 2) {
-        _attr = defineProperty({}, _attr, value);
-      }
-
-      return this.forEach(function (elem, index) {
-        new Super(_attr).forEach(function (value, key) {
-          elem.setAttribute(key, isFunction(value) ? value(elem.getAttribute(key), elem, index) : value);
-        });
-      });
-    }
-
-    /**
-     * @method Elem#blob
-     * @public
-     * @param {Object} [options = {}] - Options that are passed into {@link blob}.
-     * @returns {Promise.<BlobObject>} New instance of promise.
-     * @description Returns a {@link BlobObject} Promise. Works with image or canvas first element.
-     *
-     * @example
-     * image.blob().then((blob) => console.log(blob));  // BlobObject
-     * canvas.blob().then((blob) => console.log(blob)); // BlobObject
-     */
-
-  }, {
-    key: 'blob',
-    value: function blob() {
-      var _this4 = this;
-
-      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-      // TODO: write using ArrayBuffer
-
-      return new Promise$1(function (resolve, reject) {
-        var elem = _this4.first();
-        var name = elem.name;
-
-
-        if (name !== 'img' && name !== 'canvas') {
-          reject(new Error('First element in the set isn\'t an image or a canvas! (Elem#blob)'));
-        }
-
-        if (name === 'canvas') {
-          return resolve(elem);
-        }
-
-        elem.load().then(function () {
-          if (elem.isBroken()) {
-            return reject(new Error('The image is broken! (Elem#blob)'));
-          }
-
-          var canvas = new Elem(nativeDocument).canvas();
-          var width = elem.width();
-          var height = elem.height();
-
-          canvas.width(width).height(height).drawImage(elem.$[0], 0, 0);
-
-          resolve(canvas);
-        });
-      }).then(function (canvas) {
-        return dataURLFetch(canvas.dataURL());
-      }).then(function (_ref) {
-        var ab = _ref.data;
-        return blob$1(ab, options);
-      });
-    }
-
-    /**
-     * @method Elem#blur
-     * @returns {Elem} Returns this.
-     * @see https://developer.mozilla.org/en/docs/Web/API/HTMLElement/blur
-     * @description Synonym for
-     * [HTMLElement#blur]{@link https://developer.mozilla.org/en/docs/Web/API/HTMLElement/blur}.
-     */
-
-  }, {
-    key: 'blur',
-    value: function blur() {
-      return this.forEach(function (elem) {
-        elem.blur();
-      });
-    }
-
-    /**
-     * @method Elem#calcCSS
-     * @param {String} [pseudo] - See the link.
-     * @returns {CSSStyleDeclaration} See the link.
-     * @see https://developer.mozilla.org/en/docs/Web/API/Window/getComputedStyle
-     * @description Synonym for
-     * [getComputedStyle]{@link https://developer.mozilla.org/en/docs/Web/API/Window/getComputedStyle}.
-     * Returns computed style for the first element in the set or undefined.
-     */
-
-  }, {
-    key: 'calcCSS',
-    value: function calcCSS() {
-      var pseudo = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-
-      return getComputedStyle(getElem(this), pseudo);
-    }
-
-    /**
-     * @method Elem#changeRule
-     * @public
-     * @param {String} name - Name of the rule.
-     * @param {Object.<String, String>} style - Style for the selector.
-     * @returns {Elem} Returns this.
-     * @description Method for changing css styles in the first style tag in the set.
-     * Note: style element should be inside the document.
-     *
-     * @example
-     * style.changeRule('img-size', {
-     *   width: '50px !important',
-     *   height: '50px !important'
-     * });
-     */
-
-  }, {
-    key: 'changeRule',
-    value: function changeRule(name, style) {
-      this.some(function (elem) {
-        if (getName(elem) === 'style') {
-          var _ref2 = new Arr(elem.sheet.cssRules).find(function (rule) {
-            return rule.dwayneData && rule.dwayneData.name === name;
-          }) || {};
-
-          var rule = _ref2.value;
-
-
-          if (rule) {
-            new Elem(rule).css(style);
-
-            return true;
-          }
-        }
-      });
-
-      return this;
-    }
-
-    /**
-     * @method Elem#child
-     * @public
-     * @param {Number|String|Elem|Element|Element[]} element - If the argument is a number a wrap of the set of the children
-     * of this index of each element in the set returned otherwise an element to put into this element, a collection
-     * or a selector of it.
-     * @returns {Elem} Returns a wrap of children or inserted elements.
-     * @description Method is similar to
-     * [Node#appendChild]{@link https://developer.mozilla.org/en/docs/Web/API/Node/appendChild}.
-     *
-     * @example
-     * const child = elem.child(1);
-     *
-     * elem.child(elem2);
-     * elem.child(document.getElementById('id'));
-     * elem.child('#id div.c1');
-     */
-
-  }, {
-    key: 'child',
-    value: function child(element) {
-      if (isInteger(element) && element >= 0) {
-        return this.children().elem(element);
-      }
-
-      return toFind(element).into(this);
-    }
-
-    /**
-     * @method Elem#children
-     * @public
-     * @returns {Elem} D-Wrap of the children of the first element in the set.
-     * @description Method for getting element's children.
-     *
-     * @example
-     * const children = elem.children();
-     */
-
-  }, {
-    key: 'children',
-    value: function children() {
-      return new Elem(this.length ? this.$[0].children : []);
-    }
-
-    /**
-     * @method Elem#class
-     * @public
-     * @param {String} [cls] - If it's present it has to contain class attribute to set.
-     * @returns {Arr|Elem} If the argument is present this returned otherwise a wrap of the classes array returned.
-     * @description Method for getting/setting classes.
-     *
-     * @example
-     * elem.class('c1 c2'); // class set to 'c1 c2'
-     * elem.class().$;      // ['c1', 'c2']
-     */
-
-  }, {
-    key: 'class',
-    value: function _class(cls) {
-      if (!arguments.length) {
-        return new Arr(getElem(this).className.split(' '));
-      }
-
-      return this.forEach(function (elem) {
-        elem.className = cls;
-      });
-    }
-
-    /**
-     * @method Elem#click
-     * @returns {Elem} Returns this.
-     * @see https://developer.mozilla.org/en/docs/Web/API/HTMLElement/click
-     * @description Synonym for
-     * [HTMLElement#click]{@link https://developer.mozilla.org/en/docs/Web/API/HTMLElement/click}.
-     */
-
-  }, {
-    key: 'click',
-    value: function click() {
-      return this.forEach(_click);
-    }
-
-    /**
-     * @method Elem#clone
-     * @public
-     * @param {Boolean|*} [deep = false] - See thee link.
-     * @returns {Elem} New instance of Elem.
-     * @see https://developer.mozilla.org/en/docs/Web/API/Node/cloneNode
-     * @description Synonym for
-     * [Node#cloneNode]{@link https://developer.mozilla.org/en/docs/Web/API/Node/cloneNode}.
-     */
-
-  }, {
-    key: 'clone',
-    value: function clone() {
-      var deep = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
-      return this.object(function (elems, elem) {
-        elems.add(elem.cloneNode(!!deep));
-      }, new Elem());
-    }
-
-    /**
-     * @method Elem#closest
-     * @public
-     * @param {String} selector - See the link.
-     * @returns {Elem} Set of the closest elements.
-     * @description Synonym for
-     * [Element#closest]{@link https://developer.mozilla.org/en/docs/Web/API/Element/closest}.
-     */
-
-  }, {
-    key: 'closest',
-    value: function closest(selector) {
-      return this.object(function (elems, elem) {
-        while (elem) {
-          if (new Elem(elem).is(selector)) {
-            return elems.add(elem);
-          }
-
-          elem = elem.parentElement;
-        }
-      }, new Elem());
-    }
-
-    /**
-     * @method Elem#contains
-     * @public
-     * @param {String|Elem|Element} element - Element to find out if it's within the first element
-     * in the set or a selector of it.
-     * @returns {Boolean} Returns if the argument within this element.
-     * @description Method is extension for
-     * [Node#contains]{@link https://developer.mozilla.org/en/docs/Web/API/Node/contains}.
-     *
-     * @example
-     * elem1.contains(elem2);   // true|false
-     * elem.contains(selector); // true|false
-     */
-
-  }, {
-    key: 'contains',
-    value: function contains(element) {
-      element = toFind(element);
-
-      return getElem(this).contains(getElem(element));
-    }
-
-    /**
-     * @method Elem#create
-     * @public
-     * @param {String} type - Type of created element.
-     * @param {...String} appliedExpressions - Strings that are passed into {@link Elem#apply}.
-     * @returns {Elem} New instance of Elem - wrap of the created element.
-     * @description Method for creating elements inside this element. If this element is a document it's just created.
-     *
-     * @example
-     * elem.create('div', '#id .c1 .c2 *Some text*');
-     *
-     * // also there are shorthands for almost every HTML-element
-     * elem.div();
-     * elem.input('$type(checkbox) $name(country)');
-     */
-
-  }, {
-    key: 'create',
-    value: function create(type) {
-      for (var _len4 = arguments.length, appliedExpressions = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
-        appliedExpressions[_key4 - 1] = arguments[_key4];
-      }
-
-      return this.object(function (elems, elem) {
-        var element = new Elem(nativeDocument.createElement(type));
-
-        if (elem !== nativeDocument) {
-          element.into(elem);
-        }
-
-        elems.add(element.apply.apply(element, appliedExpressions));
-      }, new Elem());
-    }
-
-    /**
-     * @method Elem#css
-     * @public
-     * @param {String|Object.<String, String|ElemValueCallback>} [property] - Name of the property to get or
-     * an object of the format { [property]: value, ... } to set styles.
-     * @param {String|ElemValueCallback} [value] - If the first argument is a string it should be a value to set for that property.
-     * @returns {Super|String|Elem} If no arguments passed, D-Wrap of css styles of the element returned,
-     * if 1 string argument is passed the value of the property returned otherwise returns this.
-     * @description Method for getting/setting styles. Supports !important.
-     *
-     * @example
-     * elem.css('display', 'none'); // display set to 'none' and this returned
-     * elem.css('display');         // 'none'
-     * elem.css({
-     *   display: 'inline',         // display set to 'inline'
-     *   cursor: 'pointer'          // cursor set to 'pointer'
-     * });                          // this returned
-     * elem.css().$;                // { display: 'none', cursor: 'pointer' }
-     */
-
-  }, {
-    key: 'css',
-    value: function css(property, value) {
-      var style = getElem(this).style;
-
-      if (!arguments.length) {
-        return new Str(style.cssText).split(/; ?/).object(function (o, value) {
-          if (value) {
-            property = value.split(/: /);
-
-            o[new Str(property[0]).toCamelCase().$] = property[1];
-          }
-        });
-      }
-
-      if (arguments.length <= 1 && isString(property)) {
-        property = new Str(property).toHyphenCase().$;
-
-        return style.getPropertyValue(property) + (style.getPropertyPriority(property) ? ' !important' : '');
-      }
-
-      if (arguments.length >= 2) {
-        property = defineProperty({}, property, value);
-      }
-
-      return this.forEach(function (elem, index) {
-        new Super(property).forEach(function (value, property) {
-          property = new Str(property).toHyphenCase().$;
-
-          if (isFunction(value)) {
-            value = value(new Elem(elem).css(property), elem, index);
-          }
-
-          elem.style.removeProperty(property);
-          elem.style.setProperty(property, value.replace(/ ?!important$/, ''), /!important$/.test(value) ? 'important' : '');
-        });
-      });
-    }
-
-    /**
-     * @method Elem#ctx
-     * @public
-     * @param {String|Object|CtxCallback} [property] - If present and object
-     * it's assigned to the canvas rendering context, if function
-     * it's called with canvas rendering context argument, if string
-     * the value from the second argument is used for assigning
-     * this property to canvas rendering context and if not present
-     * canvas rendering context returned.
-     * @param {*} [value] - See the property argument.
-     * @returns {CanvasRenderingContext2D|Elem}
-     * @description Rendering context of the first canvas in the set.
-     *
-     * @example
-     * canvas.ctx; // CanvasRenderingContext2D
-     */
-
-  }, {
-    key: 'ctx',
-    value: function ctx(property, value) {
-      var ctx = void 0;
-
-      this.some(function (elem) {
-        if (getName(elem) === 'canvas') {
-          ctx = elem.dwayneData.ctx;
-
-          return true;
-        }
-      });
-
-      if (!arguments.length) {
-        return ctx;
-      }
-
-      if (isFunction(property)) {
-        property(ctx);
-      } else {
-        if (arguments.length >= 2) {
-          property = defineProperty({}, property, value);
-        }
-
-        assign$1(ctx, property);
-      }
-
-      return this;
-    }
-
-    /**
-     * @method Elem#data
-     * @public
-     * @param {String|Object.<String, String|ElemValueCallback>} [key] - Name of the data attribute (without data- prefix)
-     * to get or an object of the format { [attrName]: value, ... } to set attributes.
-     * @param {String|ElemValueCallback} [value] - If the first argument is a string it should be a value to set for that attribute.
-     * @returns {Super|String|Elem} If no arguments passed, D-Wrap of dataset of the element returned,
-     * if 1 string argument is passed the value of the data attribute returned otherwise returns this.
-     * @description Method for getting/setting data attributes. See
-     * [HTMLElement#dataset]{@link https://developer.mozilla.org/en/docs/Web/API/HTMLElement/dataset}.
-     *
-     * @example
-     * elem.data('someKey1', 'value'); // attribute data-some-key1 set to 'value1' and this returned
-     * elem.data('someKey1');          // 'value1'
-     * elem.data({
-     *   someKey1: 'value3',           // attribute data-some-key1 set to 'value3'
-     *   someKey2: 'value2'            // attribute data-some-key2 set to 'value2'
-     * });                             // this returned
-     * elem.data().$;                  // { someKey1: 'value3', someKey2: 'value2' }
-     */
-
-  }, {
-    key: 'data',
-    value: function data(key, value) {
-      var _this5 = this;
-
-      var dataset = getElem(this).dataset;
-
-      if (!arguments.length) {
-        return new Super(dataset).object(function (o, value, key) {
-          o[key] = value;
-        });
-      }
-
-      if (arguments.length === 1 && isString(key)) {
-        return dataset[key];
-      }
-
-      if (arguments.length >= 2) {
-        key = defineProperty({}, key, value);
-      }
-
-      iterate(key, function (value, key) {
-        _this5.forEach(function (elem, index) {
-          elem.dataset[key] = isFunction(value) ? value(elem.dataset[key], elem, index) : value;
-        });
-      });
-
-      return this;
-    }
-
-    /**
-     * @method Elem#dataURL
-     * @param {String} [type = 'image/png'] - See the link
-     * @param {Number} [encoderOptions = 0.92] - See the link.
-     * @returns {String} Data URL for the first canvas element in the set.
-     * @see https://developer.mozilla.org/en/docs/Web/API/HTMLCanvasElement/toDataURL
-     * @description Synonym for
-     * [HTMLCanvasElement#toDataURL]{@link https://developer.mozilla.org/en/docs/Web/API/HTMLCanvasElement/toDataURL}.
-     *
-     * @example
-     * canvas.dataURL();
-     */
-
-  }, {
-    key: 'dataURL',
-    value: function dataURL(type, encoderOptions) {
-      var ctx = this.ctx();
-
-      if (!ctx) {
-        return '';
-      }
-
-      return ctx.canvas.toDataURL.apply(ctx.canvas, arguments);
-    }
-
-    /**
-     * @method Elem#deleteRule
-     * @public
-     * @param {String} name - Name of the rule.
-     * @returns {Elem} Returns this.
-     * @description Method for deleting css styles in a style tag.
-     * Note: style element should be inside the document.
-     *
-     * @example
-     * style.deleteRule('img-size');
-     */
-
-  }, {
-    key: 'deleteRule',
-    value: function deleteRule(name) {
-      this.some(function (elem) {
-        if (getName(elem) === 'style') {
-          var rule = new Arr(elem.sheet.cssRules).find(function (rule) {
-            return rule.dwayneData && rule.dwayneData.name === name;
-          });
-
-          if (rule) {
-            elem.sheet.deleteRule(rule.key);
-
-            return true;
-          }
-        }
-      });
-
-      return this;
-    }
-
-    /**
-     * @method Elem#dispatch
-     * @public
-     * @param {String|Event} event - Event or a string (new Event(event) is created).
-     * @param {Object} [eventInit = {}] - See the link.
-     * @param {Boolean} [eventInit.bubbles = true] - See the link.
-     * @param {Boolean} [eventInit.cancelable = true] - See the link.
-     * @param {Object} [details = {}] - Object that is assigned to the event.
-     * @returns {Elem} Returns this.
-     * @see https://developer.mozilla.org/en/docs/Web/API/Event/Event
-     * @description Synonym for
-     * [EventTarget#dispatchEvent]{@link https://developer.mozilla.org/en/docs/Web/API/EventTarget/dispatchEvent}.
-     *
-     * @example
-     * elem.dispatch('click');
-     * elem.dispatch('click', { bubbles: false, cancellable: false });
-     * elem.dispatch(new CustomEvent('custom-event'));
-     */
-
-  }, {
-    key: 'dispatch',
-    value: function dispatch(event) {
-      var eventInit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      var details = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
-      var _ref3 = eventInit || {};
-
-      var _ref3$bubbles = _ref3.bubbles;
-      var bubbles = _ref3$bubbles === undefined ? true : _ref3$bubbles;
-      var _ref3$cancelable = _ref3.cancelable;
-      var cancelable = _ref3$cancelable === undefined ? true : _ref3$cancelable;
-
-      var finalEvent = event;
-
-      if (!/Event$/.test(toStringTag(finalEvent))) {
-        try {
-          finalEvent = new Event(finalEvent, { bubbles: bubbles, cancelable: cancelable });
-        } catch (err) {
-          finalEvent = nativeDocument.createEvent('Event');
-          finalEvent.initEvent(event, bubbles, cancelable);
-        }
-
-        assign$1(finalEvent, details);
-      }
-
-      return this.forEach(function (elem) {
-        elem.dispatchEvent(finalEvent);
-      });
-    }
-
-    /**
-     * @method Elem#elem
-     * @public
-     * @param {Number} [index = 0] - Index of the element of the set to get. Negative index means elem.length + index.
-     * @returns {Elem} New instance of Elem.
-     *
-     * @example
-     * elem.elem(1); // a wrap of the element in the set that has index 1
-     * elem.elem();  // a wrap of the element in the set that has index 0
-     */
-
-  }, {
-    key: 'elem',
-    value: function elem() {
-      var index = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-
-      if (index < 0) {
-        index = this.length + index;
-      }
-
-      return new Elem(this.$[index]);
-    }
-
-    /**
-     * @method Elem#filter
-     * @public
-     * @param {String|Function|Element[]|Elem} [selector = Boolean] - If it's a string the method filters elements with the selector
-     * otherwise super.filter is called.
-     * @returns {Elem} New instance of Elem.
-     * @description Method for filtering elements.
-     *
-     * @example
-     * elem.filter((elem) => new Elem(elem).closest('.parent'));
-     * elem.filter(elemsInArray);
-     * elem.filter(elemsInElem);
-     * elem.filter('.child');
-     */
-
-  }, {
-    key: 'filter',
-    value: function filter() {
-      var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Boolean;
-
-      return new Elem(get$1(Elem.prototype.__proto__ || Object.getPrototypeOf(Elem.prototype), 'filter', this).call(this, filterSwitcher(selector)));
-    }
-
-    /**
-     * @method Elem#find
-     * @public
-     * @param {String|Function} selector - Selector to find.
-     * @returns {Elem|{ key: Key, value: * }|null} New instance of Elem if selector is a string
-     * otherwise super.find is called.
-     * @description Synonym for
-     * [Element#querySelectorAll]{@link https://developer.mozilla.org/en/docs/Web/API/Element/querySelectorAll}.
-     */
-
-  }, {
-    key: 'find',
-    value: function find(selector) {
-      if (!isString(selector)) {
-        return get$1(Elem.prototype.__proto__ || Object.getPrototypeOf(Elem.prototype), 'find', this).call(this, selector);
-      }
-
-      return this.object(function (elems, elem) {
-        elems.add(_find(selector, elem));
-      }, new Elem());
-    }
-
-    /**
-     * @method Elem#first
-     * @public
-     * @returns {Elem} New instance of Elem.
-     * @description Synonym for elem.elem(0).
-     */
-
-  }, {
-    key: 'first',
-    value: function first() {
-      return this.elem(0);
-    }
-
-    /**
-     * @method Elem#first
-     * @public
-     * @param {String} [selector = null] - If present, finds first child in every elem that matches the selector.
-     * If not, finds first child of each element in the set.
-     * @returns {Elem} New instance of Elem.
-     * @description Method for finding first children of each element in the set.
-     *
-     * @example
-     * elem.first();       // finds first child of each element in the elem set
-     * elem.first('.foo'); // find first child that has foo class of each element in the set
-     */
-
-  }, {
-    key: 'firstChild',
-    value: function firstChild() {
-      var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-
-      return this.object(function (elems, elem) {
-        var _ref4 = new Arr(elem.children).find(function (elem) {
-          return new Elem(elem).is(selector);
-        }) || {};
-
-        var found = _ref4.value;
-
-
-        elems.add(found);
-      }, new Elem());
-    }
-
-    /**
-     * @method Elem#focus
-     * @returns {Elem} Returns this.
-     * @see https://developer.mozilla.org/en/docs/Web/API/HTMLElement/focus
-     * @description Synonym for
-     * [HTMLElement#focus]{@link https://developer.mozilla.org/en/docs/Web/API/HTMLElement/focus}.
-     */
-
-  }, {
-    key: 'focus',
-    value: function focus() {
-      return this.forEach(function (elem) {
-        elem.focus();
-      });
-    }
-
-    /**
-     * @method Elem#getRule
-     * @public
-     * @param {String} name - Name of the rule.
-     * @returns {{ selector: (String|void), rules: Object }} Set of the css rules.
-     * @description Method for getting set of the rules under the name.
-     * Note: style element should be inside the document.
-     *
-     * @example
-     * style.addRule('img-size', 'img.square', {
-     *   width: '40px',
-     *   height: '40px'
-     * });
-     * style.getRule('img-size');
-     * // {
-     * //   selector: 'img.square',
-     * //   rules: {
-     * //     width: '40px',
-     * //     height: '40px'
-     * //   }
-     * // }
-     */
-
-  }, {
-    key: 'getRule',
-    value: function getRule(name) {
-      var found = {
-        selector: undefined,
-        rules: {}
-      };
-
-      this.some(function (elem) {
-        if (getName(elem) === 'style') {
-          var _ref5 = new Arr(elem.sheet.cssRules).find(function (rule) {
-            return rule.dwayneData && rule.dwayneData.name === name;
-          }) || {};
-
-          var rule = _ref5.value;
-
-
-          if (rule) {
-            found = {
-              selector: rule.selectorText,
-              rules: new Elem(rule).css().$
-            };
-
-            return true;
-          }
-        }
-      });
-
-      return found;
-    }
-
-    /**
-     * @method Elem#hasAttr
-     * @public
-     * @param {String} attr - Name of the attribute.
-     * @returns {Boolean} If the first element in the set has the attribute.
-     * @description Method that returns if the first element in the set has the attribute or not.
-     *
-     * @example
-     * elem.attr('attr', 'value').hasAttr('attr'); // true
-     * elem.removeAttr('attr').hasAttr('attr');    // false
-     */
-
-  }, {
-    key: 'hasAttr',
-    value: function hasAttr(attr) {
-      return getElem(this).hasAttribute(attr);
-    }
-
-    /**
-     * @method Elem#hasClass
-     * @public
-     * @param {String} cls - Name of the class.
-     * @returns {Boolean} If the first element in the set has the class.
-     * @description Method that returns if the first element in the set has the class or not.
-     *
-     * @example
-     * elem.addClass('cls').hasClass('cls');    // true
-     * elem.removeClass('cls').hasClass('cls'); // false
-     */
-
-  }, {
-    key: 'hasClass',
-    value: function hasClass(cls) {
-      return getElem(this).classList.contains(cls);
-    }
-
-    /**
-     * @method Elem#height
-     * @public
-     * @param {*|ElemValueCallback} [height] - Height to set.
-     * @returns {Elem|String} If no arguments passed height of the first element in the set returned.
-     * Otherwise all elements heights in the set are set to the height argument.
-     * @description Gets or sets height.
-     *
-     * @example
-     * elem.height(123);
-     * elem.height(); // 123
-     */
-
-  }, {
-    key: 'height',
-    value: function height(_height) {
-      return this.prop.apply(this, new Arr(arguments).unshift('height').$);
-    }
-
-    /**
-     * @method Elem#hide
-     * @public
-     * @returns {Elem} Returns this.
-     * @description Hides all elements in the set.
-     *
-     * @example
-     * elem.hide();
-     */
-
-  }, {
-    key: 'hide',
-    value: function hide() {
-      return this.forEach(function (elem) {
-        elem = new Elem(elem);
-
-        var currentDisplay = elem.css('display');
-
-        if (currentDisplay.indexOf('none')) {
-          elem.prop('dwayneData').previousDisplay = currentDisplay;
-        }
-
-        elem.css('display', 'none !important');
-      });
-    }
-
-    /**
-     * @method Elem#html
-     * @public
-     * @param {String|ElemValueCallback|*} [html] - HTML to write instead of current HTML.
-     * @returns {Elem|String} If no arguments passed HTML of the first element in the set returned.
-     * Otherwise all elements HTML in the set are set to the html argument.
-     * @description Gets or sets HTML.
-     *
-     * @example
-     * elem.html('&lt;div&gt;1&lt;/div&gt;');
-     * elem.html(); // '&lt;div&gt;1&lt;/div&gt;'
-     */
-
-  }, {
-    key: 'html',
-    value: function html(_html) {
-      if (!arguments.length) {
-        return getElem(this).innerHTML;
-      }
-
-      return this.forEach(function (elem, index) {
-        elem.innerHTML = isFunction(_html) ? _html(elem.innerHTML, elem, index) : _html;
-      });
-    }
-
-    /**
-     * @method Elem#id
-     * @public
-     * @param {String|*} [id] - Id to set.
-     * @returns {Elem|String} If no arguments passed id of the first element in the set returned.
-     * Otherwise all elements ids in the set are set to the id argument.
-     * @description Gets id or sets ids.
-     *
-     * @example
-     * elem.id('unique');
-     * elem.id(); // 'unique'
-     */
-
-  }, {
-    key: 'id',
-    value: function id(_id) {
-      if (!arguments.length) {
-        return getElem(this).id;
-      }
-
-      return this.forEach(function (elem) {
-        elem.id = _id;
-      });
-    }
-
-    /**
-     * @member {Number} Elem#innerHeight
-     * @type {Number}
-     * @public
-     * @readonly
-     * @description Method for finding how much height content of the first element can be.
-     *
-     * @example
-     * elem.css({
-     *   boxSizing: 'border-box',
-     *   height: '200px',
-     *   paddingTop: '2px',
-     *   paddingBottom: '3px',
-     *   borderTop: '1px solid black',
-     *   borderBottom: '4px solid black'
-     * }).innerHeight; // 190
-     * elem
-     *   .css('box-sizing', 'content-box')
-     *   .innerHeight; // 200
-     * elem
-     *   .css('box-sizing', 'padding-box')
-     *   .innerHeight; // 195
-     */
-
-  }, {
-    key: 'insertAfter',
-
-
-    /**
-     * @method Elem#insertAfter
-     * @public
-     * @param {String|Elem|Element} element - Element to insert this element after or a selector of it.
-     * @returns {Elem} Returns this.
-     * @description Puts the elements from the set after the element specified by the argument.
-     * The elements remain in the same order.
-     *
-     * @example
-     * elem.insertAfter(elem2);
-     * elem.insertAfter(document.getElementById('id'));
-     * elem.insertAfter('#id div.c1');
-     */
-    value: function insertAfter(element) {
-      element = toFind(element).first();
-
-      var parent = element.parent();
-
-      if (!parent.length) {
-        return this;
-      }
-
-      element = element.next().$[0];
-      parent = parent.$[0];
-
-      return this.forEach(function (elem) {
-        if (element) {
-          parent.insertBefore(elem, element);
-
-          element = elem;
-        } else {
-          parent.appendChild(elem);
-        }
-      });
-    }
-
-    /**
-     * @method Elem#insertBefore
-     * @public
-     * @param {String|Elem|Element} element - Element to insert this element before or a selector of it.
-     * @returns {Elem} Returns this.
-     * @description Puts the elements from the set before the element specified by the argument.
-     * The elements remain in the same order.
-     *
-     * @example
-     * elem.insertBefore(elem2);
-     * elem.insertBefore(document.getElementById('id'));
-     * elem.insertBefore('#id div.c1');
-     */
-
-  }, {
-    key: 'insertBefore',
-    value: function insertBefore(element) {
-      element = toFind(element).first();
-
-      var parent = element.parent();
-
-      if (!parent.length) {
-        return this;
-      }
-
-      element = element.$[0];
-      parent = parent.$[0];
-
-      return this.forEach(function (elem) {
-        parent.insertBefore(elem, element);
-      });
-    }
-
-    /**
-     * @method Elem#into
-     * @public
-     * @param {String|Elem|Element} element - Element to put this elements into or a selector of it.
-     * @returns {Elem} Returns this.
-     * @description Method is similar to
-     * [Node#appendChild]{@link https://developer.mozilla.org/en/docs/Web/API/Node/appendChild}.
-     *
-     * @example
-     * elem.into(elem2);
-     * elem.into(document.getElementById('id'));
-     * elem.into('#id div.c1');
-     */
-
-  }, {
-    key: 'into',
-    value: function into(element) {
-      element = toFind(element).$[0];
-
-      if (!element) {
-        return this;
-      }
-
-      return this.forEach(function (elem) {
-        element.appendChild(elem);
-      });
-    }
-
-    /**
-     * @method Elem#is
-     * @public
-     * @param {String} selector
-     * @returns {Boolean} If the first element in the set matches the selector.
-     * If the selector is undefined or null always returns true.
-     * @description Synonym for
-     * [Element#matches]{@link https://developer.mozilla.org/en/docs/Web/API/Element/matches}.
-     *
-     * @example
-     * elem.addClass('cls');
-     * elem.is('.cls');         // true
-     *
-     * elem.removeClass('cls');
-     * elem.is('.cls');         // false
-     */
-
-  }, {
-    key: 'is',
-    value: function is(selector) {
-      if (isNull(selector)) {
-        return true;
-      }
-
-      var elem = getElem(this);
-      var matches = elem.matches || elem.matchesSelector || elem.webkitMatchesSelector || elem.mozMatchesSelector || elem.msMatchesSelector || elem.oMatchesSelector;
-
-      try {
-        return matches.call(elem, selector);
-      } catch (err) {
-        console.error('Selector \'' + selector + '\' is not a valid selector (Elem#is)');
-
-        return false;
-      }
-    }
-
-    /**
-     * @method Elem#isBroken
-     * @public
-     * @returns {Boolean} If the first image in the set is broken.
-     * @description Returns if the first element in the set is broken. Not image and not loaded image is considered proper.
-     *
-     * @example
-     * const img = elem.img().on({
-     *   'load': onload,
-     *   'error': onload
-     * });
-     *
-     * onload = () => {
-     *   console.log(img.isBroken()); // true
-     * };
-     *
-     * img.ref('/some/non-existent/site/not-found.png');
-     */
-
-  }, {
-    key: 'isBroken',
-    value: function isBroken() {
-      var isBroken = false;
-
-      this.some(function (elem) {
-        if (getName(elem) === 'img') {
-          isBroken = !!(elem.complete && (!elem.naturalWidth || !elem.naturalHeight));
-
-          return true;
-        }
-      });
-
-      return isBroken;
-    }
-
-    /**
-     * @method Elem#isWithinDocument
-     * @public
-     * @returns {Boolean} Returns if the first element in the set is within the document or not.
-     * @description Returns if the first element in the set is within the document or not.
-     *
-     * @example
-     * new Elem(document.body).isWithinDocument();  // true
-     * new Elem(document).div().isWithinDocument(); // false
-     */
-
-  }, {
-    key: 'isWithinDocument',
-    value: function isWithinDocument() {
-      return this.first().closest('html').length !== 0;
-    }
-
-    /**
-     * @method Elem#last
-     * @public
-     * @returns {Elem} New instance of Elem.
-     * @description Synonym for elem.elem(-1).
-     */
-
-  }, {
-    key: 'last',
-    value: function last() {
-      return this.elem(-1);
-    }
-
-    /**
-     * @method Elem#last
-     * @public
-     * @param {String} [selector = null] - If present, finds last child in every elem that matches the selector.
-     * If not, finds last child of each element in the set.
-     * @returns {Elem} New instance of Elem.
-     * @description Method for finding last children of each element in the set.
-     *
-     * @example
-     * elem.last();       // finds last child of each element in the elem set
-     * elem.last('.foo'); // find last child that has 'foo' class of each element in the set
-     */
-
-  }, {
-    key: 'lastChild',
-    value: function lastChild() {
-      var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-
-      return this.object(function (elems, elem) {
-        var _ref6 = new Arr(elem.children).reverse().find(function (elem) {
-          return new Elem(elem).is(selector);
-        }) || {};
-
-        var found = _ref6.value;
-
-
-        elems.add(found);
-      }, new Elem());
-    }
-
-    /**
-     * @method Elem#load
-     * @public
-     * @returns {Promise.<{ proper: Elem, broken: Elem }>} Promise with broken and proper images.
-     * @description Loads each image in the set and puts it to the proper or broken array.
-     *
-     * @example
-     * images.load().then(({ broken }) => {
-     *   broken.filter('img').ref('/fallback.png');
-     * });
-     */
-
-  }, {
-    key: 'load',
-    value: function load() {
-      var images = {
-        proper: new Elem(),
-        broken: new Elem()
-      };
-
-      return Promise$1.all(this.filter(function (elem) {
-        return getName(elem) === 'img';
-      }).map(function (elem) {
-        var $elem = new Elem(elem);
-
-        if (elem.complete) {
-          images[$elem.isBroken() ? 'broken' : 'proper'].push(elem);
-
-          return;
-        }
-
-        return new Promise$1(function (resolve) {
-          var removeListeners = $elem.on({
-            load: function load() {
-              images.proper.add(elem);
-
-              removeListeners();
-              resolve();
-            },
-            error: function error() {
-              images.broken.add(elem);
-
-              removeListeners();
-              resolve();
-            }
-          });
-        });
-      }).$).then(function () {
-        return images;
-      });
-    }
-
-    /**
-     * @method Elem#moveAttr
-     * @public
-     * @param {String} attr - Attribute to move to the first element.
-     * @param {String} [value = ''] - Value to set for the attribute. If not set attribute of the previous element or '' used.
-     * @returns {Elem} Returns this.
-     * @description Method for moving an attribute from previous element to the next one (first element in this set).
-     *
-     * @example
-     * elem1.moveAttr('attr', 'value');     // attribute 'attr' set to 'value' on elem1
-     * elem2.moveAttr('attr');              // attribute 'attr' removed from elem1. set to 'value' on elem2
-     * elem3.moveAttr('attr', 'new value'); // attribute 'attr' removed from elem2. set to 'new value' on elem3
-     */
-
-  }, {
-    key: 'moveAttr',
-    value: function moveAttr(attr) {
-      var value = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-
-      var prev = attrs[attr];
-      var elem = this.elem();
-
-      if (prev && elem.length) {
-        if (arguments.length < 2) {
-          value = prev.attr(attr);
-        }
-
-        prev.removeAttr(attr);
-      }
-
-      if (elem.length) {
-        attrs[attr] = elem.attr(attr, value);
-      }
-
-      return this;
-    }
-
-    /**
-     * @method Elem#moveClass
-     * @public
-     * @param {String} cls - Class to move to the first element.
-     * @returns {Elem} Returns this.
-     * @description Method for moving a class from previous element to the next one (first element in this set).
-     *
-     * @example
-     * elem1.moveClass('cls'); // class 'cls' added to elem1
-     * elem2.moveClass('cls'); // class 'cls' removed from elem1. added to elem1
-     */
-
-  }, {
-    key: 'moveClass',
-    value: function moveClass(cls) {
-      var prev = classes[cls];
-      var elem = this.elem();
-
-      if (prev && elem.length) {
-        prev.removeClass(cls);
-      }
-
-      if (elem.length) {
-        classes[cls] = elem.addClass(cls);
-      }
-
-      return this;
-    }
-
-    /**
-     * @member Elem#name
-     * @type {String}
-     * @public
-     * @readonly
-     * @description tagName (lowercased) of the first element in the set.
-     *
-     * @example
-     * const elem1 = elem.create('div');
-     * elem1.name // 'div'
-     */
-
-  }, {
-    key: 'next',
-
-
-    /**
-     * @method Elem#next
-     * @public
-     * @param {String} [selector = null] - If present, finds next element to every elem that matches the selector.
-     * If not, finds next element to each element in the set.
-     * @returns {Elem} New instance of Elem.
-     * @description Method for finding next element to each element in the set.
-     *
-     * @example
-     * elem.next();       // finds next element to each element in the set
-     * elem.next('.foo'); // finds next element to each element that has 'foo' class
-     */
-    value: function next() {
-      var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-
-      return this.object(function (elems, elem) {
-        /* eslint no-cond-assign: 0 */
-        while (elem = elem.nextElementSibling) {
-          if (isNull(selector) || new Elem(elem).is(selector)) {
-            return elems.add(elem);
-          }
-        }
-      }, new Elem());
-    }
-
-    /**
-     * @method Elem#off
-     * @public
-     * @param {...ElemEventString} events - Events to remove.
-     * @returns {Elem} Returns this.
-     * @description Method that removes all the listeners from each element in the set specified by the events arguments.
-     *
-     * @example
-     * elem.off('click');
-     * elem.off('click, input');
-     * elem.off('click, input', 'focus');
-     */
-
-  }, {
-    key: 'off',
-    value: function off() {
-      var _arguments2 = arguments;
-
-      for (var _len5 = arguments.length, events = Array(_len5), _key6 = 0; _key6 < _len5; _key6++) {
-        events[_key6] = arguments[_key6];
-      }
-
-      return this.forEach(function (elem) {
-        var listeners = elem.dwayneData.listeners;
-
-
-        iterate(_arguments2, function (event) {
-          iterate(event.split(eventSeparator), function (event) {
-            (listeners[event] || new Super()).forEach(function (_ref7) {
-              var removeListener = _ref7.removeListener;
-              return removeListener();
-            });
-          });
-        });
-      });
-    }
-
-    /**
-     * @method Elem#on
-     * @public
-     * @param {ElemEventString|Object.<ElemEventString|ElemListener>} event - Either a {@link ElemEventString} string
-     * or an object with event keys (a key is also ElemEventString) and listeners values.
-     * @param {String} [selector = null] - Selector to filter event targets.
-     * @param {ElemListener} [listener] - If the first argument is a string it must be a listener function for
-     * specified event(s).
-     * @returns {ElemRemoveListeners} Function that takes optional event argument.
-     * @description Adds event listeners for all the elements in the set.
-     * For debugging: If you need to know what listeners are in work (and what selectors filter targets)
-     * you can look at the base property of the only dwayne listener that listens for the event
-     * and find all working listeners in listener.base.dwayneData.listeners[event].$.
-     *
-     * @example
-     * elem.on(
-     *   'change, input',
-     *   'input, select, textarea, datalist, keygen, output',
-     *   (e, elem, index) => console.log(elem.value)
-     * );
-     * elem.on(
-     *   'change, input',
-     *   (e, elem, index) => console.log(elem.value)
-     * );
-     * elem.on(
-     *   {
-     *     'change, input': (e, elem, index) => console.log(elem.value),
-     *     'blur': console.log('blur')
-     *   },
-     *   'input, select, textarea, datalist, keygen, output'
-     * );
-     *
-     * const removeListeners = elem.on({
-     *   'change, input': (e, elem, index) => console.log(elem.value),
-     *   'blur': console.log('blur')
-     * });
-     *
-     * removeListeners('click');
-     * removeListeners('blur, change');
-     * removeListeners('blur, change', 'input');
-     * removeListeners();
-     */
-
-  }, {
-    key: 'on',
-    value: function on(event) {
-      var selector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-      var listener = arguments[2];
-
-      var allListeners = new Super({});
-
-      if (isFunction(selector)) {
-        listener = selector;
-        selector = null;
-      }
-
-      if (isString(event)) {
-        event = defineProperty({}, event, listener);
-      }
-
-      event = new Super(event).object(function (listeners, listener, event) {
-        iterate(event.split(eventSeparator), function (event) {
-          listeners[event] = listener;
-        });
-      });
-
-      this.forEach(function (elem) {
-        var _ref8 = (windowsDwayneData.find(function (_ref10) {
-          var element = _ref10.element;
-          return element === elem;
-        }) || {}).value || elem.dwayneData;
-
-        var listeners = _ref8.listeners;
-
-
-        event.forEach(function (listener, event) {
-          var removeEventListeners = listeners[event] = listeners[event] || new Super({}).define('index', {
-            value: 0,
-            configurable: true,
-            writable: true
-          });
-          var index = removeEventListeners.prop('index');
-
-          if (!removeEventListeners.has('listener')) {
-            var newListener = function newListener(e) {
-              removeEventListeners.forEach(function (_ref9) {
-                var selector = _ref9.selector;
-                var listener = _ref9.listener;
-
-                if (new Elem(e.target).is(selector)) {
-                  listener.call(elem, e, elem, index);
-                }
-              });
-            };
-
-            newListener.base = elem;
-
-            elem.addEventListener(event, newListener, false);
-            removeEventListeners.define('listener', {
-              value: newListener,
-              configurable: true,
-              writable: true
-            });
-          }
-
-          var removeListener = function removeListener() {
-            removeEventListeners.delete(index);
-
-            if (!removeEventListeners.count) {
-              elem.removeEventListener(event, removeEventListeners.prop('listener'), false);
-              removeEventListeners.delete('listener');
-            }
-          };
-
-          allListeners.prop(event, (allListeners.prop(event) || new Arr()).push(removeListener));
-
-          removeEventListeners.assign(defineProperty({
-            index: index + 1
-          }, index, {
-            selector: selector,
-            listener: listener,
-            removeListener: removeListener
-          }));
-        });
-      });
-
-      return function removeEventListeners(event) {
-        if (arguments.length) {
-          iterate(arguments, function (event) {
-            iterate(event.split(eventSeparator), function (event) {
-              if (allListeners.has(event)) {
-                allListeners.prop(event).forEach(function (removeListener) {
-                  return removeListener();
-                });
-                allListeners.delete(event);
-              }
-            });
-          });
-
-          return;
-        }
-
-        allListeners.forEach(function (removeListeners) {
-          removeListeners.forEach(function (removeListener) {
-            return removeListener();
-          });
-        });
-      };
-    }
-
-    /**
-     * @member {Number} Elem#outerWidth
-     * @type {Number}
-     * @public
-     * @readonly
-     * @description Method for finding how much height the element actually is.
-     *
-     * @example
-     * elem.css({
-     *   boxSizing: 'border-box',
-     *   height: '200px',
-     *   paddingTop: '2px',
-     *   paddingBottom: '3px',
-     *   borderTop: '1px solid black',
-     *   borderBottom: '4px solid black'
-     *   marginTop: '0px',
-     *   marginBottom: '5px'
-     * }).outerHeight; // 205
-     * elem
-     *   .css('box-sizing', 'content-box')
-     *   .outerHeight; // 215
-     * elem
-     *   .css('box-sizing', 'padding-box')
-     *   .outerHeight; // 210
-     */
-
-  }, {
-    key: 'parent',
-
-
-    /**
-     * @method Elem#parent
-     * @public
-     * @returns {Elem} New instance of Elem.
-     * @description Method returns wrap of the set of the parent elements of each element in the set.
-     */
-    value: function parent() {
-      return this.object(function (elems, elem) {
-        return elems.add(elem.parentElement);
-      }, new Elem());
-    }
-
-    /**
-     * @method Elem#parentTree
-     * @public
-     * @returns {Elem} New instance of Elem.
-     * @description Returns wrap of all parents of each element in the set.
-     *
-     * @example
-     * elem.parentTree(); // Elem
-     */
-
-  }, {
-    key: 'parentTree',
-    value: function parentTree() {
-      return this.object(function (elems, elem) {
-        while (elem = elem.parentNode) {
-          elems.add(elem);
-        }
-      }, new Elem());
-    }
-
-    /**
-     * @method Elem#prev
-     * @public
-     * @param {String} [selector = null] - If present, finds previous element to every elem that matches the selector.
-     * If not, finds previous element to each element in the set.
-     * @returns {Elem} New instance of Elem.
-     * @description Method for finding previous element to each element in the set.
-     *
-     * @example
-     * elem.next();       // finds previous element to each element in the set
-     * elem.next('.foo'); // finds previous element to each element that has 'foo' class
-     */
-
-  }, {
-    key: 'prev',
-    value: function prev() {
-      var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-
-      return this.object(function (elems, elem) {
-        /* eslint no-cond-assign: 0 */
-        while (elem = elem.previousElementSibling) {
-          if (isNull(selector) || new Elem(elem).is(selector)) {
-            return elems.add(elem);
-          }
-        }
-      }, new Elem());
-    }
-
-    /**
-     * @method Elem#prop
-     * @public
-     * @param {String|Object.<String, ElemValueCallback|*>} property - Either a string of a property or an assigned object.
-     * @param {ElemValueCallback|*} [value] - If a property parameter is a string
-     * this has to be an assigned value if it's present.
-     * @returns {Elem|*} Returns this if it's setter or a value if getter.
-     * @description Method that is either a property getter for the first element in the set
-     * or a setter for every element in the set.
-     *
-     * @example
-     * elem.prop('draggable', false);
-     * elem.prop('draggable'); // false
-     */
-
-  }, {
-    key: 'prop',
-    value: function prop(property, value) {
-      if (arguments.length <= 1 && isString(property)) {
-        return this.$[0] ? this.$[0][property] : undefined;
-      }
-
-      if (arguments.length >= 2) {
-        property = defineProperty({}, property, value);
-      }
-
-      return this.forEach(function (elem, index) {
-        iterate(property, function (value, prop$$1) {
-          elem[prop$$1] = isFunction(value) ? value(elem[prop$$1], elem, index) : value;
-        });
-      });
-    }
-
-    /**
-     * @method Elem#ref
-     * @public
-     * @param {String|ElemValueCallback} [link] - If it's present link to a resource.
-     * @returns {Elem|String} If the link argument isn't present it's a getter of the 'src' attribute
-     * for the one of following elements: img, script, iframe, audio, video; of the 'action' attribute
-     * for a form element and of the 'href' attribute for the rest. If it's present it's a setter
-     * of the same attribute for all the element in the set.
-     * @description Method for getting resources links and setting them.
-     *
-     * @example
-     * elem.ref('/some/cool/image.png');
-     * elem.ref(); // '/some/cool/image.png'
-     */
-
-  }, {
-    key: 'ref',
-    value: function ref(link) {
-      if (!arguments.length) {
-        return this.attr(refSwitcher(this.name));
-      }
-
-      return this.forEach(function (elem) {
-        elem = new Elem(elem);
-
-        elem.attr(refSwitcher(elem.name), link);
-      });
-    }
-
-    /**
-     * @method Elem#remove
-     * @public
-     * @returns {Elem} Returns this.
-     * @description Removes all the elements from the set from the document.
-     * Note: it doesn't remove them from the set so watch out for the memory leaks.
-     *
-     * @example
-     * elem.remove();
-     */
-
-  }, {
-    key: 'remove',
-    value: function remove() {
-      return this.forEach(function (elem) {
-        var parent = elem.parentElement;
-
-        if (parent) {
-          parent.removeChild(elem);
-        }
-      });
-    }
-
-    /**
-     * @method Elem@removeAttr
-     * @public
-     * @param {...String} attributes - Attributes to remove.
-     * @returns {Elem} Returns this.
-     * @description Removes all the attributes from arguments from all the elements in the set.
-     *
-     * @example
-     * elem.removeAttr('foo', 'bar', 'baz');
-     */
-
-  }, {
-    key: 'removeAttr',
-    value: function removeAttr() {
-      var _arguments3 = arguments;
-
-      for (var _len6 = arguments.length, attributes = Array(_len6), _key7 = 0; _key7 < _len6; _key7++) {
-        attributes[_key7] = arguments[_key7];
-      }
-
-      return this.forEach(function (elem) {
-        iterate(_arguments3, function (attr) {
-          elem.removeAttribute(attr);
-        });
-      });
-    }
-
-    /**
-     * @method Elem#removeClass
-     * @public
-     * @param {...String} classes - Classes to remove.
-     * @returns {Elem} Returns this.
-     * @description Removes all the classes from arguments from all the elements in the set.
-     *
-     * @example
-     * elem.removeClass('foo', 'bar', 'baz');
-     */
-
-  }, {
-    key: 'removeClass',
-    value: function removeClass() {
-      var _arguments4 = arguments;
-
-      for (var _len7 = arguments.length, classes = Array(_len7), _key8 = 0; _key8 < _len7; _key8++) {
-        classes[_key8] = arguments[_key8];
-      }
-
-      return this.forEach(function (elem) {
-        var list = elem.classList;
-
-        iterate(_arguments4, function (cls) {
-          return list.remove(cls);
-        });
-      });
-    }
-
-    /**
-     * @method Elem#removeCSS
-     * @public
-     * @param {...String} props - CSS properties to remove.
-     * @returns {Elem} Returns this.
-     * @description Removes all the CSS properties from arguments from all the elements in the set.
-     *
-     * @example
-     * elem.removeCSS('display', 'position', 'margin');
-     */
-
-  }, {
-    key: 'removeCSS',
-    value: function removeCSS() {
-      var _arguments5 = arguments;
-
-      for (var _len8 = arguments.length, props = Array(_len8), _key9 = 0; _key9 < _len8; _key9++) {
-        props[_key9] = arguments[_key9];
-      }
-
-      return this.forEach(function (elem) {
-        iterate(_arguments5, function (css) {
-          elem.style.removeProperty(css);
-        });
-      });
-    }
-
-    /**
-     * @method Elem#replace
-     * @public
-     * @param {String|Elem|Element} element - Element to replace the first element in the set
-     * with a set of elements specified by the argument (Element, set of elements or a selector of them).
-     * @returns {Elem} Returns this.
-     * @description Method is similar to
-     * [Node#replaceChild]{@link https://developer.mozilla.org/en/docs/Web/API/Node/replaceChild}.
-     *
-     * @example
-     * elem.replace(elem2);
-     * elem.replace(document.getElementById('id'));
-     * elem.replace('#id div.c1');
-     */
-
-  }, {
-    key: 'replace',
-    value: function replace(element) {
-      element = toFind(element);
-
-      var parent = this.first().parent();
-
-      if (!parent.length) {
-        return this;
-      }
-
-      var elem = parent;
-      var method$$1 = 'into';
-      var next = this.next().first().$[0];
-      var prev = this.prev().first().$[0];
-
-      if (next) {
-        elem = next;
-        method$$1 = 'insertBefore';
-      } else if (prev) {
-        elem = prev;
-        method$$1 = 'insertAfter';
-      }
-
-      this.first().remove();
-
-      element[method$$1](elem);
-    }
-
-    /**
-     * @method Elem#setOf
-     * @public
-     * @param {String} type - HTML element type.
-     * @param {Number|Object|*[]} iterator - A number (how many elements to create inside each element),
-     * an object or an array to iterate over.
-     * @param {ElemSetOfCallback} callback
-     * @returns {Elem} New instance of Elem.
-     * @description Function for creating set of elements inside each element in the set based on an array or an object.
-     *
-     * @example
-     * table.setOf('tr', [[1, 2], [3, 4], [5, 6]], (row, array) => {
-     *   D(row).setOf('td', array, (col, number) => {
-     *     D(col).text(number);
-     *   });
-     * });
-     */
-
-  }, {
-    key: 'setOf',
-    value: function setOf(type, iterator, callback) {
-      validate$1({ 2: callback }, { 2: ['function'] }, 'Elem#setOf');
-
-      iterator = new Super(iterator).$;
-
-      if (isNumber(iterator)) {
-        try {
-          validate$1({ 1: iterator }, { 1: ['intLike', '>=0'] }, 'Elem#setOf');
-        } catch (e) {
-          throw new Error('2nd argument must be either or non-negative integer, or object! (at Elem#setOf)');
-        }
-
-        iterator = array(iterator).$;
-      }
-
-      return this.object(function (elems, elem, index) {
-        iterate(iterator, function (value, key) {
-          var created = new Elem(elem).create(type);
-
-          callback(created.$[0], value, key, iterator, elem, index);
-
-          elems.add(created);
-        });
-      }, new Elem());
-    }
-
-    /**
-     * @method Elem#show
-     * @public
-     * @returns {Elem} Returns this.
-     * @description Shows all elements in the set.
-     * If an element was hidden using {@link Elem#hide} previous display is set.
-     *
-     * @example
-     * elem.show();
-     */
-
-  }, {
-    key: 'show',
-    value: function show() {
-      return this.forEach(function (elem) {
-        var _elem = elem;
-        var dwayneData = _elem.dwayneData;
-
-
-        elem = new Elem(elem);
-
-        if (elem.css('display').indexOf('none') === 0) {
-          elem.css('display', dwayneData.previousDisplay);
-        }
-
-        dwayneData.previousDisplay = '';
-      });
-    }
-
-    /**
-     * @method Elem#text
-     * @public
-     * @param {String|ElemValueCallback|*} [text] - Text to write instead of current text.
-     * @returns {Elem|String} If no arguments passed text of the first element in the set returned.
-     * Otherwise all elements texts in the set are set to the text argument.
-     * @description Gets or sets text.
-     *
-     * @example
-     * elem.text('123');
-     * elem.text(); // '123'
-     */
-
-  }, {
-    key: 'text',
-    value: function text(_text) {
-      if (!arguments.length) {
-        return this.prop(textProperty);
-      }
-
-      return this.forEach(function (elem, index) {
-        var txt = elem[textProperty];
-
-        new Elem(elem).html('').addText(isFunction(_text) ? _text(txt, elem, index) : _text);
-      });
-    }
-
-    /**
-     * @method Elem#toggleAttr
-     * @public
-     * @param {String} attr - Attribute to toggle.
-     * @param {Boolean|*} [condition] - If present and the condition is truthy method adds the attribute
-     * with the '' value and if falsey method removes the attribute. If not present method adds
-     * the attribute if it doesn't exist and removes if it does.
-     * @returns {Elem} Returns this.
-     * @description Method for toggling attributes.
-     *
-     * @example
-     * elem.toggleAttr('attr');
-     * elem.toggleAttr('attr', someCondition);
-     */
-
-  }, {
-    key: 'toggleAttr',
-    value: function toggleAttr(attr, condition) {
-      var _arguments6 = arguments;
-
-      return this.forEach(function (elem) {
-        elem = new Elem(elem);
-
-        if (_arguments6.length < 2 ? !elem.hasAttr(attr) : condition) {
-          elem.attr(attr, '');
-        } else {
-          elem.removeAttr(attr);
-        }
-      });
-    }
-
-    /**
-     * @method Elem#toggleAttr
-     * @public
-     * @param {String} cls - Class to toggle.
-     * @param {Boolean|*} [condition] - If present and the condition is truthy method adds the class
-     * and if falsey method removes the class. If not present method adds
-     * the class if it doesn't exist and removes if it does.
-     * @returns {Elem} Returns this.
-     * @description Method for toggling classes.
-     *
-     * @example
-     * elem.toggleClass('cls');
-     * elem.toggleClass('cls', someCondition);
-     */
-
-  }, {
-    key: 'toggleClass',
-    value: function toggleClass(cls, condition) {
-      return (arguments.length < 2 ? !this.hasClass(cls) : condition) ? this.addClass(cls) : this.removeClass(cls);
-    }
-  }, {
-    key: 'up',
-
-
-    /**
-     * @method Elem#up
-     * @param {Integer} [level = 1] - What level up along the tree should be the parent.
-     * @returns {Elem} New instance of Elem.
-     * @description Creates a collection of parents of level &lt;level&gt;.
-     *
-     * @example
-     * elem.up();
-     * elem.up(2);
-     */
-    value: function up() {
-      var level = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-
-      validate$1([level], [['intLike', '>=0']], 'Elem#up');
-
-      level = Number(level);
-
-      return this.object(function (elems, elem) {
-        var n = level;
-
-        while (n-- && elem) {
-          elem = elem.parentElement;
-        }
-
-        elems.add(elem);
-      }, new Elem());
-    }
-
-    /**
-     * @method Elem#validate
-     * @public
-     * @param {ValidateCallback} [validator] - If present, function that validates inputs.
-     * @returns {Elem|Object.<String, Error|*>|{ form: Error?, inputs: <Object.<String, Error>>|null }|null}
-     * If a callback argument provided returns this. If no arguments provided returns either an object
-     * with input names keys and errors values or null if no errors found.
-     * @description If a callback argument provided adds it to the element validators list.
-     * If no arguments provided validates every input element in the set with its own functions.
-     * If an element is a form it validates all input elements inside it. After the validation
-     * fires 'validate' event with 'valid' and 'error' (if form it's errors) properties.
-     *
-     * @example
-     * form.on('input change', 'input', (value, input) => {
-     *   const $input = D(input);
-     *
-     *   if (Number(value) %3) {
-     *     $input.attr('invalid', '');
-     *
-     *     throw new Error('The value should be divided by 3!');
-     *   }
-     *
-     *   $input.removeAttr('invalid');
-     * });
-     */
-
-  }, {
-    key: 'validate',
-    value: function validate(validator) {
-      validate$1([validator], ['function||!'], 'Elem#validate');
-
-      if (validator) {
-        return this.forEach(function (_ref11) {
-          var dwayneData = _ref11.dwayneData;
-
-          dwayneData.validators.push(validator);
-        });
-      }
-
-      var errors = new Super({ errors: null });
-
-      this.filter(inputElements + ', form').forEach(function (elem, index) {
-        if (getName(elem) === 'form') {
-          var _ret = function () {
-            var formErrors = { errors: null };
-            var form = new Elem(elem);
-            var inputs = form.find(inputElements);
-
-            inputs.forEach(function (input, index) {
-              validatorWrap(input, index, formErrors);
-            });
-
-            errors.deepAssign(formErrors);
-
-            formErrors = formErrors.errors;
-
-            form.dispatch('validate', {}, {
-              valid: !formErrors,
-              errors: formErrors
-            });
-
-            return {
-              v: inputs.forEach(function (input) {
-                var inputError = (formErrors || {})[input.name];
-
-                new Elem(input).dispatch('validate', {}, {
-                  valid: !inputError,
-                  error: inputError || null
-                });
-              })
-            };
-          }();
-
-          if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
-        }
-
-        var inputError = { errors: null };
-
-        validatorWrap(elem, index, inputError);
-        errors.deepAssign(inputError);
-
-        inputError = (inputError.errors || {})[elem.name];
-
-        new Elem(elem).dispatch('validate', {}, {
-          valid: !inputError,
-          error: inputError || null
-        });
-      });
-
-      function validatorWrap(input, index, errors) {
-        try {
-          if (input.validity && !input.validity.valid) {
-            throw new Error(input.validationMessage);
-          }
-
-          input.dwayneData.validators.forEach(function (validator) {
-            validator(input.value, input, index);
-          });
-        } catch (err) {
-          (errors.errors = errors.errors || {})[input.name] = err;
-        }
-      }
-
-      if (errors.every(function (error) {
-        return isNull(error);
-      })) {
-        return null;
-      }
-
-      return errors.$.errors;
-    }
-
-    /**
-     * @method Elem#width
-     * @public
-     * @param {*|ElemValueCallback} [width] - Width to set.
-     * @returns {Elem|String} If no arguments passed width of the first element in the set returned.
-     * Otherwise all elements widths in the set are set to the width argument.
-     * @description Gets or sets width.
-     *
-     * @example
-     * elem.width(123);
-     * elem.width(); // 123
-     */
-
-  }, {
-    key: 'width',
-    value: function width(_width) {
-      return this.prop.apply(this, new Arr(arguments).unshift('width').$);
-    }
-  }, {
-    key: 'innerHeight',
-    get: function get() {
-      var elem = this.$[0];
-
-      if (!elem) {
-        return 0;
-      }
-
-      if (isWindow(elem)) {
-        return elem.innerHeight;
-      }
-
-      var _calcCSS = this.calcCSS();
-
-      var borderTopWidth = _calcCSS.borderTopWidth;
-      var borderBottomWidth = _calcCSS.borderBottomWidth;
-      var boxSizing = _calcCSS.boxSizing;
-      var height = _calcCSS.height;
-      var paddingTop = _calcCSS.paddingTop;
-      var paddingBottom = _calcCSS.paddingBottom;
-
-      var borders = px(borderTopWidth) + px(borderBottomWidth);
-      var paddings = px(paddingTop) + px(paddingBottom);
-
-      return px(height) - innerSwitcher(boxSizing, [paddings, borders]);
-    }
-
-    /**
-     * @member {Number} Elem#innerWidth
-     * @type {Number}
-     * @public
-     * @readonly
-     * @description Method for finding how much width content of the first element can be.
-     *
-     * @example
-     * elem.css({
-     *   boxSizing: 'border-box',
-     *   width: '200px',
-     *   paddingLeft: '2px',
-     *   paddingRight: '3px',
-     *   borderLeft: '1px solid black',
-     *   borderRight: '4px solid black'
-     * }).innerWidth; // 190
-     * elem
-     *   .css('box-sizing', 'content-box')
-     *   .innerWidth; // 200
-     * elem
-     *   .css('box-sizing', 'padding-box')
-     *   .innerWidth; // 195
-     */
-
-  }, {
-    key: 'innerWidth',
-    get: function get() {
-      var elem = this.$[0];
-
-      if (!elem) {
-        return 0;
-      }
-
-      if (isWindow(elem)) {
-        return elem.innerWidth;
-      }
-
-      var _calcCSS2 = this.calcCSS();
-
-      var borderLeftWidth = _calcCSS2.borderLeftWidth;
-      var borderRightWidth = _calcCSS2.borderRightWidth;
-      var boxSizing = _calcCSS2.boxSizing;
-      var paddingLeft = _calcCSS2.paddingLeft;
-      var paddingRight = _calcCSS2.paddingRight;
-      var width = _calcCSS2.width;
-
-      var borders = px(borderLeftWidth) + px(borderRightWidth);
-      var paddings = px(paddingLeft) + px(paddingRight);
-
-      return px(width) - innerSwitcher(boxSizing, [paddings, borders]);
-    }
-  }, {
-    key: 'name',
-    get: function get() {
-      return getName(this.$[0]);
-    }
-  }, {
-    key: 'outerHeight',
-    get: function get() {
-      var elem = this.$[0];
-
-      if (!elem) {
-        return 0;
-      }
-
-      if (isWindow(elem)) {
-        return elem.outerHeight;
-      }
-
-      var _calcCSS3 = this.calcCSS();
-
-      var borderTopWidth = _calcCSS3.borderTopWidth;
-      var borderBottomWidth = _calcCSS3.borderBottomWidth;
-      var boxSizing = _calcCSS3.boxSizing;
-      var height = _calcCSS3.height;
-      var marginTop = _calcCSS3.marginTop;
-      var marginBottom = _calcCSS3.marginBottom;
-      var paddingTop = _calcCSS3.paddingTop;
-      var paddingBottom = _calcCSS3.paddingBottom;
-
-      var borders = px(borderTopWidth) + px(borderBottomWidth);
-      var paddings = px(paddingTop) + px(paddingBottom);
-
-      return px(height) + px(marginTop) + px(marginBottom) + outerSwitcher(boxSizing, [borders, paddings]);
-    }
-
-    /**
-     * @member {Number} Elem#outerWidth
-     * @type {Number}
-     * @public
-     * @readonly
-     * @description Method for finding how much width the element actually is.
-     *
-     * @example
-     * elem.css({
-     *   boxSizing: 'border-box',
-     *   width: '200px',
-     *   paddingLeft: '2px',
-     *   paddingRight: '3px',
-     *   borderLeft: '1px solid black',
-     *   borderRight: '4px solid black'
-     *   marginLeft: '0px',
-     *   marginRight: '5px'
-     * }).outerWidth; // 205
-     * elem
-     *   .css('box-sizing', 'content-box')
-     *   .outerWidth; // 215
-     * elem
-     *   .css('box-sizing', 'padding-box')
-     *   .outerWidth; // 210
-     */
-
-  }, {
-    key: 'outerWidth',
-    get: function get() {
-      var elem = this.$[0];
-
-      if (!elem) {
-        return 0;
-      }
-
-      if (isWindow(elem)) {
-        return elem.outerWidth;
-      }
-
-      var _calcCSS4 = this.calcCSS();
-
-      var borderLeftWidth = _calcCSS4.borderLeftWidth;
-      var borderRightWidth = _calcCSS4.borderRightWidth;
-      var boxSizing = _calcCSS4.boxSizing;
-      var marginLeft = _calcCSS4.marginLeft;
-      var marginRight = _calcCSS4.marginRight;
-      var paddingLeft = _calcCSS4.paddingLeft;
-      var paddingRight = _calcCSS4.paddingRight;
-      var width = _calcCSS4.width;
-
-      var borders = px(borderLeftWidth) + px(borderRightWidth);
-      var paddings = px(paddingLeft) + px(paddingRight);
-
-      return px(width) + px(marginLeft) + px(marginRight) + outerSwitcher(boxSizing, [borders, paddings]);
-    }
-  }, {
-    key: 'toStringTag',
-    get: function get() {
-      return toStringTag(this.$$);
-    }
-  }]);
-  return Elem;
-}(Arr);
-
-defineProperties(Elem.prototype, defineProperty({}, _Symbol.toStringTag, 'Elem'));
-
-/**
- * @const {Elem} win
- * @type {Elem}
- * @public
- * @description Elem instance of window.
- */
-var win = new Elem(global$1);
-
-/**
- * @const {Elem} doc
- * @type {Elem}
- * @public
- * @description Elem instance of document.
- */
-var doc = new Elem(nativeDocument);
-
-/**
- * @const {Elem} html
- * @type {Elem}
- * @public
- * @description Elem instance of document.documentElement.
- */
-var html = new Elem(nativeDocument.documentElement);
-
-/**
- * @const {Elem} body
- * @type {Elem}
- * @public
- * @description Elem instance of document.body.
- */
-var body = new Elem(nativeDocument.body);
-
-/**
- * @const {Elem} head
- * @type {Elem}
- * @public
- * @description Elem instance of document.head.
- */
-var head$1 = new Elem(nativeDocument.head);
-
-dynamicDefineProperties(Elem.prototype, elements, function (elem) {
-  return function () {
-    return this.create.apply(this, new Arr(arguments).unshift(elem).$);
-  };
-});
-
-dynamicDefineProperties(Elem.prototype, canvasGetMethods, function (method$$1) {
-  return function () {
-    var ctx = this.ctx();
-
-    if (ctx) {
-      return ctx[method$$1].apply(ctx, arguments);
-    }
-  };
-});
-
-dynamicDefineProperties(Elem.prototype, canvasRestMethods, function (method$$1) {
-  return function () {
-    var ctx = this.ctx();
-
-    if (ctx) {
-      ctx[method$$1].apply(ctx, arguments);
-    }
-
-    return this;
-  };
-});
-
-/**
- * @function toFind
- * @private
- * @param {Element|Elem|String} elem - Element, selector of Elements or Elem.
- * @returns {Elem} Instance of Elem.
- */
-function toFind(elem) {
-  if (isString(elem)) {
-    elem = _find(elem);
-  }
-
-  return new Elem(elem);
-}
-
-/**
- * @function isElem
- * @private
- * @param {*} value - Value to check if it's Elem.
- * @returns {Boolean} If the value is Elem.
- * @description Returns if the value is Elem or not.
- */
-function isElem(value) {
-  return value instanceof Elem;
-}
-
-/**
- * @function isWindow
- * @private
- * @param {*} value - Value to check if it's Window.
- * @returns {Boolean} If the value is Window.
- * @description Returns if the value is Window or not.
- */
-function isWindow(value) {
-  return toStringTag(value) === 'Window';
-}
-
-/**
- * @function isHTMLDocument
- * @private
- * @param {*} value - Value to check if it's HTMLDocument.
- * @returns {Boolean} If the value is HTMLDocument.
- * @description Returns if the value is HTMLDocument or not.
- */
-function isHTMLDocument(value) {
-  return toStringTag(value) === 'HTMLDocument';
-}
-
-/**
- * @function getElem
- * @private
- * @param {Elem} elem - Element to check.
- * @returns {Element} The argument or a fallback if needed.
- */
-function getElem(elem) {
-  return elem.$[0] || emptyDiv;
-}
-
-/**
- * @function getName
- * @private
- * @param {Element} [elem] - Element which name is needed to know.
- * @returns {String} Elements name
- */
-function getName(elem) {
-  return elem && elem.tagName && elem.tagName.toLowerCase() || '';
-}
-
-/**
- * @function addDwayneData
- * @private
- * @param {Element} elem - Element to add dwayneData to.
- * @returns {void}
- */
-function addDwayneData(elem) {
-  if (!{}.hasOwnProperty.call(elem, 'dwayneData') && !isWindow(elem)) {
-    /**
-     * @member Element#dwayneData
-     * @type {Object}
-     * @protected
-     * @property {String} previousDisplay - Parameter used for hiding/showing elements.
-     * @property {Object.<String, Super>} removeListeners - Parameter used for remove event listeners.
-     * @property {CanvasRenderingContext2D} [ctx] - Canvas rendering context.
-     * @property {Arr} validators - Validators assigned to element.
-     * @description D data.
-     */
-    Object.defineProperty(elem, 'dwayneData', {
-      value: {
-        previousDisplay: '',
-        listeners: {},
-        ctx: getName(elem) === 'canvas' && elem.getContext('2d'),
-        validators: new Arr([])
-      }
-    });
-  } else if (!windowsDwayneData.some(function (_ref12) {
-    var element = _ref12.element;
-    return element === elem;
-  })) {
-    windowsDwayneData.push({
-      element: elem,
-      listeners: {}
-    });
-  }
-}
-
-constructors[2].push({
-  check: function check(elem) {
-    return isElement(elem) || isWindow(elem) || isHTMLDocument(elem) || /^(HTMLCollection|NodeList)$/.test(toStringTag(elem));
-  },
-  cls: Elem
-});
-
-/**
- * @function find
- * @public
- * @param {String} selector - Selector to find.
- * @param {Element} [base = document] - Base to find in.
- * @returns {Elem} New instance of Elem.
- * @description Synonym for
- * [Document#querySelectorAll]{@link https://developer.mozilla.org/en/docs/Web/API/Document/querySelectorAll}.
- */
-function _find(selector) {
-  var base = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : nativeDocument;
-
-  return new Elem(base.querySelectorAll(String(selector)));
-}
-
-/**
- * @function parseHTML
- * @public
- * @param {String} html - HTML to parse.
- * @returns {Elem} New instance of Elem.
- * @description Parses HTML and returns the contents.
- *
- * @example
- * parseHTML('&lt;div&gt;123&lt;/div&gt;'); // Elem
- */
-function parseHTML(html) {
-  return doc.div().html(html).children();
-}
-
-/**
- * @function px
- * @public
- * @param {String|Number} size - String containing pixels value or a number.
- * @returns {Number} Number of pixels.
- * @description Function for parsing pixel strings.
- *
- * @example
- * px('0px');  // 0
- * px('42px'); // 42
- */
-function px(size) {
-  return Number(String(size).replace(/px$/, ''));
-}
-
-/**
  * @module helpers/resolveURL
  * @private
  * @description Exports Object.assign-like method.
  */
 
-var _global$2 = global$1;
-var location$1 = _global$2.location;
+var _global$3 = global$1;
+var location$1 = _global$3.location;
 
 
 var resolveURL = (function (decodeQuery) {
-  var query = location$1.search;
-  var hash = location$1.hash;
+  var query = location$1.search,
+      hash = location$1.hash;
 
   var params = {
     query: {},
@@ -13001,26 +16413,23 @@ var resolveURL = (function (decodeQuery) {
   }
 
   new Str(query.replace(/^\?/, '')).split('&').forEach(function (rawParam) {
-    var _rawParam$split = rawParam.split('=');
-
-    var _rawParam$split2 = slicedToArray(_rawParam$split, 2);
-
-    var param = _rawParam$split2[0];
-    var _rawParam$split2$ = _rawParam$split2[1];
-    var value = _rawParam$split2$ === undefined ? '' : _rawParam$split2$;
-
+    var _rawParam$split = rawParam.split('='),
+        _rawParam$split2 = slicedToArray(_rawParam$split, 2),
+        param = _rawParam$split2[0],
+        _rawParam$split2$ = _rawParam$split2[1],
+        value = _rawParam$split2$ === undefined ? '' : _rawParam$split2$;
 
     param = decodeQuery ? decodeURIComponent(param) : param;
     value = decodeQuery ? decodeURIComponent(value) : value;
 
-    if (!/^[^\[]+/.test(param)) {
+    if (!/^[^[]+/.test(param)) {
       return;
     }
 
     var paramName = void 0;
     var paramObject = params.query;
 
-    new Str(param).match(/^[^\[\]]*|\[[^\[\]]*\]/g).forEach(function (name) {
+    new Str(param).match(/^[^[\]]*|\[[^[\]]*]/g).forEach(function (name) {
       if (name.indexOf('[')) {
         paramName = name;
 
@@ -13043,170 +16452,30 @@ var resolveURL = (function (decodeQuery) {
  * @module Router
  * @private
  * @mixin
- * @description Exports Router class.
+ * @description Exports Router.
  */
 
-/**
- * @typedef {Object} URLOptions
- * @public
- * @property {Object} [params = {}] - URL params.
- * @property {Object} [query = {}] - Query params.
- * @property {String} [hash = ''] - Hash.
- */
-
-/**
- * @event Router#event
- * @public
- * @description Router event.
- */
-
-/**
- * @method Router#event#pause
- * @public
- * @description Method that pauses the event propagation. Only {@link Router#event:beforeLeave} and
- * {@link Router#event:beforeLoad} can be paused.
- *
- * @example
- * event.pause();
- */
-
-/**
- * @method Router#event#continue
- * @public
- * @description Method that continues the event propagation. Only {@link Router#event:beforeLeave} and
- * {@link Router#event:beforeLoad} can be paused therefore continued.
- *
- * @example
- * event.continue();
- */
-
-/**
- * @method Router#event#stop
- * @public
- * @description Method that stops the event propagation. Only {@link Router#event:beforeLeave} and
- * {@link Router#event:beforeLoad} can be stopped.
- *
- * @example
- * event.stop();
- */
-
-/**
- * @method Router#event#go
- * @public
- * @description Method that prevents Router from loading the default state forcing the page
- * going directly to another URL.
- *
- * @example
- * event.go('/login');
- */
-
-/**
- * @method Router#event#redirectTo
- * @public
- * @description Method that prevents Router from loading the default state forcing the page
- * going directly to another URL.
- *
- * @example
- * event.go('/login');
- */
-
-/**
- * @event Router#event:init
- * @public
- * @property {String} type - 'init' string.
- * @description Router init event. Is fired on Router once after Router.init has been called
- * and Router initialization. It cannot be [paused]{@link Router#event#pause}
- * or [stopped]{@link Router#event#stop}.
- */
-
-/**
- * @event Router#event:beforeLeave
- * @public
- * @property {String} type - 'beforeLeave' string.
- * @property {Router} state - Initial state.
- * @property {String} toURL - URL the redirect goes to.
- * @description Router beforeLeave event. Is fired when an attempt to leave the state happened
- * (or it bubbled to the parent state). It can be [paused]{@link Router#event#pause}
- * and [stopped]{@link Router#event#stop}.
- */
-
-/**
- * @event Router#event:leave
- * @public
- * @property {String} type - 'leave' string.
- * @property {Router} state - Initial state.
- * @property {String} toURL - URL the redirect goes to.
- * @description Router leave event. Is fired right after {@link Router#event:beforeLeave} has been fired.
- * It cannot be [paused]{@link Router#event#pause} or [stopped]{@link Router#event#stop}.
- */
-
-/**
- * @event Router#event:reload
- * @public
- * @property {String} type - 'reload' string.
- * @description Router reload event. Is fired only on Router during {@link reload} is called.
- */
-
-/**
- * @event Router#event:beforeLoad
- * @public
- * @property {String} type - 'beforeLoad' string.
- * @property {Router} state - Eventual state.
- * @description Router beforeLoad event. Is fired when the URL has been already changed after
- * {@link Router#event:leave} has been fired, after the only {@link Router#event:init}
- * has been fired and after browser back or forward buttons has been pressed.
- * It can be [paused]{@link Router#event#pause} and [stopped]{@link Router#event#stop}
- * preventing the state from loading and causing going to the next matched state.
- * Is fired from the Router state down to the loading state.
- */
-
-/**
- * @event Router#event:load
- * @public
- * @property {String} type - 'leave' string.
- * @property {Router} state - Eventual state.
- * @description Router load event. Is fired right after {@link Router#event:beforeLoad} has been fired.
- * It cannot be [paused]{@link Router#event#pause} or [stopped]{@link Router#event#stop}.
- * Is fired from the Router state down to the loading state.
- */
-
-/**
- * @event Router#event:render
- * @public
- * @property {String} type - 'render' string.
- * @property {Router} state - Eventual state.
- * @property {Router} renderingState - Constructor of current rendering state.
- * @description Router load event. Is fired right after {@link Router#event:beforeLoad} has been fired.
- * It cannot be [paused]{@link Router#event#pause} or [stopped]{@link Router#event#stop}.
- * In order to render the state there should be an element with the "dwayne-router-state" attribute
- * set to the state name. States are rendered from the Router down to the current state.
- */
-
-/**
- * @callback RouterListener
- * @public
- * @param {Router#event} e - Fired event.
- */
-
-/**
- * @callback RouterRemoveListeners
- * @public
- * @param {String} [event] - If not specified all listeners are removed.
- * Otherwise only specified by the name are to be removed.
- */
-
-var extendLink = 'https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Classes#Sub_classing_with_extends';
-var stateAttrName = 'dwayne-router-state';
-var isPrototypeOf = {}.isPrototypeOf;
-var _global$1 = global$1;
-var history = _global$1.history;
-var location = _global$1.location;
-var _global$location = _global$1.location;
+var Routes = new Arr([]);
+var subscribers = new Super({});
+var _global$2 = global$1;
+var history = _global$2.history;
+var location = _global$2.location;
+var _global$location = _global$2.location;
 var origin = _global$location.origin;
 var href = _global$location.href;
 
-var stoppable = new Arr(['beforeLeave', 'beforeLoad']);
-var states = new Arr([]);
+var initialized = void 0;
+var pushed = void 0;
+var wasRoot = void 0;
+var wasDefault = void 0;
+var rootRoute = void 0;
+var redirectRoute = void 0;
+var RedirectRoute = void 0;
+var defaultRoute = void 0;
+var DefaultRoute = void 0;
+var currentRoute = void 0;
+var currentRouteParams = void 0;
+
 var pathSwitcher = switcher('call', function () {
   throw new Error('State path must be a string, a regular expression or undefined! (at registerState)');
 }).case(isRegExp, function (path) {
@@ -13215,7 +16484,7 @@ var pathSwitcher = switcher('call', function () {
     url: path,
     params: {}
   };
-}).case(isNullOrUndefined, function () {
+}).case(isNil, function () {
   return {
     path: '/',
     url: '/',
@@ -13223,7 +16492,7 @@ var pathSwitcher = switcher('call', function () {
   };
 }).case(isString, function (path) {
   if (path.indexOf('/')) {
-    throw new Error('If state path is a string it must start with "/"! (at registerState)');
+    throw new Error('If route path is a string it must start with "/"! (at registerState)');
   }
 
   var index = path.indexOf('?');
@@ -13231,13 +16500,13 @@ var pathSwitcher = switcher('call', function () {
   var newURL = '';
   var newPath = new Str(path).slice(0, index === -1 ? path.length : index).replace(/^\/|\/$/g).split(/\//).map(function (part, i, array$$1) {
     if (!part && array$$1.length > 1) {
-      throw new Error('If state path is a string it must not contain "//" or end with "/"! (at registerState)');
+      throw new Error('If route path is a string it must not contain "//" or end with "/"! (at makeRoute)');
     }
 
     var index = part.indexOf(':');
 
     if (index > 0) {
-      throw new Error('If state path is a string resource part must be either a string or an URL parameter! (at registerState)');
+      throw new Error('If route path is a string resource part must be either a string or an URL parameter! (at makeRoute)');
     }
 
     if (index === -1) {
@@ -13247,12 +16516,10 @@ var pathSwitcher = switcher('call', function () {
       };
     }
 
-    var _resolveParameter = resolveParameter(part.slice(1), 'URL parameter must not be an empty string or contain characters besides "a-zA-Z_$"! (at registerState)', 'URL parameter regexp validator must be within parentheses (e.g. :userId(\\d+) and not contain ones)! (at registerState)');
-
-    var name = _resolveParameter.name;
-    var _resolveParameter$reg = _resolveParameter.regexp;
-    var regexp = _resolveParameter$reg === undefined ? /[^\/]*/ : _resolveParameter$reg;
-
+    var _resolveParameter = resolveParameter(part.slice(1), 'URL parameter must not be an empty string or contain characters besides "a-zA-Z_$"! (at makeRoute)', 'URL parameter regexp validator must be within parentheses (e.g. :userId(\\d+) and not contain ones)! (at makeRoute)'),
+        name = _resolveParameter.name,
+        _resolveParameter$reg = _resolveParameter.regexp,
+        regexp = _resolveParameter$reg === undefined ? /[^/]*/ : _resolveParameter$reg;
 
     params.$[name] = params.count;
 
@@ -13262,9 +16529,9 @@ var pathSwitcher = switcher('call', function () {
       value: regexp
     };
   }).word(function (_ref) {
-    var type = _ref.type;
-    var url = _ref.url;
-    var value = _ref.value;
+    var type = _ref.type,
+        url = _ref.url,
+        value = _ref.value;
 
     var newPath = void 0;
 
@@ -13285,992 +16552,503 @@ var pathSwitcher = switcher('call', function () {
     params: params.$
   };
 });
-var selectorMatchesSwitcher = switcher('call', function (selector) {
-  return function (name) {
-    return name === selector;
-  };
-}).case(isNull, function (selector) {
-  return function (name) {
-    return true;
-  };
-}).case(isRegExp, function (selector) {
-  return function (name) {
-    return selector.test(name);
-  };
-}).case(isArray, function (selector) {
-  return function (name) {
-    return selector.indexOf(name) !== -1;
-  };
-});
 
-var eventPromise = Promise$1.resolve();
-var pushed = void 0;
-var initialized = void 0;
-var routerLoaded = void 0;
-var router = void 0;
-var pageTitle = void 0;
-var pageIcon = void 0;
-var defaultState = void 0;
-var currentState = void 0;
-var currentTitle = void 0;
-var currentIcon = void 0;
-var initTitle = void 0;
-var initIcon = void 0;
-var initHTML = void 0;
-
-/**
- * @class Router
- * @public
- * @param {Object} props - Always pass props to the super constructor from the Router subclasses.
- * @returns {Router} New instance of Router state.
- * @description Wrap of an array.
- *
- * @example
- * Class for routing the app. It uses [History API]{@link https://developer.mozilla.org/en/docs/Web/API/History_API}.
- * You can redirect and go to parts of your app not reloading the page (changing the URL).
- * URLs and queries can be validates. There can hooks (such as {@link Router#event:beforeLoad},
- * {@link Router#event:load}, {@link Router#event:beforeLeave}, {@link Router#event:leave}
- * and {@link Router#event:render}). Don't try to call new <YourState>() or new Router().
- * All following examples contain proposed syntax for class properties.
- */
-var Router = function () {
-  createClass(Router, null, [{
-    key: 'buildURL',
-
-
-    /**
-     * @method Router.buildURL
-     * @public
-     * @param {URLOptions} [options = {}] - URL options.
-     * @returns {String} Built URL.
-     * @description Method for building URLs that guaranteed to be matched by this state.
-     * Works properly only after {@link Router#event:init} has been fired.
-     *
-     * @example
-     * class MyState extends Router {
-     *   static stateName = 'myState';
-     *   static path = '/user/:userId';
-     * }
-     *
-     * registerState(MyState);
-     *
-     * Router.on('init', () => {
-     *   MyState.buildURL({
-     *     params: {
-     *       userId: 42
-     *     },
-     *     query: {
-     *       param: 'value'
-     *     }
-     *   }); // '<yourOrigin>/user/42?param=value'
-     * });
-     */
-    value: function buildURL() {
-      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-      var url = this.url;
-
-
-      if (isRegExp(url)) {
-        throw new Error('URL can be built only from the string URLs! (Router.buildURL)');
-      }
-
-      var _options$params = options.params;
-      var params = _options$params === undefined ? {} : _options$params;
-      var _options$query = options.query;
-      var query = _options$query === undefined ? {} : _options$query;
-      var _options$hash = options.hash;
-      var hash = _options$hash === undefined ? '' : _options$hash;
-
-
-      return constructURL(origin, url, params, query, hash, {
-        params: this.encodeParams,
-        query: this.encodeQuery
-      });
-    }
-
-    /**
-     * @method Router.go
-     * @public
-     * @fires Router#event:beforeLeave
-     * @param {URLOptions} [options = {}] - URL options.
-     * @description Method combines {@link Router#buildURL} and {@link go}.
-     *
-     * @example
-     * class MyState extends Router {
-     *   static stateName = 'myState';
-     *   static path = '/user/:userId';
-     * }
-     *
-     * registerState(MyState);
-     *
-     * Router.on('init', () => {
-     *   MyState.go({
-     *     params: {
-     *       userId: 42
-     *     },
-     *     query: {
-     *       param: 'value'
-     *     }
-     *   });
-     * });
-     */
-
-  }, {
-    key: 'go',
-    value: function go(options) {
-      if (this.abstract) {
-        throw new Error('Cannot go to an abstract state! (at Router.go)');
-      }
-
-      _go(this.buildURL(options));
-    }
-
-    /**
-     * @method Router.redirect
-     * @public
-     * @fires Router#event:beforeLeave
-     * @param {URLOptions} [options = {}] - URL options.
-     * @description Method combines {@link Router#buildURL} and {@link redirectTo}.
-     *
-     * @example
-     * class MyState extends Router {
-     *   static stateName = 'myState';
-     *   static path = '/user/:userId';
-     * }
-     *
-     * registerState(MyState);
-     *
-     * Router.on('init', () => {
-     *   MyState.redirect({
-     *     params: {
-     *       userId: 42
-     *     },
-     *     query: {
-     *       param: 'value'
-     *     }
-     *   });
-     * });
-     */
-
-  }, {
-    key: 'redirect',
-    value: function redirect(options) {
-      if (this.abstract) {
-        throw new Error('Cannot go to an abstract state! (at Router.go)');
-      }
-
-      redirectTo(this.buildURL(options));
-    }
-
-    /**
-     * @method Router.init
-     * @public
-     * @fires Router#event:init
-     * @description Method for initializing Router.
-     * Note that method like {@link Router.buildURL} and {@link Router.go}
-     * don't work properly until the 'init' event is fired. In order to initialize Router
-     * there should be an element with the "dwayne-router" id (content of the Router states).
-     *
-     * @example
-     * Router.init();
-     */
-
-  }, {
-    key: 'init',
-    value: function init() {
-      initialized = true;
-
-      initialize();
-    }
-
-    /**
-     * @method Router.on
-     * @public
-     * @listens Router#event
-     * @param {String|Object.<String|Listener>} event - Either a event string
-     * or an object with event keys and listeners values.
-     * @param {String|String[]|RegExp} selector - String, array of strings or
-     * a regular expression to filter states by the state name. Render event is treated
-     * the special way: current rendering state name is compared to the selector.
-     * @param {RouterListener} [listener] - If the first argument is a string it must be
-     * a listener function for specified event.
-     * @returns {RouterRemoveListeners} Function that can remove listeners that has just been set.
-     * @description Method for listening to all events you want. beforeLeave
-     */
-
-  }, {
-    key: 'on',
-    value: function on(event) {
-      var _this = this;
-
-      var selector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-      var listener = arguments[2];
-
-      if (isFunction(selector)) {
-        listener = selector;
-        selector = null;
-      }
-
-      if (isString(event)) {
-        event = defineProperty({}, event, listener);
-      }
-
-      var listeners = this.$$.listeners;
-
-      var allListeners = {};
-      var matchesSelector = selectorMatchesSwitcher(selector);
-
-      iterate(event, function (listener, event) {
-        var array$$1 = listeners[event] || new Arr([]);
-        var newListener = function newListener(e) {
-          var name = e.state && e.state.name;
-
-          if (e.renderingState) {
-            name = e.renderingState.stateName;
-          }
-
-          if (matchesSelector(name)) {
-            listener.call(_this, e);
-          }
-        };
-
-        newListener.toString = function () {
-          return listener.toString();
-        };
-
-        allListeners[event] = newListener;
-        (listeners[event] = array$$1).push(newListener);
-      });
-
-      return function removeEventListeners(event) {
-        var actualListeners = allListeners;
-
-        if (allListeners[event]) {
-          actualListeners = defineProperty({}, event, allListeners[event]);
-        }
-
-        iterate(actualListeners, function (listener, event) {
-          var eventListeners = listeners[event];
-
-          var found = eventListeners.find(function (l) {
-            return l === listener;
-          });
-
-          if (found) {
-            eventListeners.splice(found.key, 1);
-          }
-        });
-      };
-    }
-
-    // TODO: Router#store
-
-    /**
-     * @member {Elem} Router#base
-     * @type {Elem}
-     * @public
-     * @description State rendering base node.
-     * Created before firing {@link Router#event:render}.
-     */
-
-
-    /**
-     * @member {String} Router#name
-     * @type {String}
-     * @public
-     * @description State name (inherited from the constructor).
-     * Created during state initialization.
-     */
-
-
-    /**
-     * @member {Object} Router#params
-     * @type {Object}
-     * @public
-     * @description State URL params.
-     * Created during state initialization.
-     */
-
-
-    /**
-     * @member {Object} Router#query
-     * @type {Object}
-     * @public
-     * @description State query params.
-     * Created during state initialization.
-     */
-
-
-    /**
-     * @member {String} Router#hash
-     * @type {String}
-     * @public
-     * @description State query params.
-     * Created during state initialization.
-     */
-
-
-    /**
-     * @member {Object} Router#templateParams
-     * @type {Object}
-     * @public
-     * @description State template params. Inherited from the constructor template params.
-     * Can be changed before rendering in beforeLoad or load event listeners.
-     * Created during state initialization.
-     */
-
-  }, {
-    key: 'default',
-
-
-    /**
-     * @member {Router} Router.default
-     * @type {Router}
-     * @public
-     * @description Works with Router only. Default Router state.
-     */
-
-
-    /**
-     * @member {Boolean} Router.icon
-     * @type {String}
-     * @public
-     * @description URL to the state icon (one within the tab). To set icons you should create a link element
-     * with "dwayne-router-icon" id. Router will set href itself.
-     * Not required and inherited from the parent state. Router default value is null.
-     */
-
-
-    /**
-     * @member {Boolean} Router.encodeQuery
-     * @type {Boolean}
-     * @public
-     * @description If the query params should be encoded during the URL building (see {@link Router.buildURL}).
-     * Not required and inherited from the parent state. Router default value is true.
-     */
-
-
-    /**
-     * @member {Boolean} Router.encodeParams
-     * @type {Boolean}
-     * @public
-     * @description If the URL params should be encoded during the URL building (see {@link Router.buildURL}).
-     * Not required and inherited from the parent state. Router default value is true.
-     */
-
-
-    /**
-     * @member {Object} Router.templateParams
-     * @type {Object}
-     * @public
-     * @description State template params (for javascript templates).
-     * During the Router initialization are inherited from the parent state template params.
-     * Not required and defaults to {}.
-     */
-
-
-    /**
-     * @member {String|RegExp} Router.path
-     * @type {String|RegExp}
-     * @public
-     * @description State path relative to the parent state. Must begin with "/" if present.
-     * Not required and defaults to "/".
-     */
-
-
-    /**
-     * @member {Boolean} Router.abstract
-     * @type {Boolean}
-     * @public
-     * @description If the states should be abstract or not. Abstract state cannot be current state.
-     * This field is not required and defaults to false.
-     */
-
-
-    /**
-     * @member {Object} Router.query
-     * @type {Object}
-     * @protected
-     * @description State query params. Generated during the state registration.
-     */
-
-
-    /**
-     * @member {String|RegExp} Router.relativeURL
-     * @type {String|RegExp}
-     * @protected
-     * @description State matching relative URL. Generated during the state registration.
-     */
-
-
-    /**
-     * @member {String} Router.url
-     * @type {String}
-     * @protected
-     * @description State matching URL. Generated during the router initialization.
-     */
-
-
-    /**
-     * @member {Arr} Router.children
-     * @type {Arr}
-     * @protected
-     * @description Children states.
-     */
-
-    /**
-     * @member {Object} Router.$$
-     * @type {Object}
-     * @protected
-     * @property {Object} listeners - State listeners.
-     * @property {Arr} [states] - All states. Only Router has this property.
-     * @property {Router} [state] - Current state. Only Router has this property.
-     * @description Config object.
-     */
-    get: function get() {
-      return defaultState;
-    }
-    // noinspection JSAnnotator
-
-
-    /**
-     * @member {Boolean} Router.title
-     * @type {String}
-     * @public
-     * @description App title (one within the tab). To set title you should create a title element
-     * with "dwayne-router-title" id. Router will set the value itself.
-     * Not required and inherited from the parent state. Router default value is null.
-     */
-
-
-    /**
-     * @member {Boolean} Router.decodeQuery
-     * @type {Boolean}
-     * @public
-     * @description If the query params should be decoded during the state initialization.
-     * Not required and inherited from the parent state. Router default value is true.
-     */
-
-
-    /**
-     * @member {Boolean} Router.decodeParams
-     * @type {Boolean}
-     * @public
-     * @description If the URL params should be decoded during the state initialization.
-     * Not required and inherited from the parent state. Router default value is true.
-     */
-
-
-    /**
-     * @member {Object} Router.elements
-     * @type {Object}
-     * @public
-     * @description State view elements selectors and event listeners.
-     * Before rendering these elements are found within the rendering state
-     * and assigned to the state. Events will be eventually lowercased.
-     * Event listeners are set to the specified events and elements
-     * and already bound to the state. Not required and defaults to {}.
-     *
-     * @example
-     * class MyState extends Router {
-     *   static stateName = 'myState';
-     *   static elements = {
-     *     caption: '.caption',
-     *     form: {
-     *       $: '.form',
-     *
-     *       $onSubmit: 'onSubmit',
-     *
-     *       emailInput: 'input[type="email"]',
-     *       passwordInput: 'input[type="password"]'
-     *     },
-     *     container: {
-     *       $: '.container',
-     *
-     *       nestedContainer: {
-     *         $: '.nested-container',
-     *
-     *         $onClick: 'onNestedContainerClick',
-     *
-     *         content: '.content'
-     *       }
-     *     }
-     *   };
-     *
-     *   logEvent(e) {
-     *     console.log(e);
-     *   }
-     *
-     *   onSubmit(e) {
-     *     this.logEvent(e);
-     *
-     *     console.log('submitting form');
-     *   }
-     *
-     *   onNestedContainerClick(e) {
-     *     this.logEvent(e);
-     *
-     *     console.log('clicked container');
-     *   }
-     *
-     *   onRender() {
-     *     console.log(this.caption); // instance of Elem
-     *     console.log(this.form);    // instance of Elem
-     *     console.log(this.content); // instance of Elem
-     *
-     *     // etc
-     *   }
-     * }
-     *
-     * // this is an equivalent to
-     *
-     * class MyState extends Router {
-     *   static stateName = 'myState';
-     *
-     *   logEvent(e) {
-     *     console.log(e);
-     *   }
-     *
-     *   onSubmit(e) {
-     *     this.logEvent(e);
-     *
-     *     console.log('submitting form');
-     *   }
-     *
-     *   onNestedContainerClick(e) {
-     *     this.logEvent(e);
-     *
-     *     console.log('clicked container');
-     *   }
-     *
-     *   onRender() {
-     *     const { base } = this;
-     *
-     *     this.caption         = base.find('.caption');
-     *     this.form            = base.find('.form');
-     *     this.emailInput      = base.find('.form input[type="email"]');
-     *     this.passwordInput   = base.find('.form input[type="password"]');
-     *     this.container       = base.find('.container');
-     *     this.nestedContainer = base.find('.container .nested-container');
-     *     this.content         = base.find('.container .nested-container .content');
-     *
-     *     this.form.on('submit', this.onSubmit.bind(this));
-     *     this.nestedContainer.on('click', this.onNestedContainerClick.bind(this));
-     *
-     *     // your usual onRender code goes here
-     *   }
-     * }
-     */
-
-
-    /**
-     * @member {String|Function} Router.template
-     * @type {String|Function}
-     * @public
-     * @description State template. Can be either a static string template
-     * or a generated function from your javascript templates provider.
-     * Not required and defaults to "".
-     */
-
-
-    /**
-     * @member {String} Router.stateName
-     * @type {String}
-     * @public
-     * @description A unique name bound to state. Required.
-     */
-
-
-    /**
-     * @member {Super} Router.elems
-     * @type {Super}
-     * @protected
-     * @description State elements selectors. Generated during the state registration.
-     */
-
-
-    /**
-     * @member {Object} Router.params
-     * @type {Object}
-     * @protected
-     * @description State URL params. Generated during the state registration.
-     */
-
-
-    /**
-     * @member {String} Router.relativePath
-     * @type {String}
-     * @protected
-     * @description State matching relative path. Generated during the state registration.
-     */
-
-
-    /**
-     * @member {RegExp} Router.validatePath
-     * @type {RegExp}
-     * @protected
-     * @description Regexp to validate the URL. Created during the router initialization.
-     */
-
-
-    /**
-     * @member {Router} Router.parent
-     * @type {Router}
-     * @protected
-     * @description Parent state.
-     */
-    ,
-    set: function set(state) {
-      if (states.indexOf(state) === -1) {
-        throw new Error('State must be registered! (Router.default)');
-      }
-
-      var abstract = state.abstract;
-      var path = state.path;
-      var params = state.params;
-      var query = state.query;
-
-
-      if (abstract) {
-        throw new Error('Default state must not be abstract! (Router.default)');
-      }
-
-      if (isRegExp(path)) {
-        throw new Error('Default state must not have regexp path! (Router.default)');
-      }
-
-      if (new Super(params).count || new Super(query).count) {
-        throw new Error('Default state must not have URL or query params! (Router.default)');
-      }
-
-      defaultState = state;
-    }
-  }]);
-
-  function Router() {
-    var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    classCallCheck(this, Router);
-    this.base = router;
-    this.name = null;
-    this.params = {};
-    this.query = {};
-    this.hash = '';
-    this.templateParams = new Super(new Super(this).proto().$.constructor.templateParams).create().$;
-
-    assign$1(this, props);
-  }
-
-  /**
-   * @method Router#onBeforeLeave
-   * @public
-   * @listens Router#event:beforeLeave
-   * @param {Router#event:beforeLeave} event - Fired event.
-   * @description Called on beforeLeave event. Called after the listeners.
-   */
-
-
-  createClass(Router, [{
-    key: 'onBeforeLeave',
-    value: function onBeforeLeave() {}
-
-    /**
-     * @method Router#onBeforeLoad
-     * @public
-     * @listens Router#event:beforeLoad
-     * @param {Router#event:beforeLoad} event - Fired event.
-     * @description Called on beforeLoad event. Called after the listeners.
-     */
-
-  }, {
-    key: 'onBeforeLoad',
-    value: function onBeforeLoad() {}
-
-    /**
-     * @method Router#onInit
-     * @public
-     * @listens Router#event:init
-     * @param {Router#event:init} event - Fired event.
-     * @description Called on init event. Called after the listeners.
-     */
-
-  }, {
-    key: 'onInit',
-    value: function onInit() {}
-
-    /**
-     * @method Router#onLeave
-     * @public
-     * @listens Router#event:leave
-     * @param {Router#event:leave} event - Fired event.
-     * @description Called on leave event. Called after the listeners.
-     */
-
-  }, {
-    key: 'onLeave',
-    value: function onLeave() {}
-
-    /**
-     * @method Router#onLoad
-     * @public
-     * @listens Router#event:load
-     * @param {Router#event:load} event - Fired event.
-     * @description Called on load event. Called after the listeners.
-     */
-
-  }, {
-    key: 'onLoad',
-    value: function onLoad() {}
-
-    /**
-     * @method Router#onRender
-     * @public
-     * @listens Router#event:render
-     * @param {Router#event:render} event - Fired event.
-     * @description Called on render event. Called after the listeners.
-     */
-
-  }, {
-    key: 'onRender',
-    value: function onRender() {}
-  }]);
-  return Router;
-}();
-
-Router.$$ = {
-  listeners: {},
-  state: null,
-  states: states
-};
-Router.parent = null;
-Router.children = new Arr([]);
-Router.validatePath = /^\/$/;
-Router.url = '/';
-Router.relativePath = '/';
-Router.relativeURL = '/';
-Router.params = {};
-Router.query = {};
-Router.elems = new Super({});
-Router.abstract = false;
-Router.stateName = null;
-Router.path = '/';
-Router.template = '';
-Router.templateParams = {};
-Router.elements = {};
-Router.encodeParams = true;
-Router.decodeParams = true;
-Router.encodeQuery = true;
-Router.decodeQuery = true;
-Router.icon = null;
-Router.title = null;
-var MainState = Router.prototype;
-
-defaultState = Router;
-
-var RouterError = function RouterError() {
-  classCallCheck(this, RouterError);
-};
-
-var stopError = new RouterError();
-
-/**
- * @function redirect
- * @private
- * @param {String} newURL - New URL to go to.
- * @param {Boolean} [push] - If it's need to push state or rather replace it.
- */
-function redirect(newURL, push) {
-  eventPromise = eventPromise.then(function () {
-    return beforeLeave(newURL);
-  }).then(function () {
-    (currentState ? currentState.base : new Elem([])).hide().html('');
-
-    changeHistory(newURL, push);
-  }).then(function () {
-    currentState = Router.$$.state = null;
-  }).then(beforeLoad).catch(printError);
-}
-
-/**
- * @function beforeLeave
- * @private
- * @param {String} newURL - New URL to go to.
- * @returns {Promise}
- */
-function beforeLeave(newURL) {
-  return Promise$1.resolve().then(function () {
-    return dispatchNewEvent('beforeLeave');
-  }).then(function () {
-    return dispatchNewEvent('leave');
+var Route = function Route(options) {
+  classCallCheck(this, Route);
+
+  options = options || {};
+
+  var _ref2 = options || {},
+      name = _ref2.name,
+      _ref2$path = _ref2.path,
+      path = _ref2$path === undefined ? '/' : _ref2$path,
+      _ref2$abstract = _ref2.abstract,
+      abstract = _ref2$abstract === undefined ? false : _ref2$abstract,
+      parent = _ref2.parent,
+      _ref2$decodeQuery = _ref2.decodeQuery,
+      decodeQuery = _ref2$decodeQuery === undefined ? true : _ref2$decodeQuery,
+      _ref2$encodeQuery = _ref2.encodeQuery,
+      encodeQuery = _ref2$encodeQuery === undefined ? true : _ref2$encodeQuery,
+      _ref2$decodeParams = _ref2.decodeParams,
+      decodeParams = _ref2$decodeParams === undefined ? true : _ref2$decodeParams,
+      _ref2$encodeParams = _ref2.encodeParams,
+      encodeParams = _ref2$encodeParams === undefined ? true : _ref2$encodeParams;
+
+  var _pathSwitcher = pathSwitcher(path),
+      relativeURL = _pathSwitcher.url,
+      relativePath = _pathSwitcher.path,
+      params = _pathSwitcher.params;
+
+  var query = {};
+
+  new Super(this).assign({
+    name: name,
+    parentName: parent,
+    abstract: !!abstract,
+    children: new Arr([]),
+    decodeParams: !!decodeParams,
+    decodeQuery: !!decodeQuery,
+    encodeParams: !!encodeParams,
+    encodeQuery: !!encodeQuery,
+    params: params,
+    query: query,
+    relativePath: relativePath,
+    relativeURL: relativeURL
   });
 
-  function dispatchNewEvent(type) {
-    return dispatchEvent(type, {
-      type: type,
-      state: currentState,
-      toURL: newURL
+  var index = isString(path) ? path.indexOf('?') : -1;
+
+  if (index !== -1) {
+    new Str(path).replace(/&$/).slice(index + 1).split('&').forEach(function (param) {
+      var _resolveParameter2 = resolveParameter(param, 'Query parameter must not be an empty string or contain characters besides "a-zA-Z_$"! (at makeRoute)', 'Query parameter regexp validator must be within parentheses (e.g. :userId(\\d+)) and not contain them! (at makeRoute)'),
+          name = _resolveParameter2.name,
+          _resolveParameter2$re = _resolveParameter2.regexp,
+          regexp = _resolveParameter2$re === undefined ? /[\s\S]*/ : _resolveParameter2$re;
+
+      query[name] = new RegExp('^' + regexp.source.replace(/\\\//g, '/') + '$');
     });
   }
-}
 
-/**
- * @function beforeLoad
- * @private
- * @returns {Promise}
- */
-function beforeLoad() {
-  var _resolveURL = resolveURL(Router.decodeQuery);
+  if (name === defaultRoute && (new Super(params).count || new Super(query).count)) {
+    throw new Error('Default route must not have URL or query params! (at makeRoute)');
+  }
+};
 
-  var hash = _resolveURL.hash;
+var baseRoute = new Route();
 
-  var newState = void 0;
+function initRouter() {
+  if (initialized) {
+    return;
+  }
 
-  return Promise$1.resolve().then(function () {
-    return loadStatesByOne();
-  }).then(function () {
-    currentState = Router.$$.state = newState;
+  initialized = true;
+  RedirectRoute = (Routes.find(function (_ref3) {
+    var name = _ref3.name;
+    return name === redirectRoute;
+  }) || {}).value;
+  DefaultRoute = (Routes.find(function (_ref4) {
+    var name = _ref4.name;
+    return name === defaultRoute;
+  }) || {}).value;
 
-    return dispatchNewEvent('load');
-  }).then(function () {
-    var proto = new Super(newState).proto().$.constructor;
-    var renderStates = new Arr([proto]);
-    var _newState = newState;
-    var stateName = _newState.stateName;
-    var templateParams = _newState.templateParams;
-    var title = proto.title;
-    var icon = proto.icon;
+  if (redirectRoute && !RedirectRoute) {
+    throw new Error('There is no specified fallback route ("' + redirectRoute + '")! (at initRouter)');
+  }
 
-    var ownTemplateParams = new Super(templateParams).clone();
-    var state = proto;
-    var promise = Promise$1.resolve();
+  Routes.forEach(function (route) {
+    var parentName = route.parentName,
+        name = route.name;
 
-    while (!getStateBase(state).length && (state = state.parent)) {
-      renderStates.unshift(state);
+    var ParentName = parentName || rootRoute;
+
+    var _ref5 = Routes.find(function (_ref6) {
+      var name = _ref6.name;
+      return name === ParentName;
+    }) || {},
+        parent = _ref5.value;
+
+    if (!parent) {
+      throw new Error('No such parent route ("' + ParentName + '") found for the route ("' + name + '")! (at initRouter)');
     }
 
-    _find('[' + stateAttrName + ']').forEach(function (elem) {
-      elem = new Elem(elem);
+    if (!parent.abstract && name !== rootRoute) {
+      throw new Error('Parent route must be abstract (for "' + name + '")! (at initRouter)');
+    }
 
-      var stateNameFromAttr = elem.attr(stateAttrName);
+    if (name !== rootRoute) {
+      route.parentName = ParentName;
+    }
 
-      var _ref2 = states.find(function (_ref3) {
-        var stateName = _ref3.stateName;
-        return stateName === stateNameFromAttr;
-      }) || {};
+    route.parent = name === rootRoute ? baseRoute : parent;
+  }).forEach(function (route) {
+    var name = route.name,
+        _route$parent = route.parent,
+        parentParams = _route$parent.params,
+        parentQuery = _route$parent.query,
+        path = _route$parent.path,
+        params = route.params,
+        query = route.query,
+        relativeURL = route.relativeURL,
+        relativePath = route.relativePath;
 
-      var foundState = _ref2.value;
+    var proto = route;
+    var count = 0;
+    var newPath = relativePath;
+    var newURL = '';
 
+    if (isRegExp(path)) {
+      throw new Error('URL regexp route cannot be extended! (at initRouter)');
+    }
 
-      if (!foundState || stateNameFromAttr !== stateName && !(newState instanceof foundState)) {
-        elem.hide().html('');
+    while (proto = proto.parent) {
+      count += new Super(proto.params).count;
+      newPath = proto.relativePath + newPath;
+      newURL = proto.relativeURL + newURL;
+
+      proto.children.push(route);
+    }
+
+    newPath = new RegExp('^' + (newPath.replace(/\/+/g, '/').replace(/\/$/, '') || '/') + '$');
+    newURL = isRegExp(relativeURL) ? newPath : (newURL + relativeURL).replace(/\/+/g, '/').replace(/\/$/, '') || '/';
+
+    new Super(query).proto(parentQuery);
+    new Super(params).proto(parentParams).forEach(function (value, key, params) {
+      params[key] += count;
+    });
+
+    if (name === defaultRoute && (new Super(params).count || new Super(query).count)) {
+      throw new Error('Default route must not have URL or query params! (at initRouter)');
+    }
+
+    route.url = newURL;
+    route.validatePath = newPath;
+  });
+
+  changeRoute();
+
+  win.on({
+    popstate: function popstate() {
+      if (location.href !== href) {
+        pushed = true;
       }
-    });
 
-    renderStates.forEach(function (state) {
-      var template = state.template;
-      var parentTemplateParams = state.templateParams;
-      var elems = state.elems;
+      if (pushed) {
+        changeRoute();
+      }
+    },
+    click: function click(e) {
+      var closestLink = new Elem(e.target).closest('a');
 
-      var templateParams = new Super(parentTemplateParams).create().assign(ownTemplateParams).$;
+      if (closestLink.length && closestLink.attr('target') !== '_blank') {
+        e.preventDefault();
 
-      promise = promise.then(function () {
-        var base = getStateBase(state).first().show();
+        forward(closestLink.attr('href') || '', true);
+      }
+    }
+  });
+}
 
-        try {
-          base.html(isFunction(template) ? template(templateParams) : template);
-        } catch (err) {
-          console.error('%s %o', 'Render error:', err);
-        }
+function makeRoute(options) {
+  var _ref7 = options || {},
+      name = _ref7.name,
+      path = _ref7.path,
+      abstract = _ref7.abstract,
+      root = _ref7.root,
+      fallbackTo = _ref7.fallbackTo,
+      isDefault = _ref7.default;
 
-        base.find('[' + stateAttrName + ']').hide();
+  if (initialized) {
+    console.warn('Router was already initialized (at makeRoute)');
 
-        newState.base = base;
-
-        new Super(newState).assign(elems.map(function (_ref4) {
-          var selector = _ref4.selector;
-          var listeners = _ref4.listeners;
-
-          var elem = base.find(selector);
-
-          listeners.forEach(function (listenerName, event) {
-            var listener = new Func(newState[listenerName]).bindContext(newState);
-
-            if (isFunction(listener)) {
-              elem.on(event, listener);
-            }
-          });
-
-          return elem;
-        }).$);
-
-        if (state === proto) {
-          if (!isNull(title) && title !== currentTitle) {
-            pageTitle.text(currentTitle = title);
-          }
-
-          if (!isNull(icon) && icon !== currentIcon) {
-            pageIcon.ref(currentIcon = icon);
-          }
-        }
-
-        return dispatchNewEvent('render', state);
-      });
-    });
-
-    return promise;
-  }).catch(printError);
-
-  function dispatchNewEvent(type, renderingState) {
-    return dispatchEvent(type, {
-      type: type,
-      state: newState
-    }, renderingState);
+    return self$1;
   }
 
-  function loadStatesByOne() {
-    var promise = Promise$1.reject(stopError);
+  if (wasRoot && root) {
+    throw new Error('There can\'t be two root routes ("' + rootRoute + '" and "' + name + '")! (at makeRoute)');
+  }
 
-    findStatesByURL().forEach(function (_ref5) {
-      var state = _ref5.state;
-      var params = _ref5.params;
-      var query = _ref5.query;
+  if (wasDefault && isDefault) {
+    throw new Error('There can\'t be two default routes ("' + defaultRoute + '" and "' + name + '")! (at makeRoute)');
+  }
 
-      promise = promise.catch(function (err) {
-        if (err instanceof RouterError && err.type === 'redirect') {
-          throw err;
+  if (!name) {
+    throw new Error('State must have a non-empty string "name" property! (at makeRoute)');
+  }
+
+  if (Routes.some(function (_ref8) {
+    var Name = _ref8.name;
+    return Name === name;
+  })) {
+    throw new Error('State must have unique "name" property! (at makeRoute)');
+  }
+
+  if (root) {
+    wasRoot = true;
+    rootRoute = name;
+    options.parent = null;
+
+    if (fallbackTo) {
+      redirectRoute = fallbackTo;
+    }
+  }
+
+  if (isDefault) {
+    wasDefault = true;
+    defaultRoute = name;
+
+    if (abstract) {
+      throw new Error('Default route can\'t be abstract! (at makeRoute)');
+    }
+
+    if (isRegExp(path)) {
+      throw new Error('Default route can\'t have a regexp path! (at makeRoute)');
+    }
+  }
+
+  var route = new Route(options);
+
+  Routes.push(route);
+
+  var unsubscribe = void 0;
+  var routeLoaded = void 0;
+
+  return function (Block) {
+    var _class, _temp;
+
+    return _temp = _class = function (_Block) {
+      inherits(_class, _Block);
+
+      function _class(opts) {
+        classCallCheck(this, _class);
+
+        var _this = possibleConstructorReturn(this, (_class.__proto__ || Object.getPrototypeOf(_class)).call(this, opts));
+
+        if (root) {
+          (function () {
+            initRouter();
+
+            var router = {
+              buildURL: function buildURL(name) {
+                var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+                var _ref9 = Routes.find(function (_ref10) {
+                  var n = _ref10.name;
+                  return n === name;
+                }) || {},
+                    route = _ref9.value;
+
+                if (!route) {
+                  throw new Error('There are no routes with name "' + name + '"! (at router.buildURL)');
+                }
+
+                var url = route.url,
+                    encodeParams = route.encodeParams,
+                    encodeQuery = route.encodeQuery;
+
+
+                if (isRegExp(url)) {
+                  throw new Error('URL can be built only from the string URLs! (at router.buildURL)');
+                }
+
+                var _options$params = options.params,
+                    params = _options$params === undefined ? {} : _options$params,
+                    _options$query = options.query,
+                    query = _options$query === undefined ? {} : _options$query,
+                    _options$hash = options.hash,
+                    hash = _options$hash === undefined ? '' : _options$hash;
+
+
+                return constructURL(origin, url, params, query, hash, {
+                  params: encodeParams,
+                  query: encodeQuery
+                });
+              },
+              go: function go(name, options) {
+                forward(router.buildURL(name, options), true);
+              },
+              goToURL: function goToURL(url) {
+                forward(url, true);
+              },
+              pushURL: function pushURL(url) {
+                changeHistory(url, true);
+              },
+              redirect: function redirect(name, options) {
+                forward(router.buildURL(name, options));
+              },
+              redirectToURL: function redirectToURL(url) {
+                forward(url);
+              },
+              replaceURL: function replaceURL(url) {
+                changeHistory(url);
+              }
+            };
+
+            _this.global.router = router;
+          })();
         }
 
-        printError(err);
+        _this.__isCurrentRoute__ = route === currentRoute || route.children.indexOf(currentRoute) !== -1;
+        _this.args.route = currentRouteParams;
 
-        newState = new state({
-          name: state.stateName,
-          params: params,
-          query: query,
-          hash: hash
+        routeLoaded = false;
+        unsubscribe = subscribe(name, function () {
+          var isCurrentRoute = route === currentRoute || route.children.indexOf(currentRoute) !== -1;
+
+          if (isCurrentRoute) {
+            callBeforeLoad(_this);
+          } else {
+            callBeforeLeave(_this);
+          }
+
+          _this.args.route = currentRouteParams;
+          _this.__isCurrentRoute__ = isCurrentRoute;
         });
 
-        return dispatchNewEvent('beforeLoad');
-      });
-    });
-
-    return promise.catch(function (err) {
-      if (err instanceof RouterError && err.type === 'redirect') {
-        changeHistory(err.url, err.push);
-
-        return loadStatesByOne();
+        if (_this.__isCurrentRoute__) {
+          callBeforeLoad(_this);
+        }
+        return _this;
       }
 
-      throw err;
-    });
+      createClass(_class, [{
+        key: 'beforeRemove',
+        value: function beforeRemove() {
+          unsubscribe();
+          unsubscribe = null;
+          callBeforeLeave(this);
+        }
+      }]);
+      return _class;
+    }(Block), _class.template = '<div class="route-' + name + '" d-show="{__isCurrentRoute__}">' + Block.template + '</div>', _temp;
+  };
+
+  function callBeforeLoad(route) {
+    if (route.beforeLoadRoute && !routeLoaded) {
+      try {
+        route.beforeLoadRoute();
+      } catch (err) {
+        console.error('Uncaught error in ' + name + '#beforeLeave:', err);
+      }
+    }
+
+    routeLoaded = true;
+  }
+
+  function callBeforeLeave(route) {
+    if (route.beforeLeaveRoute && routeLoaded) {
+      try {
+        route.beforeLeaveRoute();
+      } catch (err) {
+        console.error('Uncaught error in ' + name + '#beforeLeave:', err);
+      }
+    }
+
+    routeLoaded = false;
   }
 }
 
-/**
- * @function changeHistory
- * @private
- * @param {String} url - URL to go to.
- * @param {Boolean} push - If the state is needed to be pushed or replaced.
- * @description Function for manipulating history.
- */
+function subscribe(name, callback) {
+  subscribers.$[name] = callback;
+
+  return function () {
+    subscribers.delete(name);
+  };
+}
+
+function forward(url, push) {
+  changeHistory(url, push);
+  changeRoute();
+}
+
+function changeRoute() {
+  var route = findRouteByURL();
+
+  if (route) {
+    var _route = route;
+    currentRoute = _route.route;
+    currentRouteParams = objectWithoutProperties(_route, ['route']);
+
+    assign$1(currentRouteParams, {
+      name: currentRoute.name,
+      host: location.host,
+      hostname: location.hostname,
+      href: location.href,
+      origin: location.origin,
+      pathname: location.pathname,
+      port: location.port,
+      protocol: location.protocol,
+      search: location.search
+    });
+  } else {
+    if (redirectRoute) {
+      var _RedirectRoute = RedirectRoute,
+          url = _RedirectRoute.url,
+          encodeParams = _RedirectRoute.encodeParams,
+          encodeQuery = _RedirectRoute.encodeQuery;
+
+
+      return forward(constructURL(origin, url, {}, {}, '', {
+        params: encodeParams,
+        query: encodeQuery
+      }));
+    }
+
+    currentRoute = null;
+    currentRouteParams = null;
+  }
+
+  subscribers.forEach(function (callback) {
+    return callback();
+  });
+}
+
+function findRouteByURL() {
+  var pathname = location.pathname || '/';
+  var search = location.search || '';
+  var urlParams = void 0;
+
+  Routes.some(function (route) {
+    if (route.abstract) {
+      return;
+    }
+
+    var routeURL = route.url,
+        validatePath = route.validatePath,
+        params = route.params,
+        requiredQuery = route.query,
+        decodeParams = route.decodeParams,
+        decodeQuery = route.decodeQuery;
+
+    var resolved = resolveURL(decodeQuery);
+    var query = new Super(resolved.query);
+    var eventualParams = {};
+    var match = ((pathname.replace(/\/$/, '') || '/') + (isRegExp(routeURL) ? search : '')).match(validatePath);
+
+    if (!match) {
+      return;
+    }
+
+    /* eslint guard-for-in: 0 */
+    for (var param in requiredQuery) {
+      if (!query.hasOwn(param) || !requiredQuery[param].test(query.$[param])) {
+        return;
+      }
+    }
+
+    match.shift();
+
+    for (var _param in params) {
+      eventualParams[_param] = decode(match[params[_param]], decodeParams);
+    }
+
+    urlParams = {
+      route: route,
+      params: eventualParams,
+      query: query.$,
+      hash: resolved.hash
+    };
+
+    return true;
+  });
+
+  if (urlParams) {
+    return urlParams;
+  }
+
+  if (!defaultRoute) {
+    return;
+  }
+
+  return _extends({
+    route: DefaultRoute,
+    params: {}
+  }, resolveURL(DefaultRoute.decodeQuery));
+}
+
+function decode(string, decodeParams) {
+  return decodeParams ? decodeURIComponent(string) : string;
+}
+
 function changeHistory(url, push) {
   try {
     history[push ? 'pushState' : 'replaceState'](null, null, url);
@@ -14280,56 +17058,8 @@ function changeHistory(url, push) {
   }
 }
 
-/**
- * @function decode
- * @private
- * @param {String} string - String to decode.
- * @param {Boolean} decodeParams - If the string should be decoded in the first place.
- * @returns {String} Decoded string.
- */
-function decode(string, decodeParams) {
-  return decodeParams ? decodeURIComponent(string) : string;
-}
-
-/**
- * @function printError
- * @private
- * @param {Error} err - Error to log.
- */
-function printError(err) {
-  if (!(err instanceof RouterError)) {
-    console.error('%s %o', 'Uncaught (in event listener)', err);
-  }
-}
-
-/**
- * @function getStateBase
- * @param {Router} state - State to find the base of.
- * @returns {Elem} State base.
- */
-function getStateBase(state) {
-  return state === Router ? router : _find('[' + stateAttrName + '="' + state.stateName + '"]');
-}
-
-/**
- * @function isInstanceOfRouterState
- * @param {Router} state - State to find out if it extends Router.
- * @returns {Boolean} If the state extends Router.
- */
-function isInstanceOfRouterState(state) {
-  return isPrototypeOf.call(Router, state) || isPrototypeOf.call(MainState, state.prototype);
-}
-
-/**
- * @function resolveParameter
- * @private
- * @param {String} param - Param to resolve.
- * @param {String} nameErrorName - Name error description.
- * @param {String} valueErrorName - Name error description.
- * @returns {{ name: String, regexp: RegExp|undefined }}
- */
 function resolveParameter(param, nameErrorName, valueErrorName) {
-  var nameMatch = param.match(/^[a-z_\$]+/i);
+  var nameMatch = param.match(/^[a-z_$]+/i);
 
   if (!nameMatch) {
     throw new Error(nameErrorName);
@@ -14353,499 +17083,6 @@ function resolveParameter(param, nameErrorName, valueErrorName) {
   };
 }
 
-/**
- * @function findStatesByURL
- * @private
- * @returns {Arr} Arr of matching states.
- */
-function findStatesByURL() {
-  var pathname = location.pathname || '/';
-  var search = location.search || '';
-  var eventualStates = states.object(function (states, state) {
-    if (state.abstract) {
-      return;
-    }
-
-    var stateURL = state.url;
-    var validatePath = state.validatePath;
-    var params = state.params;
-    var requiredQuery = state.query;
-    var decodeParams = state.decodeParams;
-    var decodeQuery = state.decodeQuery;
-
-    var query = new Super(resolveURL(decodeQuery).query);
-    var eventualParams = {};
-    var match = ((pathname.replace(/\/$/, '') || '/') + (isRegExp(stateURL) ? search : '')).match(validatePath);
-
-    if (!match) {
-      return false;
-    }
-
-    /* eslint guard-for-in: 0 */
-    for (var param in requiredQuery) {
-      if (!query.hasOwn(param) || !requiredQuery[param].test(query.$[param])) {
-        return;
-      }
-    }
-
-    match.shift();
-
-    for (var _param in params) {
-      eventualParams[_param] = decode(match[params[_param]], decodeParams);
-    }
-
-    states.push({
-      state: state,
-      params: eventualParams,
-      query: query.$
-    });
-  }, new Arr([]));
-
-  if (eventualStates.every(function (_ref6) {
-    var state = _ref6.state;
-    return state !== defaultState;
-  })) {
-    eventualStates.push({
-      state: defaultState,
-      params: {},
-      query: resolveURL(defaultState.decodeQuery).query
-    });
-  }
-
-  return eventualStates;
-}
-
-/**
- * @function dispatchEvent
- * @private
- * @param {String} event - Event to be fired.
- * @param {Object} [assigned] - Properties to be assigned to the event.
- * @param {Router} [renderingState] - Current state.
- */
-function dispatchEvent(event, assigned, renderingState) {
-  var eventualEvent = new Super({}).value({
-    type: event
-  }).value(assigned || {}).$;
-  var type = eventualEvent.type;
-  var state = eventualEvent.state;
-
-  var isStoppable = stoppable.indexOfStrict(type) !== -1 && state && (new Super(state).proto().$.constructor !== defaultState || type !== 'beforeLoad');
-
-  var paused = void 0;
-  var stopped = void 0;
-  var continuePropagation = function continuePropagation() {};
-  var stopPropagation = function stopPropagation() {};
-  var redirect = function redirect() {};
-  var promise = Promise$1.resolve();
-  var currentState = void 0;
-
-  new Super(eventualEvent).get('renderingState', function () {
-    return currentState;
-  }).value({
-    continue: function _continue() {
-      if (isStoppable) {
-        paused = false;
-        continuePropagation();
-      }
-    },
-    pause: function pause() {
-      if (isStoppable) {
-        paused = true;
-      }
-    },
-    stop: function stop() {
-      if (isStoppable) {
-        stopped = true;
-        stopPropagation();
-      }
-    },
-    go: function go(url) {
-      if (isStoppable && type === 'beforeLoad') {
-        redirect(url, true);
-      }
-    },
-    redirectTo: function redirectTo(url) {
-      if (isStoppable && type === 'beforeLoad') {
-        redirect(url);
-      }
-    }
-  });
-
-  getListeners(state, type, renderingState).forEach(function (_ref7) {
-    var renderingState = _ref7.renderingState;
-    var listener = _ref7.listener;
-
-    promise = promise.then(function () {
-      return new Promise$1(function (resolve, reject) {
-        currentState = renderingState;
-
-        var finished = false;
-
-        continuePropagation = function continuePropagation() {
-          if (finished) {
-            resolve();
-          }
-        };
-
-        redirect = function redirect(url, push) {
-          var err = new RouterError();
-
-          err.type = 'redirect';
-          err.push = push;
-          err.url = url;
-
-          reject(err);
-        };
-
-        stopPropagation = function stopPropagation() {
-          reject(stopError);
-        };
-
-        listener(eventualEvent);
-
-        finished = true;
-
-        if (stopped) {
-          return reject(stopError);
-        }
-
-        if (!paused) {
-          resolve();
-        }
-      });
-    });
-  });
-
-  return promise.catch(function (err) {
-    if (isStoppable) {
-      throw err;
-    }
-
-    printError(err);
-  });
-}
-
-/**
- * @function getListeners
- * @private
- * @param {Router} state - State to get listeners from.
- * @param {String} type - Event type.
- * @param {Router} [renderingState] - If the type is "render" then it's current rendering state.
- */
-function getListeners() {
-  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Super(MainState).create().$;
-  var type = arguments[1];
-  var renderingState = arguments[2];
-
-  var tree = new Arr([]);
-  var desc = /leave/i.test(type);
-  var method$$1 = desc ? 'push' : 'unshift';
-  var listenerName = 'on' + new Str(type).capitalizeFirst();
-  var proto = new Super(state).proto().$.constructor;
-
-  while (proto) {
-    if (!renderingState || isPrototypeOf.call(proto, renderingState) || renderingState === proto) {
-      tree[method$$1](proto);
-    }
-
-    proto = proto.parent;
-  }
-
-  return tree.object(function (listeners, _ref8) {
-    var ownListeners = _ref8.$$.listeners;
-    var proto = _ref8.prototype;
-
-    if (new Super(proto).hasOwn(listenerName)) {
-      listeners.push({
-        renderingState: renderingState,
-        listener: new Func(proto[listenerName]).bindContext(state)
-      });
-    }
-
-    listeners.push.apply(listeners, (ownListeners[type] || new Arr([])).map(function (listener) {
-      return {
-        renderingState: renderingState,
-        listener: listener
-      };
-    }).$);
-  }, new Arr([]));
-}
-
-/**
- * @function initialize
- * @private
- */
-function initialize() {
-  if (!initialized || routerLoaded) {
-    return;
-  }
-
-  routerLoaded = true;
-  pageTitle = _find('#dwayne-router-title').first();
-  pageIcon = _find('#dwayne-router-icon').first();
-  router = _find('#dwayne-router').first();
-  initHTML = router.html() || '';
-  initTitle = pageTitle.text() || '';
-  initIcon = pageIcon.ref() || '';
-
-  _find('[' + stateAttrName + ']').hide();
-
-  defineProperties(MainState, {
-    base: router
-  });
-
-  win.on('click', function (e) {
-    var closestLink = new Elem(e.target).closest('a');
-
-    if (closestLink.length && closestLink.attr('target') !== '_blank') {
-      e.preventDefault();
-
-      redirect(closestLink.attr('href') || '', true);
-    }
-  });
-
-  states.forEach(function (state) {
-    var _state$parent = state.parent;
-    var children = _state$parent.children;
-    var parentParams = _state$parent.params;
-    var parentQuery = _state$parent.query;
-    var parentTemplateParams = _state$parent.templateParams;
-    var params = state.params;
-    var query = state.query;
-    var templateParams = state.templateParams;
-    var relativeURL = state.relativeURL;
-    var relativePath = state.relativePath;
-
-    var proto = state;
-    var count = 0;
-    var newPath = relativePath;
-    var newURL = '';
-
-    while (proto = proto.parent) {
-      count += new Super(proto.params).count;
-      newPath = proto.relativePath + newPath;
-      newURL = proto.relativeURL + newURL;
-    }
-
-    newPath = new RegExp('^' + (newPath.replace(/\/+/g, '/').replace(/\/$/, '') || '/') + '$');
-    newURL = isRegExp(relativeURL) ? newPath : (newURL + relativeURL).replace(/\/+/g, '/').replace(/\/$/, '') || '/';
-
-    children.push(state);
-
-    new Super(templateParams).proto(parentTemplateParams);
-    new Super(query).proto(parentQuery);
-    new Super(params).proto(parentParams).forEach(function (value, key, params) {
-      params[key] += count;
-    });
-
-    defineProperties(state, {
-      url: newURL,
-      validatePath: newPath
-    });
-  });
-
-  eventPromise = eventPromise.then(function () {
-    return dispatchEvent('init');
-  }).then(function () {
-    return beforeLoad();
-  }).then(function () {
-    win.on('popstate', function () {
-      if (location.href !== href) {
-        pushed = true;
-      }
-
-      if (pushed) {
-        eventPromise = eventPromise.then(function () {
-          return beforeLoad();
-        });
-      }
-    });
-  });
-}
-
-/**
- * @function go
- * @public
- * @fires Router#event:beforeLeave
- * @param {String} url - URL to go to.
- * @returns {void}
- * @description Function for directing to an URL. Can be external one or inner one.
- *
- * @example
- * go('/user/56');
- */
-function _go(url) {
-  redirect(url, true);
-}
-
-/**
- * @function redirectTo
- * @public
- * @fires Router#event:beforeLeave
- * @param {String} url - URL to go to.
- * @returns {void}
- * @description Function for redirecting to an URL. Can be external one or inner one.
- *
- * @example
- * redirectTo('/user/56');
- */
-function redirectTo(url) {
-  redirect(url);
-}
-
-/**
- * @function reload
- * @public
- * @fires Router#event:beforeLeave
- * @returns {void}
- * @description Fires {@link Router#event:beforeLeave}, {@link Router#event:leave}
- * as usual, then resets router content, page title and icon to initial content,
- * fires {@link Router#event:reload} and then loads page like if it was the first time.
- */
-function reload() {
-  eventPromise = eventPromise.then(function () {
-    return beforeLeave(location.href);
-  }).then(function () {
-    router.html(initHTML);
-    pageTitle.text(initTitle);
-    pageIcon.ref(initIcon);
-  }).then(function () {
-    currentState = Router.$$.state = null;
-  }).then(function () {
-    return dispatchEvent('reload');
-  }).then(beforeLoad).catch(printError);
-}
-
-/**
- * @function registerState
- * @public
- * @param {Router} state - State to register.
- * @returns {void}
- * @description Function for registering states.
- *
- * @example
- * class MyState extends Router {
- *   static stateName = 'myState';
- *   static path = '/user/:userId';
- * }
- *
- * registerState(MyState);
- */
-function registerState(state) {
-  if (states.indexOf(state) !== -1) {
-    return;
-  }
-
-  if (!isInstanceOfRouterState(state)) {
-    throw new Error('State must extend (' + extendLink + ') Router! (at registerState)');
-  }
-
-  var stateName = state.stateName;
-
-
-  if (!new Super(state).hasOwn('stateName') || states.find(function (_ref9) {
-    var n = _ref9.stateName;
-    return n === stateName;
-  })) {
-    throw new Error('State must have unique stateName! (at registerState)');
-  }
-
-  var proto = Object.getPrototypeOf(state);
-
-  if (isRegExp(proto.url)) {
-    throw new Error('URL regexp state cannot be extended! (at registerState)');
-  }
-
-  var $state = new Super(state);
-  var path = $state.hasOwn('path') ? state.path : '/';
-
-  var _pathSwitcher = pathSwitcher(path);
-
-  var relativeURL = _pathSwitcher.url;
-  var relativePath = _pathSwitcher.path;
-  var params = _pathSwitcher.params;
-
-  var elems = new Super({});
-
-  if ($state.hasOwn('elements')) {
-    var elements = state.elements;
-
-
-    new Super(elements).deepForEach(function (value, key, object, tree) {
-      tree = new Arr(tree);
-
-      tree.reverse().shift();
-
-      var selectors = tree.map(function (_ref10) {
-        var value = _ref10.value;
-        return String(value.$ || value || '');
-      });
-
-      if (key === '$' || /\$on[\s\S]/.test(key)) {
-        var name = tree.$[tree.length - 2].key;
-        var elem = elems.$[name] = elems.$[name] || {
-          listeners: new Super({})
-        };
-
-        if (key === '$') {
-          selectors.pop();
-
-          elem.selector = selectors.join(' ');
-        } else {
-          elem.listeners.$[key.replace(/^\$on[\s\S]/, function (match) {
-            return match[3] || '';
-          }).toLowerCase()] = value;
-        }
-
-        return;
-      }
-
-      elems.$[key] = {
-        selector: selectors.join(' '),
-        listeners: new Super({})
-      };
-    });
-  }
-
-  defineProperties(state, {
-    $$: {
-      listeners: {}
-    },
-
-    stateName: stateName,
-    path: path,
-    parent: proto,
-    children: new Arr([]),
-    template: $state.hasOwn('template') ? state.template : '',
-    relativeURL: relativeURL,
-    relativePath: relativePath,
-    params: params,
-    abstract: $state.hasOwn('abstract') && !!state.abstract,
-    templateParams: $state.hasOwn('templateParams') ? state.templateParams : {},
-    elems: elems,
-    query: {}
-  });
-
-  var query = state.query;
-
-  var index = isString(path) ? path.indexOf('?') : -1;
-
-  if (index !== -1) {
-    new Str(path).replace(/&$/).slice(index + 1).split('&').forEach(function (param) {
-      var _resolveParameter2 = resolveParameter(param, 'Query parameter must not be an empty string or contain characters besides "a-zA-Z_$"! (at registerState)', 'Query parameter regexp validator must be within parentheses (e.g. :userId(\\d+)) and not contain them! (at registerState)');
-
-      var name = _resolveParameter2.name;
-      var _resolveParameter2$re = _resolveParameter2.regexp;
-      var regexp = _resolveParameter2$re === undefined ? /[\s\S]*/ : _resolveParameter2$re;
-
-
-      query[name] = new RegExp('^' + regexp.source.replace(/\\\//g, '/') + '$');
-    });
-  }
-
-  states.push(state);
-}
-
 
 
 var statics = Object.freeze({
@@ -14862,7 +17099,7 @@ var statics = Object.freeze({
 	isIntegerLike: isIntegerLike,
 	isNaN: isNaN,
 	isNull: isNull,
-	isNullOrUndefined: isNullOrUndefined,
+	isNil: isNil,
 	isNumber: isNumber,
 	isNumberLike: isNumberLike,
 	isObject: isObject,
@@ -14879,16 +17116,20 @@ var statics = Object.freeze({
 	iterate: iterate$1,
 	BlobObject: BlobObject,
 	blob: blob$1,
+	Block: Block,
+	Mixin: Mixin,
+	initApp: initApp,
+	wrap: wrap,
 	Dat: Dat,
 	now: now,
 	date: date,
-	find: _find,
 	Elem: Elem,
 	win: win,
 	doc: doc,
 	html: html,
 	body: body,
 	head: head$1,
+	find: _find,
 	parseHTML: parseHTML,
 	px: px,
 	Fetch: Fetch,
@@ -14902,12 +17143,7 @@ var statics = Object.freeze({
 	rand: rand,
 	random: random,
 	Promise: Promise$1,
-	go: _go,
-	Router: Router,
-	redirectTo: redirectTo,
-	reload: reload,
-	registerState: registerState,
-	get currentState () { return currentState; },
+	makeRoute: makeRoute,
 	Str: Str,
 	parseJSON: parseJSON,
 	Super: Super,
@@ -14921,7 +17157,6 @@ var D$$1 = D$2;
 
 assign$1(D$$1, statics);
 
-delete D$$1.default;
 delete D$$1.D;
 
-export { D$2 as D, isArray, isArrayLike, isBoolean, isDate, isDateLike, isElement, isFinite, isFunction, isInteger, isIntegerLike, isNaN, isNull, isNullOrUndefined, isNumber, isNumberLike, isObject, isPlainObject, isPrimitive, isRegExp, isString, isSymbol, isUndefined, Alphabet, alphabet, Arr, array, iterate$1 as iterate, BlobObject, blob$1 as blob, Dat, now, date, _find as find, Elem, win, doc, html, body, head$1 as head, parseHTML, px, Fetch, fetch, Func, method, noop, prop$1 as prop, self$1 as self, Num, rand, random, Promise$1 as Promise, _go as go, Router, redirectTo, reload, registerState, currentState, Str, parseJSON, Super, Switcher, switcher, when };export default D$$1;
+export { D$2 as D, isArray, isArrayLike, isBoolean, isDate, isDateLike, isElement, isFinite, isFunction, isInteger, isIntegerLike, isNaN, isNull, isNil, isNumber, isNumberLike, isObject, isPlainObject, isPrimitive, isRegExp, isString, isSymbol, isUndefined, Alphabet, alphabet, Arr, array, iterate$1 as iterate, BlobObject, blob$1 as blob, Block, Mixin, initApp, wrap, Dat, now, date, Elem, win, doc, html, body, head$1 as head, _find as find, parseHTML, px, Fetch, fetch, Func, method, noop, prop$1 as prop, self$1 as self, Num, rand, random, Promise$1 as Promise, makeRoute, Str, parseJSON, Super, Switcher, switcher, when };export default D$$1;
