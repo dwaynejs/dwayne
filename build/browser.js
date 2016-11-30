@@ -17325,7 +17325,7 @@ function makeRoute(options) {
         }
       }]);
       return _class;
-    }(Block), _class.template = '<div class="route-' + name + '" d-show="{__isCurrentRoute__}">' + Block.template + '</div>', _temp;
+    }(Block), _class.template = '<div class="dwayne-route route-' + name + '" d-show="{__isCurrentRoute__}">' + Block.template + '</div>', _temp;
   };
 
   function callBeforeLoad(route) {
