@@ -13865,6 +13865,7 @@ var svgNS = 'http://www.w3.org/2000/svg';
 var onEvalError = void 0;
 var evalMode = void 0;
 var getting = void 0;
+var changed = void 0;
 
 /**
  * @class Block
@@ -14056,21 +14057,18 @@ var Block = function () {
 
                     watcher.onRemove = function () {
                       localWatchers.forEach(function (watcherBlock) {
-                        var localWatcher = watcherBlock.watcher;
+                        var watcher = watcherBlock.watcher;
                         var watchers = watcherBlock.watchers;
 
                         var index1 = watchersToRemove.indexOf(watcherBlock);
+                        var index2 = watchers.indexOf(watcher);
 
                         if (index1 !== -1) {
                           watchersToRemove.splice(index1, 1);
                         }
 
-                        if (watcher !== localWatcher) {
-                          var index2 = watchers.indexOf(watcher);
-
-                          if (index2 !== -1) {
-                            watchers.splice(index2, 1);
-                          }
+                        if (index2 !== -1) {
+                          watchers.splice(index2, 1);
                         }
                       });
                     };
@@ -14119,12 +14117,34 @@ var Block = function () {
     }
   }
 
+  /**
+   * @method Block#afterConstruct
+   * @public
+   * @description Is called after block construction (including all scopes)
+   * but before rendering the block and its children.
+   */
+
+
   createClass(Block, [{
     key: 'afterConstruct',
     value: function afterConstruct() {}
+
+    /**
+     * @method Block#afterRender
+     * @public
+     * @description Is called after block has been rendered.
+     */
+
   }, {
     key: 'afterRender',
     value: function afterRender() {}
+
+    /**
+     * @method Block#afterRender
+     * @public
+     * @description Is called before the block removal.
+     */
+
   }, {
     key: 'beforeRemove',
     value: function beforeRemove() {}
@@ -14188,60 +14208,260 @@ var Block = function () {
     }
 
     /**
+     * @method Block#watch
+     * @public
+     * @param {...String} [args] - Vars to watch (args, global or local).
+     * @param {Watcher} watcher - Called when watched vars are changed.
+     * @description Method for watching for vars. If no vars passed in arguments
+     * all vars are to be watched. Otherwise specified vars will be watched.
+     * Watchers should not be put inside the constructor. It is considered best
+     * practice to do it inside the {@link Block#afterConstruct} method.
+     * Note that these expressions (vars, i.e. "args.arg") are not to be
+     * evaluated so you cannot put there things like "a[b]" or any js code,
+     * only expressions like "a", "b", "args.a", "args.b" and "global.a", "global.b".
+     *
+     * @example
+     * class MyBlock extends Block {
+     *   static template = '<div />';
+     *
+     *   afterConstruct() {
+     *     this.watch('a', () => {});
+     *     this.watch('args.a', 'global.r', () => {});
+     *     this.watch(() => {});
+     *   }
+     * }
+     */
+
+  }, {
+    key: 'watch',
+    value: function watch() {
+      var _this3 = this;
+
+      var watcher = arguments[arguments.length - 1];
+
+      if (!isFunction(watcher)) {
+        return;
+      }
+
+      if (arguments.length === 1) {
+        for (var _global2 in this.$$.global) {
+          /* eslint guard-for-in: 0 */
+          this.$$.global[_global2].watchers.perm.push(watcher);
+        }
+
+        iterate(this.$$.args, function (_ref2) {
+          var watchers = _ref2.watchers;
+
+          watchers.perm.push(watcher);
+        });
+
+        return iterate(this.$$.locals, function (_ref3) {
+          var watchers = _ref3.watchers;
+
+          watchers.perm.push(watcher);
+        });
+      }
+
+      iterate(arguments, function (variable) {
+        if (variable === watcher) {
+          return;
+        }
+
+        variable = '' + variable;
+
+        if (/^args\./.test(variable)) {
+          variable = variable.replace(/^args\./, '');
+
+          if (!_this3.$$.args[variable]) {
+            return;
+          }
+
+          _this3.$$.args[variable].watchers.perm.push(watcher);
+
+          return;
+        }
+
+        if (/^global\./.test(variable)) {
+          variable = variable.replace(/^global\./, '');
+
+          if (!_this3.$$.global[variable]) {
+            return;
+          }
+
+          _this3.$$.global[variable].watchers.perm.push(watcher);
+
+          return;
+        }
+
+        if (!_this3.$$.locals[variable]) {
+          return;
+        }
+
+        _this3.$$.locals[variable].watchers.perm.push(watcher);
+      });
+    }
+
+    /**
      * @method Block#watchArgs
      * @public
-     * @param {String} arg - Arg to watch.
-     * @param {Watcher} watcher - Called when watched arg is changed.
+     * @param {...String} [args] - Args to watch.
+     * @param {Watcher} watcher - Called when watched args are changed.
+     * @description Method for watching for args. If no args passed in arguments
+     * all args are to be watched. Otherwise specified args will be watched.
+     * Watchers should not be put inside the constructor. It is considered best
+     * practice to do it inside the {@link Block#afterConstruct} method.
+     *
+     * @example
+     * class MyBlock extends Block {
+     *   static template = '<div />';
+     *
+     *   afterConstruct() {
+     *     this.watchArgs('a', () => {});
+     *     this.watchArgs('a', 'b', () => {});
+     *     this.watchArgs(() => {});
+     *   }
+     * }
      */
 
   }, {
     key: 'watchArgs',
-    value: function watchArgs(arg, watcher) {
-      validate$1([arg, watcher], ['string', 'function'], 'Block#watchArgs');
+    value: function watchArgs() {
+      var _this4 = this;
 
-      if (!this.$$.args[arg]) {
-        constructPublicScope(this.args, defineProperty({}, arg, this.args[arg]), this.$$.args);
+      var watcher = arguments[arguments.length - 1];
+
+      if (!isFunction(watcher)) {
+        return;
       }
 
-      this.$$.args[arg].watchers.perm.push(watcher);
+      if (arguments.length === 1) {
+        return iterate(this.$$.args, function (_ref4) {
+          var watchers = _ref4.watchers;
+
+          watchers.perm.push(watcher);
+        });
+      }
+
+      iterate(arguments, function (arg) {
+        if (arg === watcher) {
+          return;
+        }
+
+        if (!_this4.$$.args[arg]) {
+          return;
+        }
+
+        _this4.$$.args[arg].watchers.perm.push(watcher);
+      });
     }
 
     /**
      * @method Block#watchGlobal
      * @public
-     * @param {String} global - Global variable to watch.
-     * @param {Watcher} watcher - Called when watched global is changed.
+     * @param {...String} [globals] - Globals to watch.
+     * @param {Watcher} watcher - Called when watched globals are changed.
+     * @description Method for watching for globals. If no globals passed in arguments
+     * all globals are to be watched. Otherwise specified globals will be watched.
+     * Watchers should not be put inside the constructor. It is considered best
+     * practice to do it inside the {@link Block#afterConstruct} method.
+     *
+     * @example
+     * class MyBlock extends Block {
+     *   static template = '<div />';
+     *
+     *   afterConstruct() {
+     *     this.watchGlobal('a', () => {});
+     *     this.watchGlobal('a', 'b', () => {});
+     *     this.watchGlobal(() => {});
+     *   }
+     * }
      */
 
   }, {
-    key: 'watchGlobal',
-    value: function watchGlobal(global, watcher) {
-      validate$1([global, watcher], ['string', 'function'], 'Block#watchArgs');
+    key: 'watchGlobals',
+    value: function watchGlobals() {
+      var _this5 = this;
 
-      if (!this.$$.global[global]) {
-        constructPublicScope(this.global, defineProperty({}, global, this.global[global]), this.$$.global);
+      var watcher = arguments[arguments.length - 1];
+
+      if (!isFunction(watcher)) {
+        return;
       }
 
-      this.$$.global[global].watchers.perm.push(watcher);
+      if (arguments.length === 1) {
+        for (var _global3 in this.$$.global) {
+          /* eslint guard-for-in: 0 */
+          this.$$.global[_global3].watchers.perm.push(watcher);
+        }
+
+        return;
+      }
+
+      iterate(arguments, function (global) {
+        if (global === watcher) {
+          return;
+        }
+
+        if (!_this5.$$.global[global]) {
+          return;
+        }
+
+        _this5.$$.global[global].watchers.perm.push(watcher);
+      });
     }
 
     /**
      * @method Block#watchLocals
      * @public
-     * @param {String} local - Local variable to watch.
-     * @param {Watcher} watcher - Called when watched local is changed.
+     * @param {...String} [locals] - Locals to watch.
+     * @param {Watcher} watcher - Called when watched locals are changed.
+     * @description Method for watching for locals. If no locals passed in arguments
+     * all locals are to be watched. Otherwise specified locals will be watched.
+     * Watchers should not be put inside the constructor. It is considered best
+     * practice to do it inside the {@link Block#afterConstruct} method.
+     *
+     * @example
+     * class MyBlock extends Block {
+     *   static template = '<div />';
+     *
+     *   afterConstruct() {
+     *     this.watchLocals('a', () => {});
+     *     this.watchLocals('a', 'b', () => {});
+     *     this.watchLocals(() => {});
+     *   }
+     * }
      */
 
   }, {
     key: 'watchLocals',
-    value: function watchLocals(local, watcher) {
-      validate$1([local, watcher], ['string', 'function'], 'Block#watchLocals');
+    value: function watchLocals() {
+      var _this6 = this;
 
-      if (!this.$$.locals[local]) {
-        constructPublicScope(this, defineProperty({}, local, this[local]), this.$$.locals);
+      var watcher = arguments[arguments.length - 1];
+
+      if (!isFunction(watcher)) {
+        return;
       }
 
-      this.$$.locals[local].watchers.perm.push(watcher);
+      if (arguments.length === 1) {
+        return iterate(this.$$.locals, function (_ref5) {
+          var watchers = _ref5.watchers;
+
+          watchers.perm.push(watcher);
+        });
+      }
+
+      iterate(arguments, function (local) {
+        if (local === watcher) {
+          return;
+        }
+
+        if (!_this6.$$.locals[local]) {
+          return;
+        }
+
+        _this6.$$.locals[local].watchers.perm.push(watcher);
+      });
     }
   }]);
   return Block;
@@ -14255,7 +14475,7 @@ registerBuiltIns(Blocks, Block);
 
 var Mixin = function () {
   function Mixin(opts) {
-    var _this3 = this;
+    var _this7 = this;
 
     classCallCheck(this, Mixin);
     var value = opts.value;
@@ -14281,10 +14501,10 @@ var Mixin = function () {
 
     if (new Super(this).proto().$.constructor.evaluate) {
       this.value = this.evaluateAndWatch(function (newValue, oldValue) {
-        _this3.value = newValue;
+        _this7.value = newValue;
 
         try {
-          _this3.afterUpdate(newValue, oldValue);
+          _this7.afterUpdate(newValue, oldValue);
         } catch (err) {
           console.error('Uncaught error in ' + name + '#onUpdate:', err);
         }
@@ -14478,12 +14698,12 @@ function registerBuiltIns(set$$1, proto) {
   });
 }
 
-function createBlock(_ref2) {
-  var node = _ref2.node;
-  var after = _ref2.after;
-  var parent = _ref2.parent;
-  var parentBlock = _ref2.parentBlock;
-  var parentScope = _ref2.parentScope;
+function createBlock(_ref6) {
+  var node = _ref6.node;
+  var after = _ref6.after;
+  var parent = _ref6.parent;
+  var parentBlock = _ref6.parentBlock;
+  var parentScope = _ref6.parentScope;
 
   parentScope = node && node.block || parentScope;
 
@@ -14722,13 +14942,13 @@ function createBlock(_ref2) {
   return blockInstance;
 }
 
-function createMixin(_ref3) {
-  var name = _ref3.name;
-  var value = _ref3.value;
-  var match = _ref3.match;
-  var elem = _ref3.elem;
-  var parentBlock = _ref3.parentBlock;
-  var parentScope = _ref3.parentScope;
+function createMixin(_ref7) {
+  var name = _ref7.name;
+  var value = _ref7.value;
+  var match = _ref7.match;
+  var elem = _ref7.elem;
+  var parentBlock = _ref7.parentBlock;
+  var parentScope = _ref7.parentScope;
 
   var Mixin = mixins[name];
 
@@ -14817,9 +15037,9 @@ function isInstanceOfMixin(mixin) {
 }
 
 function removeWatchers(watchersToRemove) {
-  watchersToRemove.forEach(function (_ref4) {
-    var watcher = _ref4.watcher;
-    var watchers = _ref4.watchers;
+  watchersToRemove.forEach(function (_ref8) {
+    var watcher = _ref8.watcher;
+    var watchers = _ref8.watchers;
 
     var index = watchers.indexOf(watcher);
 
@@ -14866,7 +15086,11 @@ function constructPublicScope(scope, scopeValues, privateScope) {
           return;
         }
 
-        var oldTempWatchers = scope.watchers.temp;
+        if (!changed) {
+          changed = [];
+        }
+
+        var oldTempWatchers = scope.watchers.temp.slice();
         var oldValue = scope.value;
 
         scope.watchers.temp = new Arr([]);
@@ -14876,9 +15100,44 @@ function constructPublicScope(scope, scopeValues, privateScope) {
           watcher.onRemove();
           watcher();
         });
-        scope.watchers.perm.forEach(function (watcher) {
-          watcher(value, oldValue);
+        changed.push({
+          scope: scope,
+          oldValue: oldValue,
+          value: value
         });
+
+        setTimeout(function () {
+          if (!changed) {
+            return;
+          }
+
+          var was = new Arr([]);
+
+          while (changed.length) {
+            var _loop = function _loop(i) {
+              var _changed$i = changed[i];
+              var scope = _changed$i.scope;
+              var value = _changed$i.value;
+              var oldValue = _changed$i.oldValue;
+
+
+              scope.watchers.perm.forEach(function (watcher) {
+                if (was.indexOf(watcher) === -1) {
+                  watcher(value, oldValue);
+                  was.push(watcher);
+                }
+              });
+
+              changed.splice(i, 1);
+            };
+
+            for (var i = changed.length - 1; i >= 0; i--) {
+              _loop(i);
+            }
+          }
+
+          changed = null;
+        }, 0);
       }
     };
   }).$);
