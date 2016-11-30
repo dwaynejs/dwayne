@@ -54,7 +54,7 @@ gulp.task('default', ['server:dev'], () => {
   });
 });
 
-gulp.task('build', ['build:default', 'build:min', 'build:es6', 'build:es5']);
+gulp.task('build', ['build:default', 'build:min', 'build:browser', 'build:node']);
 
 gulp.task('jsdoc', ['server:dev', 'jsdoc:compile'], () => (
   gulp.watch(['./lib/**/*.js'], ['jsdoc:compile'])
@@ -125,19 +125,19 @@ gulp.task('build:min', () => {
     .pipe(gulp.dest('./build'));
 });
 
-gulp.task('build:es6', () => {
+gulp.task('build:browser', () => {
   const config = _.cloneDeep(rollupBuildConfig);
 
   config.entry = './dwayne.js';
-  config.format = 'es';
+  config.format = 'cjs';
   config.sourceMap = false;
 
   return rollupStream(config)
-    .pipe(source('es6.js'))
+    .pipe(source('browser.js'))
     .pipe(gulp.dest('./build'));
 });
 
-gulp.task('build:es5', () => {
+gulp.task('build:node', () => {
   const config = _.cloneDeep(rollupBuildConfig);
 
   config.entry = './node.js';
@@ -145,7 +145,7 @@ gulp.task('build:es5', () => {
   config.sourceMap = false;
 
   return rollupStream(config)
-    .pipe(source('es5.js'))
+    .pipe(source('node.js'))
     .pipe(gulp.dest('./build'));
 });
 

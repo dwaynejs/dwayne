@@ -1,9 +1,6 @@
-(function () {
 'use strict';
 
-/* eslint no-nested-ternary: 0 */
-/* eslint no-negated-condition: 0 */
-var global$1 = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+Object.defineProperty(exports, '__esModule', { value: true });
 
 /**
  * @module constants/appliedRegExps
@@ -3000,7 +2997,7 @@ var validateCheckExpressions = {
  * D(new Date());    // Dat
  * D(document.body); // Elem
  */
-function D$1(value) {
+function D$2(value) {
   for (var i = constructors.length - 1; i >= 0; i--) {
     var levelConstructors = constructors[i];
 
@@ -3178,6 +3175,10 @@ function defineProperties(target, properties) {
     }
   });
 }
+
+/* eslint no-nested-ternary: 0 */
+/* eslint no-negated-condition: 0 */
+var global$1 = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 /**
  * @module helpers/Symbol
@@ -4125,7 +4126,7 @@ var Super = function () {
      * }).$; // { a: 1 }
      */
     value: function create(descriptors) {
-      return D$1(isPrimitive(this.$) ? undefined : Object.create(this.$, descriptors));
+      return D$2(isPrimitive(this.$) ? undefined : Object.create(this.$, descriptors));
     }
 
     /**
@@ -4296,7 +4297,7 @@ var Super = function () {
 
       var filtered = _deepFilter(this.$, callback, n, [{ key: null, value: this.$ }]);
 
-      return D$1(isNil(filtered) ? filtered : filtered || {});
+      return D$2(isNil(filtered) ? filtered : filtered || {});
     }
 
     /**
@@ -4432,7 +4433,7 @@ var Super = function () {
 
       n = Number(n);
 
-      return D$1(_deepMap(this.$, callback, n, [{ key: null, value: this.$ }]));
+      return D$2(_deepMap(this.$, callback, n, [{ key: null, value: this.$ }]));
     }
 
     /**
@@ -4682,7 +4683,7 @@ var Super = function () {
         }
       });
 
-      return D$1(o);
+      return D$2(o);
     }
 
     /**
@@ -4983,7 +4984,7 @@ var Super = function () {
     value: function keys() {
       var object = this.$;
 
-      return D$1(isObject(object) ? Object.keys(object) : []);
+      return D$2(isObject(object) ? Object.keys(object) : []);
     }
 
     /**
@@ -5011,7 +5012,7 @@ var Super = function () {
         o[key] = callback(value, key, object);
       });
 
-      return D$1(o);
+      return D$2(o);
     }
 
     /**
@@ -5105,7 +5106,7 @@ var Super = function () {
         callback(_object, value, key, obj);
       });
 
-      return D$1(_object);
+      return D$2(_object);
     }
 
     /**
@@ -5181,7 +5182,7 @@ var Super = function () {
     value: function propertyNames() {
       var object = this.$;
 
-      return D$1(isObject(object) ? Object.getOwnPropertyNames(object) : []);
+      return D$2(isObject(object) ? Object.getOwnPropertyNames(object) : []);
     }
 
     /**
@@ -5201,7 +5202,7 @@ var Super = function () {
     value: function propertySymbols() {
       var object = this.$;
 
-      return D$1(isObject(object) ? Object.getOwnPropertySymbols(object) : []);
+      return D$2(isObject(object) ? Object.getOwnPropertySymbols(object) : []);
     }
 
     /**
@@ -5464,7 +5465,7 @@ var Super = function () {
         array.push(value);
       });
 
-      return D$1(array);
+      return D$2(array);
     }
 
     /**
@@ -8849,7 +8850,7 @@ var Str = function (_Super) {
      * [String#match]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/match}.
      */
     value: function match(regexp) {
-      return D$1(this.$.match.apply(this.$, arguments));
+      return D$2(this.$.match.apply(this.$, arguments));
     }
 
     /**
@@ -9000,7 +9001,7 @@ var Str = function (_Super) {
   }, {
     key: 'split',
     value: function split(separator) {
-      return D$1(this.$.split.apply(this.$, arguments));
+      return D$2(this.$.split.apply(this.$, arguments));
     }
 
     /**
@@ -9304,7 +9305,7 @@ function parseJSON() {
   var callback = arguments[2];
 
   if (arguments.length <= 1) {
-    return D$1(JSON.parse(json));
+    return D$2(JSON.parse(json));
   }
 
   if (isFunction(options)) {
@@ -9326,7 +9327,7 @@ function parseJSON() {
     return callback ? callback.apply(this, arguments) : value;
   });
 
-  return D$1(parsed);
+  return D$2(parsed);
 }
 
 /**
@@ -17251,7 +17252,7 @@ function resolveParameter(param, nameErrorName, valueErrorName) {
 
 
 var statics = Object.freeze({
-	D: D$1,
+	D: D$2,
 	isArray: isArray,
 	isArrayLike: isArrayLike,
 	isBoolean: isBoolean,
@@ -17317,15 +17318,75 @@ var statics = Object.freeze({
 	when: when
 });
 
-var D$$1 = D$1;
+var D$$1 = D$2;
 
 
 assign$1(D$$1, statics);
 
 delete D$$1.D;
 
-global$1.D = D$$1;
-
-}());
-
-//# sourceMappingURL=dwayne.js.map
+exports['default'] = D$$1;
+exports.D = D$2;
+exports.isArray = isArray;
+exports.isArrayLike = isArrayLike;
+exports.isBoolean = isBoolean;
+exports.isDate = isDate;
+exports.isDateLike = isDateLike;
+exports.isElement = isElement;
+exports.isFinite = isFinite;
+exports.isFunction = isFunction;
+exports.isInteger = isInteger;
+exports.isIntegerLike = isIntegerLike;
+exports.isNaN = isNaN;
+exports.isNull = isNull;
+exports.isNil = isNil;
+exports.isNumber = isNumber;
+exports.isNumberLike = isNumberLike;
+exports.isObject = isObject;
+exports.isPlainObject = isPlainObject;
+exports.isPrimitive = isPrimitive;
+exports.isRegExp = isRegExp;
+exports.isString = isString;
+exports.isSymbol = isSymbol;
+exports.isUndefined = isUndefined;
+exports.Alphabet = Alphabet;
+exports.alphabet = alphabet;
+exports.Arr = Arr;
+exports.array = array;
+exports.iterate = iterate$1;
+exports.BlobObject = BlobObject;
+exports.blob = blob$1;
+exports.Block = Block;
+exports.Mixin = Mixin;
+exports.initApp = initApp;
+exports.wrap = wrap;
+exports.Dat = Dat;
+exports.now = now;
+exports.date = date;
+exports.Elem = Elem;
+exports.win = win;
+exports.doc = doc;
+exports.html = html;
+exports.body = body;
+exports.head = head$1;
+exports.find = _find;
+exports.parseHTML = parseHTML;
+exports.px = px;
+exports.Fetch = Fetch;
+exports.fetch = fetch;
+exports.Func = Func;
+exports.method = method;
+exports.noop = noop;
+exports.prop = prop$1;
+exports.self = self$1;
+exports.Num = Num;
+exports.rand = rand;
+exports.random = random$1;
+exports.Promise = Promise$1;
+exports.makeRoute = makeRoute;
+exports.Str = Str;
+exports.parseJSON = parseJSON;
+exports.Super = Super;
+exports.Switcher = Switcher;
+exports.switcher = switcher;
+exports.when = when;

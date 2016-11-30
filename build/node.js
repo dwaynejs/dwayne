@@ -91,7 +91,118 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 
 
+var asyncGenerator = function () {
+  function AwaitValue(value) {
+    this.value = value;
+  }
 
+  function AsyncGenerator(gen) {
+    var front, back;
+
+    function send(key, arg) {
+      return new Promise(function (resolve, reject) {
+        var request = {
+          key: key,
+          arg: arg,
+          resolve: resolve,
+          reject: reject,
+          next: null
+        };
+
+        if (back) {
+          back = back.next = request;
+        } else {
+          front = back = request;
+          resume(key, arg);
+        }
+      });
+    }
+
+    function resume(key, arg) {
+      try {
+        var result = gen[key](arg);
+        var value = result.value;
+
+        if (value instanceof AwaitValue) {
+          Promise.resolve(value.value).then(function (arg) {
+            resume("next", arg);
+          }, function (arg) {
+            resume("throw", arg);
+          });
+        } else {
+          settle(result.done ? "return" : "normal", result.value);
+        }
+      } catch (err) {
+        settle("throw", err);
+      }
+    }
+
+    function settle(type, value) {
+      switch (type) {
+        case "return":
+          front.resolve({
+            value: value,
+            done: true
+          });
+          break;
+
+        case "throw":
+          front.reject(value);
+          break;
+
+        default:
+          front.resolve({
+            value: value,
+            done: false
+          });
+          break;
+      }
+
+      front = front.next;
+
+      if (front) {
+        resume(front.key, front.arg);
+      } else {
+        back = null;
+      }
+    }
+
+    this._invoke = send;
+
+    if (typeof gen.return !== "function") {
+      this.return = undefined;
+    }
+  }
+
+  if (typeof Symbol === "function" && Symbol.asyncIterator) {
+    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
+      return this;
+    };
+  }
+
+  AsyncGenerator.prototype.next = function (arg) {
+    return this._invoke("next", arg);
+  };
+
+  AsyncGenerator.prototype.throw = function (arg) {
+    return this._invoke("throw", arg);
+  };
+
+  AsyncGenerator.prototype.return = function (arg) {
+    return this._invoke("return", arg);
+  };
+
+  return {
+    wrap: function (fn) {
+      return function () {
+        return new AsyncGenerator(fn.apply(this, arguments));
+      };
+    },
+    await: function (value) {
+      return new AwaitValue(value);
+    }
+  };
+}();
 
 
 
@@ -1452,15 +1563,15 @@ var Switcher = function (_Function) {
 
     function switcher(value) {
       var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-      var _switcher$$$ = switcher.$$,
-          mode = _switcher$$$.mode,
-          def = _switcher$$$.default,
-          cases = _switcher$$$.cases;
+      var _switcher$$$ = switcher.$$;
+      var mode = _switcher$$$.mode;
+      var def = _switcher$$$.default;
+      var cases = _switcher$$$.cases;
 
 
       var ret = iterate(cases, function (_ref) {
-        var val = _ref.value,
-            Case = _ref.case;
+        var val = _ref.value;
+        var Case = _ref.case;
 
         if (mode === 'boolean' && Case ||
         /* eslint eqeqeq: 0 */
@@ -3765,535 +3876,6 @@ constructors[0].push({
 });
 
 /**
- * @module Arr
- * @private
- * @mixin
- * @description Exports Arr class.
- */
-
-/**
- * @typedef {Array|*} ArrayLike
- * @public
- * @description Array-like type.
- */
-
-/**
- * @callback ArrayCallback
- * @public
- * @param {Number} i - Iteration index.
- */
-
-/**
- * @callback IterateCallback
- * @public
- * @param {Number} i - Iteration index.
- */
-
-/**
- * @callback CompareFunction
- * @public
- * @param {*} x - First value to be compared.
- * @param {*} y - Second value to be compared.
- */
-
-/**
- * @class Arr
- * @extends Super
- * @public
- * @param {Array} [array = []] - An array to wrap.
- * @returns {Arr} Instance of Arr.
- * @description Wrap of an array.
- *
- * @example
- * new Arr([1, 2]);
- */
-
-var Arr = function (_Super) {
-  inherits(Arr, _Super);
-
-  function Arr() {
-    var array = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-    classCallCheck(this, Arr);
-    return possibleConstructorReturn(this, (Arr.__proto__ || Object.getPrototypeOf(Arr)).call(this, toArray$1(array instanceof Arr ? array.$ : array)));
-
-    /**
-     * @member Arr#$
-     * @type {Array}
-     * @public
-     * @description Made array.
-     */
-  }
-
-  /**
-   * @method Arr#concat
-   * @public
-   * @param {...(Array|Arr|*)} values - Arrays or any other values to concat the array with.
-   * @returns {Arr} New instance of Arr.
-   * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/concat
-   * @description Synonym for
-   * [Array#concat]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/concat}.
-   */
-
-
-  createClass(Arr, [{
-    key: 'concat',
-    value: function concat() {
-      for (var _len = arguments.length, values = Array(_len), _key = 0; _key < _len; _key++) {
-        values[_key] = arguments[_key];
-      }
-
-      var array = toArray$1(this.$, true);
-
-      iterate(arguments, function (value) {
-        value = new Super(value).$;
-
-        if (isArrayLike(value) && !isString(value)) {
-          iterate(value, function (value) {
-            array.push(value);
-          });
-
-          return;
-        }
-
-        array.push(value);
-      });
-
-      return new this.constructor(array);
-    }
-
-    /**
-     * @member Arr#first
-     * @type {*}
-     * @public
-     * @readonly
-     * @description Returns the first element of the array.
-     *
-     * @example
-     * new Arr([1, 2, 3]).first; // 1
-     * new Arr([]).first;        // undefined
-     */
-
-  }, {
-    key: 'indexOf',
-
-
-    /**
-     * @method Arr#indexOf
-     * @public
-     * @param {*} value - Value to search.
-     * @returns {Number} Index of the argument.
-     * @description Almost the same as {@link Super#keyOf}. The difference is that if the value is not found
-     * -1 returned instead of null and if found Number(key) returned.
-     *
-     * @example
-     * new Arr([1, 2, 3]).indexOf(1);       // 0
-     * new Arr([1, 2, 3]).indexOf('1');     // 0
-     * new Arr([1, 2, 3]).indexOf(3);       // -1
-     * new Arr([1, 2, NaN]).indexOf(NaN);   // 2
-     */
-    value: function indexOf(value) {
-      var key = this.keyOf(value);
-
-      return key === null ? -1 : Number(key);
-    }
-
-    /**
-     * @method Arr#indexOfStrict
-     * @public
-     * @param {*} value - Value to search.
-     * @returns {Number} Index of the argument.
-     * @description Almost the same as {@link Super#keyOfStrict}. The difference is that if the value is not found
-     * -1 returned instead of null and if found Number(key) returned.
-     *
-     * @example
-     * new Arr([1, 2, 3]).indexOfStrict(1);       // 0
-     * new Arr([1, 2, 3]).indexOfStrict('1');     // -1
-     * new Arr([1, 2, 3]).indexOfStrict(3);       // -1
-     * new Arr([1, 2, NaN]).indexOfStrict(NaN);   // 2
-     */
-
-  }, {
-    key: 'indexOfStrict',
-    value: function indexOfStrict(value) {
-      var key = this.keyOfStrict(value);
-
-      return key === null ? -1 : Number(key);
-    }
-
-    /**
-     * @method Arr#join
-     * @public
-     * @param {String} [separator = ','] - See the link.
-     * @returns {String} - String of joined array.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/join
-     * @description Synonym for
-     * [Array#join]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/join}.
-     */
-
-  }, {
-    key: 'join',
-    value: function join(separator) {
-      return this.$.join.apply(this.$, arguments);
-    }
-
-    /**
-     * @member Arr#last
-     * @type {*}
-     * @public
-     * @readonly
-     * @description The last element of the array.
-     *
-     * @example
-     * new Arr([1, 2, 3]).last; // 3
-     * new Arr([]).last;        // undefined
-     */
-
-  }, {
-    key: 'pop',
-
-
-    /**
-     * @method Arr#pop
-     * @public
-     * @returns {*} Returns deleted element.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/pop
-     * @description Synonym for
-     * [Array#pop]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/pop}.
-     */
-    value: function pop() {
-      return this.$.pop();
-    }
-
-    /**
-     * @method Arr#push
-     * @public
-     * @param {...*} values See the link.
-     * @this {Arr}
-     * @returns {Arr} Returns this.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/push
-     * @description Synonym for
-     * [Array#push]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/push}
-     * besides returning this.
-     */
-
-  }, {
-    key: 'push',
-    value: function push() {
-      for (var _len2 = arguments.length, values = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        values[_key2] = arguments[_key2];
-      }
-
-      this.$.push.apply(this.$, arguments);
-
-      return this;
-    }
-
-    /**
-     * @method Arr#reverse
-     * @public
-     * @returns {Arr} A wrap of the reversed array.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse
-     * @description Synonym for
-     * [Array#reverse]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse}.
-     */
-
-  }, {
-    key: 'reverse',
-    value: function reverse() {
-      this.$.reverse();
-
-      return this;
-    }
-
-    /**
-     * @method Arr#shift
-     * @public
-     * @returns {*} Returns deleted element.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/shift
-     * @description Synonym for
-     * [Array#shift]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/shift}.
-     */
-
-  }, {
-    key: 'shift',
-    value: function shift() {
-      return this.$.shift();
-    }
-
-    /**
-     * @method Arr#shuffle
-     * @public
-     * @returns {Arr} Returns this.
-     * @description Method for shuffling.
-     *
-     * @example
-     * new Arr([1, 2, 3, 4]).shuffle().$; // [4, 2, 3, 1]
-     * new Arr([1, 2, 3, 4]).shuffle().$; // [1, 3, 4, 2]
-     */
-
-  }, {
-    key: 'shuffle',
-    value: function shuffle() {
-      var length = this.$.length;
-
-      return this.forEach(function (value, index, array) {
-        var randomIndex = index + Math.floor((length - index) * Math.random());
-
-        array[index] = array[randomIndex];
-        array[randomIndex] = value;
-      });
-    }
-
-    /**
-     * @method Arr#slice
-     * @public
-     * @param {Number} [begin = 0] - See the link.
-     * @param {Number} [end = array.length] - See the link.
-     * @returns {Arr} A wrap of a sliced array.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/slice
-     * @description Synonym for
-     * [Array#slice]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/slice}.
-     */
-
-  }, {
-    key: 'slice',
-    value: function slice(begin, end) {
-      return new this.constructor(this.$.slice.apply(this.$, arguments));
-    }
-
-    /**
-     * @method Arr#sort
-     * @public
-     * @param {CompareFunction} [compareFunction] - See the link.
-     * @returns {Arr} Returns this.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
-     * @description Synonym for
-     * [Array#sort]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/sort}.
-     */
-
-  }, {
-    key: 'sort',
-    value: function sort(compareFunction) {
-      validate([compareFunction], ['function||!'], 'Arr#sort');
-
-      this.$.sort(compareFunction);
-
-      return this;
-    }
-
-    /**
-     * @method Arr#sortAsc
-     * @public
-     * @returns {Arr} Returns this.
-     * @description Method for ascending sorting. Puts non-numbers first, then NaNs, then sorted values.
-     *
-     * @example
-     * new Arr([NaN, 1, -7, '100', 5]).sortAsc().$; // ['100', NaN, -7, 1, 5]
-     */
-
-  }, {
-    key: 'sortAsc',
-    value: function sortAsc() {
-      return this.sort(asc);
-    }
-
-    /**
-     * @method Arr#sortDesc
-     * @public
-     * @returns {Arr} Returns this.
-     * @description Method for descending sorting. Puts sorted values first, then NaNs, then non-numbers.
-     *
-     * @example
-     * new Arr([NaN, 1, -7, '100', 5]).sortDesc().$; // [5, 1, -7, NaN, '100']
-     */
-
-  }, {
-    key: 'sortDesc',
-    value: function sortDesc() {
-      return this.sort(function (y, x) {
-        return asc(x, y);
-      });
-    }
-
-    /**
-     * @method Arr#splice
-     * @public
-     * @param {Number} [start] - See the link.
-     * @param {Number} [deleteCount] - See the link.
-     * @param {...*} [items] - See the link.
-     * @returns {Arr} A wrap of return value of #splice call.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
-     * @description Synonym for
-     * [Array#splice]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/splice}.
-     */
-
-  }, {
-    key: 'splice',
-    value: function splice(start, deleteCount) {
-      for (var _len3 = arguments.length, items = Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
-        items[_key3 - 2] = arguments[_key3];
-      }
-
-      return new Arr(this.$.splice.apply(this.$, arguments));
-    }
-
-    /**
-     * @method Arr#string
-     * @public
-     * @returns {String} Concatenated array.
-     * @description Synonym for array.join('').
-     *
-     * @example
-     * new Arr([1, 2, 3]).string(); // '123'
-     */
-
-  }, {
-    key: 'string',
-    value: function string() {
-      return this.join('');
-    }
-
-    /**
-     * @method Arr#unshift
-     * @public
-     * @param {...*} [values] - See the link.
-     * @returns {Arr} Returns this.
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/unshift
-     * @description Synonym for
-     * [Array#unshift]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/unshift}
-     * besides returning this.
-     */
-
-  }, {
-    key: 'unshift',
-    value: function unshift() {
-      for (var _len4 = arguments.length, values = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-        values[_key4] = arguments[_key4];
-      }
-
-      this.$.unshift.apply(this.$, arguments);
-
-      return this;
-    }
-  }, {
-    key: 'first',
-    get: function get() {
-      return this.$[0];
-    }
-  }, {
-    key: 'last',
-    get: function get() {
-      var array = this.$;
-
-      return array[array.length - 1];
-    }
-
-    /**
-     * @member Arr#length
-     * @type {Number}
-     * @public
-     * @readonly
-     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/length
-     * @description Synonym for
-     * [Array#length]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/length}.
-     */
-
-  }, {
-    key: 'length',
-    get: function get() {
-      return this.$.length;
-    }
-  }]);
-  return Arr;
-}(Super);
-
-defineProperties(Arr.prototype, defineProperty({}, _Symbol.toStringTag, 'Arr'));
-
-/**
- * @function asc
- * @private
- * @param {*} x - First value to be compared.
- * @param {*} y - Second value to be compared.
- * @returns {Number} Where to put the first element: before or after.
- */
-function asc(x, y) {
-  if (!isNumber(x) && !isNumber(y)) {
-    return 0;
-  }
-
-  if (!isNumber(x)) {
-    return -1;
-  }
-
-  if (!isNumber(y)) {
-    return 1;
-  }
-
-  if (isNaN(x) && isNaN(y)) {
-    return 0;
-  }
-
-  if (isNaN(x)) {
-    return -1;
-  }
-
-  if (isNaN(y)) {
-    return 1;
-  }
-
-  return x - y;
-}
-
-constructors[1].push({
-  check: isArrayLike,
-  cls: Arr
-});
-
-/**
- * @function array
- * @public
- * @param {Number} number - Length of the array.
- * @param {ArrayCallback} [callback] - If it's present it has to be a function
- * that returns the element that is pushed to the new array.
- * @returns {Arr} New instance of Arr.
- * @description Method for creating new array from the length using optional callback.
- *
- * @example
- * array(3).$;               // [0, 1, 2]
- * array(3, (i) => i * 2).$; // [0, 2, 4]
- */
-function array(number, callback) {
-  validate([number, callback], [['intLike', '>=0'], 'function||!'], 'array');
-
-  var array = [];
-
-  for (var i = 0; i < number; i++) {
-    array.push(callback ? callback(i) : i);
-  }
-
-  return new Arr(array);
-}
-
-/**
- * @function iterate
- * @public
- * @param {Number} number - Number of iterations.
- * @param {IterateCallback} callback - Callback that is called on each iteration with the iteration index.
- * @returns {void}
- * @description Method for replacing for (...) construction.
- *
- * @example
- * iterate();
- */
-function iterate$1(number, callback) {
-  validate([number, callback], [['intLike', '>=0'], 'function'], 'iterate');
-
-  for (var i = 0; i < number; i++) {
-    callback(i);
-  }
-}
-
-/**
  * @module Promise
  * @private
  * @mixin
@@ -4454,8 +4036,8 @@ var Promise$1 = function () {
             onReject[i](err);
           }
 
-          var onUnhandledRejection = Promise.onUnhandledRejection,
-              onError = Promise.onError;
+          var onUnhandledRejection = Promise.onUnhandledRejection;
+          var onError = Promise.onError;
 
 
           if (isFunction(onError)) {
@@ -4798,14 +4380,14 @@ var Func = function (_Super) {
 
       if (++proxy.$$.called < proxy.$$.canBeCalled) {
         var _ret2 = function () {
-          var _proxy$$$ = proxy.$$,
-              before = _proxy$$$.before,
-              after = _proxy$$$.after,
-              sync = _proxy$$$.sync,
-              contextLocked = _proxy$$$.contextLocked;
-          var _proxy$$$2 = proxy.$$,
-              context = _proxy$$$2.context,
-              args = _proxy$$$2.args;
+          var _proxy$$$ = proxy.$$;
+          var before = _proxy$$$.before;
+          var after = _proxy$$$.after;
+          var sync = _proxy$$$.sync;
+          var contextLocked = _proxy$$$.contextLocked;
+          var _proxy$$$2 = proxy.$$;
+          var context = _proxy$$$2.context;
+          var args = _proxy$$$2.args;
 
           var ret = void 0;
 
@@ -6256,7 +5838,7 @@ function rand() {
  * random(1, 5); // 3
  * random(1, 5); // 1
  */
-function random(start, end) {
+function random$1(start, end) {
   validate([start, end], ['intLike', 'intLike'], 'random');
 
   if (end <= start) {
@@ -6264,6 +5846,552 @@ function random(start, end) {
   }
 
   return Math.floor(rand(start, end + 1));
+}
+
+/**
+ * @module Arr
+ * @private
+ * @mixin
+ * @description Exports Arr class.
+ */
+
+/**
+ * @typedef {Array|*} ArrayLike
+ * @public
+ * @description Array-like type.
+ */
+
+/**
+ * @callback ArrayCallback
+ * @public
+ * @param {Number} i - Iteration index.
+ */
+
+/**
+ * @callback IterateCallback
+ * @public
+ * @param {Number} i - Iteration index.
+ */
+
+/**
+ * @callback CompareFunction
+ * @public
+ * @param {*} x - First value to be compared.
+ * @param {*} y - Second value to be compared.
+ */
+
+/**
+ * @class Arr
+ * @extends Super
+ * @public
+ * @param {Array} [array = []] - An array to wrap.
+ * @returns {Arr} Instance of Arr.
+ * @description Wrap of an array.
+ *
+ * @example
+ * new Arr([1, 2]);
+ */
+
+var Arr = function (_Super) {
+  inherits(Arr, _Super);
+
+  function Arr() {
+    var array = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+    classCallCheck(this, Arr);
+    return possibleConstructorReturn(this, (Arr.__proto__ || Object.getPrototypeOf(Arr)).call(this, toArray$1(array instanceof Arr ? array.$ : array)));
+
+    /**
+     * @member Arr#$
+     * @type {Array}
+     * @public
+     * @description Made array.
+     */
+  }
+
+  /**
+   * @method Arr#concat
+   * @public
+   * @param {...(Array|Arr|*)} values - Arrays or any other values to concat the array with.
+   * @returns {Arr} New instance of Arr.
+   * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/concat
+   * @description Synonym for
+   * [Array#concat]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/concat}.
+   */
+
+
+  createClass(Arr, [{
+    key: 'concat',
+    value: function concat() {
+      for (var _len = arguments.length, values = Array(_len), _key = 0; _key < _len; _key++) {
+        values[_key] = arguments[_key];
+      }
+
+      var array = toArray$1(this.$, true);
+
+      iterate(arguments, function (value) {
+        value = new Super(value).$;
+
+        if (isArrayLike(value) && !isString(value)) {
+          iterate(value, function (value) {
+            array.push(value);
+          });
+
+          return;
+        }
+
+        array.push(value);
+      });
+
+      return new this.constructor(array);
+    }
+
+    /**
+     * @member Arr#first
+     * @type {*}
+     * @public
+     * @readonly
+     * @description Returns the first element of the array.
+     *
+     * @example
+     * new Arr([1, 2, 3]).first; // 1
+     * new Arr([]).first;        // undefined
+     */
+
+  }, {
+    key: 'indexOf',
+
+
+    /**
+     * @method Arr#indexOf
+     * @public
+     * @param {*} value - Value to search.
+     * @returns {Number} Index of the argument.
+     * @description Almost the same as {@link Super#keyOf}. The difference is that if the value is not found
+     * -1 returned instead of null and if found Number(key) returned.
+     *
+     * @example
+     * new Arr([1, 2, 3]).indexOf(1);       // 0
+     * new Arr([1, 2, 3]).indexOf('1');     // 0
+     * new Arr([1, 2, 3]).indexOf(3);       // -1
+     * new Arr([1, 2, NaN]).indexOf(NaN);   // 2
+     */
+    value: function indexOf(value) {
+      var key = this.keyOf(value);
+
+      return key === null ? -1 : Number(key);
+    }
+
+    /**
+     * @method Arr#indexOfStrict
+     * @public
+     * @param {*} value - Value to search.
+     * @returns {Number} Index of the argument.
+     * @description Almost the same as {@link Super#keyOfStrict}. The difference is that if the value is not found
+     * -1 returned instead of null and if found Number(key) returned.
+     *
+     * @example
+     * new Arr([1, 2, 3]).indexOfStrict(1);       // 0
+     * new Arr([1, 2, 3]).indexOfStrict('1');     // -1
+     * new Arr([1, 2, 3]).indexOfStrict(3);       // -1
+     * new Arr([1, 2, NaN]).indexOfStrict(NaN);   // 2
+     */
+
+  }, {
+    key: 'indexOfStrict',
+    value: function indexOfStrict(value) {
+      var key = this.keyOfStrict(value);
+
+      return key === null ? -1 : Number(key);
+    }
+
+    /**
+     * @method Arr#join
+     * @public
+     * @param {String} [separator = ','] - See the link.
+     * @returns {String} - String of joined array.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/join
+     * @description Synonym for
+     * [Array#join]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/join}.
+     */
+
+  }, {
+    key: 'join',
+    value: function join(separator) {
+      return this.$.join.apply(this.$, arguments);
+    }
+
+    /**
+     * @member Arr#last
+     * @type {*}
+     * @public
+     * @readonly
+     * @description The last element of the array.
+     *
+     * @example
+     * new Arr([1, 2, 3]).last; // 3
+     * new Arr([]).last;        // undefined
+     */
+
+  }, {
+    key: 'pop',
+
+
+    /**
+     * @method Arr#pop
+     * @public
+     * @returns {*} Returns deleted element.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/pop
+     * @description Synonym for
+     * [Array#pop]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/pop}.
+     */
+    value: function pop() {
+      return this.$.pop();
+    }
+
+    /**
+     * @method Arr#push
+     * @public
+     * @param {...*} values See the link.
+     * @this {Arr}
+     * @returns {Arr} Returns this.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/push
+     * @description Synonym for
+     * [Array#push]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/push}
+     * besides returning this.
+     */
+
+  }, {
+    key: 'push',
+    value: function push() {
+      for (var _len2 = arguments.length, values = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        values[_key2] = arguments[_key2];
+      }
+
+      this.$.push.apply(this.$, arguments);
+
+      return this;
+    }
+
+    /**
+     * @method Arr#random
+     * @public
+     * @returns {*} Random item of the array.
+     * @description Method for getting random items of the array.
+     *
+     * @example
+     * new Arr([1, 5, 3]).random(); // 3
+     * new Arr([1, 5, 3]).random(); // 5
+     */
+
+  }, {
+    key: 'random',
+    value: function random() {
+      return this.$[random$1(0, this.$.length - 1)];
+    }
+
+    /**
+     * @method Arr#reverse
+     * @public
+     * @returns {Arr} A wrap of the reversed array.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse
+     * @description Synonym for
+     * [Array#reverse]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse}.
+     */
+
+  }, {
+    key: 'reverse',
+    value: function reverse() {
+      this.$.reverse();
+
+      return this;
+    }
+
+    /**
+     * @method Arr#shift
+     * @public
+     * @returns {*} Returns deleted element.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/shift
+     * @description Synonym for
+     * [Array#shift]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/shift}.
+     */
+
+  }, {
+    key: 'shift',
+    value: function shift() {
+      return this.$.shift();
+    }
+
+    /**
+     * @method Arr#shuffle
+     * @public
+     * @returns {Arr} Returns this.
+     * @description Method for shuffling.
+     *
+     * @example
+     * new Arr([1, 2, 3, 4]).shuffle().$; // [4, 2, 3, 1]
+     * new Arr([1, 2, 3, 4]).shuffle().$; // [1, 3, 4, 2]
+     */
+
+  }, {
+    key: 'shuffle',
+    value: function shuffle() {
+      var length = this.$.length;
+
+      return this.forEach(function (value, index, array) {
+        var randomIndex = index + Math.floor((length - index) * Math.random());
+
+        array[index] = array[randomIndex];
+        array[randomIndex] = value;
+      });
+    }
+
+    /**
+     * @method Arr#slice
+     * @public
+     * @param {Number} [begin = 0] - See the link.
+     * @param {Number} [end = array.length] - See the link.
+     * @returns {Arr} A wrap of a sliced array.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/slice
+     * @description Synonym for
+     * [Array#slice]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/slice}.
+     */
+
+  }, {
+    key: 'slice',
+    value: function slice(begin, end) {
+      return new this.constructor(this.$.slice.apply(this.$, arguments));
+    }
+
+    /**
+     * @method Arr#sort
+     * @public
+     * @param {CompareFunction} [compareFunction] - See the link.
+     * @returns {Arr} Returns this.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+     * @description Synonym for
+     * [Array#sort]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/sort}.
+     */
+
+  }, {
+    key: 'sort',
+    value: function sort(compareFunction) {
+      validate([compareFunction], ['function||!'], 'Arr#sort');
+
+      this.$.sort(compareFunction);
+
+      return this;
+    }
+
+    /**
+     * @method Arr#sortAsc
+     * @public
+     * @returns {Arr} Returns this.
+     * @description Method for ascending sorting. Puts non-numbers first, then NaNs, then sorted values.
+     *
+     * @example
+     * new Arr([NaN, 1, -7, '100', 5]).sortAsc().$; // ['100', NaN, -7, 1, 5]
+     */
+
+  }, {
+    key: 'sortAsc',
+    value: function sortAsc() {
+      return this.sort(asc);
+    }
+
+    /**
+     * @method Arr#sortDesc
+     * @public
+     * @returns {Arr} Returns this.
+     * @description Method for descending sorting. Puts sorted values first, then NaNs, then non-numbers.
+     *
+     * @example
+     * new Arr([NaN, 1, -7, '100', 5]).sortDesc().$; // [5, 1, -7, NaN, '100']
+     */
+
+  }, {
+    key: 'sortDesc',
+    value: function sortDesc() {
+      return this.sort(function (y, x) {
+        return asc(x, y);
+      });
+    }
+
+    /**
+     * @method Arr#splice
+     * @public
+     * @param {Number} [start] - See the link.
+     * @param {Number} [deleteCount] - See the link.
+     * @param {...*} [items] - See the link.
+     * @returns {Arr} A wrap of return value of #splice call.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
+     * @description Synonym for
+     * [Array#splice]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/splice}.
+     */
+
+  }, {
+    key: 'splice',
+    value: function splice(start, deleteCount) {
+      for (var _len3 = arguments.length, items = Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
+        items[_key3 - 2] = arguments[_key3];
+      }
+
+      return new Arr(this.$.splice.apply(this.$, arguments));
+    }
+
+    /**
+     * @method Arr#string
+     * @public
+     * @returns {String} Concatenated array.
+     * @description Synonym for array.join('').
+     *
+     * @example
+     * new Arr([1, 2, 3]).string(); // '123'
+     */
+
+  }, {
+    key: 'string',
+    value: function string() {
+      return this.join('');
+    }
+
+    /**
+     * @method Arr#unshift
+     * @public
+     * @param {...*} [values] - See the link.
+     * @returns {Arr} Returns this.
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/unshift
+     * @description Synonym for
+     * [Array#unshift]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/unshift}
+     * besides returning this.
+     */
+
+  }, {
+    key: 'unshift',
+    value: function unshift() {
+      for (var _len4 = arguments.length, values = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+        values[_key4] = arguments[_key4];
+      }
+
+      this.$.unshift.apply(this.$, arguments);
+
+      return this;
+    }
+  }, {
+    key: 'first',
+    get: function get() {
+      return this.$[0];
+    }
+  }, {
+    key: 'last',
+    get: function get() {
+      var array = this.$;
+
+      return array[array.length - 1];
+    }
+
+    /**
+     * @member Arr#length
+     * @type {Number}
+     * @public
+     * @readonly
+     * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/length
+     * @description Synonym for
+     * [Array#length]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/length}.
+     */
+
+  }, {
+    key: 'length',
+    get: function get() {
+      return this.$.length;
+    }
+  }]);
+  return Arr;
+}(Super);
+
+defineProperties(Arr.prototype, defineProperty({}, _Symbol.toStringTag, 'Arr'));
+
+/**
+ * @function asc
+ * @private
+ * @param {*} x - First value to be compared.
+ * @param {*} y - Second value to be compared.
+ * @returns {Number} Where to put the first element: before or after.
+ */
+function asc(x, y) {
+  if (!isNumber(x) && !isNumber(y)) {
+    return 0;
+  }
+
+  if (!isNumber(x)) {
+    return -1;
+  }
+
+  if (!isNumber(y)) {
+    return 1;
+  }
+
+  if (isNaN(x) && isNaN(y)) {
+    return 0;
+  }
+
+  if (isNaN(x)) {
+    return -1;
+  }
+
+  if (isNaN(y)) {
+    return 1;
+  }
+
+  return x - y;
+}
+
+constructors[1].push({
+  check: isArrayLike,
+  cls: Arr
+});
+
+/**
+ * @function array
+ * @public
+ * @param {Number} number - Length of the array.
+ * @param {ArrayCallback} [callback] - If it's present it has to be a function
+ * that returns the element that is pushed to the new array.
+ * @returns {Arr} New instance of Arr.
+ * @description Method for creating new array from the length using optional callback.
+ *
+ * @example
+ * array(3).$;               // [0, 1, 2]
+ * array(3, (i) => i * 2).$; // [0, 2, 4]
+ */
+function array(number, callback) {
+  validate([number, callback], [['intLike', '>=0'], 'function||!'], 'array');
+
+  var array = [];
+
+  for (var i = 0; i < number; i++) {
+    array.push(callback ? callback(i) : i);
+  }
+
+  return new Arr(array);
+}
+
+/**
+ * @function iterate
+ * @public
+ * @param {Number} number - Number of iterations.
+ * @param {IterateCallback} callback - Callback that is called on each iteration with the iteration index.
+ * @returns {void}
+ * @description Method for replacing for (...) construction.
+ *
+ * @example
+ * iterate();
+ */
+function iterate$1(number, callback) {
+  validate([number, callback], [['intLike', '>=0'], 'function'], 'iterate');
+
+  for (var i = 0; i < number; i++) {
+    callback(i);
+  }
 }
 
 /**
@@ -6932,9 +7060,9 @@ function parseJSON() {
     options = {};
   }
 
-  var _options = options,
-      numbers = _options.numbers,
-      dates = _options.dates;
+  var _options = options;
+  var numbers = _options.numbers;
+  var dates = _options.dates;
 
   var parsed = JSON.parse(json, function (key, value) {
     if (dates && /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.\d\d\dZ?$/.test(value)) {
@@ -7723,7 +7851,7 @@ var statics = Object.freeze({
 	self: self$1,
 	Num: Num,
 	rand: rand,
-	random: random,
+	random: random$1,
 	Promise: Promise$1,
 	Str: Str,
 	parseJSON: parseJSON,

@@ -52,7 +52,20 @@ module.exports = {
     babel({
       include: './**/*.@(js|pug)',
       exclude: 'node_modules/**',
-      plugins: ['external-helpers']
+      presets: [
+        [
+          'es2015',
+          {
+            modules: false
+          }
+        ],
+        'stage-0'
+      ],
+      plugins: [
+        'transform-class-properties',
+        'transform-object-rest-spread',
+        'external-helpers'
+      ]
     }),
     inject({
       exclude: './lib/constants/global.js',
