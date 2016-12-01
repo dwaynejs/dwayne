@@ -13298,6 +13298,14 @@ function registerDClass(Mixin) {
         newValue = new Super(newValue).$;
         oldValue = new Super(oldValue).$;
 
+        if (isString(newValue)) {
+          newValue = newValue.split(/\s+/);
+        }
+
+        if (isString(oldValue)) {
+          newValue = newValue.split(/\s+/);
+        }
+
         if (isArray(newValue)) {
           iterate(oldValue, function (cls) {
             if (isString(cls) && !newValue[cls]) {
@@ -13309,12 +13317,6 @@ function registerDClass(Mixin) {
               elem.addClass(cls);
             }
           });
-        } else if (isString(newValue)) {
-          if (isString(oldValue)) {
-            elem.removeClass(oldValue);
-          }
-
-          elem.addClass(newValue);
         } else if (isObject(newValue)) {
           iterate(oldValue, function (val, cls) {
             if (val && !newValue[cls]) {
@@ -13326,8 +13328,6 @@ function registerDClass(Mixin) {
               elem.addClass(cls);
             }
           });
-        } else if (isString(oldValue)) {
-          elem.removeClass(oldValue);
         } else if (isArray(oldValue)) {
           iterate(oldValue, function (cls) {
             if (isString(cls)) {
