@@ -2,6 +2,7 @@
   "name": "dwayne",
   "version": "2.0.0",
   "browser": "build/browser.js",
+  "jsnext:main": "build/es6.js",
   "main": "build/node.js",
   "devDependencies": {
     "babel-core": "^6.4.0",
