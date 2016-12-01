@@ -13852,6 +13852,12 @@ var Mixins = Object.freeze({
  * @param {*} oldValue - Old value.
  */
 
+/**
+ * @callback Wrapper
+ * @param {Block} Block class to wrap.
+ * @returns {Block} New Block class.
+ */
+
 var blocks = Object.create(null);
 var mixins = Object.create(null);
 var isPrototypeOf = {}.isPrototypeOf;
@@ -14462,6 +14468,38 @@ var Block = function () {
 
         _this6.$$.locals[local].watchers.perm.push(watcher);
       });
+    }
+
+    /**
+     * @method Block#wrap
+     * @public
+     * @param {Wrapper} func - Function that returns wrapped block.
+     * @returns {Block} New block.
+     * @description Method for wrapping blocks into another blocks.
+     * It is considered best practice to just extends the old block with a new one.
+     *
+     * @example
+     * class MyBlock extends Block {
+     *   static template = '<div>123</div>';
+     * }
+     *
+     * MyBlock.wrap((Block) => {
+     *   return class extends Block {
+     *     static template = `<section class="wrapper">${ Block.template }</section>`;
+     *
+     *     constructor() {
+     *       this.additionalVar = 'additional';
+     *     }
+     *   };
+     * });
+     */
+
+  }, {
+    key: 'wrap',
+    value: function wrap(func) {
+      validate$1([func], ['function']);
+
+      return func(this);
     }
   }]);
   return Block;
@@ -15141,20 +15179,6 @@ function constructPublicScope(scope, scopeValues, privateScope) {
       }
     };
   }).$);
-}
-
-function wrap(Block) {
-  var middlewares = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-
-  return new Arr(middlewares).reduce(function (Block, middleware) {
-    if (!isFunction(middleware)) {
-      return Block;
-    }
-
-    var block = middleware(Block);
-
-    return isInstanceOfBlock(block) ? block : Block;
-  }, Block);
 }
 
 /**
@@ -17545,7 +17569,6 @@ var statics = Object.freeze({
 	Block: Block,
 	Mixin: Mixin,
 	initApp: initApp,
-	wrap: wrap,
 	Dat: Dat,
 	now: now,
 	date: date,
@@ -17619,7 +17642,6 @@ exports.blob = blob$1;
 exports.Block = Block;
 exports.Mixin = Mixin;
 exports.initApp = initApp;
-exports.wrap = wrap;
 exports.Dat = Dat;
 exports.now = now;
 exports.date = date;
