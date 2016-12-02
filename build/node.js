@@ -91,7 +91,118 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 
 
+var asyncGenerator = function () {
+  function AwaitValue(value) {
+    this.value = value;
+  }
 
+  function AsyncGenerator(gen) {
+    var front, back;
+
+    function send(key, arg) {
+      return new Promise(function (resolve, reject) {
+        var request = {
+          key: key,
+          arg: arg,
+          resolve: resolve,
+          reject: reject,
+          next: null
+        };
+
+        if (back) {
+          back = back.next = request;
+        } else {
+          front = back = request;
+          resume(key, arg);
+        }
+      });
+    }
+
+    function resume(key, arg) {
+      try {
+        var result = gen[key](arg);
+        var value = result.value;
+
+        if (value instanceof AwaitValue) {
+          Promise.resolve(value.value).then(function (arg) {
+            resume("next", arg);
+          }, function (arg) {
+            resume("throw", arg);
+          });
+        } else {
+          settle(result.done ? "return" : "normal", result.value);
+        }
+      } catch (err) {
+        settle("throw", err);
+      }
+    }
+
+    function settle(type, value) {
+      switch (type) {
+        case "return":
+          front.resolve({
+            value: value,
+            done: true
+          });
+          break;
+
+        case "throw":
+          front.reject(value);
+          break;
+
+        default:
+          front.resolve({
+            value: value,
+            done: false
+          });
+          break;
+      }
+
+      front = front.next;
+
+      if (front) {
+        resume(front.key, front.arg);
+      } else {
+        back = null;
+      }
+    }
+
+    this._invoke = send;
+
+    if (typeof gen.return !== "function") {
+      this.return = undefined;
+    }
+  }
+
+  if (typeof Symbol === "function" && Symbol.asyncIterator) {
+    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
+      return this;
+    };
+  }
+
+  AsyncGenerator.prototype.next = function (arg) {
+    return this._invoke("next", arg);
+  };
+
+  AsyncGenerator.prototype.throw = function (arg) {
+    return this._invoke("throw", arg);
+  };
+
+  AsyncGenerator.prototype.return = function (arg) {
+    return this._invoke("return", arg);
+  };
+
+  return {
+    wrap: function (fn) {
+      return function () {
+        return new AsyncGenerator(fn.apply(this, arguments));
+      };
+    },
+    await: function (value) {
+      return new AwaitValue(value);
+    }
+  };
+}();
 
 
 
@@ -1452,15 +1563,15 @@ var Switcher = function (_Function) {
 
     function switcher(value) {
       var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-      var _switcher$$$ = switcher.$$,
-          mode = _switcher$$$.mode,
-          def = _switcher$$$.default,
-          cases = _switcher$$$.cases;
+      var _switcher$$$ = switcher.$$;
+      var mode = _switcher$$$.mode;
+      var def = _switcher$$$.default;
+      var cases = _switcher$$$.cases;
 
 
       var ret = iterate(cases, function (_ref) {
-        var val = _ref.value,
-            Case = _ref.case;
+        var val = _ref.value;
+        var Case = _ref.case;
 
         if (mode === 'boolean' && Case ||
         /* eslint eqeqeq: 0 */
@@ -3925,8 +4036,8 @@ var Promise$1 = function () {
             onReject[i](err);
           }
 
-          var onUnhandledRejection = Promise.onUnhandledRejection,
-              onError = Promise.onError;
+          var onUnhandledRejection = Promise.onUnhandledRejection;
+          var onError = Promise.onError;
 
 
           if (isFunction(onError)) {
@@ -4269,14 +4380,14 @@ var Func = function (_Super) {
 
       if (++proxy.$$.called < proxy.$$.canBeCalled) {
         var _ret2 = function () {
-          var _proxy$$$ = proxy.$$,
-              before = _proxy$$$.before,
-              after = _proxy$$$.after,
-              sync = _proxy$$$.sync,
-              contextLocked = _proxy$$$.contextLocked;
-          var _proxy$$$2 = proxy.$$,
-              context = _proxy$$$2.context,
-              args = _proxy$$$2.args;
+          var _proxy$$$ = proxy.$$;
+          var before = _proxy$$$.before;
+          var after = _proxy$$$.after;
+          var sync = _proxy$$$.sync;
+          var contextLocked = _proxy$$$.contextLocked;
+          var _proxy$$$2 = proxy.$$;
+          var context = _proxy$$$2.context;
+          var args = _proxy$$$2.args;
 
           var ret = void 0;
 
@@ -6949,9 +7060,9 @@ function parseJSON() {
     options = {};
   }
 
-  var _options = options,
-      numbers = _options.numbers,
-      dates = _options.dates;
+  var _options = options;
+  var numbers = _options.numbers;
+  var dates = _options.dates;
 
   var parsed = JSON.parse(json, function (key, value) {
     if (dates && /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.\d\d\dZ?$/.test(value)) {
