@@ -13685,7 +13685,7 @@ function registerDValidate(Mixin) {
         elem.validate(validator);
       }
 
-      if (match === 'on-change' && elem.$$.dwayneData.validators.length === 1) {
+      if (validator === true && match === 'on-change' && elem.$$.dwayneData.validators.length === 1) {
         elem.on(listenerSwitcher(elem.name, [elem.prop('type')]), function () {
           elem.validate();
         });
