@@ -10,7 +10,8 @@ const inject = require('rollup-plugin-inject');
 module.exports = {
   entry: [
     './browser.js',
-    './livereload.js'
+    './livereload.js',
+    './entry.js'
   ],
   dest: './bundle.js',
   format: 'iife',

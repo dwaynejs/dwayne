@@ -26,6 +26,7 @@ const modules = [
   'Alphabet',
   'Arr',
   'BlobObject',
+  'Block',
   'Dat',
   'Elem',
   'Fetch',

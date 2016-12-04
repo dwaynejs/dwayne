@@ -1,0 +1,17 @@
+div(d-elem="elem")
+  d-switch(value="{test}")
+    d-case(if="primitive")
+      PrimitiveTest
+    d-case(if="variables")
+      VariablesTest
+    d-case(if="changing-variables")
+      ChangingVariablesTest
+    d-case(if="changing-args-variables")
+      ChangingArgsVariablesTest(caption="{argForChangingArgsVariablesTest}")
+    d-case(if="changing-globals")
+      ChangingGlobalsTest
+    d-case(if="changing-multiple-variables")
+      ChangingMultipleVariablesTest(caption="{argForChangingMultipleVariablesTest}")
+    d-case(if="d-block-simple")
+      DBlockSimpleTest
+        span {forDBlockTest}
