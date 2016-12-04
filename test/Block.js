@@ -1,7 +1,6 @@
 import { deepStrictEqual, strictEqual } from 'assert';
 import { Block, initApp } from '../lib/Block';
 import { Elem, find } from '../lib/Elem';
-import './blocks';
 import AppTemplate from './blocks/App/index.pug';
 
 let app;
