@@ -360,7 +360,7 @@ class DIfElseIfTest extends Block {
       <d-if if="{variable === 'if'}">
         {captionForIf}
       </d-if>
-      <d-else-if if="{variable === 'else-if}">
+      <d-else-if if="{variable === 'else-if'}">
         {captionForElseIf}
       </d-else-if>
     </div>
