@@ -187,6 +187,196 @@ class DEachScopeTest extends Block {
   }
 }
 
+class DEachChangingSetTest extends Block {
+  static template = `
+    <div id="d-each-changing-set-test">
+      <d-each set="{people}">
+        <span>
+          {$item.name}
+        </span>
+      </d-each>
+    </div>
+  `;
+
+  people = [
+    {
+      id: 0,
+      name: 'Bill'
+    },
+    {
+      id: 1,
+      name: 'John'
+    },
+    {
+      id: 2,
+      name: 'Michael'
+    }
+  ];
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+}
+
+class DEachUIDTest extends Block {
+  static template = `
+    <div id="d-each-uid-test">
+      <d-each set="{people}" uid="{$item.id}">
+        <span>
+          {$item.name}
+        </span>
+      </d-each>
+    </div>
+  `;
+
+  people = [
+    {
+      id: 0,
+      name: 'Bill'
+    },
+    {
+      id: 1,
+      name: 'John'
+    },
+    {
+      id: 2,
+      name: 'Michael'
+    }
+  ];
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+}
+
+class DEachAttrsTest extends Block {
+  static template = `
+    <div id="d-each-attrs-test">
+      <d-each set="{people}" item="person" index="index" uid="{person.id}">
+        <span>
+          {index + ': ' + person.name}
+        </span>
+      </d-each>
+    </div>
+  `;
+
+  people = [
+    {
+      id: 0,
+      name: 'Bill'
+    },
+    {
+      id: 1,
+      name: 'John'
+    },
+    {
+      id: 2,
+      name: 'Michael'
+    }
+  ];
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+}
+
+class DEachNestedTest extends Block {
+  static template = `
+    <table id="d-each-nested-test">
+      <d-each set="{table}" item="row" index="y">
+        <tr>
+          <d-each set="{row}" item="col" index="x">
+            <td>{y + ' * ' + x + ' = ' + y*x + ' = ' + col}</td>
+          </d-each>
+        </tr>
+      </d-each>
+    </table>
+  `;
+
+  table = [
+    [0, 0, 0],
+    [0, 1, 2],
+    [0, 2, 4]
+  ];
+}
+
+class DEachDoubleNestedTest extends Block {
+  static template = `
+    <table id="d-each-double-nested-test">
+      <d-each set="{table}" item="row" index="a">
+        <tr>
+          <d-each set="{row}" item="col" index="b">
+            <td>
+              <d-each set="{col}" item="val" index="c">
+                <span>{'' + a + b + c + val}</span>
+              </d-each>
+            </td>
+          </d-each>
+        </tr>
+      </d-each>
+    </table>
+  `;
+
+  table = [
+    [
+      [0, 1],
+      [2, 3]
+    ],
+    [
+      [4, 5],
+      [6, 7]
+    ]
+  ];
+}
+
+class DIfSimpleTest extends Block {
+  static template = `
+    <div id="d-if-simple-test">
+      <d-if if="{condition}">
+        {caption}
+      </d-if>
+    </div>
+  `;
+
+  condition = false;
+  caption = '';
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+}
+
+class DIfElseIfTest extends Block {
+  static template = `
+    <div id="d-if-else-if-test">
+      <d-if if="{variable === 'if'}">
+        {captionForIf}
+      </d-if>
+      <d-else-if if="{variable === 'else-if}">
+        {captionForElseIf}
+      </d-else-if>
+    </div>
+  `;
+
+  variable = null;
+  captionForIf = '';
+  captionForElseIf = '';
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+}
+
 Block.register('App', App);
 Block.register('PrimitiveTest', PrimitiveTest);
 Block.register('VariablesTest', VariablesTest);
@@ -194,12 +384,22 @@ Block.register('ChangingVariablesTest', ChangingVariablesTest);
 Block.register('ChangingArgsVariablesTest', ChangingArgsVariablesTest);
 Block.register('ChangingGlobalsTest', ChangingGlobalsTest);
 Block.register('ChangingMultipleVariablesTest', ChangingMultipleVariablesTest);
+
 Block.register('DBlockSimpleTest', DBlockSimpleTest);
 Block.register('DBlockNamedTest', DBlockNamedTest);
 Block.register('DBlockNestedTest', DBlockNestedTest);
 Block.register('DBlockNestedTestHelper', DBlockNestedTestHelper);
+
 Block.register('DEachSimpleTest', DEachSimpleTest);
 Block.register('DEachScopeTest', DEachScopeTest);
+Block.register('DEachChangingSetTest', DEachChangingSetTest);
+Block.register('DEachUIDTest', DEachUIDTest);
+Block.register('DEachAttrsTest', DEachAttrsTest);
+Block.register('DEachNestedTest', DEachNestedTest);
+Block.register('DEachDoubleNestedTest', DEachDoubleNestedTest);
+
+Block.register('DIfSimpleTest', DIfSimpleTest);
+Block.register('DIfElseIfTest', DIfElseIfTest);
 
 before((done) => {
   let isDone = 0;
@@ -433,7 +633,7 @@ describe('it should test Block', () => {
     });
   });
   describe('d-block', () => {
-    describe('d-block simple test', () => {
+    describe('simple test', () => {
       before((done) => {
         app.test = 'd-block-simple';
 
@@ -463,7 +663,7 @@ describe('it should test Block', () => {
         }, 0);
       });
     });
-    describe('d-block named test', () => {
+    describe('named test', () => {
       before((done) => {
         app.test = 'd-block-named';
 
@@ -506,7 +706,7 @@ describe('it should test Block', () => {
         }, 0);
       });
     });
-    describe('d-block nested test', () => {
+    describe('nested test', () => {
       before((done) => {
         app.test = 'd-block-nested';
 
@@ -549,7 +749,7 @@ describe('it should test Block', () => {
     });
   });
   describe('d-each', () => {
-    describe('d-each simple test', () => {
+    describe('simple test', () => {
       before((done) => {
         app.test = 'd-each-simple';
 
@@ -571,7 +771,7 @@ describe('it should test Block', () => {
         strictEqual(nestedChildren.elem(2).text(), '20');
       });
     });
-    describe('d-each scope test', () => {
+    describe('scope test', () => {
       before((done) => {
         app.test = 'd-each-scope';
 
@@ -633,6 +833,334 @@ describe('it should test Block', () => {
             strictEqual(nestedChildren.elem(1).text(), '2 is not one');
             strictEqual(nestedChildren.elem(2).id(), 'item-2');
             strictEqual(nestedChildren.elem(2).text(), '1 is not zero');
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+    });
+    describe('changing set test', () => {
+      before((done) => {
+        app.test = 'd-each-changing-set';
+
+        setTimeout(done, 0);
+      });
+
+      it('should render captions using variables from the d-each scope', () => {
+        const children = appElem.children().exceptComments();
+        const nestedChildren = children.elem(0).children().exceptComments();
+
+        strictEqual(children.length, 1);
+        strictEqual(children.elem(0).id(), 'd-each-changing-set-test');
+        strictEqual(nestedChildren.length, 3);
+        strictEqual(nestedChildren.elem(0).text(), 'Bill');
+        strictEqual(nestedChildren.elem(1).text(), 'John');
+        strictEqual(nestedChildren.elem(2).text(), 'Michael');
+      });
+      it('should re-render captions when the set changes', (done) => {
+        currentBlock.people = [
+          ...currentBlock.people.slice(1)
+        ];
+
+        setTimeout(() => {
+          const children = appElem.children().exceptComments();
+          const nestedChildren = children.elem(0).children().exceptComments();
+
+          try {
+            strictEqual(nestedChildren.length, 2);
+            strictEqual(nestedChildren.elem(0).text(), 'John');
+            strictEqual(nestedChildren.elem(1).text(), 'Michael');
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 50);
+      });
+    });
+    describe('uid test', () => {
+      before((done) => {
+        app.test = 'd-each-uid';
+
+        setTimeout(done, 0);
+      });
+
+      it('should render captions using variables from the d-each scope', () => {
+        const children = appElem.children().exceptComments();
+        const nestedChildren = children.elem(0).children().exceptComments();
+
+        strictEqual(children.length, 1);
+        strictEqual(children.elem(0).id(), 'd-each-uid-test');
+        strictEqual(nestedChildren.length, 3);
+        strictEqual(nestedChildren.elem(0).text(), 'Bill');
+        strictEqual(nestedChildren.elem(1).text(), 'John');
+        strictEqual(nestedChildren.elem(2).text(), 'Michael');
+      });
+      it('should not re-render captions which don\'t change when the set changes', (done) => {
+        const children = appElem.children().exceptComments();
+        const nestedChildren = children.elem(0).children().exceptComments();
+        const JohnSpan = nestedChildren.elem(1);
+        const MichaelSpan = nestedChildren.elem(2);
+
+        currentBlock.people = [
+          ...currentBlock.people.slice(1)
+        ];
+
+        setTimeout(() => {
+          const children = appElem.children().exceptComments();
+          const nestedChildren = children.elem(0).children().exceptComments();
+
+          try {
+            strictEqual(nestedChildren.length, 2);
+            strictEqual(nestedChildren.elem(0).text(), 'John');
+            strictEqual(nestedChildren.elem(1).text(), 'Michael');
+            strictEqual(JohnSpan.isWithinDocument(), true);
+            strictEqual(MichaelSpan.isWithinDocument(), true);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 50);
+      });
+    });
+    describe('attrs test', () => {
+      before((done) => {
+        app.test = 'd-each-attrs';
+
+        setTimeout(done, 0);
+      });
+
+      it('should render captions using redefined variables from the d-each scope', () => {
+        const children = appElem.children().exceptComments();
+        const nestedChildren = children.elem(0).children().exceptComments();
+
+        strictEqual(children.length, 1);
+        strictEqual(children.elem(0).id(), 'd-each-attrs-test');
+        strictEqual(nestedChildren.length, 3);
+        strictEqual(nestedChildren.elem(0).text(), '0: Bill');
+        strictEqual(nestedChildren.elem(1).text(), '1: John');
+        strictEqual(nestedChildren.elem(2).text(), '2: Michael');
+      });
+    });
+    describe('nested test', () => {
+      before((done) => {
+        app.test = 'd-each-nested';
+
+        setTimeout(done, 0);
+      });
+
+      it('should render captions using variables from both d-each scopes', () => {
+        const children = appElem.children().exceptComments();
+        const nestedChildren = children.elem(0).children().exceptComments();
+        const nestedChildren0 = nestedChildren.elem(0).children().exceptComments();
+        const nestedChildren1 = nestedChildren.elem(1).children().exceptComments();
+        const nestedChildren2 = nestedChildren.elem(2).children().exceptComments();
+
+        strictEqual(children.length, 1);
+        strictEqual(children.elem(0).name, 'table');
+        strictEqual(children.elem(0).id(), 'd-each-nested-test');
+        strictEqual(nestedChildren.length, 3);
+        strictEqual(nestedChildren.elem(0).name, 'tr');
+        strictEqual(nestedChildren0.elem(0).name, 'td');
+        strictEqual(nestedChildren0.elem(0).text(), '0 * 0 = 0 = 0');
+        strictEqual(nestedChildren0.elem(1).name, 'td');
+        strictEqual(nestedChildren0.elem(1).text(), '0 * 1 = 0 = 0');
+        strictEqual(nestedChildren0.elem(2).name, 'td');
+        strictEqual(nestedChildren0.elem(2).text(), '0 * 2 = 0 = 0');
+        strictEqual(nestedChildren.elem(1).name, 'tr');
+        strictEqual(nestedChildren1.elem(0).name, 'td');
+        strictEqual(nestedChildren1.elem(0).text(), '1 * 0 = 0 = 0');
+        strictEqual(nestedChildren1.elem(1).name, 'td');
+        strictEqual(nestedChildren1.elem(1).text(), '1 * 1 = 1 = 1');
+        strictEqual(nestedChildren1.elem(2).name, 'td');
+        strictEqual(nestedChildren1.elem(2).text(), '1 * 2 = 2 = 2');
+        strictEqual(nestedChildren.elem(2).name, 'tr');
+        strictEqual(nestedChildren2.elem(0).name, 'td');
+        strictEqual(nestedChildren2.elem(0).text(), '2 * 0 = 0 = 0');
+        strictEqual(nestedChildren2.elem(1).name, 'td');
+        strictEqual(nestedChildren2.elem(1).text(), '2 * 1 = 2 = 2');
+        strictEqual(nestedChildren2.elem(2).name, 'td');
+        strictEqual(nestedChildren2.elem(2).text(), '2 * 2 = 4 = 4');
+      });
+    });
+    describe('double-nested test', () => {
+      before((done) => {
+        app.test = 'd-each-double-nested';
+
+        setTimeout(done, 0);
+      });
+
+      it('should render captions using variables from all three d-each scopes', () => {
+        const children = appElem.children().exceptComments();
+        const nestedChildren = children.elem(0).children().exceptComments();
+        const nestedChildren0 = nestedChildren.elem(0).children().exceptComments();
+        const nestedChildren1 = nestedChildren.elem(1).children().exceptComments();
+        const nestedChildren2 = nestedChildren0.elem(0).children().exceptComments();
+        const nestedChildren3 = nestedChildren0.elem(1).children().exceptComments();
+        const nestedChildren4 = nestedChildren1.elem(0).children().exceptComments();
+        const nestedChildren5 = nestedChildren1.elem(1).children().exceptComments();
+
+        strictEqual(children.length, 1);
+        strictEqual(children.elem(0).name, 'table');
+        strictEqual(children.elem(0).id(), 'd-each-double-nested-test');
+        strictEqual(nestedChildren.length, 2);
+        strictEqual(nestedChildren.elem(0).name, 'tr');
+        strictEqual(nestedChildren0.elem(0).name, 'td');
+        strictEqual(nestedChildren2.elem(0).name, 'span');
+        strictEqual(nestedChildren2.elem(0).text(), '0000');
+        strictEqual(nestedChildren2.elem(1).name, 'span');
+        strictEqual(nestedChildren2.elem(1).text(), '0011');
+        strictEqual(nestedChildren0.elem(1).name, 'td');
+        strictEqual(nestedChildren3.elem(0).name, 'span');
+        strictEqual(nestedChildren3.elem(0).text(), '0102');
+        strictEqual(nestedChildren3.elem(1).name, 'span');
+        strictEqual(nestedChildren3.elem(1).text(), '0113');
+        strictEqual(nestedChildren.elem(1).name, 'tr');
+        strictEqual(nestedChildren1.elem(0).name, 'td');
+        strictEqual(nestedChildren4.elem(0).name, 'span');
+        strictEqual(nestedChildren4.elem(0).text(), '1004');
+        strictEqual(nestedChildren4.elem(1).name, 'span');
+        strictEqual(nestedChildren4.elem(1).text(), '1015');
+        strictEqual(nestedChildren1.elem(1).name, 'td');
+        strictEqual(nestedChildren5.elem(0).name, 'span');
+        strictEqual(nestedChildren5.elem(0).text(), '1106');
+        strictEqual(nestedChildren5.elem(1).name, 'span');
+        strictEqual(nestedChildren5.elem(1).text(), '1117');
+      });
+    });
+  });
+  describe('d-if', () => {
+    describe('simple test', () => {
+      before((done) => {
+        app.test = 'd-if-simple';
+
+        setTimeout(done, 0);
+      });
+
+      it('should not render anything if the condition is negative', () => {
+        const children = appElem.children().exceptComments();
+        const nestedChildren = children.elem(0).children().exceptComments();
+
+        strictEqual(children.length, 1);
+        strictEqual(children.elem(0).id(), 'd-if-simple-test');
+        strictEqual(nestedChildren.length, 0);
+      });
+      it('should re-render caption after the condition has been changed', (done) => {
+        currentBlock.condition = true;
+        const caption = currentBlock.caption = 'Hello, world!';
+
+        setTimeout(() => {
+          const children = appElem.children().exceptComments();
+          const nestedChildren = children.elem(0).children().exceptComments();
+
+          try {
+            strictEqual(nestedChildren.length, 1);
+            strictEqual(nestedChildren.text(), caption);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should re-render caption again after the condition has been changed', (done) => {
+        currentBlock.condition = false;
+
+        setTimeout(() => {
+          const children = appElem.children().exceptComments();
+          const nestedChildren = children.elem(0).children().exceptComments();
+
+          try {
+            strictEqual(nestedChildren.length, 0);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+    });
+    describe('else-if test', () => {
+      before((done) => {
+        app.test = 'd-if-else-if';
+
+        setTimeout(done, 0);
+      });
+
+      it('should not render anything if no condition are true', () => {
+        const children = appElem.children().exceptComments();
+        const nestedChildren = children.elem(0).children().exceptComments();
+
+        strictEqual(children.length, 1);
+        strictEqual(children.elem(0).id(), 'd-if-else-if-test');
+        strictEqual(nestedChildren.length, 0);
+      });
+      it('should render caption after some condition has been changed to true', (done) => {
+        currentBlock.variable = 'if';
+        const caption = currentBlock.captionForIf = 'IF';
+
+        setTimeout(() => {
+          const children = appElem.children().exceptComments();
+          const nestedChildren = children.elem(0).children().exceptComments();
+
+          try {
+            strictEqual(nestedChildren.length, 1);
+            strictEqual(nestedChildren.text(), caption);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should re-render caption after some important condition has been changed', (done) => {
+        currentBlock.variable = 'else-if';
+        const caption = currentBlock.captionForElseIf = 'ELSE_IF';
+
+        setTimeout(() => {
+          const children = appElem.children().exceptComments();
+          const nestedChildren = children.elem(0).children().exceptComments();
+
+          try {
+            strictEqual(nestedChildren.length, 1);
+            strictEqual(nestedChildren.text(), caption);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should re-render caption after some condition has been changed again', (done) => {
+        currentBlock.variable = 'if';
+        const caption = currentBlock.captionForIf = 'IF_AGAIN';
+
+        setTimeout(() => {
+          const children = appElem.children().exceptComments();
+          const nestedChildren = children.elem(0).children().exceptComments();
+
+          try {
+            strictEqual(nestedChildren.length, 1);
+            strictEqual(nestedChildren.text(), caption);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should render nothing again after all conditions are false again', (done) => {
+        currentBlock.variable = 'else';
+
+        setTimeout(() => {
+          const children = appElem.children().exceptComments();
+          const nestedChildren = children.elem(0).children().exceptComments();
+
+          try {
+            strictEqual(nestedChildren.length, 0);
 
             done();
           } catch (err) {
