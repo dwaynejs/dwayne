@@ -2,6 +2,7 @@ div(d-elem="elem")
   d-switch(value="{test}")
     d-case(if="primitive")
       PrimitiveTest
+
     d-case(if="variables")
       VariablesTest
     d-case(if="changing-variables")
@@ -12,6 +13,7 @@ div(d-elem="elem")
       ChangingGlobalsTest
     d-case(if="changing-multiple-variables")
       ChangingMultipleVariablesTest(caption="{argForChangingMultipleVariablesTest}")
+
     d-case(if="d-block-simple")
       DBlockSimpleTest
         span {forDBlockTest}
@@ -27,6 +29,7 @@ div(d-elem="elem")
           span {forDBlockNestedA}
         d-block-b
           span {forDBlockNestedB}
+
     d-case(if="d-each-simple")
       DEachSimpleTest
     d-case(if="d-each-scope")
@@ -41,7 +44,46 @@ div(d-elem="elem")
       DEachNestedTest
     d-case(if="d-each-double-nested")
       DEachDoubleNestedTest
+
     d-case(if="d-if-simple")
       DIfSimpleTest
     d-case(if="d-if-else-if")
       DIfElseIfTest
+    d-case(if="d-if-else-if-else")
+      DIfElseIfElseTest
+
+    d-case(if="d-attr-simple")
+      DAttrSimpleTest
+    d-case(if="d-attr-conflict")
+      DAttrConflictTest
+
+    d-case(if="d-bind")
+      DBindTest
+
+    d-case(if="d-class-simple")
+      DClassSimpleTest
+    d-case(if="d-class-conflict")
+      DClassConflictTest
+
+    d-case(if="d-elem")
+      DElemTest
+
+    d-case(if="d-hide")
+      DHideTest
+
+    d-case(if="d-on")
+      DOnTest
+
+    d-case(if="d-show")
+      DShowTest
+
+    d-case(if="d-style-simple")
+      DStyleSimpleTest
+    d-case(if="d-style-conflict")
+      DStyleConflictTest
+
+    d-case(if="d-validate")
+      DValidateTest
+
+    d-case(if="d-value-simple")
+      DValueSimpleTest

@@ -2,12 +2,15 @@ import { deepStrictEqual, strictEqual } from 'assert';
 import { Block, initApp } from '../lib/Block';
 import { Arr } from '../lib/Arr';
 import { Elem, find } from '../lib/Elem';
+import { Super } from '../lib/Super';
+import { isNil } from '../lib/helpers';
 import AppTemplate from './blocks/App/index.pug';
 
 let app;
 let currentBlock;
 let appRendered;
 let appElem;
+let inputElem;
 
 Elem.prototype.exceptComments = function () {
   return this.filter((elem) => new Elem(elem).name !== '#comment');
@@ -54,7 +57,6 @@ class VariablesTest extends Block {
 
   caption = 'Hello, world!';
 }
-
 class ChangingVariablesTest extends Block {
   static template = '<div id="changing-variables-test">{caption}</div>';
 
@@ -66,15 +68,12 @@ class ChangingVariablesTest extends Block {
     currentBlock = this;
   }
 }
-
 class ChangingArgsVariablesTest extends Block {
   static template = '<div id="changing-args-variables-test">{args.caption}</div>';
 }
-
 class ChangingGlobalsTest extends Block {
   static template = '<div id="changing-globals-test">{global.forChangingGlobalsTest}</div>';
 }
-
 class ChangingMultipleVariablesTest extends Block {
   static template = `
     <div id="changing-multiple-variables-test">
@@ -98,7 +97,6 @@ class DBlockSimpleTest extends Block {
     </div>
   `;
 }
-
 class DBlockNamedTest extends Block {
   static template = `
     <div id="d-block-named-test">
@@ -114,7 +112,6 @@ class DBlockNamedTest extends Block {
     </div>
   `;
 }
-
 class DBlockNestedTest extends Block {
   static template = `
     <div id="d-block-nested-test">
@@ -129,7 +126,6 @@ class DBlockNestedTest extends Block {
     </div>
   `;
 }
-
 class DBlockNestedTestHelper extends Block {
   static template = `
     <div id="d-block-a">
@@ -152,7 +148,6 @@ class DEachSimpleTest extends Block {
     </div>
   `;
 }
-
 class DEachScopeTest extends Block {
   static template = `
     <div id="d-each-scope-test">
@@ -186,7 +181,6 @@ class DEachScopeTest extends Block {
     currentBlock = this;
   }
 }
-
 class DEachChangingSetTest extends Block {
   static template = `
     <div id="d-each-changing-set-test">
@@ -219,7 +213,6 @@ class DEachChangingSetTest extends Block {
     currentBlock = this;
   }
 }
-
 class DEachUIDTest extends Block {
   static template = `
     <div id="d-each-uid-test">
@@ -252,7 +245,6 @@ class DEachUIDTest extends Block {
     currentBlock = this;
   }
 }
-
 class DEachAttrsTest extends Block {
   static template = `
     <div id="d-each-attrs-test">
@@ -285,7 +277,6 @@ class DEachAttrsTest extends Block {
     currentBlock = this;
   }
 }
-
 class DEachNestedTest extends Block {
   static template = `
     <table id="d-each-nested-test">
@@ -305,7 +296,6 @@ class DEachNestedTest extends Block {
     [0, 2, 4]
   ];
 }
-
 class DEachDoubleNestedTest extends Block {
   static template = `
     <table id="d-each-double-nested-test">
@@ -353,7 +343,6 @@ class DIfSimpleTest extends Block {
     currentBlock = this;
   }
 }
-
 class DIfElseIfTest extends Block {
   static template = `
     <div id="d-if-else-if-test">
@@ -369,6 +358,227 @@ class DIfElseIfTest extends Block {
   variable = null;
   captionForIf = '';
   captionForElseIf = '';
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+}
+class DIfElseIfElseTest extends Block {
+  static template = `
+    <div id="d-if-else-if-else-test">
+      <d-if if="{variable === 'if'}">
+        {captionForIf}
+      </d-if>
+      <d-else-if if="{variable === 'else-if'}">
+        {captionForElseIf}
+      </d-else-if>
+      <d-else>
+        {captionForElse}
+      </d-else>
+    </div>
+  `;
+
+  variable = null;
+  captionForIf = '';
+  captionForElseIf = '';
+  captionForElse = '';
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+}
+
+class DAttrSimpleTest extends Block {
+  static template = '<div id="d-attr-simple-test" d-attr="{attrs}"/>';
+
+  attrs = {
+    a: '1'
+  };
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+}
+class DAttrConflictTest extends Block {
+  static template = '<div id="d-attr-conflict-test" d-attr-a="{attrsA}" d-attr-b="{attrsB}"/>';
+
+  attrsA = {
+    a: '1'
+  };
+  attrsB = {
+    b: '1'
+  };
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+}
+
+class DBindTest extends Block {
+  static template = `
+    <div id="d-bind-test" d-bind-click="{onClick}"/>
+  `;
+
+  onClick = null;
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+}
+
+class DClassSimpleTest extends Block {
+  static template = '<div id="d-class-simple-test" d-class="{classes}"/>';
+
+  classes = 'a';
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+}
+class DClassConflictTest extends Block {
+  static template = `
+    <div
+      id="d-class-conflict-test"
+      d-class-string="{stringClasses}"
+      d-class-array="{arrayClasses}"
+      d-class-object="{objectClasses}"
+    />`;
+
+  stringClasses = 'a b';
+  arrayClasses = ['c', 'd', false];
+  objectClasses = {
+    e: true,
+    f: true,
+    g: false
+  };
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+}
+
+class DElemTest extends Block {
+  static template = `
+    <div id="d-elem-test">
+      <span d-elem="span"/>
+      <input d-elem="{setInput}"/>
+    </div>
+  `;
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+
+  setInput(input) {
+    inputElem = input;
+  }
+}
+
+class DHideTest extends Block {
+  static template = '<div id="d-hide-test" d-hide="{hide}"/>';
+
+  hide = false;
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+}
+
+class DOnTest extends Block {
+  static template = `
+    <div id="d-on-test" d-on-click="{onClick()}"/>
+  `;
+
+  onClick = null;
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+}
+
+class DShowTest extends Block {
+  static template = '<div id="d-show-test" d-show="{show}"/>';
+
+  show = true;
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+}
+
+class DStyleSimpleTest extends Block {
+  static template = '<div id="d-style-simple-test" d-style="{styles}"/>';
+
+  styles = {
+    left: '10px'
+  };
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+}
+class DStyleConflictTest extends Block {
+  static template = '<div id="d-style-conflict-test" d-style-a="{stylesA}" d-style-b="{stylesB}"/>';
+
+  stylesA = {
+    left: '10px'
+  };
+  stylesB = {
+    top: '10px'
+  };
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+}
+
+class DValidateTest extends Block {
+  static template = '<input id="d-validate-test" d-validate="{validator}"/>';
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+
+  validator() {}
+}
+
+class DValueSimpleTest extends Block {
+  static template = `
+    <div id="d-value-simple-test">
+      <input d-value="input"/>
+      <input d-value="input"/>
+    </div>
+  `;
+
+  input = '123';
 
   constructor(opts) {
     super(opts);
@@ -400,6 +610,30 @@ Block.register('DEachDoubleNestedTest', DEachDoubleNestedTest);
 
 Block.register('DIfSimpleTest', DIfSimpleTest);
 Block.register('DIfElseIfTest', DIfElseIfTest);
+Block.register('DIfElseIfElseTest', DIfElseIfElseTest);
+
+Block.register('DAttrSimpleTest', DAttrSimpleTest);
+Block.register('DAttrConflictTest', DAttrConflictTest);
+
+Block.register('DBindTest', DBindTest);
+
+Block.register('DClassSimpleTest', DClassSimpleTest);
+Block.register('DClassConflictTest', DClassConflictTest);
+
+Block.register('DElemTest', DElemTest);
+
+Block.register('DHideTest', DHideTest);
+
+Block.register('DOnTest', DOnTest);
+
+Block.register('DShowTest', DShowTest);
+
+Block.register('DStyleSimpleTest', DStyleSimpleTest);
+Block.register('DStyleConflictTest', DStyleConflictTest);
+
+Block.register('DValidateTest', DValidateTest);
+
+Block.register('DValueSimpleTest', DValueSimpleTest);
 
 before((done) => {
   let isDone = 0;
@@ -435,204 +669,206 @@ describe('it should test Block', () => {
       strictEqual(children.elem(0).html(), '<span>Hello, world!</span>');
     });
   });
-  describe('variables test', () => {
-    before((done) => {
-      app.test = 'variables';
+  describe('variables tests', () => {
+    describe('variables test', () => {
+      before((done) => {
+        app.test = 'variables';
 
-      setTimeout(done, 0);
+        setTimeout(done, 0);
+      });
+
+      it('should render caption using local variable from the block', () => {
+        const children = appElem.children().exceptComments();
+
+        strictEqual(children.length, 1);
+        strictEqual(children.elem(0).id(), 'variables-test');
+        strictEqual(children.elem(0).text(), 'Hello, world!');
+      });
     });
+    describe('changing variables test', () => {
+      before((done) => {
+        app.test = 'changing-variables';
 
-    it('should render caption using local variable from the block', () => {
-      const children = appElem.children().exceptComments();
+        setTimeout(done, 0);
+      });
 
-      strictEqual(children.length, 1);
-      strictEqual(children.elem(0).id(), 'variables-test');
-      strictEqual(children.elem(0).text(), 'Hello, world!');
+      it('should render caption using local variable from the block', () => {
+        const children = appElem.children().exceptComments();
+
+        strictEqual(children.length, 1);
+        strictEqual(children.elem(0).id(), 'changing-variables-test');
+        strictEqual(children.elem(0).text(), '');
+      });
+      it('should re-render caption after it\'s been changed', (done) => {
+        const caption = currentBlock.caption = 'Hello, world!';
+
+        setTimeout(() => {
+          const children = appElem.children().exceptComments();
+
+          try {
+            strictEqual(children.elem(0).text(), caption);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should re-render caption again after it\'s been changed', (done) => {
+        const caption = currentBlock.caption = 'Hello, world, again!';
+
+        setTimeout(() => {
+          const children = appElem.children().exceptComments();
+
+          try {
+            strictEqual(children.elem(0).text(), caption);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+    });
+    describe('changing args variables test', () => {
+      before((done) => {
+        app.test = 'changing-args-variables';
+
+        setTimeout(done, 0);
+      });
+
+      it('should render caption using args variable from the block', () => {
+        const children = appElem.children().exceptComments();
+
+        strictEqual(children.length, 1);
+        strictEqual(children.elem(0).id(), 'changing-args-variables-test');
+        strictEqual(children.elem(0).text(), '');
+      });
+      it('should re-render caption after the arg has been changed', (done) => {
+        const caption = app.argForChangingArgsVariablesTest = 'Hello, world!';
+
+        setTimeout(() => {
+          const children = appElem.children().exceptComments();
+
+          try {
+            strictEqual(children.elem(0).text(), caption);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should re-render caption again after the arg been changed', (done) => {
+        const caption = app.argForChangingArgsVariablesTest = 'Hello, world, again!';
+
+        setTimeout(() => {
+          const children = appElem.children().exceptComments();
+
+          try {
+            strictEqual(children.elem(0).text(), caption);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+    });
+    describe('changing globals test', () => {
+      before((done) => {
+        app.test = 'changing-globals';
+
+        setTimeout(done, 0);
+      });
+
+      it('should render caption using global variable', () => {
+        const children = appElem.children().exceptComments();
+
+        strictEqual(children.length, 1);
+        strictEqual(children.elem(0).id(), 'changing-globals-test');
+        strictEqual(children.elem(0).text(), '');
+      });
+      it('should re-render caption after the global has been changed', (done) => {
+        const caption = app.global.forChangingGlobalsTest = 'Hello, world!';
+
+        setTimeout(() => {
+          const children = appElem.children().exceptComments();
+
+          try {
+            strictEqual(children.elem(0).text(), caption);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should re-render caption again after the global been changed', (done) => {
+        const caption = app.global.forChangingGlobalsTest = 'Hello, world, again!';
+
+        setTimeout(() => {
+          const children = appElem.children().exceptComments();
+
+          try {
+            strictEqual(children.elem(0).text(), caption);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+    });
+    describe('changing multiple variables test', () => {
+      before((done) => {
+        app.test = 'changing-multiple-variables';
+
+        setTimeout(done, 0);
+      });
+
+      it('should render caption using variables', () => {
+        const children = appElem.children().exceptComments();
+
+        strictEqual(children.length, 1);
+        strictEqual(children.elem(0).id(), 'changing-multiple-variables-test');
+        strictEqual(children.elem(0).text(), 'Hello, world!');
+      });
+      it('should re-render caption after one variable has been changed', (done) => {
+        app.global.forChangingMultipleVariablesTest = 'Goodbye';
+
+        setTimeout(() => {
+          const children = appElem.children().exceptComments();
+
+          try {
+            strictEqual(children.elem(0).text(), 'Goodbye, world!');
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should re-render caption after all variables have been changed', (done) => {
+        app.global.forChangingMultipleVariablesTest = 'To be';
+        app.argForChangingMultipleVariablesTest = ' or ';
+        currentBlock.caption = 'not to be?';
+
+        setTimeout(() => {
+          const children = appElem.children().exceptComments();
+
+          try {
+            strictEqual(children.elem(0).text(), 'To be or not to be?');
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
     });
   });
-  describe('changing variables test', () => {
-    before((done) => {
-      app.test = 'changing-variables';
-
-      setTimeout(done, 0);
-    });
-
-    it('should render caption using local variable from the block', () => {
-      const children = appElem.children().exceptComments();
-
-      strictEqual(children.length, 1);
-      strictEqual(children.elem(0).id(), 'changing-variables-test');
-      strictEqual(children.elem(0).text(), '');
-    });
-    it('should re-render caption after it\'s been changed', (done) => {
-      const caption = currentBlock.caption = 'Hello, world!';
-
-      setTimeout(() => {
-        const children = appElem.children().exceptComments();
-
-        try {
-          strictEqual(children.elem(0).text(), caption);
-
-          done();
-        } catch (err) {
-          done(err);
-        }
-      }, 0);
-    });
-    it('should re-render caption again after it\'s been changed', (done) => {
-      const caption = currentBlock.caption = 'Hello, world, again!';
-
-      setTimeout(() => {
-        const children = appElem.children().exceptComments();
-
-        try {
-          strictEqual(children.elem(0).text(), caption);
-
-          done();
-        } catch (err) {
-          done(err);
-        }
-      }, 0);
-    });
-  });
-  describe('changing args variables test', () => {
-    before((done) => {
-      app.test = 'changing-args-variables';
-
-      setTimeout(done, 0);
-    });
-
-    it('should render caption using args variable from the block', () => {
-      const children = appElem.children().exceptComments();
-
-      strictEqual(children.length, 1);
-      strictEqual(children.elem(0).id(), 'changing-args-variables-test');
-      strictEqual(children.elem(0).text(), '');
-    });
-    it('should re-render caption after the arg has been changed', (done) => {
-      const caption = app.argForChangingArgsVariablesTest = 'Hello, world!';
-
-      setTimeout(() => {
-        const children = appElem.children().exceptComments();
-
-        try {
-          strictEqual(children.elem(0).text(), caption);
-
-          done();
-        } catch (err) {
-          done(err);
-        }
-      }, 0);
-    });
-    it('should re-render caption again after the arg been changed', (done) => {
-      const caption = app.argForChangingArgsVariablesTest = 'Hello, world, again!';
-
-      setTimeout(() => {
-        const children = appElem.children().exceptComments();
-
-        try {
-          strictEqual(children.elem(0).text(), caption);
-
-          done();
-        } catch (err) {
-          done(err);
-        }
-      }, 0);
-    });
-  });
-  describe('changing globals test', () => {
-    before((done) => {
-      app.test = 'changing-globals';
-
-      setTimeout(done, 0);
-    });
-
-    it('should render caption using global variable', () => {
-      const children = appElem.children().exceptComments();
-
-      strictEqual(children.length, 1);
-      strictEqual(children.elem(0).id(), 'changing-globals-test');
-      strictEqual(children.elem(0).text(), '');
-    });
-    it('should re-render caption after the global has been changed', (done) => {
-      const caption = app.global.forChangingGlobalsTest = 'Hello, world!';
-
-      setTimeout(() => {
-        const children = appElem.children().exceptComments();
-
-        try {
-          strictEqual(children.elem(0).text(), caption);
-
-          done();
-        } catch (err) {
-          done(err);
-        }
-      }, 0);
-    });
-    it('should re-render caption again after the global been changed', (done) => {
-      const caption = app.global.forChangingGlobalsTest = 'Hello, world, again!';
-
-      setTimeout(() => {
-        const children = appElem.children().exceptComments();
-
-        try {
-          strictEqual(children.elem(0).text(), caption);
-
-          done();
-        } catch (err) {
-          done(err);
-        }
-      }, 0);
-    });
-  });
-  describe('changing multiple variables test', () => {
-    before((done) => {
-      app.test = 'changing-multiple-variables';
-
-      setTimeout(done, 0);
-    });
-
-    it('should render caption using variables', () => {
-      const children = appElem.children().exceptComments();
-
-      strictEqual(children.length, 1);
-      strictEqual(children.elem(0).id(), 'changing-multiple-variables-test');
-      strictEqual(children.elem(0).text(), 'Hello, world!');
-    });
-    it('should re-render caption after one variable has been changed', (done) => {
-      app.global.forChangingMultipleVariablesTest = 'Goodbye';
-
-      setTimeout(() => {
-        const children = appElem.children().exceptComments();
-
-        try {
-          strictEqual(children.elem(0).text(), 'Goodbye, world!');
-
-          done();
-        } catch (err) {
-          done(err);
-        }
-      }, 0);
-    });
-    it('should re-render caption after all variables have been changed', (done) => {
-      app.global.forChangingMultipleVariablesTest = 'To be';
-      app.argForChangingMultipleVariablesTest = ' or ';
-      currentBlock.caption = 'not to be?';
-
-      setTimeout(() => {
-        const children = appElem.children().exceptComments();
-
-        try {
-          strictEqual(children.elem(0).text(), 'To be or not to be?');
-
-          done();
-        } catch (err) {
-          done(err);
-        }
-      }, 0);
-    });
-  });
-  describe('d-block', () => {
+  describe('d-block tests', () => {
     describe('simple test', () => {
       before((done) => {
         app.test = 'd-block-simple';
@@ -748,7 +984,7 @@ describe('it should test Block', () => {
       });
     });
   });
-  describe('d-each', () => {
+  describe('d-each tests', () => {
     describe('simple test', () => {
       before((done) => {
         app.test = 'd-each-simple';
@@ -877,7 +1113,7 @@ describe('it should test Block', () => {
           } catch (err) {
             done(err);
           }
-        }, 50);
+        }, 25);
       });
     });
     describe('uid test', () => {
@@ -923,7 +1159,7 @@ describe('it should test Block', () => {
           } catch (err) {
             done(err);
           }
-        }, 50);
+        }, 25);
       });
     });
     describe('attrs test', () => {
@@ -1032,7 +1268,7 @@ describe('it should test Block', () => {
       });
     });
   });
-  describe('d-if', () => {
+  describe('d-if tests', () => {
     describe('simple test', () => {
       before((done) => {
         app.test = 'd-if-simple';
@@ -1040,7 +1276,7 @@ describe('it should test Block', () => {
         setTimeout(done, 0);
       });
 
-      it('should not render anything if the condition is negative', () => {
+      it('should not render anything if the condition is false', () => {
         const children = appElem.children().exceptComments();
         const nestedChildren = children.elem(0).children().exceptComments();
 
@@ -1090,7 +1326,7 @@ describe('it should test Block', () => {
         setTimeout(done, 0);
       });
 
-      it('should not render anything if no condition are true', () => {
+      it('should not render anything if no condition is true', () => {
         const children = appElem.children().exceptComments();
         const nestedChildren = children.elem(0).children().exceptComments();
 
@@ -1167,6 +1403,726 @@ describe('it should test Block', () => {
             done(err);
           }
         }, 0);
+      });
+    });
+    describe('else-if-else test', () => {
+      before((done) => {
+        app.test = 'd-if-else-if-else';
+
+        setTimeout(done, 0);
+      });
+
+      it('should render else condition if no condition is true', () => {
+        const children = appElem.children().exceptComments();
+        const nestedChildren = children.elem(0).children().exceptComments();
+
+        strictEqual(children.length, 1);
+        strictEqual(children.elem(0).id(), 'd-if-else-if-else-test');
+        strictEqual(nestedChildren.length, 1);
+        strictEqual(nestedChildren.text(), '');
+      });
+      it('should render caption after some condition has been changed to true', (done) => {
+        currentBlock.variable = 'if';
+        const caption = currentBlock.captionForIf = 'IF';
+
+        setTimeout(() => {
+          const children = appElem.children().exceptComments();
+          const nestedChildren = children.elem(0).children().exceptComments();
+
+          try {
+            strictEqual(nestedChildren.length, 1);
+            strictEqual(nestedChildren.text(), caption);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should re-render caption after some important condition has been changed', (done) => {
+        currentBlock.variable = 'else-if';
+        const caption = currentBlock.captionForElseIf = 'ELSE_IF';
+
+        setTimeout(() => {
+          const children = appElem.children().exceptComments();
+          const nestedChildren = children.elem(0).children().exceptComments();
+
+          try {
+            strictEqual(nestedChildren.length, 1);
+            strictEqual(nestedChildren.text(), caption);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should re-render caption using else if all conditions are false', (done) => {
+        currentBlock.variable = 'else';
+        const caption = currentBlock.captionForElse = 'ELSE';
+
+        setTimeout(() => {
+          const children = appElem.children().exceptComments();
+          const nestedChildren = children.elem(0).children().exceptComments();
+
+          try {
+            strictEqual(nestedChildren.length, 1);
+            strictEqual(nestedChildren.text(), caption);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should re-render caption after some condition has been changed again', (done) => {
+        currentBlock.variable = 'else-if';
+        const caption = currentBlock.captionForElseIf = 'ELSE_IF_AGAIN';
+
+        setTimeout(() => {
+          const children = appElem.children().exceptComments();
+          const nestedChildren = children.elem(0).children().exceptComments();
+
+          try {
+            strictEqual(nestedChildren.length, 1);
+            strictEqual(nestedChildren.text(), caption);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should re-render caption using else if all conditions are false again', (done) => {
+        currentBlock.variable = 'else';
+        const caption = currentBlock.captionForElse = 'ELSE_AGAIN';
+
+        setTimeout(() => {
+          const children = appElem.children().exceptComments();
+          const nestedChildren = children.elem(0).children().exceptComments();
+
+          try {
+            strictEqual(nestedChildren.length, 1);
+            strictEqual(nestedChildren.text(), caption);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+    });
+  });
+  describe('d-attr tests', () => {
+    describe('simple test', () => {
+      before((done) => {
+        app.test = 'd-attr-simple';
+
+        setTimeout(done, 0);
+      });
+
+      it('should set attributes from the mixin', () => {
+        const elem = appElem.children().exceptComments().first();
+
+        strictEqual(elem.id(), 'd-attr-simple-test');
+        deepStrictEqual(elem.attr().$, new Super({ id: 'd-attr-simple-test' }).assign(currentBlock.attrs).$);
+      });
+      it('should change attributes on value change', (done) => {
+        const attrs = currentBlock.attrs = {
+          b: '2'
+        };
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+
+          try {
+            deepStrictEqual(elem.attr().$, new Super({ id: 'd-attr-simple-test' }).assign(attrs).$);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should ignore (delete previous) null and undefined values', (done) => {
+        const attrs = currentBlock.attrs = {
+          b: null,
+          a: undefined,
+          c: '3'
+        };
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+
+          try {
+            deepStrictEqual(
+              elem.attr().$,
+              new Super({ id: 'd-attr-simple-test' })
+                .assign(attrs)
+                .filter((value) => !isNil(value))
+                .$
+            );
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+    });
+    describe('conflict test', () => {
+      before((done) => {
+        app.test = 'd-attr-conflict';
+
+        setTimeout(done, 0);
+      });
+
+      it('should set attributes from mixins', () => {
+        const elem = appElem.children().exceptComments().first();
+
+        strictEqual(elem.id(), 'd-attr-conflict-test');
+        deepStrictEqual(
+          elem.attr().$,
+          new Super({ id: 'd-attr-conflict-test' })
+            .assign(currentBlock.attrsA, currentBlock.attrsB)
+            .$
+        );
+      });
+      it('should set attributes right if they don\'t conflict', (done) => {
+        currentBlock.attrsA = {
+          a: '2',
+          c: '3'
+        };
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+
+          try {
+            deepStrictEqual(
+              elem.attr().$,
+              new Super({ id: 'd-attr-conflict-test' })
+                .assign(currentBlock.attrsA, currentBlock.attrsB)
+                .$
+            );
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should set attributes right again if they don\'t conflict', (done) => {
+        currentBlock.attrsB = {
+          b: '2',
+          d: '3'
+        };
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+
+          try {
+            deepStrictEqual(
+              elem.attr().$,
+              new Super({ id: 'd-attr-conflict-test' })
+                .assign(currentBlock.attrsA, currentBlock.attrsB)
+                .$
+            );
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+    });
+  });
+  describe('d-bind', () => {
+    before((done) => {
+      app.test = 'd-bind';
+
+      setTimeout(done, 0);
+    });
+
+    it('should bind event listeners', (done) => {
+      currentBlock.onClick = (e) => {
+        try {
+          strictEqual(e.type, 'click');
+
+          done();
+        } catch (err) {
+          done(err);
+        }
+      };
+
+      setTimeout(() => {
+        const elem = appElem.children().exceptComments().first();
+
+        try {
+          strictEqual(elem.id(), 'd-bind-test');
+
+          elem.click();
+        } catch (err) {
+          done(err);
+        }
+      }, 0);
+    });
+  });
+  describe('d-class tests', () => {
+    describe('simple test', () => {
+      before((done) => {
+        app.test = 'd-class-simple';
+
+        setTimeout(done, 0);
+      });
+
+      it('should set classes from the mixin', () => {
+        const elem = appElem.children().exceptComments().first();
+
+        strictEqual(elem.id(), 'd-class-simple-test');
+        deepStrictEqual(elem.class().$, ['a']);
+      });
+      it('should change classes on value change', (done) => {
+        currentBlock.classes = 'b';
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+
+          try {
+            deepStrictEqual(elem.class().$, ['b']);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should ignore non-string values in array value', (done) => {
+        currentBlock.classes = [
+          /1/,
+          false,
+          'c',
+          null,
+          undefined,
+          'd'
+        ];
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+
+          try {
+            deepStrictEqual(elem.class().$, ['c', 'd']);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should support string value', (done) => {
+        currentBlock.classes = 'e f g';
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+
+          try {
+            deepStrictEqual(elem.class().$, ['e', 'f', 'g']);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should support object value', (done) => {
+        currentBlock.classes = {
+          f: true,
+          h: false,
+          i: true
+        };
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+
+          try {
+            deepStrictEqual(elem.class().$, ['f', 'i']);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+    });
+    describe('conflict test', () => {
+      before((done) => {
+        app.test = 'd-class-conflict';
+
+        setTimeout(done, 0);
+      });
+
+      it('should set classes from mixins', () => {
+        const elem = appElem.children().exceptComments().first();
+
+        strictEqual(elem.id(), 'd-class-conflict-test');
+        deepStrictEqual(elem.class().$, ['a', 'b', 'c', 'd', 'e', 'f']);
+      });
+      it('should set classes right if they don\'t conflict', (done) => {
+        currentBlock.stringClasses = 'a h i';
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+
+          try {
+            deepStrictEqual(elem.class().$, ['a', 'c', 'd', 'e', 'f', 'h', 'i']);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should set classes right again if they don\'t conflict', (done) => {
+        currentBlock.arrayClasses = [
+          'd',
+          'j',
+          true,
+          'k'
+        ];
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+
+          try {
+            deepStrictEqual(elem.class().$, ['a', 'd', 'e', 'f', 'h', 'i', 'j', 'k']);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should set classes right again if they don\'t conflict', (done) => {
+        currentBlock.objectClasses = {
+          e: true,
+          g: true,
+          l: true
+        };
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+
+          try {
+            deepStrictEqual(elem.class().$, ['a', 'd', 'e', 'h', 'i', 'j', 'k', 'g', 'l']);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+    });
+  });
+  describe('d-elem', () => {
+    before((done) => {
+      app.test = 'd-elem';
+
+      setTimeout(done, 0);
+    });
+
+    it('should support string argument and set the block property to the Elem', () => {
+      const elem = appElem.children().exceptComments().first();
+
+      strictEqual(currentBlock.span.$[0], elem.find('span').$[0]);
+    });
+    it('should support function argument and call the function with th Elem argument', () => {
+      const elem = appElem.children().exceptComments().first();
+
+      strictEqual(inputElem.$[0], elem.find('input').$[0]);
+    });
+  });
+  describe('d-hide', () => {
+    before((done) => {
+      app.test = 'd-hide';
+
+      setTimeout(done, 0);
+    });
+
+    it('should not be hidden if the condition is falsey', () => {
+      const elem = appElem.children().exceptComments().first();
+
+      strictEqual(elem.id(), 'd-hide-test');
+      strictEqual(elem.css('display'), '');
+    });
+    it('should be hidden if the condition is truthy', (done) => {
+      currentBlock.hide = true;
+
+      setTimeout(() => {
+        const elem = appElem.children().exceptComments().first();
+
+        try {
+          strictEqual(elem.css('display'), 'none !important');
+
+          done();
+        } catch (err) {
+          done(err);
+        }
+      }, 0);
+    });
+    it('should not be hidden if the condition is falsey again', (done) => {
+      currentBlock.hide = false;
+
+      setTimeout(() => {
+        const elem = appElem.children().exceptComments().first();
+
+        try {
+          strictEqual(elem.css('display'), '');
+
+          done();
+        } catch (err) {
+          done(err);
+        }
+      }, 0);
+    });
+  });
+  describe('d-on', () => {
+    before((done) => {
+      app.test = 'd-on';
+
+      setTimeout(done, 0);
+    });
+
+    it('should call the expression every time the event is fired', (done) => {
+      currentBlock.onClick = () => {
+        done();
+      };
+
+      setTimeout(() => {
+        const elem = appElem.children().exceptComments().first();
+
+        try {
+          strictEqual(elem.id(), 'd-on-test');
+
+          elem.click();
+        } catch (err) {
+          done(err);
+        }
+      }, 0);
+    });
+  });
+  describe('d-show', () => {
+    before((done) => {
+      app.test = 'd-show';
+
+      setTimeout(done, 0);
+    });
+
+    it('should not be hidden if the condition is truthy', () => {
+      const elem = appElem.children().exceptComments().first();
+
+      strictEqual(elem.id(), 'd-show-test');
+      strictEqual(elem.css('display'), '');
+    });
+    it('should be hidden if the condition is truthy', (done) => {
+      currentBlock.show = false;
+
+      setTimeout(() => {
+        const elem = appElem.children().exceptComments().first();
+
+        try {
+          strictEqual(elem.css('display'), 'none !important');
+
+          done();
+        } catch (err) {
+          done(err);
+        }
+      }, 0);
+    });
+    it('should not be hidden if the condition is truthy again', (done) => {
+      currentBlock.show = true;
+
+      setTimeout(() => {
+        const elem = appElem.children().exceptComments().first();
+
+        try {
+          strictEqual(elem.css('display'), '');
+
+          done();
+        } catch (err) {
+          done(err);
+        }
+      }, 0);
+    });
+  });
+  describe('d-style tests', () => {
+    describe('simple test', () => {
+      before((done) => {
+        app.test = 'd-style-simple';
+
+        setTimeout(done, 0);
+      });
+
+      it('should set styles from the mixin', () => {
+        const elem = appElem.children().exceptComments().first();
+
+        strictEqual(elem.id(), 'd-style-simple-test');
+        deepStrictEqual(elem.css().$, currentBlock.styles);
+      });
+      it('should change styles on value change', (done) => {
+        const styles = currentBlock.styles = {
+          right: '10px'
+        };
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+
+          try {
+            deepStrictEqual(elem.css().$, styles);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should ignore (delete previous) null and undefined values', (done) => {
+        const styles = currentBlock.styles = {
+          left: null,
+          right: null,
+          top: '10px'
+        };
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+
+          try {
+            deepStrictEqual(elem.css().$, new Super(styles).filter((value) => !isNil(value)).$);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+    });
+    describe('conflict test', () => {
+      before((done) => {
+        app.test = 'd-style-conflict';
+
+        setTimeout(done, 0);
+      });
+
+      it('should set styles from mixins', () => {
+        const elem = appElem.children().exceptComments().first();
+
+        strictEqual(elem.id(), 'd-style-conflict-test');
+        deepStrictEqual(elem.css().$, new Super({}).assign(currentBlock.stylesA, currentBlock.stylesB).$);
+      });
+      it('should set attributes right if they don\'t conflict', (done) => {
+        currentBlock.stylesA = {
+          left: '20px',
+          right: '30px'
+        };
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+
+          try {
+            deepStrictEqual(elem.css().$, new Super({}).assign(currentBlock.stylesA, currentBlock.stylesB).$);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should set attributes right again if they don\'t conflict', (done) => {
+        currentBlock.stylesB = {
+          top: '20px',
+          bottom: '30px'
+        };
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+
+          try {
+            deepStrictEqual(elem.css().$, new Super({}).assign(currentBlock.stylesA, currentBlock.stylesB).$);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+    });
+  });
+  describe('d-validate', () => {
+    before((done) => {
+      app.test = 'd-validate';
+
+      setTimeout(done, 0);
+    });
+
+    it('should add validator from the mixin', () => {
+      const elem = appElem.children().exceptComments().first();
+
+      strictEqual(elem.$[0].dwayneData.validators.indexOf(currentBlock.validator), 0);
+    });
+  });
+  describe('d-value tests', () => {
+    describe('simple test', () => {
+      before((done) => {
+        app.test = 'd-value-simple';
+
+        setTimeout(done, 0);
+      });
+
+      it('should set default values', () => {
+        const elem = appElem.children().exceptComments().first();
+        const children = elem.children().exceptComments();
+
+        strictEqual(elem.id(), 'd-value-simple-test');
+        strictEqual(children.elem(0).prop('value'), '123');
+        strictEqual(children.elem(1).prop('value'), '123');
+      });
+      it('should react on variable change', (done) => {
+        const input = currentBlock.input = '456';
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+          const children = elem.children().exceptComments();
+
+          try {
+            strictEqual(children.elem(0).prop('value'), input);
+            strictEqual(children.elem(1).prop('value'), input);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should react on user interactions', (done) => {
+        const elem = appElem.children().exceptComments().first();
+        const children = elem.children().exceptComments();
+        const input = '789';
+
+        children.elem(0)
+          .prop('value', input)
+          .dispatch('input');
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+          const children = elem.children().exceptComments();
+
+          try {
+            strictEqual(children.elem(0).prop('value'), input);
+            strictEqual(children.elem(1).prop('value'), input);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 25);
       });
     });
   });
