@@ -575,10 +575,156 @@ class DValueSimpleTest extends Block {
     <div id="d-value-simple-test">
       <input d-value="input"/>
       <input d-value="input"/>
+      <input d-value="input2" value="456"/>
     </div>
   `;
 
   input = '123';
+  input2 = null;
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+}
+class DValueContentEditableTest extends Block {
+  static template = `
+    <div id="d-value-content-editable-test">
+      <div contentEditable d-value="input"/>
+      <div contentEditable d-value="input"/>
+      <div contentEditable d-value="input2">456</div>
+    </div>
+  `;
+
+  input = '123';
+  input2 = null;
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+}
+class DValueColorTest extends Block {
+  static template = `
+    <div id="d-value-color-test">
+      <input type="color" d-value="color"/>
+      <input type="color" d-value="color"/>
+      <input type="color" d-value="color2" value="#6576f3"/>
+    </div>
+  `;
+
+  color = '#f476f7';
+  color2 = null;
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+}
+class DValueRadioTest extends Block {
+  static template = `
+    <div id="d-value-radio-test">
+      <input type="radio" d-value="choice" value="a"/>
+      <input type="radio" d-value="choice" value="b"/>
+      <input type="radio" d-value="choice" value="c"/>
+      <input type="radio" d-value="choice" value="a"/>
+      <input type="radio" d-value="choice" value="b"/>
+      <input type="radio" d-value="choice" value="c"/>
+      <input type="radio" d-value="choice2" value="a"/>
+      <input type="radio" d-value="choice2" value="b" checked/>
+      <input type="radio" d-value="choice2" value="c"/>
+    </div>
+  `;
+
+  choice = 'a';
+  choice2 = null;
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+}
+class DValueCheckboxTest extends Block {
+  static template = `
+    <div id="d-value-checkbox-test">
+      <input type="checkbox" d-value="choice" value="a"/>
+      <input type="checkbox" d-value="choice" value="b"/>
+      <input type="checkbox" d-value="choice" value="c"/>
+      <input type="checkbox" d-value="choice" value="a"/>
+      <input type="checkbox" d-value="choice" value="b"/>
+      <input type="checkbox" d-value="choice" value="c"/>
+      <input type="checkbox" d-value="choice2" value="a" checked/>
+      <input type="checkbox" d-value="choice2" value="b"/>
+      <input type="checkbox" d-value="choice2" value="c" checked/>
+    </div>
+  `;
+
+  choice = ['a', 'b'];
+  choice2 = null;
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+}
+class DValueSelectTest extends Block {
+  static template = `
+    <div id="d-value-select-test">
+      <select d-value="choice">
+        <option value="a"/>
+        <option value="b"/>
+        <option value="c"/>
+      </select>
+      <select d-value="choice">
+        <option value="a"/>
+        <option value="b"/>
+        <option value="c"/>
+      </select>
+      <select d-value="choice2">
+        <option value="a"/>
+        <option value="b" selected/>
+        <option value="c"/>
+      </select>
+    </div>
+  `;
+
+  choice = 'a';
+  choice2 = null;
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+}
+class DValueSelectMultipleTest extends Block {
+  static template = `
+    <div id="d-value-select-multiple-test">
+      <select d-value="choice" multiple>
+        <option value="a"/>
+        <option value="b"/>
+        <option value="c"/>
+      </select>
+      <select d-value="choice" multiple>
+        <option value="a"/>
+        <option value="b"/>
+        <option value="c"/>
+      </select>
+      <select d-value="choice2" multiple>
+        <option value="a" selected/>
+        <option value="b"/>
+        <option value="c" selected/>
+      </select>
+    </div>
+  `;
+
+  choice = ['a', 'b'];
+  choice2 = null;
 
   constructor(opts) {
     super(opts);
@@ -634,26 +780,32 @@ Block.register('DStyleConflictTest', DStyleConflictTest);
 Block.register('DValidateTest', DValidateTest);
 
 Block.register('DValueSimpleTest', DValueSimpleTest);
-
-before((done) => {
-  let isDone = 0;
-
-  appRendered = () => {
-    doneAll();
-  };
-
-  initApp('App', find('.root'));
-
-  setTimeout(doneAll, 0);
-
-  function doneAll() {
-    if (++isDone === 2) {
-      done();
-    }
-  }
-});
+Block.register('DValueContentEditableTest', DValueContentEditableTest);
+Block.register('DValueColorTest', DValueColorTest);
+Block.register('DValueRadioTest', DValueRadioTest);
+Block.register('DValueCheckboxTest', DValueCheckboxTest);
+Block.register('DValueSelectTest', DValueSelectTest);
+Block.register('DValueSelectMultipleTest', DValueSelectMultipleTest);
 
 describe('it should test Block', () => {
+  before((done) => {
+    let isDone = 0;
+
+    appRendered = () => {
+      doneAll();
+    };
+
+    initApp('App', find('.root'));
+
+    setTimeout(doneAll, 0);
+
+    function doneAll() {
+      if (++isDone === 2) {
+        done();
+      }
+    }
+  });
+
   describe('primitive test', () => {
     before((done) => {
       app.test = 'primitive';
@@ -2083,6 +2235,7 @@ describe('it should test Block', () => {
         strictEqual(elem.id(), 'd-value-simple-test');
         strictEqual(children.elem(0).prop('value'), '123');
         strictEqual(children.elem(1).prop('value'), '123');
+        strictEqual(currentBlock.input2, '456');
       });
       it('should react on variable change', (done) => {
         const input = currentBlock.input = '456';
@@ -2117,6 +2270,377 @@ describe('it should test Block', () => {
           try {
             strictEqual(children.elem(0).prop('value'), input);
             strictEqual(children.elem(1).prop('value'), input);
+            strictEqual(currentBlock.input, input);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 25);
+      });
+    });
+    describe('contentEditable test', () => {
+      before((done) => {
+        app.test = 'd-value-content-editable';
+
+        setTimeout(done, 0);
+      });
+
+      it('should set default values', () => {
+        const elem = appElem.children().exceptComments().first();
+        const children = elem.children().exceptComments();
+
+        strictEqual(elem.id(), 'd-value-content-editable-test');
+        strictEqual(children.elem(0).text(), '123');
+        strictEqual(children.elem(1).text(), '123');
+        strictEqual(currentBlock.input2, '456');
+      });
+      it('should react on variable change', (done) => {
+        const input = currentBlock.input = '456';
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+          const children = elem.children().exceptComments();
+
+          try {
+            strictEqual(children.elem(0).text(), input);
+            strictEqual(children.elem(1).text(), input);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should react on user interactions', (done) => {
+        const elem = appElem.children().exceptComments().first();
+        const children = elem.children().exceptComments();
+        const input = '789';
+
+        children.elem(0)
+          .text(input)
+          .dispatch('input');
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+          const children = elem.children().exceptComments();
+
+          try {
+            strictEqual(children.elem(0).text(), input);
+            strictEqual(children.elem(1).text(), input);
+            strictEqual(currentBlock.input, input);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 25);
+      });
+    });
+    describe('color test', () => {
+      before((done) => {
+        app.test = 'd-value-color';
+
+        setTimeout(done, 0);
+      });
+
+      it('should set default values', () => {
+        const elem = appElem.children().exceptComments().first();
+        const children = elem.children().exceptComments();
+
+        strictEqual(elem.id(), 'd-value-color-test');
+        strictEqual(children.elem(0).prop('value'), currentBlock.color);
+        strictEqual(children.elem(1).prop('value'), currentBlock.color);
+        strictEqual(children.elem(2).prop('value'), currentBlock.color2);
+      });
+      it('should react on variable change', (done) => {
+        const color = currentBlock.color = '#aa819d';
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+          const children = elem.children().exceptComments();
+
+          try {
+            strictEqual(children.elem(0).prop('value'), color);
+            strictEqual(children.elem(1).prop('value'), color);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should react on user interactions', (done) => {
+        const elem = appElem.children().exceptComments().first();
+        const children = elem.children().exceptComments();
+        const color = '#33e694';
+
+        children.elem(0)
+          .prop('value', color)
+          .dispatch('change');
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+          const children = elem.children().exceptComments();
+
+          try {
+            strictEqual(children.elem(0).prop('value'), color);
+            strictEqual(children.elem(1).prop('value'), color);
+            strictEqual(currentBlock.color, color);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 25);
+      });
+    });
+    describe('radio test', () => {
+      before((done) => {
+        app.test = 'd-value-radio';
+
+        setTimeout(done, 0);
+      });
+
+      it('should set default values', () => {
+        const elem = appElem.children().exceptComments().first();
+        const children = elem.children().exceptComments();
+
+        strictEqual(elem.id(), 'd-value-radio-test');
+        strictEqual(children.elem(0).prop('checked'), true);
+        strictEqual(children.elem(1).prop('checked'), false);
+        strictEqual(children.elem(2).prop('checked'), false);
+        strictEqual(children.elem(3).prop('checked'), true);
+        strictEqual(children.elem(4).prop('checked'), false);
+        strictEqual(children.elem(5).prop('checked'), false);
+        strictEqual(currentBlock.choice2, 'b');
+      });
+      it('should react on variable change', (done) => {
+        currentBlock.choice = 'c';
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+          const children = elem.children().exceptComments();
+
+          try {
+            strictEqual(children.elem(0).prop('checked'), false);
+            strictEqual(children.elem(1).prop('checked'), false);
+            strictEqual(children.elem(2).prop('checked'), true);
+            strictEqual(children.elem(3).prop('checked'), false);
+            strictEqual(children.elem(4).prop('checked'), false);
+            strictEqual(children.elem(5).prop('checked'), true);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should react on user interactions', (done) => {
+        const elem = appElem.children().exceptComments().first();
+        const children = elem.children().exceptComments();
+
+        children.elem(1)
+          .prop('checked', true)
+          .dispatch('change');
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+          const children = elem.children().exceptComments();
+
+          try {
+            strictEqual(children.elem(0).prop('checked'), false);
+            strictEqual(children.elem(1).prop('checked'), true);
+            strictEqual(children.elem(2).prop('checked'), false);
+            strictEqual(children.elem(3).prop('checked'), false);
+            strictEqual(children.elem(4).prop('checked'), true);
+            strictEqual(children.elem(5).prop('checked'), false);
+            strictEqual(currentBlock.choice, 'b');
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 25);
+      });
+    });
+    describe('checkbox test', () => {
+      before((done) => {
+        app.test = 'd-value-checkbox';
+
+        setTimeout(done, 0);
+      });
+
+      it('should set default values', () => {
+        const elem = appElem.children().exceptComments().first();
+        const children = elem.children().exceptComments();
+
+        strictEqual(elem.id(), 'd-value-checkbox-test');
+        strictEqual(children.elem(0).prop('checked'), true);
+        strictEqual(children.elem(1).prop('checked'), true);
+        strictEqual(children.elem(2).prop('checked'), false);
+        strictEqual(children.elem(3).prop('checked'), true);
+        strictEqual(children.elem(4).prop('checked'), true);
+        strictEqual(children.elem(5).prop('checked'), false);
+        deepStrictEqual(currentBlock.choice2, ['a', 'c']);
+      });
+      it('should react on variable change', (done) => {
+        currentBlock.choice = ['a', 'c'];
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+          const children = elem.children().exceptComments();
+
+          try {
+            strictEqual(children.elem(0).prop('checked'), true);
+            strictEqual(children.elem(1).prop('checked'), false);
+            strictEqual(children.elem(2).prop('checked'), true);
+            strictEqual(children.elem(3).prop('checked'), true);
+            strictEqual(children.elem(4).prop('checked'), false);
+            strictEqual(children.elem(5).prop('checked'), true);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should react on user interactions', (done) => {
+        const elem = appElem.children().exceptComments().first();
+        const children = elem.children().exceptComments();
+
+        children.elem(0)
+          .prop('checked', false)
+          .dispatch('change');
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+          const children = elem.children().exceptComments();
+
+          try {
+            strictEqual(children.elem(0).prop('checked'), false);
+            strictEqual(children.elem(1).prop('checked'), false);
+            strictEqual(children.elem(2).prop('checked'), true);
+            strictEqual(children.elem(3).prop('checked'), false);
+            strictEqual(children.elem(4).prop('checked'), false);
+            strictEqual(children.elem(5).prop('checked'), true);
+            deepStrictEqual(currentBlock.choice, ['c']);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 25);
+      });
+    });
+    describe('select test', () => {
+      before((done) => {
+        app.test = 'd-value-select';
+
+        setTimeout(done, 0);
+      });
+
+      it('should set default values', () => {
+        const elem = appElem.children().exceptComments().first();
+        const children = elem.children().exceptComments();
+
+        strictEqual(elem.id(), 'd-value-select-test');
+        strictEqual(children.elem(0).prop('value'), 'a');
+        strictEqual(children.elem(1).prop('value'), 'a');
+        strictEqual(currentBlock.choice2, 'b');
+      });
+      it('should react on variable change', (done) => {
+        const choice = currentBlock.choice = 'c';
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+          const children = elem.children().exceptComments();
+
+          try {
+            strictEqual(children.elem(0).prop('value'), choice);
+            strictEqual(children.elem(1).prop('value'), choice);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should react on user interactions', (done) => {
+        const elem = appElem.children().exceptComments().first();
+        const children = elem.children().exceptComments();
+        const choice = 'b';
+
+        children.elem(0)
+          .prop('value', choice)
+          .dispatch('change');
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+          const children = elem.children().exceptComments();
+
+          try {
+            strictEqual(children.elem(0).prop('value'), choice);
+            strictEqual(children.elem(1).prop('value'), choice);
+            strictEqual(currentBlock.choice, choice);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 25);
+      });
+    });
+    describe('select multiple test', () => {
+      before((done) => {
+        app.test = 'd-value-select-multiple';
+
+        setTimeout(done, 0);
+      });
+
+      it('should set default values', () => {
+        const elem = appElem.children().exceptComments().first();
+        const children = elem.children().exceptComments();
+
+        strictEqual(elem.id(), 'd-value-select-multiple-test');
+        deepStrictEqual(new Elem(children.elem(0).prop('selectedOptions')).map(({ value }) => value).$, ['a', 'b']);
+        deepStrictEqual(new Elem(children.elem(1).prop('selectedOptions')).map(({ value }) => value).$, ['a', 'b']);
+        deepStrictEqual(currentBlock.choice2, ['a', 'c']);
+      });
+      it('should react on variable change', (done) => {
+        const choice = currentBlock.choice = ['a', 'c'];
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+          const children = elem.children().exceptComments();
+
+          try {
+            deepStrictEqual(new Elem(children.elem(0).prop('selectedOptions')).map(({ value }) => value).$, choice);
+            deepStrictEqual(new Elem(children.elem(1).prop('selectedOptions')).map(({ value }) => value).$, choice);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 0);
+      });
+      it('should react on user interactions', (done) => {
+        const elem = appElem.children().exceptComments().first();
+        const children = elem.children().exceptComments();
+
+        children.child(0)
+          .prop('selected', false)
+          .parent()
+          .dispatch('change');
+
+        setTimeout(() => {
+          const elem = appElem.children().exceptComments().first();
+          const children = elem.children().exceptComments();
+
+          try {
+            deepStrictEqual(new Elem(children.elem(0).prop('selectedOptions')).map(({ value }) => value).$, ['c']);
+            deepStrictEqual(new Elem(children.elem(1).prop('selectedOptions')).map(({ value }) => value).$, ['c']);
+            deepStrictEqual(currentBlock.choice, ['c']);
 
             done();
           } catch (err) {
