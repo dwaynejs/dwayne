@@ -17032,6 +17032,7 @@ var resolveURL = (function (decodeQuery) {
  */
 
 var Routes = new Arr([]);
+var currentRoutes = new Arr([]);
 var subscribers = new Super({});
 var _global$2 = global$1;
 var history = _global$2.history;
@@ -17473,7 +17474,10 @@ function makeRoute(options) {
             callBeforeLeave(_this);
           }
 
-          _this.args.route = currentRouteParams;
+          if (route === currentRoute) {
+            _this.args.route = currentRouteParams;
+          }
+
           _this.__isCurrentRoute__ = isCurrentRoute;
         });
 
@@ -17509,8 +17513,14 @@ function makeRoute(options) {
       };
 
       block.$$.children.forEach(function beforeLoad(block) {
-        if (block.__routerInstance__ && block.__isCurrentRoute__) {
-          return;
+        if (block.__routerInstance__) {
+          var index = currentRoutes.indexOf(block);
+
+          if (index !== -1) {
+            return;
+          }
+
+          currentRoutes.push(block);
         }
 
         var _block$$$ = block.$$;
@@ -17551,8 +17561,14 @@ function makeRoute(options) {
       };
 
       block.$$.children.forEach(function beforeLeave(block) {
-        if (block.__routerInstance__ && !block.__isCurrentRoute__) {
-          return;
+        if (block.__routerInstance__) {
+          var index = currentRoutes.indexOf(block);
+
+          if (index === -1) {
+            return;
+          }
+
+          currentRoutes.splice(index, block);
         }
 
         var _block$$$2 = block.$$;
