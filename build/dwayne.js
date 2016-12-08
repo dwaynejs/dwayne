@@ -17486,31 +17486,31 @@ function makeRoute(options) {
       }]);
       return _class;
     }(Block), _class.template = '<div' + (' class="dwayne-route route-' + name + '"') + ' d-class="{{ \'active-route\': __isCurrentRoute__ }}"' + ' d-show="{__isCurrentRoute__}"' + '>' + Block.template + '</div>', _temp;
+
+    function callBeforeLoad(route) {
+      if (route.beforeLoadRoute && !routeLoaded) {
+        try {
+          route.beforeLoadRoute();
+        } catch (err) {
+          console.error('Uncaught error in ' + name + '#beforeLeave:', err);
+        }
+      }
+
+      routeLoaded = true;
+    }
+
+    function callBeforeLeave(route) {
+      if (route.beforeLeaveRoute && routeLoaded) {
+        try {
+          route.beforeLeaveRoute();
+        } catch (err) {
+          console.error('Uncaught error in ' + name + '#beforeLeave:', err);
+        }
+      }
+
+      routeLoaded = false;
+    }
   };
-
-  function callBeforeLoad(route) {
-    if (route.beforeLoadRoute && !routeLoaded) {
-      try {
-        route.beforeLoadRoute();
-      } catch (err) {
-        console.error('Uncaught error in ' + name + '#beforeLeave:', err);
-      }
-    }
-
-    routeLoaded = true;
-  }
-
-  function callBeforeLeave(route) {
-    if (route.beforeLeaveRoute && routeLoaded) {
-      try {
-        route.beforeLeaveRoute();
-      } catch (err) {
-        console.error('Uncaught error in ' + name + '#beforeLeave:', err);
-      }
-    }
-
-    routeLoaded = false;
-  }
 }
 
 function subscribe(name, callback) {
