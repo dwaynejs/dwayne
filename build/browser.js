@@ -17526,9 +17526,9 @@ function makeRoute(options) {
           mixins.forEach(beforeLoad);
         }
 
-        if (route.beforeLoadRoute) {
+        if (block.beforeLoadRoute) {
           try {
-            route.beforeLoadRoute();
+            block.beforeLoadRoute();
           } catch (err) {
             console.error('Uncaught error in ' + name + '#beforeLeave:', err);
           }
@@ -17564,9 +17564,9 @@ function makeRoute(options) {
           mixins.forEach(beforeLeave);
         }
 
-        if (route.beforeLeaveRoute) {
+        if (block.beforeLeaveRoute) {
           try {
-            route.beforeLeaveRoute();
+            block.beforeLeaveRoute();
           } catch (err) {
             console.error('Uncaught error in ' + name + '#beforeLeave:', err);
           }
