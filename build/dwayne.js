@@ -17500,25 +17500,69 @@ function makeRoute(options) {
     }(Block), _class.template = '<div' + (' class="dwayne-route route-' + name + '"') + ' d-class="{{ \'active-route\': __isCurrentRoute__ }}"' + ' d-show="{__isCurrentRoute__}"' + '>' + Block.template + '</div>', _temp;
 
     function callBeforeLoad(route) {
-      if (route.beforeLoadRoute && !routeLoaded) {
-        try {
-          route.beforeLoadRoute();
-        } catch (err) {
-          console.error('Uncaught error in ' + name + '#beforeLeave:', err);
-        }
+      if (routeLoaded) {
+        return;
       }
+
+      var block = {
+        $$: {
+          children: new Arr([route]),
+          mixins: new Arr([])
+        }
+      };
+
+      block.$$.children.forEach(function beforeLoad(block) {
+        var _block$$$ = block.$$;
+        var name = _block$$$.name;
+        var children = _block$$$.children;
+        var mixins = _block$$$.mixins;
+
+
+        children.forEach(beforeLoad);
+        mixins.forEach(beforeLoad);
+
+        if (route.beforeLoadRoute) {
+          try {
+            route.beforeLoadRoute();
+          } catch (err) {
+            console.error('Uncaught error in ' + name + '#beforeLeave:', err);
+          }
+        }
+      });
 
       routeLoaded = true;
     }
 
     function callBeforeLeave(route) {
-      if (route.beforeLeaveRoute && routeLoaded) {
-        try {
-          route.beforeLeaveRoute();
-        } catch (err) {
-          console.error('Uncaught error in ' + name + '#beforeLeave:', err);
-        }
+      if (!routeLoaded) {
+        return;
       }
+
+      var block = {
+        $$: {
+          children: new Arr([route]),
+          mixins: new Arr([])
+        }
+      };
+
+      block.$$.children.forEach(function beforeLeave(block) {
+        var _block$$$2 = block.$$;
+        var name = _block$$$2.name;
+        var children = _block$$$2.children;
+        var mixins = _block$$$2.mixins;
+
+
+        children.forEach(beforeLeave);
+        mixins.forEach(beforeLeave);
+
+        if (route.beforeLeaveRoute) {
+          try {
+            route.beforeLeaveRoute();
+          } catch (err) {
+            console.error('Uncaught error in ' + name + '#beforeLeave:', err);
+          }
+        }
+      });
 
       routeLoaded = false;
     }
