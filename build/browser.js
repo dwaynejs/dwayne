@@ -16829,19 +16829,31 @@ var Fetch = function (_Function) {
           }
 
           xhr.onabort = function () {
-            reject(new Error('Request was aborted'));
+            var error = new Error('Request was aborted');
+
+            error.type = 'ABORT_ERROR';
+
+            reject(error);
 
             xhr = null;
           };
 
           xhr.onerror = function () {
-            reject(new Error('Network error'));
+            var error = new Error('Network error');
+
+            error.type = 'NETWORK_ERROR';
+
+            reject(error);
 
             xhr = null;
           };
 
           xhr.ontimeout = function () {
-            reject(new Error('Request time exceeded'));
+            var error = new Error('Request time exceeded');
+
+            error.type = 'TIMEOUT_ERROR';
+
+            reject(error);
 
             xhr = null;
           };
