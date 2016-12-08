@@ -17571,7 +17571,7 @@ function makeRoute(options) {
             return;
           }
 
-          currentRoutes.splice(index, block);
+          currentRoutes.splice(index, 1);
         }
 
         var _block$$$2 = block.$$;
