@@ -10094,7 +10094,13 @@ var Elem = function (_Arr) {
         }
 
         new Super(_attr).forEach(function (value, key) {
-          value = isFunction(value) ? value(new Elem(elem).attr(key), elem, index) : value;
+          if (isNil(value)) {
+            return new Elem(elem).removeAttr(key);
+          }
+
+          if (isFunction(value)) {
+            value = value(new Elem(elem).attr(key), elem, index);
+          }
 
           if (isNil(value)) {
             return new Elem(elem).removeAttr(key);
@@ -10527,10 +10533,18 @@ var Elem = function (_Arr) {
         }
 
         new Super(property).forEach(function (value, property) {
+          if (isNil(value)) {
+            return new Elem(elem).removeCSS(property);
+          }
+
           property = new Str(property).toHyphenCase().$;
 
           if (isFunction(value)) {
             value = value(new Elem(elem).css(property), elem, index);
+          }
+
+          if (isNil(value)) {
+            return new Elem(elem).removeAttr(key);
           }
 
           elem.style.removeProperty(property);
@@ -13491,14 +13505,15 @@ function registerDElem(Mixin) {
 
       var _this = possibleConstructorReturn(this, (DElem.__proto__ || Object.getPrototypeOf(DElem)).call(this, opts));
 
-      var parent = _this.$$.parent;
+      var block = _this.block;
+      var elem = _this.elem;
 
       var value = _this.evaluateOnce();
 
       if (isFunction(value)) {
-        value(_this.elem);
+        value(elem);
       } else if (isString(value)) {
-        parent[value] = _this.elem;
+        block[value] = elem;
       }
       return _this;
     }
@@ -13676,15 +13691,12 @@ function registerDValidate(Mixin) {
       var _this = possibleConstructorReturn(this, (DValidate.__proto__ || Object.getPrototypeOf(DValidate)).call(this, opts));
 
       var elem = _this.elem;
-      var match = _this.match;
 
       var validator = _this.evaluateOnce();
 
       if (isFunction(validator)) {
         elem.validate(validator);
-      }
-
-      if (validator === true && match === 'on-change' && elem.$$.dwayneData.validators.length === 1) {
+      } else if (validator === true) {
         elem.on(listenerSwitcher(elem.name, [elem.prop('type')]), function () {
           elem.validate();
         });
@@ -13706,6 +13718,8 @@ function registerDValidate(Mixin) {
 
 var propSwitcher = switcher('strictEquals', function (type, elem) {
   return elem.hasAttr('contenteditable') || elem.hasAttr('contentEditable') ? 'text' : 'value';
+}).case('select', function (type, elem) {
+  return elem.hasAttr('multiple') ? 'multiple-select' : 'value';
 }).case('input', function (type) {
   if (type === 'file') {
     return 'files';
@@ -13728,13 +13742,30 @@ var setValueSwitcher = switcher('strictEquals', function (value) {
 });
 var getValueSwitcher = switcher('strictEquals', function (value) {
   return value;
-}).case('input', function (value, type, inputValue, values) {
+}).case('select', function (value, type, inputValue, values, elem, options) {
+  if (!elem.hasAttr('multiple')) {
+    return value;
+  }
+
+  return options.object(function (values, _ref) {
+    var selected = _ref.selected;
+    var value = _ref.value;
+
+    if (selected && values.indexOf(value) === -1) {
+      values.push(value);
+    }
+  }, []).$;
+}).case('input', function (value, type, inputValue, values, elem, options, init) {
   if (type !== 'radio' && type !== 'checkbox') {
     return value;
   }
 
   if (type === 'radio') {
     return value ? inputValue : null;
+  }
+
+  if (!value && init) {
+    return values;
   }
 
   if (value) {
@@ -13770,58 +13801,101 @@ function registerDValue(Mixin) {
 
       var _this = possibleConstructorReturn(this, (DValue.__proto__ || Object.getPrototypeOf(DValue)).call(this, opts));
 
-      var _this$$$ = _this.$$;
-      var _value = _this$$$._value;
-      var parent = _this$$$.parent;
+      var _value = _this.$$._value;
+      var block = _this.block;
       var elem = _this.elem;
+      var node = _this.node;
 
+      var name = elem.name;
       var type = elem.prop('type');
+      var value = _this.evaluateOnce();
+      var initialScopeValue = null;
 
-      _this.prop = propSwitcher(elem.name, [type, elem]);
+      _this.prop = propSwitcher(name, [type, elem]);
+      _this.name = name;
       _this.type = type;
+      _this.value = value;
+      _this.options = elem.find('option');
 
-      var initialScopeValue = parent.$$.evaluate('{' + _value + '}', function (newValue) {
-        _this.setProp(newValue);
-      }, _this);
-      var initialElemValue = _this.getProp(initialScopeValue);
+      if (!isFunction(value)) {
+        initialScopeValue = block.$$.evaluate('{' + _value + '}', function (newValue) {
+          _this.currentValue = newValue;
+          _this.setProp(newValue);
+        }, _this);
+      }
 
-      if (isNil(initialScopeValue) || type === 'checkbox') {
-        parent[_value] = initialElemValue;
+      var initialElemValue = _this.getProp(initialScopeValue, true);
+      var isInitialScopeValueNull = isNil(initialScopeValue);
+      var isCheckbox = type === 'checkbox';
+
+      if (isInitialScopeValueNull || isCheckbox) {
+        _this.currentValue = initialElemValue;
+        _this.changeScope();
+
+        if (!isInitialScopeValueNull && isCheckbox) {
+          _this.setProp(initialScopeValue);
+        }
       } else {
+        _this.currentValue = initialScopeValue;
         _this.setProp(initialScopeValue);
       }
 
-      elem.on(listenerSwitcher$1(elem.name, [type]), function (e) {
-        if (e.target === elem.$[0]) {
-          parent[_value] = _this.getProp(parent[_value]);
+      elem.on(listenerSwitcher$1(name, [type]), function (e) {
+        if (e.target === node) {
+          _this.currentValue = _this.getProp(_this.currentValue);
+          _this.changeScope();
         }
       });
       return _this;
     }
 
     createClass(DValue, [{
+      key: 'changeScope',
+      value: function changeScope() {
+        var block = this.block;
+        var value = this.value;
+        var currentValue = this.currentValue;
+
+
+        if (isFunction(value)) {
+          value(currentValue);
+        } else {
+          block[value] = currentValue;
+        }
+      }
+    }, {
       key: 'setProp',
       value: function setProp(value) {
         var elem = this.elem;
+        var name = this.name;
         var prop = this.prop;
         var type = this.type;
+        var node = this.node;
+        var options = this.options;
 
 
         if (prop === 'text') {
           elem.text(value);
+        } else if (prop === 'multiple-select') {
+          options.forEach(function (option) {
+            option.selected = value.indexOf(option.value) !== -1;
+          });
         } else {
-          elem.prop(prop, setValueSwitcher(elem.name, [value, type, elem.$[0].value]));
+          elem.prop(prop, setValueSwitcher(name, [value, type, node.value]));
         }
       }
     }, {
       key: 'getProp',
-      value: function getProp(values) {
+      value: function getProp(values, init) {
         var elem = this.elem;
+        var name = this.name;
         var prop = this.prop;
         var type = this.type;
+        var node = this.node;
+        var options = this.options;
 
 
-        return prop === 'text' ? elem.text() : getValueSwitcher(elem.name, [elem.prop(prop), type, elem.$[0].value, values]);
+        return prop === 'text' ? elem.text() : getValueSwitcher(name, [elem.prop(prop), type, node.value, values, elem, options, init]);
       }
     }]);
     return DValue;
@@ -13881,7 +13955,9 @@ var _global$1 = global$1;
 var document$1 = _global$1.document;
 
 var svgNS = 'http://www.w3.org/2000/svg';
-var onEvalError = void 0;
+var onEvalError = function onEvalError(err) {
+  console.error('Eval error (evaluating "' + err.expression + '" in context of block "' + err.block.$$.name + '"):', err);
+};
 var evalMode = void 0;
 var getting = void 0;
 var changed = void 0;
@@ -14072,7 +14148,6 @@ var Block = function () {
     var name = opts.name;
     var originalArgs = opts.args;
     var children = opts.children;
-    var block = opts.block;
     var parent = opts.parent;
     var parentBlock = opts.parentBlock;
     var parentScope = opts.parentScope;
@@ -14115,7 +14190,6 @@ var Block = function () {
           ns: new Super(this).proto().$.constructor,
           children: new Arr([]),
           mixins: new Arr([]),
-          Block: block,
           elems: {
             start: doc.createComment(' ' + name + ': start '),
             end: doc.createComment(' ' + name + ': end '),
@@ -14161,6 +14235,8 @@ var Block = function () {
                 result = func();
               } catch (err) {
                 if (onEvalError) {
+                  err.expression = expression;
+                  err.block = this;
                   onEvalError(err);
                 }
               }
@@ -14298,6 +14374,7 @@ var Block = function () {
     key: 'remove',
     value: function remove(isParentSignal) {
       var _$$ = this.$$;
+      var name = _$$.name;
       var parentBlock = _$$.parentBlock;
       var children = _$$.children;
       var mixins = _$$.mixins;
@@ -14321,7 +14398,7 @@ var Block = function () {
       try {
         this.beforeRemove();
       } catch (err) {
-        console.error('Uncaught error in beforeRemove:', err);
+        console.error('Uncaught error in ' + name + '#beforeRemove:', err);
       }
 
       if (!isParentSignal && parentBlock) {
@@ -14606,9 +14683,8 @@ var blocks = Block._blocks;
 
 var Mixin = function () {
   function Mixin(opts) {
-    var _this8 = this;
-
     classCallCheck(this, Mixin);
+    var name = opts.name;
     var value = opts.value;
     var elem = opts.elem;
     var match = opts.match;
@@ -14619,6 +14695,7 @@ var Mixin = function () {
     Object.defineProperties(this, {
       $$: {
         value: {
+          name: name,
           _value: value,
           parent: parentScope,
           parentBlock: parentBlock,
@@ -14628,21 +14705,9 @@ var Mixin = function () {
     });
 
     this.match = new Arr(match).slice(1).$;
+    this.block = parentScope;
     this.elem = elem;
-
-    if (new Super(this).proto().$.constructor.evaluate) {
-      this.value = this.evaluateAndWatch(function (newValue, oldValue) {
-        _this8.value = newValue;
-
-        try {
-          _this8.afterUpdate(newValue, oldValue);
-        } catch (err) {
-          console.error('Uncaught error in ' + name + '#onUpdate:', err);
-        }
-      });
-
-      this.afterUpdate(this.value);
-    }
+    this.node = elem.$[0];
 
     if (parentBlock) {
       parentBlock.$$.mixins.push(this);
@@ -14686,6 +14751,7 @@ var Mixin = function () {
     key: 'remove',
     value: function remove(isParentSignal) {
       var _$$4 = this.$$;
+      var name = _$$4.name;
       var parentBlock = _$$4.parentBlock;
       var watchersToRemove = _$$4.watchersToRemove;
 
@@ -14695,7 +14761,7 @@ var Mixin = function () {
       try {
         this.beforeRemove();
       } catch (err) {
-        console.error('Uncaught error in beforeRemove:', err);
+        console.error('Uncaught error in ' + name + '#beforeRemove:', err);
       }
 
       if (!isParentSignal && parentBlock) {
@@ -14772,9 +14838,9 @@ function createBlock(_ref6) {
   var args = node && node.attrs || {};
   var children = node && node.children || new Arr([]);
   var elem = parent.prop('namespaceURI') === svgNS ? doc.svg() : new Elem(doc.template().$[0].content);
-  var localBlocks = parentScope ? parentScope.$$.Block._blocks : blocks;
-  var localMixins = parentScope ? parentScope.$$.Block._mixins : mixins;
-  var constructor = node && localBlocks[node.name];
+  var localBlocks = parentScope ? parentScope.$$.ns._blocks : blocks;
+  var localMixins = parentScope ? parentScope.$$.ns._mixins : mixins;
+  var constructor = node && node.name && localBlocks[node.name];
   var dBlockMatch = void 0;
 
   if (!children.length && ((dBlockMatch = name.match(/^d-block-([\s\S]+)$/)) || name === 'd-block')) {
@@ -14828,6 +14894,7 @@ function createBlock(_ref6) {
 
         if (match) {
           currentMixins.push({
+            name: match.name,
             Mixin: match.Mixin,
             match: match.match,
             value: value,
@@ -14835,6 +14902,12 @@ function createBlock(_ref6) {
             parentBlock: parentBlock,
             parentScope: parentScope
           });
+
+          return;
+        }
+
+        if (!value) {
+          object[attr] = '';
 
           return;
         }
@@ -14890,12 +14963,10 @@ function createBlock(_ref6) {
     if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
   }
 
-  var block = node && node.name ? localBlocks[node.name] : null;
   var blockInstance = new constructor({
     name: name,
     args: args,
     children: children,
-    block: block,
     parent: parent,
     parentBlock: parentBlock,
     parentScope: parentScope
@@ -14945,7 +15016,7 @@ function createBlock(_ref6) {
       scope = _parent.$$.scope;
     }
 
-    $$.Block = parentScope.$$.Block;
+    $$.ns = parentScope.$$.ns;
     $$.privateScope = constructPrivateScope(scopeValues);
     constructPublicScope($$.scope = Object.create(scope), scopeValues, $$.privateScope);
   }
@@ -14973,8 +15044,6 @@ function createBlock(_ref6) {
   }
 
   after = $$.elems.start;
-
-  // console.log(blockInstance);
 
   transformDIfChildren(html$$1).forEach(function (child) {
     var block = createBlock({
@@ -15009,6 +15078,7 @@ function createBlock(_ref6) {
 }
 
 function createMixin(_ref7) {
+  var name = _ref7.name;
   var Mixin = _ref7.Mixin;
   var value = _ref7.value;
   var match = _ref7.match;
@@ -15016,13 +15086,28 @@ function createMixin(_ref7) {
   var parentBlock = _ref7.parentBlock;
   var parentScope = _ref7.parentScope;
 
-  new Mixin({
+  var mixin = new Mixin({
+    name: name,
     value: value,
     match: match,
     elem: elem,
     parentBlock: parentBlock,
     parentScope: parentScope
   });
+
+  if (Mixin.evaluate) {
+    var _value2 = mixin.value = mixin.evaluateAndWatch(function (newValue, oldValue) {
+      mixin.value = newValue;
+
+      try {
+        mixin.afterUpdate(newValue, oldValue);
+      } catch (err) {
+        console.error('Uncaught error in ' + name + '#onUpdate:', err);
+      }
+    });
+
+    mixin.afterUpdate(_value2);
+  }
 }
 
 function deepCloneChildren(children, block) {
@@ -15176,31 +15261,46 @@ function constructPublicScope(scope, scopeValues, privateScope) {
           }
 
           var was = new Arr([]);
+          var values = [];
 
-          while (changed.length) {
-            var _loop = function _loop(i) {
-              var _changed$i = changed[i];
-              var scope = _changed$i.scope;
-              var value = _changed$i.value;
-              var oldValue = _changed$i.oldValue;
+          var _loop = function _loop(i) {
+            var _changed$i = changed[i];
+            var scope = _changed$i.scope;
+            var value = _changed$i.value;
+            var oldValue = _changed$i.oldValue;
 
 
-              scope.watchers.perm.forEach(function (watcher) {
-                if (was.indexOf(watcher) === -1) {
-                  watcher(value, oldValue);
-                  was.push(watcher);
-                }
-              });
+            scope.watchers.perm.forEach(function (watcher) {
+              var index = was.indexOf(watcher);
 
-              changed.splice(i, 1);
-            };
+              if (index === -1) {
+                was.push(watcher);
+                values.push({
+                  value: value,
+                  oldValue: oldValue
+                });
+              } else {
+                values[index].oldValue = oldValue;
+              }
+            });
 
-            for (var i = changed.length - 1; i >= 0; i--) {
-              _loop(i);
-            }
+            changed.splice(i, 1);
+          };
+
+          for (var i = changed.length - 1; i >= 0; i--) {
+            _loop(i);
           }
 
           changed = null;
+
+          was.forEach(function (watcher, i) {
+            var _values$i = values[i];
+            var value = _values$i.value;
+            var oldValue = _values$i.oldValue;
+
+
+            watcher(value, oldValue);
+          });
         }, 0);
       }
     };
@@ -17192,82 +17292,86 @@ function initRouter() {
       var closestLink = new Elem(e.target).closest('a');
 
       if (closestLink.length && closestLink.attr('target') !== '_blank') {
+        var push = !closestLink.hasAttr('replace');
+
         e.preventDefault();
 
-        forward(closestLink.attr('href') || '', true);
+        forward(closestLink.attr('href') || '', push);
       }
     }
   });
 }
 
 function makeRoute(options) {
-  var _ref7 = options || {};
-
-  var name = _ref7.name;
-  var path = _ref7.path;
-  var abstract = _ref7.abstract;
-  var root = _ref7.root;
-  var fallbackTo = _ref7.fallbackTo;
-  var isDefault = _ref7.default;
-
-
-  if (initialized) {
-    console.warn('Router was already initialized (at makeRoute)');
-
-    return self$1;
-  }
-
-  if (wasRoot && root) {
-    throw new Error('There can\'t be two root routes ("' + rootRoute + '" and "' + name + '")! (at makeRoute)');
-  }
-
-  if (wasDefault && isDefault) {
-    throw new Error('There can\'t be two default routes ("' + defaultRoute + '" and "' + name + '")! (at makeRoute)');
-  }
-
-  if (!name) {
-    throw new Error('State must have a non-empty string "name" property! (at makeRoute)');
-  }
-
-  if (Routes.some(function (_ref8) {
-    var Name = _ref8.name;
-    return Name === name;
-  })) {
-    throw new Error('State must have unique "name" property! (at makeRoute)');
-  }
-
-  if (root) {
-    wasRoot = true;
-    rootRoute = name;
-    options.parent = null;
-
-    if (fallbackTo) {
-      redirectRoute = fallbackTo;
-    }
-  }
-
-  if (isDefault) {
-    wasDefault = true;
-    defaultRoute = name;
-
-    if (abstract) {
-      throw new Error('Default route can\'t be abstract! (at makeRoute)');
-    }
-
-    if (isRegExp(path)) {
-      throw new Error('Default route can\'t have a regexp path! (at makeRoute)');
-    }
-  }
-
-  var route = new Route(options);
-
-  Routes.push(route);
-
-  var unsubscribe = void 0;
-  var routeLoaded = void 0;
-
   return function (Block) {
     var _class, _temp;
+
+    options = assign$1({}, options, Block.routerOptions);
+
+    var _ref7 = options || {};
+
+    var name = _ref7.name;
+    var path = _ref7.path;
+    var abstract = _ref7.abstract;
+    var root = _ref7.root;
+    var fallbackTo = _ref7.fallbackTo;
+    var isDefault = _ref7.default;
+
+
+    if (initialized) {
+      console.warn('Router was already initialized (at makeRoute)');
+
+      return self$1;
+    }
+
+    if (wasRoot && root) {
+      throw new Error('There can\'t be two root routes ("' + rootRoute + '" and "' + name + '")! (at makeRoute)');
+    }
+
+    if (wasDefault && isDefault) {
+      throw new Error('There can\'t be two default routes ("' + defaultRoute + '" and "' + name + '")! (at makeRoute)');
+    }
+
+    if (!name) {
+      throw new Error('State must have a non-empty string "name" property! (at makeRoute)');
+    }
+
+    if (Routes.some(function (_ref8) {
+      var Name = _ref8.name;
+      return Name === name;
+    })) {
+      throw new Error('State must have unique "name" property! (at makeRoute)');
+    }
+
+    if (root) {
+      wasRoot = true;
+      rootRoute = name;
+      options.parent = null;
+
+      if (fallbackTo) {
+        redirectRoute = fallbackTo;
+      }
+    }
+
+    if (isDefault) {
+      wasDefault = true;
+      defaultRoute = name;
+
+      if (abstract) {
+        throw new Error('Default route can\'t be abstract! (at makeRoute)');
+      }
+
+      if (isRegExp(path)) {
+        throw new Error('Default route can\'t have a regexp path! (at makeRoute)');
+      }
+    }
+
+    var route = new Route(options);
+
+    Routes.push(route);
+
+    var unsubscribe = void 0;
+    var routeLoaded = void 0;
 
     return _temp = _class = function (_Block) {
       inherits(_class, _Block);
@@ -17365,6 +17469,8 @@ function makeRoute(options) {
         }
         return _this;
       }
+      /* eslint prefer-template: 0 */
+
 
       createClass(_class, [{
         key: 'beforeRemove',
@@ -17376,7 +17482,7 @@ function makeRoute(options) {
         }
       }]);
       return _class;
-    }(Block), _class.template = '<div class="dwayne-route route-' + name + '" d-show="{__isCurrentRoute__}">' + Block.template + '</div>', _temp;
+    }(Block), _class.template = '<div' + (' class="dwayne-route route-' + name + '"') + ' d-class="{{ \'active-route\': __isCurrentRoute__ }}"' + ' d-show="{__isCurrentRoute__}"' + '>' + Block.template + '</div>', _temp;
   };
 
   function callBeforeLoad(route) {
