@@ -13476,7 +13476,7 @@ function registerDClass(Mixin) {
           });
         } else {
           iterate(classes, function (cls) {
-            if (!newValue[cls]) {
+            if (!newValue || !newValue[cls]) {
               elem.removeClass(cls);
             }
           });
@@ -15106,7 +15106,7 @@ function createMixin(_ref7) {
       try {
         mixin.afterUpdate(newValue, oldValue);
       } catch (err) {
-        console.error('Uncaught error in ' + name + '#onUpdate:', err);
+        console.error('Uncaught error in ' + name + '#afterUpdate:', err);
       }
     });
 
