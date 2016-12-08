@@ -17507,8 +17507,7 @@ function makeRoute(options) {
 
       var block = {
         $$: {
-          children: new Arr([route]),
-          mixins: new Arr([])
+          children: new Arr([route])
         }
       };
 
@@ -17519,8 +17518,13 @@ function makeRoute(options) {
         var mixins = _block$$$.mixins;
 
 
-        children.forEach(beforeLoad);
-        mixins.forEach(beforeLoad);
+        if (children) {
+          children.forEach(beforeLoad);
+        }
+
+        if (mixins) {
+          mixins.forEach(beforeLoad);
+        }
 
         if (route.beforeLoadRoute) {
           try {
@@ -17541,8 +17545,7 @@ function makeRoute(options) {
 
       var block = {
         $$: {
-          children: new Arr([route]),
-          mixins: new Arr([])
+          children: new Arr([route])
         }
       };
 
@@ -17553,8 +17556,13 @@ function makeRoute(options) {
         var mixins = _block$$$2.mixins;
 
 
-        children.forEach(beforeLeave);
-        mixins.forEach(beforeLeave);
+        if (children) {
+          children.forEach(beforeLeave);
+        }
+
+        if (mixins) {
+          mixins.forEach(beforeLeave);
+        }
 
         if (route.beforeLeaveRoute) {
           try {
