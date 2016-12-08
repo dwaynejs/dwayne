@@ -17463,6 +17463,7 @@ function makeRoute(options) {
           })();
         }
 
+        _this.__routerInstance__ = true;
         _this.__isCurrentRoute__ = route === currentRoute || route.children.indexOf(currentRoute) !== -1;
         _this.args.route = currentRouteParams;
 
@@ -17512,6 +17513,10 @@ function makeRoute(options) {
       };
 
       block.$$.children.forEach(function beforeLoad(block) {
+        if (block.__routerInstance__ && block.__isCurrentRoute__) {
+          return;
+        }
+
         var _block$$$ = block.$$;
         var name = _block$$$.name;
         var children = _block$$$.children;
@@ -17550,6 +17555,10 @@ function makeRoute(options) {
       };
 
       block.$$.children.forEach(function beforeLeave(block) {
+        if (block.__routerInstance__ && block.__isCurrentRoute__) {
+          return;
+        }
+
         var _block$$$2 = block.$$;
         var name = _block$$$2.name;
         var children = _block$$$2.children;
