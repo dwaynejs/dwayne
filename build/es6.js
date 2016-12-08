@@ -17551,7 +17551,7 @@ function makeRoute(options) {
       };
 
       block.$$.children.forEach(function beforeLeave(block) {
-        if (block.__routerInstance__ && block.__isCurrentRoute__) {
+        if (block.__routerInstance__ && !block.__isCurrentRoute__) {
           return;
         }
 
