@@ -19,6 +19,7 @@ describe('it should test Arr#', () => {
       deepStrictEqual(wrap.concat(4, [5], [[6]]).$, a.concat(4, [5], [[6]]));
     });
   });
+  // TODO: includes()
   describe('indexOf()', () => {
     it('should return -1 if not find', () => {
       const a = [0, 1, 2];
