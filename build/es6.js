@@ -17512,10 +17512,17 @@ function changeRoute() {
   routesToLeave.forEach(function (_ref9) {
     var name = _ref9.name;
 
-    subscribers[name]('leave');
+    if (subscribers[name]) {
+      subscribers[name]('leave');
+    }
   });
   currentRoutes.forEach(function (route) {
-    subscribers[route.name](routesToLoad.includes(route) ? 'update' : 'load');
+    var name = route.name;
+
+
+    if (subscribers[name]) {
+      subscribers[name](routesToLoad.includes(route) ? 'update' : 'load');
+    }
   });
 }
 
