@@ -14214,6 +14214,17 @@ var Block = function () {
     if (parentBlock) {
       parentBlock.$$.children.push(this);
     }
+
+    /**
+     * @member {Object} Block#args
+     * @type {Object}
+     * @public
+     */
+    /**
+     * @member {Object} Block#global
+     * @type {Object}
+     * @public
+     */
   }
 
   /**
@@ -17308,17 +17319,17 @@ function makeRoute(options) {
         unsubscribe = subscribe(name, function (action) {
           var isCurrentRoute = action !== 'leave';
 
-          if (action === 'load') {
-            callBeforeLoad(_this);
-          } else if (action === 'leave') {
-            callBeforeLeave(_this);
-          }
+          _this.__isCurrentRoute__ = isCurrentRoute;
 
           if (isCurrentRoute) {
             _this.args.route = currentRouteParams;
           }
 
-          _this.__isCurrentRoute__ = isCurrentRoute;
+          if (action === 'load') {
+            callBeforeLoad(_this);
+          } else if (action === 'leave') {
+            callBeforeLeave(_this);
+          }
         });
 
         if (_this.__isCurrentRoute__) {
