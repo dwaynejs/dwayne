@@ -17502,7 +17502,7 @@ function changeRoute() {
     var currentParent = currentRoute;
 
     while (currentParent !== parent && currentParent !== baseRoute) {
-      routesToLoad.push(currentParent);
+      routesToLoad.unshift(currentParent);
       currentParent = currentParent.parent;
     }
 
@@ -17521,7 +17521,7 @@ function changeRoute() {
 
 
     if (subscribers[name]) {
-      subscribers[name](routesToLoad.includes(route) ? 'update' : 'load');
+      subscribers[name](routesToLoad.includes(route) ? 'load' : 'update');
     }
   });
 }
