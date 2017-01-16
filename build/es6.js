@@ -13864,8 +13864,10 @@ function registerDValue(Mixin) {
 
       elem.on(listenerSwitcher$1(name, [type]), function (e) {
         if (e.target === node) {
-          _this.currentValue = _this.getProp(_this.currentValue);
-          _this.changeScope();
+          setTimeout(function () {
+            _this.currentValue = _this.getProp(_this.currentValue);
+            _this.changeScope();
+          }, 0);
         }
       });
       return _this;
