@@ -17096,6 +17096,7 @@ var wasRoot = void 0;
 var wasDefault = void 0;
 var rootRoute = void 0;
 var redirectRoute = void 0;
+var redirectRouteIsNeededToPush = false;
 var RedirectRoute = void 0;
 var defaultRoute = void 0;
 var DefaultRoute = void 0;
@@ -17387,6 +17388,8 @@ function makeRoute(options) {
     var abstract = _ref7.abstract;
     var root = _ref7.root;
     var fallbackTo = _ref7.fallbackTo;
+    var _ref7$replace = _ref7.replace;
+    var replace = _ref7$replace === undefined ? true : _ref7$replace;
     var isDefault = _ref7.default;
 
 
@@ -17422,6 +17425,7 @@ function makeRoute(options) {
 
       if (fallbackTo) {
         redirectRoute = fallbackTo;
+        redirectRouteIsNeededToPush = !replace;
       }
     }
 
@@ -17461,6 +17465,7 @@ function makeRoute(options) {
 
         _this.__routerInstance__ = route;
         _this.__isCurrentRoute__ = currentRoutes.includes(route);
+        _this.__wasRouteActive__ = _this.__isCurrentRoute__;
         _this.args.route = currentRouteParams;
 
         routeLoaded = false;
@@ -17470,6 +17475,7 @@ function makeRoute(options) {
           _this.__isCurrentRoute__ = isCurrentRoute;
 
           if (isCurrentRoute) {
+            _this.__wasRouteActive__ = true;
             _this.args.route = currentRouteParams;
           }
 
@@ -17498,7 +17504,7 @@ function makeRoute(options) {
         }
       }]);
       return _class;
-    }(Block), _class.template = '<div' + (' class="dwayne-route route-' + name + '"') + ' d-class="{{ \'active-route\': __isCurrentRoute__ }}"' + ' d-show="{__isCurrentRoute__}"' + '>' + Block.template + '</div>', _temp;
+    }(Block), _class.template = '<d-if if="{__wasRouteActive__}">' + '<div' + ('  class="dwayne-route route-' + (name + (abstract ? ' abstract-route' : '')) + '"') + '  d-class="{{ \'active-route\': __isCurrentRoute__ }}"' + '  d-show="{__isCurrentRoute__}"' + '>' + Block.template + '</div>' + '</d-if>', _temp;
 
     function callBeforeLoad(route) {
       if (routeLoaded) {
@@ -17638,7 +17644,7 @@ function changeRoute() {
       return forward(constructURL('', url, {}, {}, '', {
         params: encodeParams,
         query: encodeQuery
-      }));
+      }), redirectRouteIsNeededToPush);
     }
 
     currentRoute = null;
