@@ -13812,7 +13812,7 @@ var getValueSwitcher = switcher('strictEquals', function (value) {
   return values;
 });
 var listenerSwitcher$1 = switcher('strictEquals', 'input').case('select', 'change').case('input', function (type) {
-  return type === 'radio' || type === 'checkbox' || type === 'color' || type === 'file' ? 'change' : 'input';
+  return type === 'radio' || type === 'checkbox' || type === 'color' || type === 'file' ? 'change' : 'change input';
 });
 
 function registerDValue(Mixin) {
@@ -13852,6 +13852,10 @@ function registerDValue(Mixin) {
       var initialElemValue = _this.getProp(initialScopeValue, true);
       var isInitialScopeValueNull = isNil(initialScopeValue);
       var isCheckbox = type === 'checkbox';
+      var changeScope = function changeScope() {
+        _this.currentValue = _this.getProp(_this.currentValue);
+        _this.changeScope();
+      };
 
       if (isInitialScopeValueNull || isCheckbox) {
         _this.currentValue = initialElemValue;
@@ -13867,11 +13871,11 @@ function registerDValue(Mixin) {
 
       elem.on(listenerSwitcher$1(name, [type]), function (e) {
         if (e.target === node) {
-          setTimeout(function () {
-            _this.currentValue = _this.getProp(_this.currentValue);
-            _this.changeScope();
-          }, 0);
+          changeScope();
         }
+      });
+      elem.closest('form').on('reset', function () {
+        setTimeout(changeScope, 0);
       });
       return _this;
     }
