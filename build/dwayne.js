@@ -13362,7 +13362,7 @@ function registerDText(Block) {
     return DText;
   }(Block);
 
-  DText.template = '<d-elements value="{[{ name: \'#text\', value: text }]}"/>';
+  DText.template = '<d-elements value="{[{ name: \'#text\', dynamic: true, value: text }]}"/>';
 
 
   return {
@@ -14908,7 +14908,7 @@ function createBlock(_ref6) {
       var children = node.children;
 
 
-      if (name === '#text' && expressionRegExp.test(value)) {
+      if (name === '#text' && node && !node.dynamic && expressionRegExp.test(value)) {
         return {
           v: createBlock({
             node: {
