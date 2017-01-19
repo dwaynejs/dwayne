@@ -13020,7 +13020,7 @@ function registerDEach(Block, createBlock) {
   };
 }
 
-function registerDElements(Block, createBlock) {
+function registerDElements(Block, createBlock, transformDIfChildren) {
   var DElements = function (_Block) {
     inherits(DElements, _Block);
 
@@ -13074,7 +13074,7 @@ function registerDElements(Block, createBlock) {
 
           var newContent = new Elem();
 
-          new Arr(value || []).forEach(function (child) {
+          transformDIfChildren(value || []).forEach(function (child) {
             var block = createBlock({
               node: child,
               after: after,
@@ -14879,7 +14879,7 @@ function initApp(block, node) {
 
 function registerBuiltIns(set$$1, scope, proto) {
   iterate(set$$1, function (register) {
-    var _register = register(proto, createBlock);
+    var _register = register(proto, createBlock, transformDIfChildren);
 
     var name = _register.name;
     var value = _register.value;
