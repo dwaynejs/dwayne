@@ -14048,35 +14048,50 @@ var Block = function () {
      * @method Block.register
      * @public
      * @param {String} name - Block or mixin name.
-     * @param {Block|Mixin} Subclass - Subclass of Block or Mixin.
+     * @param {String|Block|Mixin} Subclass - Subclass of Block or Mixin (or template string of it).
      * @returns {void}
      * @description Register block or mixin in the namespace of this.
      */
 
   }, {
     key: 'register',
-    value: function register(name, Subclass) {
+    value: function register(name, _Subclass) {
       var _this = new Super(this);
 
       if (!_this.hasOwn('_blocks')) {
-        Subclass._blocks = Object.create(_this.proto().$._blocks);
+        _Subclass._blocks = Object.create(_this.proto().$._blocks);
       }
 
       if (!_this.hasOwn('_mixins')) {
-        Subclass._mixins = Object.create(_this.proto().$._mixins);
+        _Subclass._mixins = Object.create(_this.proto().$._mixins);
       }
 
       var _blocks = this._blocks;
       var _mixins = this._mixins;
 
 
-      if (!isInstanceOfBlock(Subclass) && !isInstanceOfMixin(Subclass)) {
+      if (isString(_Subclass)) {
+        var _class, _temp;
+
+        _Subclass = (_temp = _class = function (_Block) {
+          inherits(Subclass, _Block);
+
+          function Subclass() {
+            classCallCheck(this, Subclass);
+            return possibleConstructorReturn(this, (Subclass.__proto__ || Object.getPrototypeOf(Subclass)).apply(this, arguments));
+          }
+
+          return Subclass;
+        }(Block), _class.template = _Subclass, _temp);
+      }
+
+      if (!isInstanceOfBlock(_Subclass) && !isInstanceOfMixin(_Subclass)) {
         console.warn('The "' + name + '" class does not extend Block or Mixin and will not be registered (Block.register)');
 
         return;
       }
 
-      if (isInstanceOfBlock(Subclass)) {
+      if (isInstanceOfBlock(_Subclass)) {
         if (rootBlocks[name]) {
           console.warn('The "' + name + '" block is a built-in block so the block will not be registered (Block.register)');
 
@@ -14089,9 +14104,9 @@ var Block = function () {
           return;
         }
 
-        Subclass._html = deepCloneChildren(markupToJSON('' + (Subclass.template || ''), Subclass.collapseWhiteSpace));
+        _Subclass._html = deepCloneChildren(markupToJSON('' + (_Subclass.template || ''), _Subclass.collapseWhiteSpace));
 
-        _blocks[name] = Subclass;
+        _blocks[name] = _Subclass;
       } else {
         if (rootMixins[name]) {
           console.warn('The "' + name + '" mixin is a built-in mixin so the mixin will not be registered (Block.register)');
@@ -14105,9 +14120,9 @@ var Block = function () {
           return;
         }
 
-        Subclass._match = new RegExp('^' + new Str(name).escapeRegExp().$ + '(?:-([\\s\\S]+))?$');
+        _Subclass._match = new RegExp('^' + new Str(name).escapeRegExp().$ + '(?:-([\\s\\S]+))?$');
 
-        _mixins[name] = Subclass;
+        _mixins[name] = _Subclass;
       }
     }
 
@@ -14173,7 +14188,7 @@ var Block = function () {
   }]);
 
   function Block(opts) {
-    var _this2 = this;
+    var _this3 = this;
 
     classCallCheck(this, Block);
     var name = opts.name;
@@ -14237,7 +14252,7 @@ var Block = function () {
             forDItem = !!forDItem;
             expression = expression.replace(/^\{|\}$/g, '');
 
-            var store = name === '#d-item' && !forDItem || forDEach ? (forDEach || _this2).$$.scope : _this2;
+            var store = name === '#d-item' && !forDItem || forDEach ? (forDEach || _this3).$$.scope : _this3;
 
             /* eslint no-new-func: 0 */
 
@@ -14247,10 +14262,10 @@ var Block = function () {
 
             var func = new Function('', 'with(document.DwayneStore){$$.expr=eval("$$.expr="+$$.expr);return $$.expr}');
 
-            return evaluate.call(_this2);
+            return evaluate.call(_this3);
 
             function evaluate() {
-              var _this3 = this;
+              var _this4 = this;
 
               var result = void 0;
 
@@ -14278,7 +14293,7 @@ var Block = function () {
 
                   getting.forEach(function (watchers) {
                     var watcher = function watcher() {
-                      var newResult = evaluate.call(_this3);
+                      var newResult = evaluate.call(_this4);
 
                       if (newResult !== result) {
                         onChange(newResult, result);
@@ -14336,8 +14351,8 @@ var Block = function () {
       var forDElements = name === 'd-elements' && arg === 'value';
 
       return parentScope.$$.evaluate(value, function (value) {
-        _this2.args[arg] = value;
-      }, _this2, forDElements, forDElements && parentBlock.$$.name === '#d-item');
+        _this3.args[arg] = value;
+      }, _this3, forDElements, forDElements && parentBlock.$$.name === '#d-item');
     }).$;
 
     this.args = args;
@@ -14482,7 +14497,7 @@ var Block = function () {
   }, {
     key: 'watch',
     value: function watch() {
-      var _this4 = this;
+      var _this5 = this;
 
       var watcher = arguments[arguments.length - 1];
 
@@ -14525,11 +14540,11 @@ var Block = function () {
         if (/^args\./.test(variable)) {
           variable = variable.replace(/^args\./, '');
 
-          if (!_this4.$$.args[variable]) {
+          if (!_this5.$$.args[variable]) {
             return;
           }
 
-          _this4.$$.args[variable].watchers.perm.push(watcher);
+          _this5.$$.args[variable].watchers.perm.push(watcher);
 
           return;
         }
@@ -14537,20 +14552,20 @@ var Block = function () {
         if (/^global\./.test(variable)) {
           variable = variable.replace(/^global\./, '');
 
-          if (!_this4.$$.global[variable]) {
+          if (!_this5.$$.global[variable]) {
             return;
           }
 
-          _this4.$$.global[variable].watchers.perm.push(watcher);
+          _this5.$$.global[variable].watchers.perm.push(watcher);
 
           return;
         }
 
-        if (!_this4.$$.locals[variable]) {
+        if (!_this5.$$.locals[variable]) {
           return;
         }
 
-        _this4.$$.locals[variable].watchers.perm.push(watcher);
+        _this5.$$.locals[variable].watchers.perm.push(watcher);
       });
     }
 
@@ -14579,7 +14594,7 @@ var Block = function () {
   }, {
     key: 'watchArgs',
     value: function watchArgs() {
-      var _this5 = this;
+      var _this6 = this;
 
       var watcher = arguments[arguments.length - 1];
 
@@ -14600,11 +14615,11 @@ var Block = function () {
           return;
         }
 
-        if (!_this5.$$.args[arg]) {
+        if (!_this6.$$.args[arg]) {
           return;
         }
 
-        _this5.$$.args[arg].watchers.perm.push(watcher);
+        _this6.$$.args[arg].watchers.perm.push(watcher);
       });
     }
 
@@ -14633,7 +14648,7 @@ var Block = function () {
   }, {
     key: 'watchGlobals',
     value: function watchGlobals() {
-      var _this6 = this;
+      var _this7 = this;
 
       var watcher = arguments[arguments.length - 1];
 
@@ -14661,11 +14676,11 @@ var Block = function () {
           return;
         }
 
-        if (!_this6.$$.global[global]) {
+        if (!_this7.$$.global[global]) {
           return;
         }
 
-        _this6.$$.global[global].watchers.perm.push(watcher);
+        _this7.$$.global[global].watchers.perm.push(watcher);
       });
     }
 
@@ -14694,7 +14709,7 @@ var Block = function () {
   }, {
     key: 'watchLocals',
     value: function watchLocals() {
-      var _this7 = this;
+      var _this8 = this;
 
       var watcher = arguments[arguments.length - 1];
 
@@ -14715,11 +14730,11 @@ var Block = function () {
           return;
         }
 
-        if (!_this7.$$.locals[local]) {
+        if (!_this8.$$.locals[local]) {
           return;
         }
 
-        _this7.$$.locals[local].watchers.perm.push(watcher);
+        _this8.$$.locals[local].watchers.perm.push(watcher);
       });
     }
   }]);
