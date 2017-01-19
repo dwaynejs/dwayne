@@ -14984,7 +14984,7 @@ function createBlock(_ref6) {
       }).$;
 
       if (!isNil(value)) {
-        element.text(value);
+        element.text('' + value);
       }
 
       if (attrs) {
