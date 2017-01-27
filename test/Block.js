@@ -11,6 +11,7 @@ let currentBlock;
 let appRendered;
 let appElem;
 let inputElem;
+let inputNode;
 
 Elem.prototype.exceptComments = function () {
   return this.filter((elem) => new Elem(elem).name !== '#comment');
@@ -53,12 +54,12 @@ class PrimitiveTest extends Block {
 }
 
 class VariablesTest extends Block {
-  static template = '<div id="variables-test">{caption}</div>';
+  static template = '<div id="variables-test">Hello, {caption}!</div>';
 
-  caption = 'Hello, world!';
+  caption = 'world';
 }
 class ChangingVariablesTest extends Block {
-  static template = '<div id="changing-variables-test">{caption}</div>';
+  static template = '<div id="changing-variables-test">Hello, {caption}!</div>';
 
   caption = null;
 
@@ -502,6 +503,25 @@ class DHideTest extends Block {
   }
 }
 
+class DNodeTest extends Block {
+  static template = `
+    <div id="d-node-test">
+      <span d-node="span"/>
+      <input d-node="{setInput}"/>
+    </div>
+  `;
+
+  constructor(opts) {
+    super(opts);
+
+    currentBlock = this;
+  }
+
+  setInput(input) {
+    inputNode = input;
+  }
+}
+
 class DOnTest extends Block {
   static template = `
     <div id="d-on-test" d-on-click="{onClick()}"/>
@@ -733,59 +753,61 @@ class DValueSelectMultipleTest extends Block {
   }
 }
 
-Block.register('App', App);
-Block.register('PrimitiveTest', PrimitiveTest);
-Block.register('VariablesTest', VariablesTest);
-Block.register('ChangingVariablesTest', ChangingVariablesTest);
-Block.register('ChangingArgsVariablesTest', ChangingArgsVariablesTest);
-Block.register('ChangingGlobalsTest', ChangingGlobalsTest);
-Block.register('ChangingMultipleVariablesTest', ChangingMultipleVariablesTest);
+Block.block('App', App);
+Block.block('PrimitiveTest', PrimitiveTest);
+Block.block('VariablesTest', VariablesTest);
+Block.block('ChangingVariablesTest', ChangingVariablesTest);
+Block.block('ChangingArgsVariablesTest', ChangingArgsVariablesTest);
+Block.block('ChangingGlobalsTest', ChangingGlobalsTest);
+Block.block('ChangingMultipleVariablesTest', ChangingMultipleVariablesTest);
 
-Block.register('DBlockSimpleTest', DBlockSimpleTest);
-Block.register('DBlockNamedTest', DBlockNamedTest);
-Block.register('DBlockNestedTest', DBlockNestedTest);
-Block.register('DBlockNestedTestHelper', DBlockNestedTestHelper);
+Block.block('DBlockSimpleTest', DBlockSimpleTest);
+Block.block('DBlockNamedTest', DBlockNamedTest);
+Block.block('DBlockNestedTest', DBlockNestedTest);
+Block.block('DBlockNestedTestHelper', DBlockNestedTestHelper);
 
-Block.register('DEachSimpleTest', DEachSimpleTest);
-Block.register('DEachScopeTest', DEachScopeTest);
-Block.register('DEachChangingSetTest', DEachChangingSetTest);
-Block.register('DEachUIDTest', DEachUIDTest);
-Block.register('DEachAttrsTest', DEachAttrsTest);
-Block.register('DEachNestedTest', DEachNestedTest);
-Block.register('DEachDoubleNestedTest', DEachDoubleNestedTest);
+Block.block('DEachSimpleTest', DEachSimpleTest);
+Block.block('DEachScopeTest', DEachScopeTest);
+Block.block('DEachChangingSetTest', DEachChangingSetTest);
+Block.block('DEachUIDTest', DEachUIDTest);
+Block.block('DEachAttrsTest', DEachAttrsTest);
+Block.block('DEachNestedTest', DEachNestedTest);
+Block.block('DEachDoubleNestedTest', DEachDoubleNestedTest);
 
-Block.register('DIfSimpleTest', DIfSimpleTest);
-Block.register('DIfElseIfTest', DIfElseIfTest);
-Block.register('DIfElseIfElseTest', DIfElseIfElseTest);
+Block.block('DIfSimpleTest', DIfSimpleTest);
+Block.block('DIfElseIfTest', DIfElseIfTest);
+Block.block('DIfElseIfElseTest', DIfElseIfElseTest);
 
-Block.register('DAttrSimpleTest', DAttrSimpleTest);
-Block.register('DAttrConflictTest', DAttrConflictTest);
+Block.block('DAttrSimpleTest', DAttrSimpleTest);
+Block.block('DAttrConflictTest', DAttrConflictTest);
 
-Block.register('DBindTest', DBindTest);
+Block.block('DBindTest', DBindTest);
 
-Block.register('DClassSimpleTest', DClassSimpleTest);
-Block.register('DClassConflictTest', DClassConflictTest);
+Block.block('DClassSimpleTest', DClassSimpleTest);
+Block.block('DClassConflictTest', DClassConflictTest);
 
-Block.register('DElemTest', DElemTest);
+Block.block('DElemTest', DElemTest);
 
-Block.register('DHideTest', DHideTest);
+Block.block('DHideTest', DHideTest);
 
-Block.register('DOnTest', DOnTest);
+Block.block('DNodeTest', DHideTest);
 
-Block.register('DShowTest', DShowTest);
+Block.block('DOnTest', DOnTest);
 
-Block.register('DStyleSimpleTest', DStyleSimpleTest);
-Block.register('DStyleConflictTest', DStyleConflictTest);
+Block.block('DShowTest', DShowTest);
 
-Block.register('DValidateTest', DValidateTest);
+Block.block('DStyleSimpleTest', DStyleSimpleTest);
+Block.block('DStyleConflictTest', DStyleConflictTest);
 
-Block.register('DValueSimpleTest', DValueSimpleTest);
-Block.register('DValueContentEditableTest', DValueContentEditableTest);
-Block.register('DValueColorTest', DValueColorTest);
-Block.register('DValueRadioTest', DValueRadioTest);
-Block.register('DValueCheckboxTest', DValueCheckboxTest);
-Block.register('DValueSelectTest', DValueSelectTest);
-Block.register('DValueSelectMultipleTest', DValueSelectMultipleTest);
+Block.block('DValidateTest', DValidateTest);
+
+Block.block('DValueSimpleTest', DValueSimpleTest);
+Block.block('DValueContentEditableTest', DValueContentEditableTest);
+Block.block('DValueColorTest', DValueColorTest);
+Block.block('DValueRadioTest', DValueRadioTest);
+Block.block('DValueCheckboxTest', DValueCheckboxTest);
+Block.block('DValueSelectTest', DValueSelectTest);
+Block.block('DValueSelectMultipleTest', DValueSelectMultipleTest);
 
 describe('it should test Block', () => {
   before((done) => {
@@ -849,16 +871,16 @@ describe('it should test Block', () => {
 
         strictEqual(children.length, 1);
         strictEqual(children.elem(0).id(), 'changing-variables-test');
-        strictEqual(children.elem(0).text(), '');
+        strictEqual(children.elem(0).text(), 'Hello, !');
       });
       it('should re-render caption after it\'s been changed', (done) => {
-        const caption = currentBlock.caption = 'Hello, world!';
+        const caption = currentBlock.caption = 'world';
 
         setTimeout(() => {
           const children = appElem.children().exceptComments();
 
           try {
-            strictEqual(children.elem(0).text(), caption);
+            strictEqual(children.elem(0).text(), `Hello, ${ caption }!`);
 
             done();
           } catch (err) {
@@ -867,13 +889,13 @@ describe('it should test Block', () => {
         }, 0);
       });
       it('should re-render caption again after it\'s been changed', (done) => {
-        const caption = currentBlock.caption = 'Hello, world, again!';
+        const caption = currentBlock.caption = 'dwayne';
 
         setTimeout(() => {
           const children = appElem.children().exceptComments();
 
           try {
-            strictEqual(children.elem(0).text(), caption);
+            strictEqual(children.elem(0).text(), `Hello, ${ caption }!`);
 
             done();
           } catch (err) {
@@ -1986,7 +2008,7 @@ describe('it should test Block', () => {
 
       strictEqual(currentBlock.span.$[0], elem.find('span').$[0]);
     });
-    it('should support function argument and call the function with th Elem argument', () => {
+    it('should support function argument and call the function with the Elem argument', () => {
       const elem = appElem.children().exceptComments().first();
 
       strictEqual(inputElem.$[0], elem.find('input').$[0]);
@@ -2034,6 +2056,24 @@ describe('it should test Block', () => {
           done(err);
         }
       }, 0);
+    });
+  });
+  describe('d-node', () => {
+    before((done) => {
+      app.test = 'd-node';
+
+      setTimeout(done, 0);
+    });
+
+    it('should support string argument and set the block property to the node', () => {
+      const elem = appElem.children().exceptComments().first();
+
+      strictEqual(currentBlock.span, elem.find('span').$[0]);
+    });
+    it('should support function argument and call the function with the node argument', () => {
+      const elem = appElem.children().exceptComments().first();
+
+      strictEqual(inputNode, elem.find('input').$[0]);
     });
   });
   describe('d-on', () => {
