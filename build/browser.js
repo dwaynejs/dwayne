@@ -3223,6 +3223,16 @@ function toArray$1(value, createNewArray) {
 }
 
 /**
+ * @module helpers/toJSON
+ * @private
+ * @description Exports toJSON method.
+ */
+
+function toJSON$1(what) {
+  return JSON.stringify(what);
+}
+
+/**
  * @module helpers/validate
  * @private
  * @description Exports validate method.
@@ -9364,7 +9374,7 @@ function parseJSON() {
  * @property {MarkupElement[]} children - Node children.
  */
 
-var submitString = 'Please, submit an issue at https://github.com/dwaynejs/dwayne/issues.';
+var submitString = 'Please, submit an issue at https://github.com/dwaynejs/dwayne/issues/new, if needed.';
 var NODE_REGEX_SET = new Super({
   'tag-open': new RegExp('<(' + htmlAllowedTagSymbols + ')\\s*', 'i'),
   'tag-close': constructCloseTagRegExp(htmlAllowedTagSymbols),
@@ -12831,30 +12841,24 @@ function registerDBlock(Block) {
     inherits(DBlock, _Block);
 
     function DBlock() {
-      var _ref;
-
-      var _temp, _this, _ret;
-
       classCallCheck(this, DBlock);
-
-      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = DBlock.__proto__ || Object.getPrototypeOf(DBlock)).call.apply(_ref, [this].concat(args))), _this), _this.elems = null, _temp), possibleConstructorReturn(_this, _ret);
+      return possibleConstructorReturn(this, (DBlock.__proto__ || Object.getPrototypeOf(DBlock)).apply(this, arguments));
     }
 
     createClass(DBlock, [{
       key: 'afterConstruct',
       value: function afterConstruct() {
         var children = this.$$.parent.children;
-        var name = this.args.name;
+        var _args = this.args;
+        var name = _args.name;
+        var ownChildren = _args.value;
 
+        var eventualChildren = ownChildren || children;
         var found = void 0;
 
         if (name) {
-          found = children.find(function (_ref2) {
-            var nodeName = _ref2.name;
+          found = eventualChildren.find(function (_ref) {
+            var nodeName = _ref.name;
             return nodeName === 'd-block-' + name;
           });
 
@@ -12862,7 +12866,7 @@ function registerDBlock(Block) {
             this.elems = found.value.children;
           }
         } else {
-          this.elems = children;
+          this.elems = eventualChildren;
         }
       }
     }]);
@@ -12897,7 +12901,7 @@ function registerDEach(Block, createBlock) {
       assign$1(_this.$$, {
         uids: new Super({}),
         items: new Arr([]),
-        UID: String(_this.args.uid),
+        UID: _this.args.uid || 'undefined',
         itemName: itemName,
         indexName: indexName
       });
@@ -12910,7 +12914,7 @@ function registerDEach(Block, createBlock) {
         var _this2 = this;
 
         this.constructValues(this.args.set);
-        this.watchArgs('set', function (set$$1) {
+        this.watch('args.set', function (set$$1) {
           _this2.constructValues(set$$1);
         });
       }
@@ -12939,7 +12943,7 @@ function registerDEach(Block, createBlock) {
           scope[itemName] = item;
           scope[indexName] = index;
 
-          var uid = parent.$$.evaluate(String(UID), null, null, false, false, _this3);
+          var uid = parent.$$.evaluate(UID, null, null, false, false, _this3);
 
           newKeys[uid] = newKeys[uid] || {};
           newKeys[uid][index] = true;
@@ -12952,14 +12956,14 @@ function registerDEach(Block, createBlock) {
         uids.forEach(function (items, uid) {
           if (!newKeys[uid]) {
             items.forEach(function (Item) {
-              Item.remove();
+              Item.$$.remove();
             });
 
             return;
           }
 
           items.splice(Object.keys(newKeys[uid]).length).forEach(function (Item) {
-            Item.remove();
+            Item.$$.remove();
           });
         });
 
@@ -12986,8 +12990,7 @@ function registerDEach(Block, createBlock) {
               },
               after: after,
               parent: parentElem,
-              parentBlock: _this3,
-              parentScope: parent
+              parentBlock: _this3
             });
           }
 
@@ -13020,7 +13023,7 @@ function registerDEach(Block, createBlock) {
   };
 }
 
-function registerDElements(Block, createBlock, transformDIfChildren) {
+function registerDElements(Block, createBlock) {
   var DElements = function (_Block) {
     inherits(DElements, _Block);
 
@@ -13034,7 +13037,7 @@ function registerDElements(Block, createBlock, transformDIfChildren) {
       value: function afterConstruct() {
         var _this2 = this;
 
-        this.watchArgs('value', function (value) {
+        this.watch('args.value', function (value) {
           var _$$ = _this2.$$;
           var children = _$$.children;
           var mixins = _$$.mixins;
@@ -13047,10 +13050,10 @@ function registerDElements(Block, createBlock, transformDIfChildren) {
           var after = start;
 
           children.forEach(function (child) {
-            child.remove(true);
+            child.$$.remove(true);
           });
           mixins.forEach(function (mixin) {
-            mixin.remove(true);
+            mixin.$$.remove(true);
           });
           content.remove();
 
@@ -13074,13 +13077,12 @@ function registerDElements(Block, createBlock, transformDIfChildren) {
 
           var newContent = new Elem();
 
-          transformDIfChildren(value || []).forEach(function (child) {
+          new Arr(value || []).forEach(function (child) {
             var block = createBlock({
               node: child,
               after: after,
               parent: parent,
-              parentBlock: _this2,
-              parentScope: _this2
+              parentBlock: _this2
             });
 
             if (block instanceof Block) {
@@ -13114,58 +13116,60 @@ function registerDIf(Block) {
   var DIf = function (_Block) {
     inherits(DIf, _Block);
 
-    function DIf() {
-      var _ref;
-
-      var _temp, _this, _ret;
-
+    function DIf(opts) {
       classCallCheck(this, DIf);
 
-      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
+      var _this = possibleConstructorReturn(this, (DIf.__proto__ || Object.getPrototypeOf(DIf)).call(this, opts));
 
-      return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = DIf.__proto__ || Object.getPrototypeOf(DIf)).call.apply(_ref, [this].concat(args))), _this), _this.index = Infinity, _this.elems = null, _this.values = _this.children.map(function (child, i) {
+      var index = Infinity;
+      var values = _this.children.map(function (child, i) {
         var name = child.name;
         var attrs = child.attrs;
         var children = child.children;
 
-        var cond = _this.evaluateAndWatch(name === 'd-else' ? '{true}' : attrs.if || '{true}', function (newValue) {
-          if (!!newValue === _this.values.$[i]) {
-            return;
-          }
+        var cond = attrs.if;
 
-          _this.values.$[i] = !!newValue;
+        if (name !== 'd-else' && cond) {
+          cond = _this.$$.parent.$$.evaluate(cond, function (newValue) {
+            if (!!newValue === values.$[i]) {
+              return;
+            }
 
-          if (i > _this.index) {
-            return;
-          }
+            values.$[i] = !!newValue;
 
-          if (i < _this.index) {
-            _this.index = i;
-            _this.elems = children;
+            if (i > index) {
+              return;
+            }
 
-            return;
-          }
+            if (i < index) {
+              index = i;
+              _this.elems = children;
 
-          var found = _this.values.find(Boolean);
+              return;
+            }
 
-          if (found) {
-            _this.index = found.key;
-            _this.elems = _this.children.$[found.key].children;
-          } else {
-            _this.index = Infinity;
-            _this.elems = null;
-          }
-        });
+            var found = values.find(Boolean);
 
-        if (cond && _this.index === Infinity) {
-          _this.index = i;
+            if (found) {
+              index = found.key;
+              _this.elems = _this.children.$[found.key].children;
+            } else {
+              index = Infinity;
+              _this.elems = null;
+            }
+          }, _this);
+        } else {
+          cond = true;
+        }
+
+        if (cond && index === Infinity) {
+          index = i;
           _this.elems = children;
         }
 
-        return cond;
-      }), _temp), possibleConstructorReturn(_this, _ret);
+        return !!cond;
+      });
+      return _this;
     }
 
     return DIf;
@@ -13211,7 +13215,6 @@ function registerDSwitch(Block) {
       var _this = possibleConstructorReturn(this, (DSwitch.__proto__ || Object.getPrototypeOf(DSwitch)).call(this, opts));
 
       _this.index = Infinity;
-      _this.elems = null;
       var args = _this.args;
       var value = _this.args.value;
 
@@ -13222,6 +13225,7 @@ function registerDSwitch(Block) {
         var attrs = child.attrs;
         var children = child.children;
 
+        var val = attrs.if;
 
         if (wasDefault) {
           return;
@@ -13235,12 +13239,10 @@ function registerDSwitch(Block) {
           wasDefault = true;
         }
 
-        var val = void 0;
-
         if (name === 'd-default') {
           val = args.value;
-        } else {
-          val = _this.evaluateAndWatch(attrs.if || '{undefined}', function (newValue) {
+        } else if (val) {
+          val = _this.$$.parent.$$.evaluate(val, function (newValue) {
             if (_this.equals(_this.values.$[i].value, newValue)) {
               return;
             }
@@ -13270,7 +13272,9 @@ function registerDSwitch(Block) {
               _this.index = Infinity;
               _this.elems = null;
             }
-          });
+          }, _this);
+        } else {
+          val = undefined;
         }
 
         if (_this.equals(val, value) && _this.index === Infinity) {
@@ -13292,7 +13296,7 @@ function registerDSwitch(Block) {
       value: function afterConstruct() {
         var _this2 = this;
 
-        this.watchArgs('value', function (newValue) {
+        this.watch('args.value', function (newValue) {
           _this2.index = Infinity;
           _this2.values.forEach(function (_ref2, i) {
             var name = _ref2.name;
@@ -13330,48 +13334,6 @@ function registerDSwitch(Block) {
   };
 }
 
-function registerDText(Block) {
-  var DText = function (_Block) {
-    inherits(DText, _Block);
-
-    function DText() {
-      var _ref;
-
-      var _temp, _this, _ret;
-
-      classCallCheck(this, DText);
-
-      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = DText.__proto__ || Object.getPrototypeOf(DText)).call.apply(_ref, [this].concat(args))), _this), _this.text = '', _temp), possibleConstructorReturn(_this, _ret);
-    }
-
-    createClass(DText, [{
-      key: 'afterConstruct',
-      value: function afterConstruct() {
-        var _this2 = this;
-
-        this.text = isNil(this.args.value) ? '' : this.args.value;
-
-        this.watchArgs('value', function (newValue) {
-          _this2.text = isNil(newValue) ? '' : newValue;
-        });
-      }
-    }]);
-    return DText;
-  }(Block);
-
-  DText.template = '<d-elements value="{[{ name: \'#text\', dynamic: true, value: text }]}"/>';
-
-
-  return {
-    name: 'd-text',
-    value: DText
-  };
-}
-
 
 
 var Blocks = Object.freeze({
@@ -13380,8 +13342,7 @@ var Blocks = Object.freeze({
 	registerDElements: registerDElements,
 	registerDIf: registerDIf,
 	registerDItem: registerDItem,
-	registerDSwitch: registerDSwitch,
-	registerDText: registerDText
+	registerDSwitch: registerDSwitch
 });
 
 function registerDAttr(Mixin) {
@@ -13585,6 +13546,40 @@ function registerDHide(Mixin) {
   };
 }
 
+function registerDNode(Mixin) {
+  var DNode = function (_Mixin) {
+    inherits(DNode, _Mixin);
+
+    function DNode(opts) {
+      classCallCheck(this, DNode);
+
+      var _this = possibleConstructorReturn(this, (DNode.__proto__ || Object.getPrototypeOf(DNode)).call(this, opts));
+
+      var block = _this.block;
+      var node = _this.node;
+
+      var value = _this.evaluateOnce();
+
+      if (isFunction(value)) {
+        value(node);
+      } else if (isString(value)) {
+        block[value] = node;
+      }
+      return _this;
+    }
+
+    return DNode;
+  }(Mixin);
+
+  DNode.evaluate = false;
+
+
+  return {
+    name: 'd-node',
+    value: DNode
+  };
+}
+
 function registerDOn(Mixin) {
   var DOn = function (_Mixin) {
     inherits(DOn, _Mixin);
@@ -13677,32 +13672,8 @@ function registerDStyle(Mixin) {
   };
 }
 
-function registerDText$1(Mixin) {
-  var DText = function (_Mixin) {
-    inherits(DText, _Mixin);
-
-    function DText() {
-      classCallCheck(this, DText);
-      return possibleConstructorReturn(this, (DText.__proto__ || Object.getPrototypeOf(DText)).apply(this, arguments));
-    }
-
-    createClass(DText, [{
-      key: 'afterUpdate',
-      value: function afterUpdate(value) {
-        this.elem.text(isNil(value) ? '' : '' + value);
-      }
-    }]);
-    return DText;
-  }(Mixin);
-
-  return {
-    name: 'd-text',
-    value: DText
-  };
-}
-
 var listenerSwitcher = switcher('strictEquals', 'input').case('form', 'input, change').case('select', 'change').case('input', function (type) {
-  return type === 'radio' || type === 'checkbox' || type === 'color' || type === 'file' ? 'change' : 'input';
+  return type === 'radio' || type === 'checkbox' || type === 'color' || type === 'file' ? 'change' : 'change input';
 });
 
 function registerDValidate(Mixin) {
@@ -13825,7 +13796,6 @@ function registerDValue(Mixin) {
 
       var _this = possibleConstructorReturn(this, (DValue.__proto__ || Object.getPrototypeOf(DValue)).call(this, opts));
 
-      var _value = _this.$$._value;
       var block = _this.block;
       var elem = _this.elem;
       var node = _this.node;
@@ -13842,7 +13812,7 @@ function registerDValue(Mixin) {
       _this.options = elem.find('option');
 
       if (!isFunction(value)) {
-        initialScopeValue = block.$$.evaluate('{' + _value + '}', function (newValue) {
+        initialScopeValue = block.$$.evaluate('$.' + value, function (newValue) {
           if (_this.currentValue !== newValue) {
             _this.currentValue = newValue;
             _this.setProp(newValue);
@@ -13950,13 +13920,465 @@ var Mixins = Object.freeze({
 	registerDClass: registerDClass,
 	registerDElem: registerDElem,
 	registerDHide: registerDHide,
+	registerDNode: registerDNode,
 	registerDOn: registerDOn,
 	registerDShow: registerDShow,
 	registerDStyle: registerDStyle,
-	registerDText: registerDText$1,
 	registerDValidate: registerDValidate,
 	registerDValue: registerDValue
 });
+
+var emptySpaceRegExp = /^\s+/;
+var anyEmptySpaceRegExp = /\s+/g;
+var anyEscapedExpressionRegExp = /\\[\s\S]/g;
+var anyDoubleQuoteRegExp = /"/g;
+var anyNewLineRegExp = /\r\n|\r|\n/g;
+var anyCommaEmptySpace = /\s*,\s*/;
+var properEscapedRegExp = /\\|u|n|f|r|t|b|v|`[0-7]/;
+
+var simpleExpressionRegExp = /^(?:true|false|null|undefined)/;
+var variableRegExp = /^[a-zA-Z_$][a-zA-Z0-9_$]*/;
+var numberRegExp = /^(?:NaN|-?(?:(?:\d+|\d*\.\d+)(?:[E|e][+|\-]?\d+)?|Infinity))/;
+var stringRegExp = /^(?:"(?:(?:\\[\s\S])|[^"\n\\])*"|'(?:(?:\\[\s\S])|[^'\n\\])*')/;
+var regexpRegExp = /^\/(?:(?:\\[\s\S])|[^\/\n\\])+\/[gimuy]*/;
+var arrowFunctionRegExp = /^(?:(?:\(\s*((?:[a-zA-Z_$][a-zA-Z0-9_$]*\s*,\s*)?(?:[a-zA-Z_$][a-zA-Z0-9_$]*)?)\s*\))|([a-zA-Z_$][a-zA-Z0-9_$]*))\s*=>/;
+var templateStringContentRegExp = /^(?:(?:\\[\s\S])|\$(?!\{)|[^`$\\])+/;
+var operatorRegExp = /^(?:(?:>>>|>>|<<)=?|&&|\|\||,|(?:\+|-|\*|\/|%|&|\||\^|<|>|==)=?|=)/;
+var pointOperatorRegExp = /^\.[a-zA-Z_$][a-zA-Z0-9_$]*/;
+var propertyRegExp = /^((?:"(?:(?:\\[\s\S])|[^"\n\\])*"|'(?:(?:\\[\s\S])|[^'\n\\])*'|[a-zA-Z_$][a-zA-Z0-9_$]*))\s*:/;
+var shorthandPropertyRegExp = /^([a-zA-Z_$][a-zA-Z0-9_$]*)\s*(,?)/;
+var unaryOperatorRegExp = /^(?:-|~|\+|!)/;
+
+var EXPRESSION = 'expression';
+var END_OF_FUNC_BODY = 'end of function body';
+var submitString$1 = 'Please, submit an issue at https://github.com/dwaynejs/dwayne/issues/new, if needed.';
+
+function parseJS(string, wholeString, curlyError) {
+  curlyError = !!curlyError;
+
+  var initialString = string;
+  var expected = {
+    expression: true,
+    closingExpressions: [],
+    functionScope: {}
+  };
+  var variables = {};
+  var closingExpressions = expected.closingExpressions;
+
+  var expression = '';
+  var index = 0;
+
+  while (string.length) {
+    var spaceMatch = void 0;
+    var match = void 0;
+    var toConcat = '';
+    var matched = void 0;
+    var isEmptySpace = void 0;
+
+    var _ref = closingExpressions[closingExpressions.length - 1] || {};
+
+    var properType = _ref.type;
+    var properSymbol = _ref.symbol;
+
+    var firstSymbol = string[0];
+
+    if ((spaceMatch = string.match(emptySpaceRegExp)) && !expected.templateString) {
+      isEmptySpace = true;
+      match = spaceMatch[0];
+    } else {
+      if (expected.expression) {
+        match = string.match(arrowFunctionRegExp);
+
+        if (match) {
+          var vars = (match[2] || match[1]).split(anyCommaEmptySpace);
+          var _variables = [];
+          var newFunctionVars = Object.create(expected.functionScope);
+
+          for (var i = 0, length = vars.length; i < length; i++) {
+            var variable = vars[i];
+
+            if (variable) {
+              _variables.push(variable);
+              newFunctionVars[variable] = true;
+            }
+          }
+
+          toConcat = 'function(' + _variables.join(',') + '){return ';
+          expected.functionScope = newFunctionVars;
+          closingExpressions.push({
+            type: 'any',
+            symbol: END_OF_FUNC_BODY
+          }, {
+            type: 'any',
+            symbol: EXPRESSION
+          });
+        } else if (firstSymbol === '(') {
+          match = '(';
+          closingExpressions.push({
+            type: 'paren',
+            symbol: ')'
+          });
+        } else if (firstSymbol === '[') {
+          match = '[';
+          closingExpressions.push({
+            type: 'array',
+            symbol: ']'
+          });
+        } else if (firstSymbol === '`') {
+          match = '`';
+          toConcat = '(""';
+          expected.templateString = true;
+          closingExpressions.push({
+            type: 'templateString',
+            symbol: '`'
+          });
+
+          delete expected.expression;
+        } else if (firstSymbol === '{') {
+          match = '{';
+          expected.objectProperty = true;
+          closingExpressions.push({
+            type: 'object',
+            symbol: '}'
+          });
+
+          delete expected.expression;
+        } else {
+          match = string.match(unaryOperatorRegExp);
+
+          if (match) {
+            toConcat = match[0].replace(anyEmptySpaceRegExp, ' ');
+          } else {
+            match = string.match(simpleExpressionRegExp);
+
+            if (!match) {
+              match = string.match(numberRegExp);
+
+              if (!match) {
+                match = string.match(stringRegExp);
+
+                if (!match) {
+                  match = string.match(regexpRegExp);
+
+                  if (!match) {
+                    match = string.match(variableRegExp);
+
+                    if (match) {
+                      var _variable = match[0];
+
+                      if (!expected.functionScope[_variable]) {
+                        variables[_variable] = true;
+                      }
+
+                      toConcat = getVariable(_variable, expected.functionScope);
+                    }
+                  }
+                }
+              }
+            }
+
+            if (match) {
+              expected.operator = true;
+              matched = EXPRESSION;
+
+              delete expected.expression;
+            }
+          }
+        }
+      } else if (expected.templateString) {
+        match = string.match(templateStringContentRegExp);
+
+        if (match) {
+          var _string = match[0].replace(anyEscapedExpressionRegExp, function (match) {
+            var second = match[1];
+
+            return properEscapedRegExp.test(second) ? match : second;
+          }).replace(anyDoubleQuoteRegExp, '\\"').replace(anyNewLineRegExp, function (match) {
+            if (match === '\r\n') {
+              match = '\\r\\n';
+            } else if (match === '\r') {
+              match = '\\r';
+            } else {
+              match = '\\n';
+            }
+
+            return '"+"' + match + '"+"';
+          });
+
+          toConcat = '+"' + _string + '"';
+        } else if (firstSymbol === '`') {
+          match = '`';
+          matched = EXPRESSION;
+          toConcat = ')';
+          expected.operator = true;
+          closingExpressions.pop();
+
+          delete expected.templateString;
+        } else if (string.slice(0, 2) === '${') {
+          match = '${';
+          toConcat = '+(';
+          expected.expression = true;
+          closingExpressions.push({
+            type: 'templateString',
+            symbol: '}'
+          }, {
+            type: 'any',
+            symbol: EXPRESSION
+          });
+
+          delete expected.templateString;
+        }
+      } else if (expected.objectProperty) {
+        match = string.match(propertyRegExp);
+
+        if (match) {
+          toConcat = match[1] + ':';
+          expected.expression = true;
+          closingExpressions.push({
+            type: 'any',
+            symbol: EXPRESSION
+          });
+
+          delete expected.objectProperty;
+        } else {
+          match = string.match(shorthandPropertyRegExp);
+
+          if (match) {
+            var _variable2 = match[1];
+
+            if (!expected.functionScope[_variable2]) {
+              variables[_variable2] = true;
+            }
+
+            toConcat = _variable2 + ':' + getVariable(_variable2, expected.functionScope) + match[2];
+
+            if (!match[2]) {
+              expected.operator = true;
+
+              delete expected.objectProperty;
+            }
+          }
+        }
+      } else if (expected.operator) {
+        if (firstSymbol === ')' || firstSymbol === ']' || firstSymbol === '}' || firstSymbol === ',') {
+          toConcat = closeFunctionBody(expected);
+
+          var _ref2 = closingExpressions[closingExpressions.length - 1] || {};
+
+          properType = _ref2.type;
+          properSymbol = _ref2.symbol;
+        }
+
+        if (firstSymbol === '(') {
+          match = '(';
+          expected.expression = true;
+          closingExpressions.push({
+            type: 'call',
+            symbol: ')'
+          });
+
+          delete expected.operator;
+        } else if (firstSymbol === '?') {
+          match = '?';
+          expected.expression = true;
+          closingExpressions.push({
+            type: 'ternary',
+            symbol: ':'
+          }, {
+            type: 'any',
+            symbol: EXPRESSION
+          });
+
+          delete expected.operator;
+        } else if (firstSymbol === ':' && properSymbol === ':') {
+          match = ':';
+          expected.expression = true;
+          closingExpressions.pop();
+
+          delete expected.operator;
+        } else if (firstSymbol === '[') {
+          match = '[';
+          expected.expression = true;
+          closingExpressions.push({
+            type: 'property',
+            symbol: ']'
+          }, {
+            type: 'any',
+            symbol: EXPRESSION
+          });
+
+          delete expected.operator;
+        } else if (firstSymbol === '}' && properSymbol === '}' && properType === 'templateString') {
+          match = firstSymbol;
+          toConcat += ')';
+          expected.templateString = true;
+          closingExpressions.pop();
+
+          delete expected.operator;
+        } else if (firstSymbol === ']' && properSymbol === ']' && properType === 'property') {
+          match = firstSymbol;
+          toConcat += firstSymbol;
+          matched = EXPRESSION;
+          closingExpressions.pop();
+        } else if (firstSymbol === ')' && properSymbol === ')' && properType === 'paren') {
+          match = firstSymbol;
+          toConcat += firstSymbol;
+          matched = EXPRESSION;
+          closingExpressions.pop();
+        } else if (firstSymbol === ',' && properSymbol === '}' && properType === 'object') {
+          match = firstSymbol;
+          toConcat += firstSymbol;
+          matched = EXPRESSION;
+          expected.objectProperty = true;
+
+          delete expected.operator;
+        } else {
+          match = string.match(pointOperatorRegExp);
+
+          if (match) {
+            matched = EXPRESSION;
+          } else {
+            match = string.match(operatorRegExp);
+
+            if (match) {
+              toConcat += match[0].replace(anyEmptySpaceRegExp, ' ');
+              expected.expression = true;
+              closingExpressions.push({
+                type: 'any',
+                symbol: EXPRESSION
+              });
+
+              delete expected.operator;
+            }
+          }
+        }
+      }
+
+      if (!match) {
+        if (firstSymbol === ')' || firstSymbol === ']' || firstSymbol === '}') {
+          toConcat += closeFunctionBody(expected);
+
+          var _ref3 = closingExpressions[closingExpressions.length - 1] || {};
+
+          properType = _ref3.type;
+          properSymbol = _ref3.symbol;
+        }
+
+        var closingBrace = void 0;
+
+        if (properSymbol === ')' && firstSymbol === ')' && properType === 'call') {
+          closingBrace = true;
+
+          delete expected.expression;
+        } else if (properSymbol === ']' && firstSymbol === ']' && properType === 'array') {
+          closingBrace = true;
+
+          delete expected.expression;
+        } else if (firstSymbol === '}' && properSymbol === '}' && properType === 'object') {
+          closingBrace = true;
+
+          delete expected.objectProperty;
+        }
+
+        if (closingBrace) {
+          match = firstSymbol;
+          toConcat += firstSymbol;
+          expected.operator = true;
+          matched = EXPRESSION;
+          closingExpressions.pop();
+        }
+      }
+
+      if (matched === EXPRESSION && closingExpressions.length && closingExpressions[closingExpressions.length - 1].symbol === EXPRESSION) {
+        closingExpressions.pop();
+      }
+    }
+
+    var noMatch = !match || !match[0];
+    var curlyIndex = string.indexOf('}');
+
+    if (noMatch && (curlyIndex > 0 || curlyError)) {
+      var expressionString = curlyError ? initialString : initialString.slice(0, initialString.length - string.length + curlyIndex);
+
+      throw new Error('Syntax error near ~~~ "' + initialString.slice(index, index + 15) + '" ~~~ (index: ' + index + ', ' + constructErrorInfo(expressionString, wholeString, closingExpressions, curlyError));
+    } else if (noMatch && curlyIndex === 0) {
+      break;
+    } else if (noMatch && curlyIndex === -1) {
+      return null;
+    }
+
+    match = typeof match === 'string' ? match : match[0];
+
+    if (!isEmptySpace) {
+      expression += toConcat || match;
+    }
+
+    string = string.slice(match.length);
+    index += match.length;
+  }
+
+  expression += closeFunctionBody(expected);
+
+  if (closingExpressions.length) {
+    var last = closingExpressions[closingExpressions.length - 1].symbol;
+
+    var _expressionString = initialString.slice(0, initialString.length - string.length);
+
+    throw new Error('Unexpected end of input (' + constructErrorInfo(_expressionString, wholeString, closingExpressions, curlyError));
+  }
+
+  if (!string.length && !curlyError) {
+    return null;
+  }
+
+  return {
+    expression: expression,
+    variables: variables,
+    rest: string.slice(1)
+  };
+}
+
+function getVariable(name, functionScope) {
+  return functionScope[name] ? name : '$.' + name;
+}
+
+function closeFunctionBody(expected) {
+  var closingExpressions = expected.closingExpressions;
+
+  var toConcat = '';
+
+  while (closingExpressions[closingExpressions.length - 1] && closingExpressions[closingExpressions.length - 1].symbol === END_OF_FUNC_BODY) {
+    toConcat += '}';
+    expected.functionScope = Object.getPrototypeOf(expected.functionScope);
+    closingExpressions.pop();
+
+    if (closingExpressions.length && closingExpressions[closingExpressions.length - 1].symbol === EXPRESSION) {
+      closingExpressions.pop();
+    }
+  }
+
+  return toConcat;
+}
+
+function constructErrorInfo(expressionString, wholeString, closingExpressions, curlyError) {
+  var _ref4 = closingExpressions[closingExpressions.length - 1] || {};
+
+  var last = _ref4.symbol;
+
+  var wholeStringString = '';
+
+  if (last !== EXPRESSION && last !== END_OF_FUNC_BODY) {
+    last = '"' + last + '"';
+  }
+
+  if (!curlyError) {
+    wholeStringString = ', whole string: "' + wholeString + '"';
+  }
+
+  var lastString = last ? 'expected ' + last + ', ' : '';
+
+  return lastString + 'initial expression: "' + expressionString + '"' + wholeStringString + '). ' + submitString$1;
+}
 
 /**
  * @module Block
@@ -13966,15 +14388,32 @@ var Mixins = Object.freeze({
  */
 
 /**
+ * @typedef {Error} EvaluationError
+ * @public
+ * @property {String} expression - Expression which has been evaluated with the error.
+ * @property {Block} block - Block in context of which the expression has been evaluated with the error.
+ */
+
+/**
  * @callback Watcher
+ * @public
  * @param {*} newValue - New value.
  * @param {*} oldValue - Old value.
  */
 
 /**
  * @callback Wrapper
+ * @public
  * @param {Block} Block class to wrap.
  * @returns {Block} New Block class.
+ */
+
+/**
+ * @callback AfterUpdate
+ * @public
+ * @param {*} newValue - New value.
+ * @param {*} oldValue - Old value.
+ * @param {*} mixin - Mixin instance.
  */
 
 var rootBlocks = Object.create(null);
@@ -13982,14 +14421,8 @@ var rootMixins = Object.create(null);
 var isPrototypeOf = {}.isPrototypeOf;
 var tagName = new RegExp('^' + htmlAllowedTagSymbols + '$', 'i');
 var attrName = new RegExp('^' + htmlAllowedAttrSymbols + '$');
-var expressionRegExp = /^\{[\s\S]+\}$/;
-var _global$1 = global$1;
-var document$1 = _global$1.document;
-
 var svgNS = 'http://www.w3.org/2000/svg';
-var onEvalError = function onEvalError(err) {
-  console.error('Eval error (evaluating "' + err.expression + '" in context of block "' + err.block.$$.name + '"):', err);
-};
+var curlyBracketRegExp = /\{/;
 var evalMode = void 0;
 var getting = void 0;
 var changed = void 0;
@@ -14024,17 +14457,46 @@ var changed = void 0;
  * }
  *
  * class Hello extends Block {
- *   static template = 'Hello, <d-text value="{args.text}"/>!';
+ *   static template = 'Hello, {args.text}!';
  * }
  *
- * Block.App = App;
- * Block.Hello = Hello;
+ * Block.register('App', App);
+ * Block.register('Hello', 'Hello, {args.text}!');
  *
- * initApp();
+ * initApp('App', document.getElementById('root'));
  */
 
 var Block = function () {
   createClass(Block, null, [{
+    key: 'onEvalError',
+
+
+    /**
+     * @method Block.onEvalError
+     * @public
+     * @param {EvaluationError} err - The method is called when an evaluation error occurs.
+     */
+
+
+    /**
+     * @member {Boolean} [Block.collapseWhiteSpace = true]
+     * @type {Boolean}
+     * @public
+     * @description If the whitespace between html elements and
+     * in the start and the end inside the tag should be omitted during parsing.
+     */
+    value: function onEvalError(err) {
+      console.error('Eval error (evaluating "' + err.expression + '" in context of block "' + err.block.$$.name + '"):', err);
+    }
+
+    /**
+     * @member {String} [Block.template = '']
+     * @type {String}
+     * @public
+     * @description Block template.
+     */
+
+  }, {
     key: 'getBlocks',
     value: function getBlocks() {
       return new Super(_extends({}, this._blocks));
@@ -14046,29 +14508,24 @@ var Block = function () {
     }
 
     /**
-     * @method Block.register
+     * @method Block.block
      * @public
      * @param {String} name - Block or mixin name.
-     * @param {String|Block|Mixin} Subclass - Subclass of Block or Mixin (or template string of it).
+     * @param {String|Block} Subclass - Subclass of Block or template string of it.
      * @returns {void}
-     * @description Register block or mixin in the namespace of this.
+     * @description Register block in the namespace of this.
      */
 
   }, {
-    key: 'register',
-    value: function register(name, _Subclass) {
+    key: 'block',
+    value: function block(name, _Subclass) {
       var _this = new Super(this);
 
       if (!_this.hasOwn('_blocks')) {
         _Subclass._blocks = Object.create(_this.proto().$._blocks);
       }
 
-      if (!_this.hasOwn('_mixins')) {
-        _Subclass._mixins = Object.create(_this.proto().$._mixins);
-      }
-
       var _blocks = this._blocks;
-      var _mixins = this._mixins;
 
 
       if (isString(_Subclass)) {
@@ -14086,58 +14543,103 @@ var Block = function () {
         }(Block), _class.template = _Subclass, _temp);
       }
 
-      if (!isInstanceOfBlock(_Subclass) && !isInstanceOfMixin(_Subclass)) {
-        console.warn('The "' + name + '" class does not extend Block or Mixin and will not be registered (Block.register)');
+      if (!isInstanceOfBlock(_Subclass)) {
+        console.warn('The "' + name + '" class does not extend Block and will not be registered (Block.block)');
 
         return;
       }
 
-      if (isInstanceOfBlock(_Subclass)) {
-        if (rootBlocks[name]) {
-          console.warn('The "' + name + '" block is a built-in block so the block will not be registered (Block.register)');
+      if (rootBlocks[name]) {
+        console.warn('The "' + name + '" block is a built-in block so the block will not be registered (Block.block)');
 
-          return;
-        }
-
-        if (!tagName.test(name)) {
-          console.warn('Name "' + name + '" is not allowed for blocks so the block will not be registered (Block.register)');
-
-          return;
-        }
-
-        _Subclass._html = deepCloneChildren(markupToJSON('' + (_Subclass.template || ''), _Subclass.collapseWhiteSpace));
-
-        _blocks[name] = _Subclass;
-      } else {
-        if (rootMixins[name]) {
-          console.warn('The "' + name + '" mixin is a built-in mixin so the mixin will not be registered (Block.register)');
-
-          return;
-        }
-
-        if (!attrName.test(name)) {
-          console.warn('Name "' + name + '" is not allowed for mixins so the mixin will not be registered (Block.register)');
-
-          return;
-        }
-
-        _Subclass._match = new RegExp('^' + new Str(name).escapeRegExp().$ + '(?:-([\\s\\S]+))?$');
-
-        _mixins[name] = _Subclass;
+        return;
       }
+
+      if (!tagName.test(name)) {
+        console.warn('Name "' + name + '" is not allowed for blocks so the block will not be registered (Block.block)');
+
+        return;
+      }
+
+      var variables = {};
+
+      _Subclass._html = transformDIfChildren(transformJSExpressions(markupToJSON('' + (_Subclass.template || ''), _Subclass.collapseWhiteSpace), variables));
+      _Subclass._variables = new Super(variables).keys();
+
+      _blocks[name] = _Subclass;
     }
 
     /**
-     * @member {String} Block.template
-     * @type {String}
+     * @method Block.mixin
      * @public
-     * @description Block template.
+     * @param {String} name - Block or mixin name.
+     * @param {Mixin|AfterUpdate} Subclass - Subclass of Mixin or AfterUpdate callback.
+     * @returns {void}
+     * @description Register mixin in the namespace of this.
      */
+
+  }, {
+    key: 'mixin',
+    value: function mixin(name, Subclass) {
+      var _this = new Super(this);
+
+      if (!_this.hasOwn('_mixins')) {
+        Subclass._mixins = Object.create(_this.proto().$._mixins);
+      }
+
+      var _mixins = this._mixins;
+
+
+      if (isFunction(Subclass) && !isInstanceOfMixin(Subclass)) {
+        (function () {
+          var _afterUpdate = Subclass;
+
+          Subclass = function (_Mixin) {
+            inherits(Subclass, _Mixin);
+
+            function Subclass() {
+              classCallCheck(this, Subclass);
+              return possibleConstructorReturn(this, (Subclass.__proto__ || Object.getPrototypeOf(Subclass)).apply(this, arguments));
+            }
+
+            createClass(Subclass, [{
+              key: 'afterUpdate',
+              value: function afterUpdate(newValue, oldValue) {
+                _afterUpdate.call(this, newValue, oldValue, this);
+              }
+            }]);
+            return Subclass;
+          }(Mixin);
+        })();
+      }
+
+      if (!isInstanceOfMixin(Subclass)) {
+        console.warn('The "' + name + '" class does not extend Mixin and will not be registered (Block.mixin)');
+
+        return;
+      }
+
+      if (rootMixins[name]) {
+        console.warn('The "' + name + '" mixin is a built-in mixin so the mixin will not be registered (Block.mixin)');
+
+        return;
+      }
+
+      if (!attrName.test(name)) {
+        console.warn('Name "' + name + '" is not allowed for mixins so the mixin will not be registered (Block.mixin)');
+
+        return;
+      }
+
+      Subclass._match = new RegExp('^' + new Str(name).escapeRegExp().$ + '(?:-([\\s\\S]+))?$');
+
+      _mixins[name] = Subclass;
+    }
 
     /**
      * @method Block.wrap
      * @public
-     * @param {Wrapper} func - Function that returns wrapped block.
+     * @param {...Wrapper} wrappers - Functions that return wrapped block.
      * @returns {Block} New block.
      * @description Method for wrapping blocks into another blocks.
      * It is considered best practice to just extends the old block with a new one.
@@ -14151,7 +14653,9 @@ var Block = function () {
      *   return class extends Block {
      *     static template = `<section class="wrapper">${ Block.template }</section>`;
      *
-     *     constructor() {
+     *     constructor(opts) {
+     *       super(opts);
+     *
      *       this.additionalVar = 'additional';
      *     }
      *   };
@@ -14160,36 +14664,19 @@ var Block = function () {
 
   }, {
     key: 'wrap',
-    value: function wrap(func) {
-      validate$1([func], ['function']);
-
-      return func(this);
-    }
-  }, {
-    key: 'onEvalError',
-    get: function get() {
-      return onEvalError;
-    }
-
-    /**
-     * @member {Boolean} [Block.collapseWhiteSpace = true]
-     * @type {Boolean}
-     * @public
-     * @description If the whitespace between html elements and
-     * in the start and the end inside the tag should be omitted during parsing.
-     */
-    ,
-    set: function set(listener) {
-      if (isFunction(listener)) {
-        onEvalError = listener;
-      } else {
-        onEvalError = null;
+    value: function wrap() {
+      for (var _len = arguments.length, wrappers = Array(_len), _key = 0; _key < _len; _key++) {
+        wrappers[_key] = arguments[_key];
       }
+
+      return new Arr(arguments).reduce(function (block, wrapper) {
+        return wrapper(block);
+      }, this);
     }
   }]);
 
   function Block(opts) {
-    var _this3 = this;
+    var _this4 = this;
 
     classCallCheck(this, Block);
     var name = opts.name;
@@ -14200,6 +14687,12 @@ var Block = function () {
     var parentScope = opts.parentScope;
 
     var watchersToRemove = new Arr([]);
+    var constructor = new Super(this).proto().$.constructor;
+    var childrenBlocks = new Arr([]);
+    var mixins = new Arr([]);
+    var startComment = doc.createComment(' ' + name + ': start ');
+    var content = new Elem();
+    var endComment = doc.createComment(' ' + name + ': end ');
 
     Object.defineProperties(this, {
       /**
@@ -14234,40 +14727,36 @@ var Block = function () {
           name: name,
           parent: parentScope,
           parentBlock: parentBlock,
-          ns: new Super(this).proto().$.constructor,
-          children: new Arr([]),
-          mixins: new Arr([]),
+          ns: constructor,
+          children: childrenBlocks,
+          mixins: mixins,
           elems: {
-            start: doc.createComment(' ' + name + ': start '),
-            end: doc.createComment(' ' + name + ': end '),
-            content: new Elem(),
+            start: startComment,
+            end: endComment,
+            content: content,
             parent: parent
           },
           watchersToRemove: watchersToRemove,
           evaluate: function evaluate(expression, onChange, instance, forDElements, forDItem, forDEach) {
-            if (!expressionRegExp.test(expression)) {
-              return expression || true;
-            }
-
             forDElements = !!forDElements;
             forDItem = !!forDItem;
-            expression = expression.replace(/^\{|\}$/g, '');
 
-            var store = name === '#d-item' && !forDItem || forDEach ? (forDEach || _this3).$$.scope : _this3;
-
-            /* eslint no-new-func: 0 */
+            var scope = name === '#d-item' && !forDItem || forDEach ? (forDEach || _this4).$$.scope : _this4;
 
             var _ref = instance ? instance.$$ : {};
 
             var watchersToRemove = _ref.watchersToRemove;
 
-            var func = new Function('', 'with(document.DwayneStore){$$.expr=eval("$$.expr="+$$.expr);return $$.expr}');
+            var func = void 0;
 
-            return evaluate.call(_this3);
+            try {
+              func = new Function('$', 'return ' + expression);
+            } catch (err) {
+              throw new Error('Syntax error (in "' + expression + '" in context of block "' + _this4.$$.name + '"): ' + err.message);
+            }
 
-            function evaluate() {
-              var _this4 = this;
-
+            /* eslint no-new-func: 0 */
+            var evaluate = function evaluate() {
               var result = void 0;
 
               if (onChange) {
@@ -14275,17 +14764,12 @@ var Block = function () {
                 getting = new Arr([]);
               }
 
-              store.$$.expr = expression;
-              document$1.DwayneStore = store;
-
               try {
-                result = func();
+                result = func(scope);
               } catch (err) {
-                if (onEvalError) {
-                  err.expression = expression;
-                  err.block = this;
-                  onEvalError(err);
-                }
+                err.expression = expression;
+                err.block = _this4;
+                constructor.onEvalError(err);
               }
 
               if (onChange) {
@@ -14294,7 +14778,7 @@ var Block = function () {
 
                   getting.forEach(function (watchers) {
                     var watcher = function watcher() {
-                      var newResult = evaluate.call(_this4);
+                      var newResult = evaluate();
 
                       if (newResult !== result) {
                         onChange(newResult, result);
@@ -14334,49 +14818,99 @@ var Block = function () {
                 })();
               }
 
-              store.$$.expr = null;
-              document$1.DwayneStore = null;
-
               return result;
+            };
+
+            return evaluate();
+          },
+          remove: function remove(isParentSignal) {
+            removeWatchers(watchersToRemove);
+
+            childrenBlocks.forEach(function (child) {
+              child.$$.remove(true);
+            });
+
+            mixins.forEach(function (mixin) {
+              mixin.$$.remove(true);
+            });
+
+            try {
+              _this4.beforeRemove();
+            } catch (err) {
+              console.error('Uncaught error in ' + name + '#beforeRemove:', err);
             }
+
+            if (!isParentSignal && parentBlock) {
+              var index = parentBlock.$$.children.indexOf(_this4);
+
+              if (index !== -1) {
+                parentBlock.$$.children.splice(index, 1);
+              }
+            }
+
+            new Elem([startComment, content, endComment]).remove();
           }
         }
       }
     });
 
-    var args = new Super(originalArgs).map(function (value, arg) {
-      if (name === 'd-each' && (arg === 'item' || arg === 'index' || arg === 'uid')) {
-        return value;
+    constructor._variables.forEach(function (variable) {
+      _this4[variable] = isUndefined(_this4[variable]) ? undefined : _this4[variable];
+    });
+
+    Object.defineProperties(this, {
+      /**
+       * @member {Object} Block#args
+       * @type {Object}
+       * @public
+       */
+      args: {
+        value: new Super(originalArgs).map(function (value, arg) {
+          if (name === 'd-each' && (arg === 'item' || arg === 'index' || arg === 'uid')) {
+            return arg === 'uid' ? value : JSON.parse(value);
+          }
+
+          if ((name.match(/^d-block-([\s\S]+)$/) || name === 'd-block') && arg === 'name') {
+            return value;
+          }
+
+          var forDElements = name === 'd-elements' && arg === 'value';
+
+          if (value === '""') {
+            return true;
+          }
+
+          return parentScope.$$.evaluate(value, function (value) {
+            _this4.args[arg] = value;
+          }, _this4, forDElements, forDElements && parentBlock.$$.name === '#d-item');
+        }).$
+      },
+
+      /**
+       * @member {Object} Block#children
+       * @type {Object}
+       * @public
+       */
+      children: {
+        value: children || new Arr([])
+      },
+
+      /**
+       * @member {Object} Block#global
+       * @type {Object}
+       * @public
+       */
+      global: {
+        value: Object.create(parentScope ? Object.create(parentScope.global) : null)
       }
+    });
 
-      var forDElements = name === 'd-elements' && arg === 'value';
-
-      return parentScope.$$.evaluate(value, function (value) {
-        _this3.args[arg] = value;
-      }, _this3, forDElements, forDElements && parentBlock.$$.name === '#d-item');
-    }).$;
-
-    this.args = args;
-    this.children = children || new Arr([]);
-    this.global = Object.create(parentScope ? Object.create(parentScope.global) : null);
-
-    this.$$.elems.start.$[0].DwayneBlock = this;
-    this.$$.elems.end.$[0].DwayneBlock = this;
+    startComment.$[0].DwayneBlock = this;
+    endComment.$[0].DwayneBlock = this;
 
     if (parentBlock) {
       parentBlock.$$.children.push(this);
     }
-
-    /**
-     * @member {Object} Block#args
-     * @type {Object}
-     * @public
-     */
-    /**
-     * @member {Object} Block#global
-     * @type {Object}
-     * @public
-     */
   }
 
   /**
@@ -14410,78 +14944,69 @@ var Block = function () {
   }, {
     key: 'beforeRemove',
     value: function beforeRemove() {}
-  }, {
-    key: 'evaluateAndWatch',
-    value: function evaluateAndWatch(expression, callback) {
-      return this.$$.parent.$$.evaluate(expression, callback, this);
-    }
-  }, {
-    key: 'evaluateOnce',
-    value: function evaluateOnce(expression) {
-      return this.$$.parent.$$.evaluate(expression);
-    }
 
     /**
-     * @method Block#remove
+     * @method Block#evaluateAndWatch
      * @public
-     * @description Method fot forcing the block to be removed. Calls
-     * remove method for all of its child blocks and calls beforeRemove function.
+     * @param {String} expression - Expression to evaluate.
+     * @param {Watcher} callback - Callback which is called when the expression value is changed.
+     * @returns {*} Evaluation result.
+     * @description Method for evaluating an expression in context of the block and watching for the changes.
      */
 
   }, {
-    key: 'remove',
-    value: function remove(isParentSignal) {
-      var _$$ = this.$$;
-      var name = _$$.name;
-      var parentBlock = _$$.parentBlock;
-      var children = _$$.children;
-      var mixins = _$$.mixins;
-      var _$$$elems = _$$.elems;
-      var start = _$$$elems.start;
-      var content = _$$$elems.content;
-      var end = _$$$elems.end;
-      var watchersToRemove = _$$.watchersToRemove;
+    key: 'evaluateAndWatch',
+    value: function evaluateAndWatch(expression, callback) {
+      validate$1([expression], ['string']);
+
+      var _parseJS = parseJS(expression, expression, true);
+
+      expression = _parseJS.expression;
 
 
-      removeWatchers(watchersToRemove);
+      return this.$$.parent.$$.evaluate(expression, callback, this);
+    }
 
-      children.forEach(function (child) {
-        child.remove(true);
-      });
+    /**
+     * @method Block#evaluateOnce
+     * @public
+     * @param {String} expression - Expression to evaluate.
+     * @returns {*} Evaluation result.
+     * @description Method for evaluating an expression in context of the block once.
+     */
 
-      mixins.forEach(function (mixin) {
-        mixin.remove(true);
-      });
+  }, {
+    key: 'evaluateOnce',
+    value: function evaluateOnce(expression) {
+      validate$1([expression], ['string']);
 
-      try {
-        this.beforeRemove();
-      } catch (err) {
-        console.error('Uncaught error in ' + name + '#beforeRemove:', err);
-      }
+      var _parseJS2 = parseJS(expression, expression, true);
 
-      if (!isParentSignal && parentBlock) {
-        var index = parentBlock.$$.children.indexOf(this);
+      expression = _parseJS2.expression;
 
-        if (index !== -1) {
-          parentBlock.$$.children.splice(index, 1);
-        }
-      }
 
-      new Elem([start, content, end]).remove();
+      return this.$$.parent.$$.evaluate(expression);
     }
 
     /**
      * @method Block#watch
      * @public
-     * @param {...String} [args] - Vars to watch (args, global or local).
+     * @param {...('args'|'globals'|String)} [vars] - Vars to watch (args, global or local).
+     * If no specified all locals, args and globals are to be watched.
+     * If the 'args' string all args are to be watched.
+     * If the 'global' string all globals are to be watched.
      * @param {Watcher} watcher - Called when watched vars are changed.
      * @description Method for watching for vars. If no vars passed in arguments
-     * all vars are to be watched. Otherwise specified vars will be watched.
+     * all vars are to be watched. If the 'args' string is in the arguments all args are to be watched.
+     * If the 'global' string is in the arguments all globals are to be watched.
+     * Otherwise specified vars will be watched.
      * Watchers should not be put inside the constructor. It is considered best
      * practice to do it inside the {@link Block#afterConstruct} method.
      * Note that these expressions (vars, i.e. "args.arg") are not to be
      * evaluated so you cannot put there things like "a[b]" or any js code,
      * only expressions like "a", "b", "args.a", "args.b" and "global.a", "global.b".
+     * Also note that if there are more than one var that are changed at once (synchronously)
+     * the watcher is called only once.
      *
      * @example
      * class MyBlock extends Block {
@@ -14507,27 +15032,15 @@ var Block = function () {
       }
 
       if (arguments.length === 1) {
-        for (var _global2 in this.$$.global) {
-          /* eslint guard-for-in: 0 */
-          var watchers = this.$$.global[_global2].watchers.perm;
+        watchForAllGlobals(this, watcher);
+        watchForAllArgs(this, watcher);
 
-          watchers.push(watcher);
-          this.$$.watchersToRemove.push({
-            watcher: watcher,
-            watchers: watchers
-          });
-        }
-
-        iterate(this.$$.args, function (_ref2) {
+        return iterate(this.$$.locals, function (_ref2, local) {
           var watchers = _ref2.watchers;
 
-          watchers.perm.push(watcher);
-        });
-
-        return iterate(this.$$.locals, function (_ref3) {
-          var watchers = _ref3.watchers;
-
-          watchers.perm.push(watcher);
+          watchers.perm.push(function (newValue, oldValue) {
+            watcher(newValue, oldValue, local, 'locals');
+          });
         });
       }
 
@@ -14537,6 +15050,14 @@ var Block = function () {
         }
 
         variable = '' + variable;
+
+        if (variable === 'args') {
+          return watchForAllArgs(_this5, watcher);
+        }
+
+        if (variable === 'global') {
+          return watchForAllGlobals(_this5, watcher);
+        }
 
         if (/^args\./.test(variable)) {
           variable = variable.replace(/^args\./, '');
@@ -14569,175 +15090,6 @@ var Block = function () {
         _this5.$$.locals[variable].watchers.perm.push(watcher);
       });
     }
-
-    /**
-     * @method Block#watchArgs
-     * @public
-     * @param {...String} [args] - Args to watch.
-     * @param {Watcher} watcher - Called when watched args are changed.
-     * @description Method for watching for args. If no args passed in arguments
-     * all args are to be watched. Otherwise specified args will be watched.
-     * Watchers should not be put inside the constructor. It is considered best
-     * practice to do it inside the {@link Block#afterConstruct} method.
-     *
-     * @example
-     * class MyBlock extends Block {
-     *   static template = '<div />';
-     *
-     *   afterConstruct() {
-     *     this.watchArgs('a', () => {});
-     *     this.watchArgs('a', 'b', () => {});
-     *     this.watchArgs(() => {});
-     *   }
-     * }
-     */
-
-  }, {
-    key: 'watchArgs',
-    value: function watchArgs() {
-      var _this6 = this;
-
-      var watcher = arguments[arguments.length - 1];
-
-      if (!isFunction(watcher)) {
-        return;
-      }
-
-      if (arguments.length === 1) {
-        return iterate(this.$$.args, function (_ref4) {
-          var watchers = _ref4.watchers;
-
-          watchers.perm.push(watcher);
-        });
-      }
-
-      iterate(arguments, function (arg) {
-        if (arg === watcher) {
-          return;
-        }
-
-        if (!_this6.$$.args[arg]) {
-          return;
-        }
-
-        _this6.$$.args[arg].watchers.perm.push(watcher);
-      });
-    }
-
-    /**
-     * @method Block#watchGlobal
-     * @public
-     * @param {...String} [globals] - Globals to watch.
-     * @param {Watcher} watcher - Called when watched globals are changed.
-     * @description Method for watching for globals. If no globals passed in arguments
-     * all globals are to be watched. Otherwise specified globals will be watched.
-     * Watchers should not be put inside the constructor. It is considered best
-     * practice to do it inside the {@link Block#afterConstruct} method.
-     *
-     * @example
-     * class MyBlock extends Block {
-     *   static template = '<div />';
-     *
-     *   afterConstruct() {
-     *     this.watchGlobal('a', () => {});
-     *     this.watchGlobal('a', 'b', () => {});
-     *     this.watchGlobal(() => {});
-     *   }
-     * }
-     */
-
-  }, {
-    key: 'watchGlobals',
-    value: function watchGlobals() {
-      var _this7 = this;
-
-      var watcher = arguments[arguments.length - 1];
-
-      if (!isFunction(watcher)) {
-        return;
-      }
-
-      if (arguments.length === 1) {
-        for (var _global3 in this.$$.global) {
-          /* eslint guard-for-in: 0 */
-          var watchers = this.$$.global[_global3].watchers.perm;
-
-          watchers.push(watcher);
-          this.$$.watchersToRemove.push({
-            watcher: watcher,
-            watchers: watchers
-          });
-        }
-
-        return;
-      }
-
-      iterate(arguments, function (global) {
-        if (global === watcher) {
-          return;
-        }
-
-        if (!_this7.$$.global[global]) {
-          return;
-        }
-
-        _this7.$$.global[global].watchers.perm.push(watcher);
-      });
-    }
-
-    /**
-     * @method Block#watchLocals
-     * @public
-     * @param {...String} [locals] - Locals to watch.
-     * @param {Watcher} watcher - Called when watched locals are changed.
-     * @description Method for watching for locals. If no locals passed in arguments
-     * all locals are to be watched. Otherwise specified locals will be watched.
-     * Watchers should not be put inside the constructor. It is considered best
-     * practice to do it inside the {@link Block#afterConstruct} method.
-     *
-     * @example
-     * class MyBlock extends Block {
-     *   static template = '<div />';
-     *
-     *   afterConstruct() {
-     *     this.watchLocals('a', () => {});
-     *     this.watchLocals('a', 'b', () => {});
-     *     this.watchLocals(() => {});
-     *   }
-     * }
-     */
-
-  }, {
-    key: 'watchLocals',
-    value: function watchLocals() {
-      var _this8 = this;
-
-      var watcher = arguments[arguments.length - 1];
-
-      if (!isFunction(watcher)) {
-        return;
-      }
-
-      if (arguments.length === 1) {
-        return iterate(this.$$.locals, function (_ref5) {
-          var watchers = _ref5.watchers;
-
-          watchers.perm.push(watcher);
-        });
-      }
-
-      iterate(arguments, function (local) {
-        if (local === watcher) {
-          return;
-        }
-
-        if (!_this8.$$.locals[local]) {
-          return;
-        }
-
-        _this8.$$.locals[local].watchers.perm.push(watcher);
-      });
-    }
   }]);
   return Block;
 }();
@@ -14745,6 +15097,7 @@ var Block = function () {
 Block._blocks = Object.create(rootBlocks);
 Block._mixins = Object.create(rootMixins);
 Block.collapseWhiteSpace = true;
+Block.template = '';
 
 
 registerBuiltIns(Blocks, rootBlocks, Block);
@@ -14753,6 +15106,8 @@ var blocks = Block._blocks;
 
 var Mixin = function () {
   function Mixin(opts) {
+    var _this6 = this;
+
     classCallCheck(this, Mixin);
     var name = opts.name;
     var value = opts.value;
@@ -14761,6 +15116,7 @@ var Mixin = function () {
     var parentBlock = opts.parentBlock;
     var parentScope = opts.parentScope;
 
+    var watchersToRemove = new Arr([]);
 
     Object.defineProperties(this, {
       $$: {
@@ -14769,7 +15125,24 @@ var Mixin = function () {
           _value: value,
           parent: parentScope,
           parentBlock: parentBlock,
-          watchersToRemove: new Arr([])
+          watchersToRemove: new Arr([]),
+          remove: function remove(isParentSignal) {
+            removeWatchers(watchersToRemove);
+
+            try {
+              _this6.beforeRemove();
+            } catch (err) {
+              console.error('Uncaught error in ' + name + '#beforeRemove:', err);
+            }
+
+            if (!isParentSignal && parentBlock) {
+              var index = parentBlock.$$.mixins.indexOf(_this6);
+
+              if (index !== -1) {
+                parentBlock.$$.mixins.splice(index, 1);
+              }
+            }
+          }
         }
       }
     });
@@ -14790,57 +15163,42 @@ var Mixin = function () {
   }, {
     key: 'beforeRemove',
     value: function beforeRemove() {}
+
+    /**
+     * @method Block#evaluateAndWatch
+     * @public
+     * @param {Watcher} callback - Callback which is called when the mixin value is changed.
+     * @returns {*} Evaluation result.
+     * @description Method for evaluating the mixin value and watching for the changes.
+     */
+
   }, {
     key: 'evaluateAndWatch',
     value: function evaluateAndWatch(callback) {
+      var _$$ = this.$$;
+      var _value = _$$._value;
+      var parent = _$$.parent;
+
+
+      return parent.$$.evaluate(_value, callback, this);
+    }
+
+    /**
+     * @method Block#evaluateOnce
+     * @public
+     * @returns {*} Evaluation result.
+     * @description Method for evaluating the mixin value once.
+     */
+
+  }, {
+    key: 'evaluateOnce',
+    value: function evaluateOnce() {
       var _$$2 = this.$$;
       var _value = _$$2._value;
       var parent = _$$2.parent;
 
 
-      return parent.$$.evaluate(_value, callback, this);
-    }
-  }, {
-    key: 'evaluateOnce',
-    value: function evaluateOnce() {
-      var _$$3 = this.$$;
-      var _value = _$$3._value;
-      var parent = _$$3.parent;
-
-
       return parent.$$.evaluate(_value);
-    }
-
-    /**
-     * @method Mixin#remove
-     * @public
-     * @description Method fot forcing the mixin to be removed.
-     */
-
-  }, {
-    key: 'remove',
-    value: function remove(isParentSignal) {
-      var _$$4 = this.$$;
-      var name = _$$4.name;
-      var parentBlock = _$$4.parentBlock;
-      var watchersToRemove = _$$4.watchersToRemove;
-
-
-      removeWatchers(watchersToRemove);
-
-      try {
-        this.beforeRemove();
-      } catch (err) {
-        console.error('Uncaught error in ' + name + '#beforeRemove:', err);
-      }
-
-      if (!isParentSignal && parentBlock) {
-        var index = parentBlock.$$.mixins.indexOf(this);
-
-        if (index !== -1) {
-          parentBlock.$$.mixins.splice(index, 1);
-        }
-      }
     }
   }]);
   return Mixin;
@@ -14879,14 +15237,17 @@ function initApp(block, node) {
 
 function registerBuiltIns(set$$1, scope, proto) {
   iterate(set$$1, function (register) {
-    var _register = register(proto, createBlock, transformDIfChildren);
+    var _register = register(proto, createBlock);
 
     var name = _register.name;
     var value = _register.value;
 
 
     if (proto === Block) {
-      value._html = deepCloneChildren(markupToJSON('' + (value.template || ''), value.collapseWhiteSpace));
+      var variables = {};
+
+      value._html = transformJSExpressions(markupToJSON('' + (value.template || ''), value.collapseWhiteSpace), variables);
+      value._variables = new Super(variables).keys();
     } else {
       value._match = new RegExp('^' + new Str(name).escapeRegExp().$ + '(?:-([\\s\\S]+))?$');
     }
@@ -14895,51 +15256,32 @@ function registerBuiltIns(set$$1, scope, proto) {
   });
 }
 
-function createBlock(_ref6) {
-  var node = _ref6.node;
-  var after = _ref6.after;
-  var parent = _ref6.parent;
-  var parentBlock = _ref6.parentBlock;
-  var parentScope = _ref6.parentScope;
+function createBlock(_ref3) {
+  var node = _ref3.node;
+  var after = _ref3.after;
+  var parent = _ref3.parent;
+  var parentBlock = _ref3.parentBlock;
 
-  parentScope = node && node.block || parentScope;
-
-  var name = node && node.name || 'UnknownBlock';
-  var args = node && node.attrs || {};
-  var children = node && node.children || new Arr([]);
+  var parentScope = node.block;
+  var name = node.name || 'UnknownBlock';
+  var args = node.attrs || {};
+  var children = node.children || new Arr([]);
   var elem = parent.prop('namespaceURI') === svgNS ? doc.svg() : new Elem(doc.template().$[0].content);
   var localBlocks = parentScope ? parentScope.$$.ns._blocks : blocks;
   var localMixins = parentScope ? parentScope.$$.ns._mixins : mixins;
-  var constructor = node && node.name && localBlocks[node.name];
+  var constructor = node.name && localBlocks[node.name];
   var dBlockMatch = void 0;
 
   if (!children.length && ((dBlockMatch = name.match(/^d-block-([\s\S]+)$/)) || name === 'd-block')) {
     constructor = blocks['d-block'];
-    args.name = dBlockMatch ? dBlockMatch[1] : '{null}';
+    args.name = dBlockMatch ? dBlockMatch[1] : null;
   }
 
   if (!constructor) {
-    var _ret2 = function () {
+    var _ret3 = function () {
       var value = node.value;
       var children = node.children;
 
-
-      if (name === '#text' && node && !node.dynamic && expressionRegExp.test(value)) {
-        return {
-          v: createBlock({
-            node: {
-              name: 'd-text',
-              attrs: { value: value },
-              children: new Arr([]),
-              block: parentScope
-            },
-            after: after,
-            parent: parent,
-            parentBlock: parentBlock,
-            parentScope: parentScope
-          })
-        };
-      }
 
       var element = elem.create(name);
       var currentMixins = new Arr([]);
@@ -14948,13 +15290,13 @@ function createBlock(_ref6) {
         var match = void 0;
 
         for (var _name in localMixins) {
-          var _Mixin = localMixins[_name];
-          var localMatch = attr.match(_Mixin._match);
+          var _Mixin2 = localMixins[_name];
+          var localMatch = attr.match(_Mixin2._match);
 
           if (localMatch) {
             match = {
               match: localMatch,
-              Mixin: _Mixin,
+              Mixin: _Mixin2,
               name: _name
             };
 
@@ -14967,17 +15309,11 @@ function createBlock(_ref6) {
             name: match.name,
             Mixin: match.Mixin,
             match: match.match,
-            value: value,
+            value: value === '""' ? 'true' : value,
             elem: element,
             parentBlock: parentBlock,
             parentScope: parentScope
           });
-
-          return;
-        }
-
-        if (!value) {
-          object[attr] = '';
 
           return;
         }
@@ -14988,7 +15324,19 @@ function createBlock(_ref6) {
       }).$;
 
       if (!isNil(value)) {
-        element.text('' + value);
+        var text = parentScope.$$.evaluate(value, function (value) {
+          if (isNil(value)) {
+            value = '';
+          }
+
+          element.text('' + value);
+        }, parentBlock);
+
+        if (isNil(text)) {
+          text = '';
+        }
+
+        element.text('' + text);
       }
 
       if (attrs) {
@@ -15004,13 +15352,12 @@ function createBlock(_ref6) {
       after = new Elem();
 
       if (children) {
-        transformDIfChildren(children).forEach(function (child) {
+        children.forEach(function (child) {
           var block = createBlock({
             node: child,
             after: after,
             parent: element,
-            parentBlock: parentBlock,
-            parentScope: parentScope
+            parentBlock: parentBlock
           });
 
           if (block instanceof Block) {
@@ -15030,7 +15377,7 @@ function createBlock(_ref6) {
       };
     }();
 
-    if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
+    if ((typeof _ret3 === 'undefined' ? 'undefined' : _typeof(_ret3)) === "object") return _ret3.v;
   }
 
   var blockInstance = new constructor({
@@ -15042,28 +15389,21 @@ function createBlock(_ref6) {
     parentScope: parentScope
   });
 
-  Object.defineProperties(blockInstance, {
-    args: {
-      value: blockInstance.args
-    },
-    global: {
-      value: blockInstance.global
-    }
-  });
-
-  var html$$1 = name === 'd-elements' ? new Arr(blockInstance.args.value || []) : deepCloneChildren(constructor._html, blockInstance);
-
-  if (name === 'd-elements' && parentBlock.$$.name === '#d-item') {
-    html$$1 = deepCloneChildren(html$$1, parentBlock);
-  }
-
   var $$ = blockInstance.$$;
   var Args = blockInstance.args;
   var global = blockInstance.global;
   var locals = objectWithoutProperties(blockInstance, ['$$', 'args', 'global']);
 
+  var html$$1 = void 0;
 
-  delete locals.$;
+  if (name === 'd-elements' && parentBlock.$$.name === '#d-item') {
+    html$$1 = deepCloneChildren(Args.value, parentBlock);
+  } else if (name === 'd-elements') {
+    html$$1 = new Arr(Args.value || []);
+  } else {
+    html$$1 = deepCloneChildren(constructor._html, blockInstance);
+  }
+
   delete locals.$$;
 
   $$.args = constructPrivateScope(Args);
@@ -15092,7 +15432,15 @@ function createBlock(_ref6) {
   }
 
   if (name === 'd-each') {
-    $$.scope = Object.create(parentScope);
+    var _Object$create;
+
+    $$.scope = Object.create(parentScope.$$.name === '#d-item' ? parentScope.$$.scope : parentScope, (_Object$create = {}, defineProperty(_Object$create, Args.item || '$item', {
+      value: null,
+      writable: true
+    }), defineProperty(_Object$create, Args.index || '$index', {
+      value: null,
+      writable: true
+    }), _Object$create));
   }
 
   constructPublicScope(Args, Args, $$.args);
@@ -15115,13 +15463,12 @@ function createBlock(_ref6) {
 
   after = $$.elems.start;
 
-  transformDIfChildren(html$$1).forEach(function (child) {
+  html$$1.forEach(function (child) {
     var block = createBlock({
       node: child,
       after: after,
       parent: parent,
-      parentBlock: blockInstance,
-      parentScope: parentScope
+      parentBlock: blockInstance
     });
 
     if (block instanceof Block) {
@@ -15147,14 +15494,14 @@ function createBlock(_ref6) {
   return blockInstance;
 }
 
-function createMixin(_ref7) {
-  var name = _ref7.name;
-  var Mixin = _ref7.Mixin;
-  var value = _ref7.value;
-  var match = _ref7.match;
-  var elem = _ref7.elem;
-  var parentBlock = _ref7.parentBlock;
-  var parentScope = _ref7.parentScope;
+function createMixin(_ref4) {
+  var name = _ref4.name;
+  var Mixin = _ref4.Mixin;
+  var value = _ref4.value;
+  var match = _ref4.match;
+  var elem = _ref4.elem;
+  var parentBlock = _ref4.parentBlock;
+  var parentScope = _ref4.parentScope;
 
   var mixin = new Mixin({
     name: name,
@@ -15227,6 +15574,8 @@ function transformDIfChildren(children) {
         object.ifElse = new Arr([child]);
       } else if (!isUndefined(name)) {
         html$$1.push(child);
+
+        child.children = transformDIfChildren(child.children);
       }
     } else {
       (ifElse || html$$1).push(child);
@@ -15247,6 +15596,110 @@ function transformDIfChildren(children) {
   }).$.html;
 }
 
+function transformJSExpressions(children, variables) {
+  var exclude = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  return new Arr(children || []).object(function (children, child) {
+    var name = child.name;
+    var attrs = child.attrs;
+    var ownChildren = child.children;
+    var initialValue = child.value;
+    var value = child.value;
+
+
+    child.attrs = new Super(attrs).map(function (value) {
+      if (value.indexOf('{')) {
+        return toJSON$1(value);
+      }
+
+      var parsed = parseJS(value.slice(1), value);
+
+      if (!parsed) {
+        return toJSON$1(value);
+      }
+
+      if (parsed.rest) {
+        throw new Error('Attribute, mixin and argument computed values must be of the format "{<js_expression>}"');
+      }
+
+      var usedVariables = new Super(parsed.variables).filter(function (value, variable) {
+        if (!exclude[variable]) {
+          return true;
+        }
+      }).$;
+
+      assign$1(variables, usedVariables);
+
+      return parsed.expression;
+    }).$;
+
+    if (name !== '#text') {
+      if (name === 'd-each') {
+        var _babelHelpers$extends;
+
+        exclude = _extends({}, exclude, (_babelHelpers$extends = {}, defineProperty(_babelHelpers$extends, child.attrs.item ? JSON.parse(child.attrs.item) : '$item', true), defineProperty(_babelHelpers$extends, child.attrs.index ? JSON.parse(child.attrs.index) : '$index', true), _babelHelpers$extends));
+      }
+
+      if (ownChildren) {
+        child.children = transformJSExpressions(ownChildren, variables, exclude);
+      }
+
+      children.push(child);
+
+      return;
+    }
+
+    while (value.length) {
+      var match = value.match(curlyBracketRegExp);
+
+      if (!match) {
+        children.push({
+          name: '#text',
+          value: toJSON$1(value)
+        });
+
+        break;
+      }
+
+      var index = match.index;
+
+
+      if (index) {
+        children.push({
+          name: '#text',
+          value: toJSON$1(value.slice(0, index))
+        });
+        value = value.slice(index);
+      }
+
+      var parsed = parseJS(value.slice(1), initialValue);
+
+      if (!parsed) {
+        children.push({
+          name: '#text',
+          value: toJSON$1(value)
+        });
+
+        break;
+      }
+
+      var usedVariables = new Super(parsed.variables).filter(function (value, variable) {
+        if (!exclude[variable]) {
+          return true;
+        }
+      }).$;
+
+      assign$1(variables, usedVariables);
+
+      children.push({
+        name: '#text',
+        value: parsed.expression
+      });
+      value = parsed.rest;
+    }
+  }, new Arr([]));
+}
+
 function isInstanceOfBlock(block) {
   return isPrototypeOf.call(Block, block) && isPrototypeOf.call(Block.prototype, block.prototype);
 }
@@ -15256,9 +15709,9 @@ function isInstanceOfMixin(mixin) {
 }
 
 function removeWatchers(watchersToRemove) {
-  watchersToRemove.forEach(function (_ref8) {
-    var watcher = _ref8.watcher;
-    var watchers = _ref8.watchers;
+  watchersToRemove.forEach(function (_ref5) {
+    var watcher = _ref5.watcher;
+    var watchers = _ref5.watchers;
 
     var index = watchers.indexOf(watcher);
 
@@ -15375,6 +15828,32 @@ function constructPublicScope(scope, scopeValues, privateScope) {
       }
     };
   }).$);
+}
+
+function watchForAllGlobals(block, watcher) {
+  var _block$$$ = block.$$;
+  var globals = _block$$$.global;
+  var watchersToRemove = _block$$$.watchersToRemove;
+
+
+  for (var global in globals) {
+    /* eslint guard-for-in: 0 */
+    var watchers = globals[global].watchers.perm;
+
+    watchers.push(watcher);
+    watchersToRemove.push({
+      watcher: watcher,
+      watchers: watchers
+    });
+  }
+}
+
+function watchForAllArgs(block, watcher) {
+  iterate(block.$$.args, function (_ref6) {
+    var watchers = _ref6.watchers;
+
+    watchers.perm.push(watcher);
+  });
 }
 
 /**
@@ -17038,8 +17517,8 @@ var fetch = new Fetch();
  * @description Exports Object.assign-like method.
  */
 
-var _global$3 = global$1;
-var location$1 = _global$3.location;
+var _global$2 = global$1;
+var location$1 = _global$2.location;
 
 
 var resolveURL = (function (decodeQuery) {
@@ -17104,10 +17583,10 @@ var resolveURL = (function (decodeQuery) {
 var Routes = new Arr([]);
 var currentRoutes = new Arr([]);
 var subscribers = {};
-var _global$2 = global$1;
-var history = _global$2.history;
-var location = _global$2.location;
-var initialURL = _global$2.location.href;
+var _global$1 = global$1;
+var history = _global$1.history;
+var location = _global$1.location;
+var initialURL = _global$1.location.href;
 
 var initialized = void 0;
 var pushed = void 0;

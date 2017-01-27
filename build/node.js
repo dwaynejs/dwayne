@@ -1177,6 +1177,12 @@ function toArray$1(value, createNewArray) {
 }
 
 /**
+ * @module helpers/toJSON
+ * @private
+ * @description Exports toJSON method.
+ */
+
+/**
  * @module helpers/validate
  * @private
  * @description Exports validate method.
