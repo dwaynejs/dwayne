@@ -15576,10 +15576,8 @@ function transformDIfChildren(children) {
 
       if (name === 'd-if') {
         object.ifElse = new Arr([child]);
-      } else if (!isUndefined(name)) {
+      } else if (name) {
         html$$1.push(child);
-
-        child.children = transformDIfChildren(child.children);
       }
     } else {
       (ifElse || html$$1).push(child);
@@ -15593,6 +15591,10 @@ function transformDIfChildren(children) {
 
         object.ifElse = null;
       }
+    }
+
+    if (name) {
+      child.children = transformDIfChildren(child.children);
     }
   }, {
     html: new Arr([]),
