@@ -13037,15 +13037,17 @@ function registerDElements(Block, createBlock) {
       value: function afterConstruct() {
         var _this2 = this;
 
+        var _$$$elems = this.$$.elems;
+        var start = _$$$elems.start;
+        var parent = _$$$elems.parent;
+
+
         this.watch('args.value', function (value) {
           var _$$ = _this2.$$;
           var children = _$$.children;
           var mixins = _$$.mixins;
           var watchersToRemove = _$$.watchersToRemove;
-          var _$$$elems = _$$.elems;
-          var start = _$$$elems.start;
-          var content = _$$$elems.content;
-          var parent = _$$$elems.parent;
+          var content = _$$.elems.content;
 
           var after = start;
 
@@ -14848,7 +14850,7 @@ var Block = function () {
               }
             }
 
-            new Elem([startComment, content, endComment]).remove();
+            new Elem([startComment, _this4.$$.elems.content, endComment]).remove();
           }
         }
       }
