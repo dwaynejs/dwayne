@@ -14303,6 +14303,8 @@ function parseJS(string, wholeString, curlyError) {
 
       throw new Error('Syntax error near ~~~ "' + initialString.slice(index, index + 15) + '" ~~~ (index: ' + index + ', ' + constructErrorInfo(expressionString, wholeString, closingExpressions, curlyError));
     } else if (noMatch && curlyIndex === 0) {
+      expression += toConcat;
+
       break;
     } else if (noMatch && curlyIndex === -1) {
       return null;
@@ -15609,11 +15611,11 @@ function transformJSExpressions(children, variables) {
 
 
     child.attrs = new Super(attrs).map(function (value) {
-      if (value.indexOf('{')) {
+      if (value[0] !== '{' || value[value.length - 1] !== '}') {
         return toJSON$1(value);
       }
 
-      var parsed = parseJS(value.slice(1), value);
+      var parsed = parseJS(value.slice(1, -1), value, true);
 
       if (!parsed) {
         return toJSON$1(value);
