@@ -10188,7 +10188,7 @@ var Elem = function (_Arr) {
         }
 
         new Super(_attr).forEach(function (value, key) {
-          if (isNil(value)) {
+          if (isNil(value) || value === false) {
             return new Elem(elem).removeAttr(key);
           }
 
@@ -10196,9 +10196,11 @@ var Elem = function (_Arr) {
             value = value(new Elem(elem).attr(key), elem, index);
           }
 
-          if (isNil(value)) {
+          if (isNil(value) || value === false) {
             return new Elem(elem).removeAttr(key);
           }
+
+          value = value === true ? '' : value;
 
           var ns = attrNSSwitcher(key, [new Elem(elem)]);
 
@@ -15436,12 +15438,6 @@ function createBlock(_ref3) {
             parentBlock: parentBlock,
             parentScope: parentScope
           });
-
-          return;
-        }
-
-        if (value === true) {
-          object[attr] = '';
 
           return;
         }
