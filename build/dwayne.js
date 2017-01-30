@@ -14419,8 +14419,6 @@ function parseJS(string, wholeString, curlyError) {
   expression += closeFunctionBody(expected);
 
   if (closingExpressions.length) {
-    var last = closingExpressions[closingExpressions.length - 1].symbol;
-
     var _expressionString = initialString.slice(0, initialString.length - string.length);
 
     throw new Error('Unexpected end of input (' + constructErrorInfo(_expressionString, wholeString, closingExpressions, curlyError));
@@ -14466,7 +14464,7 @@ function constructErrorInfo(expressionString, wholeString, closingExpressions, c
 
   var wholeStringString = '';
 
-  if (last !== EXPRESSION && last !== END_OF_FUNC_BODY) {
+  if (last && last !== EXPRESSION && last !== END_OF_FUNC_BODY) {
     last = '"' + last + '"';
   }
 
