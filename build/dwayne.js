@@ -14043,7 +14043,7 @@ var templateStringContentRegExp = /^(?:(?:\\[\s\S])|\$(?!\{)|[^`$\\])+/;
 var operatorRegExp = /^(?:(?:>>>|>>|<<)=?|&&|\|\||,|(?:\+|-|\*|\/|%|&|\||\^|<|>|==)=?|=)/;
 var pointOperatorRegExp = /^\.[a-zA-Z_$][a-zA-Z0-9_$]*/;
 var propertyRegExp = /^((?:"(?:(?:\\[\s\S])|[^"\n\\])*"|'(?:(?:\\[\s\S])|[^'\n\\])*'|[a-zA-Z_$][a-zA-Z0-9_$]*))\s*:/;
-var shorthandPropertyRegExp = /^([a-zA-Z_$][a-zA-Z0-9_$]*)\s*(,?)/;
+var shorthandPropertyRegExp = /^([a-zA-Z_$][a-zA-Z0-9_$]*)\s*(?=,|})(,?)/;
 var unaryOperatorRegExp = /^(?:-|~|\+|!)/;
 
 var EXPRESSION = 'expression';
