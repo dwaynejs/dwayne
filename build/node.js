@@ -1085,10 +1085,10 @@ function assign$1(target) {
  * @description Function for defining properties of an object.
  */
 function defineProperties(target, properties) {
-  iterate(properties, function (method, name) {
+  iterate(properties, function (value, name) {
     if (/^get /.test(name)) {
       Object.defineProperty(target, name.replace(/^get /, ''), {
-        get: method,
+        get: value,
         set: undefined,
         enumerable: false,
         configurable: true
@@ -1099,7 +1099,7 @@ function defineProperties(target, properties) {
 
     if (/^set /.test(name)) {
       Object.defineProperty(target, name.replace(/^set /, ''), {
-        set: method,
+        set: value,
         get: undefined,
         enumerable: false,
         configurable: true
@@ -1110,8 +1110,8 @@ function defineProperties(target, properties) {
 
     if (/^get\/set /.test(name)) {
       Object.defineProperty(target, name.replace(/^get\/set /, ''), {
-        get: method.get,
-        set: method.set,
+        get: value.get,
+        set: value.set,
         enumerable: false,
         configurable: true
       });
@@ -1121,7 +1121,7 @@ function defineProperties(target, properties) {
 
     if (name !== 'Symbol.toStringTag') {
       Object.defineProperty(target, name, {
-        value: method,
+        value: value,
         writable: true,
         enumerable: false,
         configurable: true
@@ -1129,6 +1129,23 @@ function defineProperties(target, properties) {
     }
   });
 }
+
+/**
+ * @function defineUsualProperties
+ * @param {Object} target - Target to define properties for.
+ * @param {Object} properties - Object with properties needed to be assign to the target.
+ * @returns {void}
+ * @description Function for defining usual properties of an object.
+ */
+
+
+/**
+ * @function defineFrozenProperties
+ * @param {Object} target - Target to define properties for.
+ * @param {Object} properties - Object with properties needed to be assign to the target.
+ * @returns {void}
+ * @description Function for defining frozen properties of an object.
+ */
 
 /* eslint no-nested-ternary: 0 */
 /* eslint no-negated-condition: 0 */
@@ -2605,6 +2622,30 @@ var Super = function () {
           return false;
         }
       }) !== false;
+    }
+
+    /**
+     * @method Super#except
+     * @public
+     * @param {...String} [props] - Props to filter.
+     * @returns {DWrap} New D-Wrap of filtered object.
+     * @description Returns filter by the props object.
+     *
+     * @example
+     * new Super({ a: 1, b: 2, c: 3 }).except('a', 'b').$; // { c: 3 }
+     * new Super(null).except('a').$;                      // {}
+     */
+
+  }, {
+    key: 'except',
+    value: function except() {
+      for (var _len5 = arguments.length, props = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+        props[_key5] = arguments[_key5];
+      }
+
+      return this.filter(function (value, key) {
+        return props.indexOf(key) === -1;
+      });
     }
 
     /**
@@ -7072,7 +7113,7 @@ function trim(string) {
  * parseJSON('{ "a": "1" }', { numbers: true }).$;                      // { numbers: true }
  * parseJSON('{ "a": "1999-12-31T23:59:59.999Z" }', { dates: true }).$; // { a: Date {...} }
  */
-function parseJSON() {
+function parseJSON$1() {
   var json = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   var callback = arguments[2];
@@ -7880,7 +7921,7 @@ var statics = Object.freeze({
 	random: random$1,
 	Promise: Promise$1,
 	Str: Str,
-	parseJSON: parseJSON,
+	parseJSON: parseJSON$1,
 	Super: Super,
 	Switcher: Switcher,
 	switcher: switcher,
