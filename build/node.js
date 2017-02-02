@@ -6005,8 +6005,32 @@ var Arr = function (_Super) {
      */
 
   }, {
-    key: 'includes',
+    key: 'forEachReverse',
 
+
+    /**
+     * @method Super#forEachReverse
+     * @public
+     * @param {IterationCallback} callback - Called on each iteration.
+     * @returns {Arr} Returns this.
+     * @description Method for iterating over any object.
+     *
+     * @example
+     * new Super({ a: 1, b: 2, c: 3 }).forEach((value, key, object) => {
+     *   object[key] = value * value;
+     * }).$; // { a: 1, b: { c: 4, d: 5 } }
+     */
+    value: function forEachReverse(callback) {
+      validate([callback], ['function'], 'Arr#forEachReverse');
+
+      var array = this.$;
+
+      for (var i = array.length - 1; i >= 0; i--) {
+        callback(array[i], i, array);
+      }
+
+      return this;
+    }
 
     /**
      * @method Arr#includes
@@ -6021,6 +6045,9 @@ var Arr = function (_Super) {
      * new Arr([1, 2, 3]).includes(3);       // true
      * new Arr([1, 2, NaN]).includes(NaN);   // true
      */
+
+  }, {
+    key: 'includes',
     value: function includes(value) {
       return this.indexOfStrict(value) !== -1;
     }
@@ -6118,7 +6145,7 @@ var Arr = function (_Super) {
     /**
      * @method Arr#push
      * @public
-     * @param {...*} values See the link.
+     * @param {...*} values - See the link.
      * @this {Arr}
      * @returns {Arr} Returns this.
      * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/push
@@ -6135,6 +6162,23 @@ var Arr = function (_Super) {
       }
 
       this.$.push.apply(this.$, arguments);
+
+      return this;
+    }
+
+    /**
+     * @method Arr#pushArray
+     * @public
+     * @param {Array} array - Array to push.
+     * @this {Arr}
+     * @returns {Arr} Returns this.
+     * @description Method for pushing an array into another.
+     */
+
+  }, {
+    key: 'pushArray',
+    value: function pushArray(array) {
+      this.$.push.apply(this.$, array);
 
       return this;
     }

@@ -3267,10 +3267,6 @@ function toJSON$1(what) {
   return JSON.stringify(what);
 }
 
-function parseJSON(what) {
-  return JSON.parse(what);
-}
-
 /**
  * @module helpers/validate
  * @private
@@ -8077,8 +8073,32 @@ var Arr = function (_Super) {
      */
 
   }, {
-    key: 'includes',
+    key: 'forEachReverse',
 
+
+    /**
+     * @method Super#forEachReverse
+     * @public
+     * @param {IterationCallback} callback - Called on each iteration.
+     * @returns {Arr} Returns this.
+     * @description Method for iterating over any object.
+     *
+     * @example
+     * new Super({ a: 1, b: 2, c: 3 }).forEach((value, key, object) => {
+     *   object[key] = value * value;
+     * }).$; // { a: 1, b: { c: 4, d: 5 } }
+     */
+    value: function forEachReverse(callback) {
+      validate$1([callback], ['function'], 'Arr#forEachReverse');
+
+      var array = this.$;
+
+      for (var i = array.length - 1; i >= 0; i--) {
+        callback(array[i], i, array);
+      }
+
+      return this;
+    }
 
     /**
      * @method Arr#includes
@@ -8093,6 +8113,9 @@ var Arr = function (_Super) {
      * new Arr([1, 2, 3]).includes(3);       // true
      * new Arr([1, 2, NaN]).includes(NaN);   // true
      */
+
+  }, {
+    key: 'includes',
     value: function includes(value) {
       return this.indexOfStrict(value) !== -1;
     }
@@ -8190,7 +8213,7 @@ var Arr = function (_Super) {
     /**
      * @method Arr#push
      * @public
-     * @param {...*} values See the link.
+     * @param {...*} values - See the link.
      * @this {Arr}
      * @returns {Arr} Returns this.
      * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/push
@@ -8207,6 +8230,23 @@ var Arr = function (_Super) {
       }
 
       this.$.push.apply(this.$, arguments);
+
+      return this;
+    }
+
+    /**
+     * @method Arr#pushArray
+     * @public
+     * @param {Array} array - Array to push.
+     * @this {Arr}
+     * @returns {Arr} Returns this.
+     * @description Method for pushing an array into another.
+     */
+
+  }, {
+    key: 'pushArray',
+    value: function pushArray(array) {
+      this.$.push.apply(this.$, array);
 
       return this;
     }
@@ -11306,7 +11346,7 @@ var Elem = function (_Arr) {
       }
 
       if (!end && element.firstChild) {
-        return this.slice().reverse().forEach(function (elem) {
+        return this.forEachReverse(function (elem) {
           element.insertBefore(elem, element.firstChild);
         });
       }
@@ -12920,7 +12960,7 @@ function registerDBlock(Block) {
 
       return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = DBlock.__proto__ || Object.getPrototypeOf(DBlock)).call.apply(_ref, [this].concat(args))), _this), _this.constructChildren = function () {
         var _this$$$ = _this.$$;
-        var children = _this$$$.parent.children;
+        var children = _this$$$.parentScope.children;
         var dBlockName = _this$$$.dBlockName;
         var argsChildren = _this.args.children;
 
@@ -13002,11 +13042,9 @@ function registerDEach(Block, createBlock) {
 
     this.constructValues = function () {
       var _$$ = _this2.$$;
-      var _$$$elems = _$$.elems;
-      var start = _$$$elems.start;
-      var parentElem = _$$$elems.parent;
       var uids = _$$.uids;
-      var parent = _$$.parent;
+      var parentScope = _$$.parentScope;
+      var parentElem = _$$.parentElem;
       var scope = _$$.scope;
       var itemName = _$$.itemName;
       var indexName = _$$.indexName;
@@ -13022,8 +13060,8 @@ function registerDEach(Block, createBlock) {
       var filterBy = _args.filterBy;
 
 
-      if (isArray(set$$1) && sortBy) {
-        new Arr(set$$1).sort(sortBy);
+      if (isArray(set$$1) && isFunction(sortBy)) {
+        set$$1 = new Arr(set$$1).slice().sort(sortBy).$;
       }
 
       if (isFunction(filterBy)) {
@@ -13040,7 +13078,7 @@ function registerDEach(Block, createBlock) {
         scope[itemName] = item;
         scope[indexName] = index;
 
-        var uid = parent.$$.evaluate(UID, null, null, false, false, _this2);
+        var uid = parentScope.$$.evaluate(UID, null, null, false, false, _this2);
 
         newKeys[uid] = newKeys[uid] || {};
         newKeys[uid][index] = true;
@@ -13064,7 +13102,7 @@ function registerDEach(Block, createBlock) {
         });
       });
 
-      var after = start;
+      var prevBlock = void 0;
 
       new Super(set$$1).forEach(function (item, index) {
         var uid = newUIDs[index];
@@ -13074,6 +13112,10 @@ function registerDEach(Block, createBlock) {
           block = newKeys[uid][index] = uids.$[uid].shift();
           block.$$.scope[indexName] = index;
           block.$$.scope[itemName] = item;
+
+          if (block.$$.prevBlock !== prevBlock && prevBlock) {
+            prevBlock.$$.insertAfterIt(block.$$.content, true);
+          }
         } else {
           block = newKeys[uid][index] = createBlock({
             node: {
@@ -13082,28 +13124,18 @@ function registerDEach(Block, createBlock) {
               item: item,
               index: index,
               name: '#d-item',
-              block: parent,
+              block: parentScope,
               children: children
             },
-            after: after,
-            parent: parentElem,
-            parentBlock: _this2
+            parent: _this2,
+            parentElem: parentElem,
+            parentBlock: _this2,
+            prevBlock: prevBlock
           });
         }
 
-        var _block$$$$elems = block.$$.elems;
-        var start = _block$$$$elems.start;
-        var end = _block$$$$elems.end;
-
-
-        if (start.prev().$[0] !== after.$[0]) {
-          var content = block.$$.elems.content;
-
-
-          new Elem([start, content, end]).insertAfter(after);
-        }
-
-        after = end;
+        block.$$.prevBlock = prevBlock;
+        prevBlock = block;
       });
 
       _this2.$$.uids = new Super(newKeys).map(function (items) {
@@ -13132,19 +13164,17 @@ function registerDElements(Block, createBlock) {
       value: function afterConstruct() {
         var _this2 = this;
 
-        var _$$$elems = this.$$.elems;
-        var start = _$$$elems.start;
-        var parent = _$$$elems.parent;
+        var parentElem = this.$$.parentElem;
 
 
         this.watch('args.value', function (value) {
           var _$$ = _this2.$$;
           var children = _$$.children;
           var mixins = _$$.mixins;
+          var parent = _$$.parent;
           var watchersToRemove = _$$.watchersToRemove;
-          var content = _$$.elems.content;
+          var content = _$$.content;
 
-          var after = start;
 
           children.forEach(function (child) {
             child.$$.remove(true);
@@ -13153,6 +13183,10 @@ function registerDElements(Block, createBlock) {
             mixin.$$.remove(true);
           });
           content.remove();
+
+          if (parent instanceof Block) {
+            parent.$$.removeContent(content);
+          }
 
           _this2.$$.children = new Arr([]);
           _this2.$$.mixins = new Arr([]);
@@ -13171,32 +13205,19 @@ function registerDElements(Block, createBlock) {
               watchers.splice(index, 1);
             }
           });
+          _this2.$$.content = new Elem();
 
-          var newContent = new Elem();
+          var prevBlock = void 0;
 
           new Arr(value || []).forEach(function (child) {
-            var block = createBlock({
+            prevBlock = createBlock({
               node: child,
-              after: after,
-              parent: parent,
-              parentBlock: _this2
+              parent: _this2,
+              parentElem: parentElem,
+              parentBlock: _this2,
+              prevBlock: prevBlock
             });
-
-            if (block instanceof Block) {
-              var elems = block.$$.elems;
-
-
-              after = elems.end;
-
-              newContent.add(elems.start, elems.content, elems.end);
-            } else {
-              after = block;
-
-              newContent.add(block);
-            }
           });
-
-          _this2.$$.elems.content = newContent;
         });
       }
     }]);
@@ -13218,6 +13239,8 @@ function registerDIf(Block) {
 
       var _this = possibleConstructorReturn(this, (DIf.__proto__ || Object.getPrototypeOf(DIf)).call(this, opts));
 
+      var parentScope = _this.$$.parentScope;
+
       var index = Infinity;
       var values = _this.children.map(function (child, i) {
         var name = child.name;
@@ -13227,7 +13250,7 @@ function registerDIf(Block) {
         var cond = attrs.if;
 
         if (name !== 'd-else' && cond) {
-          cond = _this.$$.parent.$$.evaluate(cond, function (newValue) {
+          cond = parentScope.$$.evaluate(cond, function (newValue) {
             if (!!newValue === values.$[i]) {
               return;
             }
@@ -13312,6 +13335,7 @@ function registerDSwitch(Block) {
       var _this = possibleConstructorReturn(this, (DSwitch.__proto__ || Object.getPrototypeOf(DSwitch)).call(this, opts));
 
       _this.index = Infinity;
+      var parentScope = _this.$$.parentScope;
       var args = _this.args;
       var value = _this.args.value;
 
@@ -13339,7 +13363,7 @@ function registerDSwitch(Block) {
         if (name === 'd-default') {
           val = args.value;
         } else if (val) {
-          val = _this.$$.parent.$$.evaluate(val, function (newValue) {
+          val = parentScope.$$.evaluate(val, function (newValue) {
             if (_this.equals(_this.values.$[i].value, newValue)) {
               return;
             }
@@ -14521,6 +14545,7 @@ var attrName = new RegExp('^' + htmlAllowedAttrSymbols + '$');
 var svgNS = 'http://www.w3.org/2000/svg';
 var curlyBracketRegExp = /\{/;
 var dRestRegExp = /^d-rest(?:-|$)/;
+var afterElem = new Elem();
 var evalMode = void 0;
 var getting = void 0;
 var changed = void 0;
@@ -14789,16 +14814,16 @@ var Block = function () {
     var dBlockName = opts.dBlockName;
     var children = opts.children;
     var parent = opts.parent;
+    var parentElem = opts.parentElem;
     var parentBlock = opts.parentBlock;
     var parentScope = opts.parentScope;
+    var prevBlock = opts.prevBlock;
 
     var watchersToRemove = new Arr([]);
     var constructor = new Super(this).proto().$.constructor;
     var childrenBlocks = new Arr([]);
     var mixins = new Arr([]);
-    var startComment = doc.createComment(' ' + name + ': start ');
-    var content = new Elem();
-    var endComment = doc.createComment(' ' + name + ': end ');
+    var isParentBlock = parent instanceof Block;
 
     defineFrozenProperties(this, {
       /**
@@ -14816,11 +14841,8 @@ var Block = function () {
        * @property {Object} args - Private args scope.
        * @property {Arr} children - Child blocks.
        * @property {Arr} mixins - Child mixins.
-       * @property {Object} elems - Elements connected to the block.
-       * @property {Elem} elems.parent - Parent element.
-       * @property {Elem} elems.start - Start comment block.
-       * @property {Elem} elems.end - End comment block.
-       * @property {Elem} elems.content - Content elements.
+       * @property {Elem} parentElem - Parent element.
+       * @property {Elem} content - Content elements.
        * @property {Function} evaluate - Evaluate function.
        * @property {Object} global - Private global scope.
        * @property {Object} locals - Private locals scope.
@@ -14829,17 +14851,15 @@ var Block = function () {
       $$: {
         name: name,
         dBlockName: dBlockName,
-        parent: parentScope,
+        parent: parent,
+        parentElem: parentElem,
+        parentScope: parentScope,
         parentBlock: parentBlock,
+        content: new Elem(),
         ns: constructor,
         children: childrenBlocks,
         mixins: mixins,
-        elems: {
-          start: startComment,
-          end: endComment,
-          content: content,
-          parent: parent
-        },
+        prevBlock: prevBlock,
         watchersToRemove: watchersToRemove,
         evaluate: function evaluate(expression, onChange, instance, forDElements, forDItem, forDEach) {
           forDElements = !!forDElements;
@@ -14944,6 +14964,10 @@ var Block = function () {
             console.error('Uncaught error in ' + name + '#beforeRemove:', err);
           }
 
+          if (!isParentSignal && isParentBlock) {
+            parent.$$.removeContent(_this4.$$.content);
+          }
+
           if (!isParentSignal && parentBlock) {
             var index = parentBlock.$$.children.indexOf(_this4);
 
@@ -14952,7 +14976,127 @@ var Block = function () {
             }
           }
 
-          new Elem([startComment, _this4.$$.elems.content, endComment]).remove();
+          _this4.$$.content.remove();
+        },
+        addContent: function addContent(contentToAdd, notRecursive) {
+          var index = _this4.$$.content.indexOf(contentToAdd.$[0].previousSibling) + 1;
+
+          if (index === 0) {
+            _this4.$$.content = contentToAdd.slice().pushArray(_this4.$$.content.$);
+          } else {
+            _this4.$$.content = _this4.$$.content.slice(0, index).pushArray(contentToAdd.$).pushArray(_this4.$$.content.slice(index).$);
+          }
+
+          if (isParentBlock && !notRecursive) {
+            parent.$$.addContent(contentToAdd);
+          }
+        },
+        moveContent: function moveContent(contentToMove, after) {
+          var index = _this4.$$.content.indexOf(contentToMove.$[0]);
+          var indexToPut = _this4.$$.content.indexOf(after.$[0]) + 1;
+
+          if (indexToPut === 0) {
+            _this4.$$.content = contentToMove.slice().pushArray(_this4.$$.content.slice(indexToPut, index).$).pushArray(_this4.$$.content.slice(index + contentToMove.length).$);
+          } else if (index > indexToPut) {
+            _this4.$$.content = _this4.$$.content.slice(0, indexToPut).pushArray(contentToMove.$).pushArray(_this4.$$.content.slice(indexToPut, index).$).pushArray(_this4.$$.content.slice(index + contentToMove.length).$);
+          } else {
+            _this4.$$.content = _this4.$$.content.slice(0, index).pushArray(_this4.$$.content.slice(index + contentToMove.length, indexToPut).$).pushArray(contentToMove.$).pushArray(_this4.$$.content.slice(indexToPut).$);
+          }
+
+          if (isParentBlock && indexToPut) {
+            parent.$$.moveContent(contentToMove, after);
+          }
+        },
+        removeContent: function removeContent(contentToRemove) {
+          _this4.$$.content = _this4.$$.content.filter(function (elem) {
+            return contentToRemove.indexOf(elem) === -1;
+          });
+
+          if (isParentBlock) {
+            parent.$$.removeContent(contentToRemove);
+          }
+        },
+        insertInStartOfIt: function insertInStartOfIt(contentToInsert, moveFlag) {
+          var prevBlock = _this4.$$.prevBlock;
+
+          var after = afterElem;
+
+          if (prevBlock instanceof Block) {
+            after = prevBlock.$$.insertAfterIt(contentToInsert, moveFlag);
+          } else if (prevBlock) {
+            after = prevBlock;
+            contentToInsert.insertAfter(prevBlock);
+
+            if (isParentBlock) {
+              if (moveFlag) {
+                parent.$$.moveContent(contentToInsert, after);
+              } else {
+                parent.$$.addContent(contentToInsert, true);
+              }
+            }
+          } else if (isParentBlock) {
+            var _prevBlock = parent.$$.prevBlock;
+
+
+            if (_prevBlock) {
+              if (_prevBlock instanceof Block) {
+                after = _prevBlock.$$.insertAfterIt(contentToInsert, moveFlag);
+              } else {
+                after = _prevBlock;
+                contentToInsert.insertAfter(_prevBlock);
+              }
+
+              if (moveFlag) {
+                parent.$$.moveContent(contentToInsert, after);
+              } else {
+                parent.$$.addContent(contentToInsert, true);
+              }
+            } else {
+              after = parent.$$.insertInStartOfIt(contentToInsert, moveFlag);
+            }
+          } else {
+            contentToInsert.into(parentElem, false);
+          }
+
+          if (moveFlag) {
+            _this4.$$.moveContent(contentToInsert, after);
+          } else {
+            _this4.$$.addContent(contentToInsert, true);
+          }
+
+          return after;
+        },
+        insertAfterIt: function insertAfterIt(contentToInsert, moveFlag) {
+          var prevBlock = _this4.$$.prevBlock;
+
+          var after = afterElem;
+          var tryToAddOrMove = void 0;
+
+          if (_this4.$$.content.length) {
+            after = _this4.$$.content.last();
+            tryToAddOrMove = true;
+            contentToInsert.insertAfter(after);
+          } else if (prevBlock instanceof Block) {
+            after = prevBlock.$$.insertAfterIt(contentToInsert, moveFlag);
+          } else if (prevBlock) {
+            after = prevBlock;
+            tryToAddOrMove = true;
+            contentToInsert.insertAfter(prevBlock);
+          } else if (isParentBlock) {
+            after = parent.$$.insertInStartOfIt(contentToInsert, moveFlag);
+          } else {
+            contentToInsert.into(parentElem, false);
+          }
+
+          if (isParentBlock && tryToAddOrMove) {
+            if (moveFlag) {
+              parent.$$.moveContent(contentToInsert, after);
+            } else {
+              parent.$$.addContent(contentToInsert);
+            }
+          }
+
+          return after;
         }
       }
     });
@@ -15023,9 +15167,6 @@ var Block = function () {
 
     calculateArgs(args, argsObject, $argsObject);
 
-    startComment.$[0].DwayneBlock = this;
-    endComment.$[0].DwayneBlock = this;
-
     if (parentBlock) {
       parentBlock.$$.children.push(this);
     }
@@ -15082,7 +15223,7 @@ var Block = function () {
       expression = _parseJS.expression;
 
 
-      return this.$$.parent.$$.evaluate(expression, callback, this);
+      return this.$$.parentScope.$$.evaluate(expression, callback, this);
     }
 
     /**
@@ -15103,7 +15244,7 @@ var Block = function () {
       expression = _parseJS2.expression;
 
 
-      return this.$$.parent.$$.evaluate(expression);
+      return this.$$.parentScope.$$.evaluate(expression);
     }
 
     /**
@@ -15243,7 +15384,7 @@ var Mixin = function () {
       $$: {
         name: name,
         _value: value,
-        parent: parentScope,
+        parentScope: parentScope,
         parentBlock: parentBlock,
         watchersToRemove: watchersToRemove,
         remove: function remove(isParentSignal) {
@@ -15296,10 +15437,10 @@ var Mixin = function () {
     value: function evaluateAndWatch(callback) {
       var _$$ = this.$$;
       var _value = _$$._value;
-      var parent = _$$.parent;
+      var parentScope = _$$.parentScope;
 
 
-      return parent.$$.evaluate(_value, callback, this);
+      return parentScope.$$.evaluate(_value, callback, this);
     }
 
     /**
@@ -15314,10 +15455,10 @@ var Mixin = function () {
     value: function evaluateOnce() {
       var _$$2 = this.$$;
       var _value = _$$2._value;
-      var parent = _$$2.parent;
+      var parentScope = _$$2.parentScope;
 
 
-      return parent.$$.evaluate(_value);
+      return parentScope.$$.evaluate(_value);
     }
   }]);
   return Mixin;
@@ -15335,23 +15476,20 @@ function initApp(block, node) {
     throw new Error('No "' + block + '" block is registered! (initApp)');
   }
 
-  var start = doc.createComment(' d-root: start ');
-  var end = doc.createComment(' d-root: end ');
-  var parent = new Elem(node);
+  var parentElem = new Elem(node);
 
-  parent.html('');
+  parentElem.html('');
 
-  new Elem([start, end]).into(parent);
-
-  createBlock({
+  parentElem.$[0].DwayneRootBlock = createBlock({
     node: {
       name: block,
       attrs: {},
       children: new Arr([])
     },
-    after: start,
-    parent: parent
+    parent: parentElem,
+    parentElem: parentElem
   });
+  parentElem.attr('dwayne-root', block);
 }
 
 function registerBuiltIns(set$$1, scope, proto) {
@@ -15377,14 +15515,15 @@ function registerBuiltIns(set$$1, scope, proto) {
 
 function createBlock(_ref3) {
   var node = _ref3.node;
-  var after = _ref3.after;
   var parent = _ref3.parent;
+  var parentElem = _ref3.parentElem;
   var parentBlock = _ref3.parentBlock;
+  var prevBlock = _ref3.prevBlock;
 
   var parentScope = node.block;
   var args = node.attrs || {};
   var children = node.children || new Arr([]);
-  var elem = parent.prop('namespaceURI') === svgNS ? doc.svg() : new Elem(doc.template().$[0].content);
+  var elem = parentElem.prop('namespaceURI') === svgNS ? doc.svg() : new Elem(doc.template().$[0].content);
   var localBlocks = parentScope ? parentScope.$$.ns._blocks : blocks;
   var localMixins = parentScope ? parentScope.$$.ns._mixins : mixins;
   var name = node.name || 'UnknownBlock';
@@ -15448,7 +15587,11 @@ function createBlock(_ref3) {
         }, parentBlock);
       }).$;
 
-      if (!isNil(value)) {
+      if (name === '#comment') {
+        element.text(value);
+      }
+
+      if (name === '#text') {
         var text = parentScope.$$.evaluate(value, function (value) {
           if (isNil(value)) {
             value = '';
@@ -15468,31 +15611,19 @@ function createBlock(_ref3) {
         element.attr(attrs);
       }
 
-      if (after.length) {
-        element.insertAfter(after);
-      } else {
-        element.into(parent);
-      }
-
-      after = new Elem();
-
       if (children) {
         (function () {
-          var parent = name === 'template' ? new Elem(element.$[0].content) : element;
+          var parentElem = name === 'template' ? new Elem(element.$[0].content) : element;
+          var prevBlock = void 0;
 
           children.forEach(function (child) {
-            var block = createBlock({
+            prevBlock = createBlock({
               node: child,
-              after: after,
-              parent: parent,
-              parentBlock: parentBlock
+              parent: parentElem,
+              parentElem: parentElem,
+              parentBlock: parentBlock,
+              prevBlock: prevBlock
             });
-
-            if (block instanceof Block) {
-              after = block.$$.elems.end;
-            } else {
-              after = block;
-            }
           });
         })();
       }
@@ -15500,6 +15631,22 @@ function createBlock(_ref3) {
       currentMixins.forEach(function (opts) {
         createMixin(opts);
       });
+
+      var isParentBlock = parent instanceof Block;
+
+      if (prevBlock instanceof Block) {
+        prevBlock.$$.insertAfterIt(element, false);
+      } else if (prevBlock) {
+        element.insertAfter(prevBlock);
+
+        if (isParentBlock) {
+          parent.$$.addContent(element);
+        }
+      } else if (isParentBlock) {
+        parent.$$.insertInStartOfIt(element, false);
+      } else {
+        element.into(parentElem, false);
+      }
 
       return {
         v: element
@@ -15515,8 +15662,10 @@ function createBlock(_ref3) {
     dBlockName: dBlockName,
     children: children,
     parent: parent,
+    parentElem: parentElem,
     parentBlock: parentBlock,
-    parentScope: parentScope
+    parentScope: parentScope,
+    prevBlock: prevBlock
   });
 
   var $$ = blockInstance.$$;
@@ -15583,36 +15732,16 @@ function createBlock(_ref3) {
     console.error('Uncaught error in ' + name + '#afterConstruct:', err);
   }
 
-  var elems = new Elem([$$.elems.start, $$.elems.end]);
-
-  if (after.length) {
-    elems.insertAfter(after);
-  } else {
-    elems.into(parent);
-  }
-
-  after = $$.elems.start;
+  prevBlock = undefined;
 
   html$$1.forEach(function (child) {
-    var block = createBlock({
+    prevBlock = createBlock({
       node: child,
-      after: after,
-      parent: parent,
-      parentBlock: blockInstance
+      parent: blockInstance,
+      parentElem: parentElem,
+      parentBlock: blockInstance,
+      prevBlock: prevBlock
     });
-
-    if (block instanceof Block) {
-      var _elems = block.$$.elems;
-
-
-      after = _elems.end;
-
-      $$.elems.content.add(_elems.start, _elems.content, _elems.end);
-    } else {
-      after = block;
-
-      $$.elems.content.add(block);
-    }
   });
 
   try {
@@ -15736,10 +15865,19 @@ function transformJSExpressions(children, variables) {
     var attrs = child.attrs;
     var ownChildren = child.children;
     var initialValue = child.value;
+
+    var isDEach = name === 'd-each';
     var value = child.value;
 
+    var excludeLocal = {};
 
-    child.attrs = new Super(attrs).map(function (value) {
+    if (isDEach) {
+      var _excludeLocal;
+
+      excludeLocal = (_excludeLocal = {}, defineProperty(_excludeLocal, child.attrs.item || '$item', true), defineProperty(_excludeLocal, child.attrs.index || '$index', true), _excludeLocal);
+    }
+
+    child.attrs = new Super(attrs).map(function (value, attr) {
       if (value === true) {
         return true;
       }
@@ -15758,7 +15896,13 @@ function transformJSExpressions(children, variables) {
         throw new Error('Attribute, mixin and argument computed values must be of the format "{<js_expression>}"');
       }
 
+      var isUID = attr === 'uid';
+
       var usedVariables = new Super(parsed.variables).filter(function (value, variable) {
+        if (isDEach && isUID && excludeLocal[variable]) {
+          return;
+        }
+
         if (!exclude[variable]) {
           return true;
         }
@@ -15770,11 +15914,7 @@ function transformJSExpressions(children, variables) {
     }).$;
 
     if (name !== '#text') {
-      if (name === 'd-each') {
-        var _babelHelpers$extends;
-
-        exclude = _extends({}, exclude, (_babelHelpers$extends = {}, defineProperty(_babelHelpers$extends, child.attrs.item ? parseJSON(child.attrs.item) : '$item', true), defineProperty(_babelHelpers$extends, child.attrs.index ? parseJSON(child.attrs.index) : '$index', true), _babelHelpers$extends));
-      }
+      exclude = _extends({}, exclude, excludeLocal);
 
       if (ownChildren) {
         child.children = transformJSExpressions(ownChildren, variables, exclude);
