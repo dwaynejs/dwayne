@@ -14058,8 +14058,8 @@ var anyNewLineRegExp = /\r\n|\r|\n/g;
 var anyCommaEmptySpace = /\s*,\s*/;
 var properEscapedRegExp = /\\|u|n|f|r|t|b|v|`[0-7]/;
 
-var thisRegExp = /^this(?![a-zA-Z_$][a-zA-Z0-9_$])/;
-var simpleExpressionRegExp = /^(?:true|false|null|undefined)(?![a-zA-Z_$][a-zA-Z0-9_$])/;
+var thisRegExp = /^this(?![a-zA-Z_$])/;
+var simpleExpressionRegExp = /^(?:true|false|null|undefined)(?![a-zA-Z_$])/;
 var variableRegExp = /^[a-zA-Z_$][a-zA-Z0-9_$]*/;
 var numberRegExp = /^(?:NaN|-?(?:(?:\d+|\d*\.\d+)(?:[E|e][+|\-]?\d+)?|Infinity))/;
 var stringRegExp = /^(?:"(?:(?:\\[\s\S])|[^"\n\\])*"|'(?:(?:\\[\s\S])|[^'\n\\])*')/;
