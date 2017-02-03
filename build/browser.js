@@ -14058,7 +14058,8 @@ var anyNewLineRegExp = /\r\n|\r|\n/g;
 var anyCommaEmptySpace = /\s*,\s*/;
 var properEscapedRegExp = /\\|u|n|f|r|t|b|v|`[0-7]/;
 
-var simpleExpressionRegExp = /^(?:true|false|null|undefined)/;
+var thisRegExp = /^this(?![a-zA-Z_$][a-zA-Z0-9_$])/;
+var simpleExpressionRegExp = /^(?:true|false|null|undefined)(?![a-zA-Z_$][a-zA-Z0-9_$])/;
 var variableRegExp = /^[a-zA-Z_$][a-zA-Z0-9_$]*/;
 var numberRegExp = /^(?:NaN|-?(?:(?:\d+|\d*\.\d+)(?:[E|e][+|\-]?\d+)?|Infinity))/;
 var stringRegExp = /^(?:"(?:(?:\\[\s\S])|[^"\n\\])*"|'(?:(?:\\[\s\S])|[^'\n\\])*')/;
@@ -14183,16 +14184,22 @@ function parseJS(string, wholeString, curlyError) {
                   match = string.match(regexpRegExp);
 
                   if (!match) {
-                    match = string.match(variableRegExp);
+                    match = string.match(thisRegExp);
 
                     if (match) {
-                      var _variable = match[0];
+                      toConcat = '$';
+                    } else {
+                      match = string.match(variableRegExp);
 
-                      if (!expected.functionScope[_variable]) {
-                        variables[_variable] = true;
+                      if (match) {
+                        var _variable = match[0];
+
+                        if (!expected.functionScope[_variable]) {
+                          variables[_variable] = true;
+                        }
+
+                        toConcat = getVariable(_variable, expected.functionScope);
                       }
-
-                      toConcat = getVariable(_variable, expected.functionScope);
                     }
                   }
                 }
