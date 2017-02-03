@@ -15043,17 +15043,21 @@ var Block = function () {
 
 
             if (_prevBlock) {
+              var notRecursive = void 0;
+
               if (_prevBlock instanceof Block) {
                 after = _prevBlock.$$.insertAfterIt(contentToInsert, moveFlag);
+                notRecursive = true;
               } else {
                 after = _prevBlock;
+                notRecursive = false;
                 contentToInsert.insertAfter(_prevBlock);
               }
 
               if (moveFlag) {
                 parent.$$.moveContent(contentToInsert, after);
               } else {
-                parent.$$.addContent(contentToInsert, true);
+                parent.$$.addContent(contentToInsert, notRecursive);
               }
             } else {
               after = parent.$$.insertInStartOfIt(contentToInsert, moveFlag);
