@@ -11276,7 +11276,7 @@ var Elem = function (_Arr) {
 
       return this.forEach(function (elem) {
         if (elem === element) {
-          element = element.next().$[0];
+          element = element.nextSibling;
 
           return;
         }
