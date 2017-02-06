@@ -1055,6 +1055,20 @@ function assign$1(target) {
 }
 
 /**
+ * @module helpers/constructEvalFunction
+ * @private
+ * @description Exports constructEvalFunction method.
+ */
+
+/**
+ * @function constructEvalFunction
+ * @param {String} code - JS code.
+ * @param {String} original - Original JS code.
+ * @returns {*} Eval function.
+ * @description Function for constructing eval function.
+ */
+
+/**
  * @module helpers/defineProperty
  * @private
  * @description Exports defineProperty and dynamicDefineProperties methods.

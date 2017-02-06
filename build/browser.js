@@ -3092,6 +3092,34 @@ function assign$1(target) {
 }
 
 /**
+ * @module helpers/constructEvalFunction
+ * @private
+ * @description Exports constructEvalFunction method.
+ */
+
+/**
+ * @function constructEvalFunction
+ * @param {String} code - JS code.
+ * @param {String} original - Original JS code.
+ * @returns {*} Eval function.
+ * @description Function for constructing eval function.
+ */
+function constructEvalFunction(code, original) {
+  var func = void 0;
+
+  try {
+    /* eslint no-new-func: 0 */
+    func = new Function('$', 'return ' + code);
+    func.expression = code;
+    func.original = original;
+
+    return func;
+  } catch (err) {
+    throw new Error('Syntax error (in "' + code + '", original code: "' + original + '")');
+  }
+}
+
+/**
  * @module helpers/defineProperty
  * @private
  * @description Exports defineProperty and dynamicDefineProperties methods.
@@ -3263,10 +3291,6 @@ function toArray$1(value, createNewArray) {
  * @private
  * @description Exports toJSON method.
  */
-
-function toJSON$1(what) {
-  return JSON.stringify(what);
-}
 
 /**
  * @module helpers/validate
@@ -13017,7 +13041,7 @@ function registerDEach(Block, createBlock) {
       assign$1(_this.$$, {
         uids: new Super({}),
         items: new Arr([]),
-        UID: _this.args.uid || 'undefined',
+        UID: _this.args.uid || undefined,
         itemName: itemName,
         indexName: indexName
       });
@@ -14005,7 +14029,7 @@ function registerDValue(Mixin) {
       _this.options = elem.find('option');
 
       if (!isFunction(value)) {
-        initialScopeValue = parentScope.$$.evaluate('$.' + value, function (newValue) {
+        initialScopeValue = parentScope.$$.evaluate(constructEvalFunction('$.' + value, value), function (newValue) {
           if (_this.currentValue !== newValue) {
             _this.currentValue = newValue;
             _this.setProp(newValue);
@@ -14540,6 +14564,7 @@ function parseJS(string, wholeString, curlyError) {
   return {
     expression: expression,
     variables: variables,
+    original: initialString.slice(0, index),
     rest: string.slice(1)
   };
 }
@@ -14951,7 +14976,11 @@ var Block = function () {
         mixins: mixins,
         prevBlock: prevBlock,
         watchersToRemove: watchersToRemove,
-        evaluate: function evaluate(expression, onChange, instance, forDElements, forDItem, forDEach) {
+        evaluate: function evaluate(func, onChange, instance, forDElements, forDItem, forDEach) {
+          if (!isFunction(func)) {
+            return func;
+          }
+
           forDElements = !!forDElements;
           forDItem = !!forDItem;
 
@@ -14961,15 +14990,8 @@ var Block = function () {
 
           var watchersToRemove = _ref.watchersToRemove;
 
-          var func = void 0;
-
-          try {
-            func = new Function('$', 'return ' + expression);
-          } catch (err) {
-            throw new Error('Syntax error (in "' + expression + '" in context of block "' + _this4.$$.name + '"): ' + err.message);
-          }
-
           /* eslint no-new-func: 0 */
+
           var evaluate = function evaluate() {
             var result = void 0;
 
@@ -14981,9 +15003,13 @@ var Block = function () {
             try {
               result = func(scope);
             } catch (err) {
-              err.expression = expression;
+              err.expression = func.expression;
+              err.original = func.original;
               err.block = _this4;
-              constructor.onEvalError(err);
+
+              if (isFunction(constructor.onEvalError)) {
+                constructor.onEvalError(err);
+              }
             }
 
             if (onChange) {
@@ -15204,10 +15230,6 @@ var Block = function () {
     var args = Object.create(constructor.defaultArgs || null);
 
     new Super(originalArgs).forEach(function (value, arg) {
-      if (value === true) {
-        value = 'true';
-      }
-
       var isDRest = dRestRegExp.test(arg);
       var localArgs = isDRest ? Object.create(args) : args;
 
@@ -15218,19 +15240,23 @@ var Block = function () {
           iterate(localArgs, function (value, arg) {
             delete localArgs[arg];
           });
-          defineUsualProperties(localArgs, transformRestArgs(transformArgs(value, name)));
+          defineUsualProperties(localArgs, transformRestArgs(value));
           calculateArgs(args, argsObject, $argsObject);
         }, _this4);
 
-        return defineUsualProperties(localArgs, transformRestArgs(transformArgs(restArgs, name)));
+        return defineUsualProperties(localArgs, transformRestArgs(restArgs));
       }
 
       var forDElements = name === 'd-elements' && arg === 'value';
 
-      defineUsualProperties(localArgs, defineProperty({}, arg, parentScope.$$.evaluate(value, function (value) {
-        localArgs[arg] = value;
-        calculateArgs(args, argsObject, $argsObject);
-      }, _this4, forDElements, forDElements && parentBlock.$$.name === '#d-item')));
+      if (name !== 'd-each' || arg !== 'uid') {
+        value = parentScope.$$.evaluate(value, function (value) {
+          localArgs[arg] = value;
+          calculateArgs(args, argsObject, $argsObject);
+        }, _this4, forDElements, forDElements && parentBlock.$$.name === '#d-item');
+      }
+
+      defineUsualProperties(localArgs, defineProperty({}, arg, value));
     });
 
     var realArgs = {};
@@ -15320,14 +15346,17 @@ var Block = function () {
   }, {
     key: 'evaluateAndWatch',
     value: function evaluateAndWatch(expression, callback) {
-      validate$1([expression], ['string']);
+      validate$1([expression], ['string'], 'Block#evaluateAndWatch');
 
       var _parseJS = parseJS(expression, expression, true);
 
-      expression = _parseJS.expression;
+      var code = _parseJS.expression;
+      var original = _parseJS.original;
 
 
-      return this.$$.parentScope.$$.evaluate(expression, callback, this);
+      var func = constructEvalFunction(code, original);
+
+      return this.$$.parentScope.$$.evaluate(func, callback, this);
     }
 
     /**
@@ -15341,14 +15370,17 @@ var Block = function () {
   }, {
     key: 'evaluateOnce',
     value: function evaluateOnce(expression) {
-      validate$1([expression], ['string']);
+      validate$1([expression], ['string'], 'Block#evaluateOnce');
 
       var _parseJS2 = parseJS(expression, expression, true);
 
-      expression = _parseJS2.expression;
+      var code = _parseJS2.expression;
+      var original = _parseJS2.original;
 
 
-      return this.$$.parentScope.$$.evaluate(expression);
+      var func = constructEvalFunction(code, original);
+
+      return this.$$.parentScope.$$.evaluate(func);
     }
 
     /**
@@ -15805,7 +15837,7 @@ function createBlock(_ref3) {
 
   var blockInstance = new constructor({
     name: name,
-    args: transformArgs(args, name),
+    args: args,
     dBlockName: dBlockName,
     children: children,
     parent: parent,
@@ -16036,13 +16068,13 @@ function transformJSExpressions(children, variables) {
       }
 
       if (value[0] !== '{' || value[value.length - 1] !== '}') {
-        return toJSON$1(value);
+        return value;
       }
 
       var parsed = parseJS(value.slice(1, -1), value, true);
 
       if (!parsed) {
-        return toJSON$1(value);
+        return value;
       }
 
       if (parsed.rest) {
@@ -16063,7 +16095,7 @@ function transformJSExpressions(children, variables) {
 
       assign$1(variables, usedVariables);
 
-      return parsed.expression;
+      return constructEvalFunction(parsed.expression, parsed.original);
     }).$;
 
     if (name !== '#text') {
@@ -16084,7 +16116,7 @@ function transformJSExpressions(children, variables) {
       if (!match) {
         children.push({
           name: '#text',
-          value: toJSON$1(value)
+          value: value
         });
 
         break;
@@ -16096,7 +16128,7 @@ function transformJSExpressions(children, variables) {
       if (index) {
         children.push({
           name: '#text',
-          value: toJSON$1(value.slice(0, index))
+          value: value.slice(0, index)
         });
         value = value.slice(index);
       }
@@ -16106,7 +16138,7 @@ function transformJSExpressions(children, variables) {
       if (!parsed) {
         children.push({
           name: '#text',
-          value: toJSON$1(value)
+          value: value
         });
 
         break;
@@ -16122,7 +16154,7 @@ function transformJSExpressions(children, variables) {
 
       children.push({
         name: '#text',
-        value: parsed.expression
+        value: constructEvalFunction(parsed.expression, parsed.original)
       });
       value = parsed.rest;
     }
@@ -16297,18 +16329,6 @@ function calculateArgs(args, argsObject, $argsObject) {
   for (var arg in args) {
     argsObject[arg] = args[arg];
   }
-}
-
-function transformArgs(args, name) {
-  var isDEach = name === 'd-each';
-
-  return new Super(args).map(function (value, arg) {
-    if (isDEach && arg === 'uid') {
-      return toJSON$1(value);
-    }
-
-    return value;
-  }).$;
 }
 
 function transformRestArgs(args) {
