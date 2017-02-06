@@ -11279,6 +11279,12 @@ var Elem = function (_Arr) {
       parent = parent.$[0];
 
       return this.forEach(function (elem) {
+        if (elem === element) {
+          element = element.next().$[0];
+
+          return;
+        }
+
         if (element) {
           parent.insertBefore(elem, element);
         } else {
