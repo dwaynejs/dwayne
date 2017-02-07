@@ -15383,6 +15383,19 @@ var Block = function () {
     }
 
     /**
+     * @method Block#setLocals
+     * @public
+     * @param {Object} locals - Object to assign to this.
+     * @description Method for simple assigning some values to this.
+     */
+
+  }, {
+    key: 'setLocals',
+    value: function setLocals(locals) {
+      assign$1(this, locals);
+    }
+
+    /**
      * @method Block#watch
      * @public
      * @param {...('args'|'globals'|String)} [vars] - Vars to watch (args, global or local).
