@@ -15680,30 +15680,39 @@ function createBlock(_ref3) {
   var prevBlock = _ref3.prevBlock;
 
   var parentScope = node.block;
-  var args = node.attrs || {};
-  var children = node.children || new Arr([]);
   var elem = parentElem.prop('namespaceURI') === svgNS ? doc.svg() : new Elem(doc.template().$[0].content);
   var localBlocks = parentScope ? parentScope.$$.ns._blocks : blocks;
   var localMixins = parentScope ? parentScope.$$.ns._mixins : mixins;
+  var children = node.children || new Arr([]);
+  var args = node.attrs || {};
   var name = node.name || 'UnknownBlock';
   var constructor = node.name && localBlocks[node.name];
   var dBlockMatch = void 0;
   var dBlockName = void 0;
+  var dBlockArgs = void 0;
+  var dBlockChildren = void 0;
+  var dElementsName = void 0;
 
   if (!children.length && ((dBlockMatch = name.match(/^d-block-([\s\S]+)$/)) || name === 'd-block') && !args.name) {
     constructor = blocks['d-block'];
     dBlockName = dBlockMatch ? dBlockMatch[1] : null;
   } else if (name === 'd-block' && args.name) {
-    name = parentScope.$$.evaluate(args.name);
+    name = 'd-elements';
     constructor = localBlocks[name];
-
-    delete args.name;
+    dElementsName = args.name;
+    dBlockArgs = new Super(args).except('name').$;
+    dBlockChildren = children;
+    children = new Arr([]);
+    args = {
+      value: function value() {}
+    };
   }
 
   if (!constructor) {
     var _ret3 = function () {
-      var value = node.value;
-      var children = node.children;
+      var _node = node;
+      var value = _node.value;
+      var children = _node.children;
 
 
       var element = elem.create(name);
@@ -15920,6 +15929,20 @@ function createBlock(_ref3) {
       prevBlock: prevBlock
     });
   });
+
+  if (dBlockArgs) {
+    node = {
+      attrs: dBlockArgs,
+      block: parentScope,
+      children: dBlockChildren
+    };
+    node.name = parentScope.$$.evaluate(dElementsName, function (newName) {
+      node.name = newName;
+      Args.value = new Arr([node]);
+    }, blockInstance, true);
+
+    Args.value = new Arr([node]);
+  }
 
   try {
     blockInstance.afterRender();
