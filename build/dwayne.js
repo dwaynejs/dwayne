@@ -15719,9 +15719,7 @@ function createBlock(_ref3) {
     dBlockArgs = new Super(args).except('name').$;
     dBlockChildren = children;
     children = new Arr([]);
-    args = {
-      value: function value() {}
-    };
+    args = {};
   }
 
   if (!constructor) {
@@ -15875,6 +15873,20 @@ function createBlock(_ref3) {
 
   var html$$1 = void 0;
 
+  if (dBlockArgs) {
+    node = {
+      attrs: dBlockArgs,
+      block: parentScope,
+      children: dBlockChildren
+    };
+    node.name = parentScope.$$.evaluate(dElementsName, function (newName) {
+      node.name = newName;
+      Args.value = new Arr([node]);
+    }, blockInstance, true);
+
+    Args.value = new Arr([node]);
+  }
+
   if (name === 'd-elements' && parentBlock.$$.name === '#d-item') {
     html$$1 = deepCloneChildren(Args.value, parentBlock);
   } else if (name === 'd-elements') {
@@ -15945,20 +15957,6 @@ function createBlock(_ref3) {
       prevBlock: prevBlock
     });
   });
-
-  if (dBlockArgs) {
-    node = {
-      attrs: dBlockArgs,
-      block: parentScope,
-      children: dBlockChildren
-    };
-    node.name = parentScope.$$.evaluate(dElementsName, function (newName) {
-      node.name = newName;
-      Args.value = new Arr([node]);
-    }, blockInstance, true);
-
-    Args.value = new Arr([node]);
-  }
 
   try {
     blockInstance.afterRender();
