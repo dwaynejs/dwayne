@@ -13012,7 +13012,7 @@ function registerDBlock(Block) {
     return DBlock;
   }(Block);
 
-  DBlock.template = '<d-elements value="{elems}" />';
+  DBlock.template = '<d-elements value="{elems}" parentScope="{$$.parentScope.$$.parentScope}" />';
 
 
   return {
@@ -13136,12 +13136,12 @@ function registerDEach(Block, createBlock) {
                   item: item,
                   index: index,
                   name: '#d-item',
-                  block: parentScope,
                   children: children
                 },
                 parent: _this2,
                 parentElem: parentElem,
                 parentBlock: _this2,
+                parentScope: parentScope,
                 prevBlock: prevBlock
               });
             }
@@ -13180,6 +13180,7 @@ function registerDElements(Block, createBlock) {
         var _this2 = this;
 
         var parentElem = this.$$.parentElem;
+        var parentScope = this.args.parentScope;
 
         var firstTime = true;
 
@@ -13238,6 +13239,7 @@ function registerDElements(Block, createBlock) {
               parent: _this2,
               parentElem: parentElem,
               parentBlock: _this2,
+              parentScope: parentScope,
               prevBlock: prevBlock
             });
           });
@@ -13318,7 +13320,7 @@ function registerDIf(Block) {
     return DIf;
   }(Block);
 
-  DIf.template = '<d-elements value="{elems}"/>';
+  DIf.template = '<d-elements value="{elems}" parentScope="{$$.parentScope}" />';
 
 
   return {
@@ -13339,7 +13341,7 @@ function registerDItem(Block) {
     return DItem;
   }(Block);
 
-  DItem.template = '<d-elements value="{children}"/>';
+  DItem.template = '<d-elements value="{children}" parentScope="{this}" />';
 
 
   return {
@@ -13480,7 +13482,7 @@ function registerDSwitch(Block) {
     return DSwitch;
   }(Block);
 
-  DSwitch.template = '<d-elements value="{elems}"/>';
+  DSwitch.template = '<d-elements value="{elems}" parentScope="{$$.parentScope}" />';
 
 
   return {
@@ -14807,7 +14809,7 @@ var Block = function () {
       var variables = {};
 
       _Subclass._html = transformDIfChildren(transformJSExpressions(markupToJSON('' + (_Subclass.template || ''), _Subclass.collapseWhiteSpace), variables));
-      _Subclass._variables = new Super(variables).keys();
+      _Subclass._variables = new Super(variables).except('$$', '$').keys();
 
       if (new Super(_Subclass).hasOwn('defaultArgs')) {
         new Super(_Subclass.defaultArgs).proto(null);
@@ -15246,13 +15248,14 @@ var Block = function () {
         return defineUsualProperties(localArgs, transformRestArgs(restArgs));
       }
 
-      var forDElements = name === 'd-elements' && arg === 'value';
+      var isDElements = name === 'd-elements';
+      var forDElements = isDElements && arg === 'value';
 
       if (name !== 'd-each' || arg !== 'uid') {
         value = parentScope.$$.evaluate(value, function (value) {
           localArgs[arg] = value;
           calculateArgs(args, argsObject, $argsObject);
-        }, _this4, forDElements, forDElements && parentBlock.$$.name === '#d-item');
+        }, _this4, forDElements, isDElements && parentBlock.$$.name === '#d-item');
       }
 
       defineUsualProperties(localArgs, defineProperty({}, arg, value));
@@ -15679,7 +15682,7 @@ function registerBuiltIns(set$$1, scope, proto) {
       var variables = {};
 
       value._html = transformJSExpressions(markupToJSON('' + (value.template || ''), value.collapseWhiteSpace), variables);
-      value._variables = new Super(variables).keys();
+      value._variables = new Super(variables).except('$$', '$').keys();
     } else {
       value._match = new RegExp('^' + new Str(name).escapeRegExp().$ + '(?:-([\\s\\S]+))?$');
     }
@@ -15693,9 +15696,9 @@ function createBlock(_ref3) {
   var parent = _ref3.parent;
   var parentElem = _ref3.parentElem;
   var parentBlock = _ref3.parentBlock;
+  var parentScope = _ref3.parentScope;
   var prevBlock = _ref3.prevBlock;
 
-  var parentScope = node.block;
   var elem = parentElem.prop('namespaceURI') === svgNS ? doc.svg() : new Elem(doc.template().$[0].content);
   var localBlocks = parentScope ? parentScope.$$.ns._blocks : blocks;
   var localMixins = parentScope ? parentScope.$$.ns._mixins : mixins;
@@ -15822,6 +15825,7 @@ function createBlock(_ref3) {
               parent: parentElem,
               parentElem: parentElem,
               parentBlock: parentBlock,
+              parentScope: parentScope,
               prevBlock: prevBlock
             });
           });
@@ -15871,29 +15875,27 @@ function createBlock(_ref3) {
   var global = blockInstance.global;
   var locals = objectWithoutProperties(blockInstance, ['$$', 'args', 'global']);
 
-  var html$$1 = void 0;
 
   if (dBlockArgs) {
     node = {
       attrs: dBlockArgs,
-      block: parentScope,
       children: dBlockChildren
     };
     node.name = parentScope.$$.evaluate(dElementsName, function (newName) {
       node.name = newName;
-      Args.value = new Arr([node]);
+
+      var html$$1 = new Arr([node]);
+
+      Args.value = newName === 'd-if' ? transformDIfChildren(html$$1) : html$$1;
     }, blockInstance, true);
 
-    Args.value = new Arr([node]);
+    var _html = new Arr([node]);
+
+    Args.value = node.name === 'd-if' ? transformDIfChildren(_html) : _html;
+    Args.parentScope = blockInstance;
   }
 
-  if (name === 'd-elements' && parentBlock.$$.name === '#d-item') {
-    html$$1 = deepCloneChildren(Args.value, parentBlock);
-  } else if (name === 'd-elements') {
-    html$$1 = new Arr(Args.value || []);
-  } else {
-    html$$1 = deepCloneChildren(constructor._html, blockInstance);
-  }
+  var html$$1 = name === 'd-elements' ? new Arr(Args.value || []) : constructor._html;
 
   delete locals.$;
   delete locals.children;
@@ -15947,6 +15949,7 @@ function createBlock(_ref3) {
   }
 
   prevBlock = undefined;
+  parentScope = name === 'd-elements' ? Args.parentScope : blockInstance;
 
   html$$1.forEach(function (child) {
     prevBlock = createBlock({
@@ -15954,6 +15957,7 @@ function createBlock(_ref3) {
       parent: blockInstance,
       parentElem: parentElem,
       parentBlock: blockInstance,
+      parentScope: parentScope,
       prevBlock: prevBlock
     });
   });
@@ -16004,31 +16008,6 @@ function createMixin(_ref4) {
   return mixin;
 }
 
-function deepCloneChildren(children, block) {
-  return new Arr(children || []).map(function (child) {
-    var name = child.name;
-    var attrs = child.attrs;
-    var value = child.value;
-    var children = child.children;
-
-    var newChild = {
-      name: name,
-      value: value,
-      attrs: _extends({}, attrs)
-    };
-
-    if (block) {
-      newChild.block = block;
-    }
-
-    if (children) {
-      newChild.children = deepCloneChildren(children, block);
-    }
-
-    return newChild;
-  });
-}
-
 function transformDIfChildren(children) {
   return new Arr(children || []).concat({}).object(function (object, child) {
     var name = child.name;
@@ -16040,7 +16019,6 @@ function transformDIfChildren(children) {
       if (ifElse) {
         html$$1.push({
           name: 'd-if',
-          block: ifElse.$[0].block,
           children: ifElse
         });
 
@@ -16058,7 +16036,6 @@ function transformDIfChildren(children) {
       if (name === 'd-else' && ifElse) {
         html$$1.push({
           name: 'd-if',
-          block: ifElse.$[0].block,
           children: ifElse
         });
 
