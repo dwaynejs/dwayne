@@ -18,7 +18,7 @@ const rollupTestConfig = require('./rollup.test.config');
 const config = require('./config.json');
 
 const devServer = createServer();
-const testServer = createServer(true);
+const testServer = createServer();
 
 const modules = [
   '',
