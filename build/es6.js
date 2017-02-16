@@ -14166,10 +14166,12 @@ var regexpRegExp = /^\/(?:(?:\\[\s\S])|[^\/\n\\])+\/[gimuy]*/;
 var arrowFunctionRegExp = /^(?:(?:\(\s*((?:[a-zA-Z_$][a-zA-Z0-9_$]*\s*,\s*)?(?:[a-zA-Z_$][a-zA-Z0-9_$]*)?)\s*\))|([a-zA-Z_$][a-zA-Z0-9_$]*))\s*=>/;
 var templateStringContentRegExp = /^(?:(?:\\[\s\S])|\$(?!\{)|[^`$\\])+/;
 var operatorRegExp = /^(?:(?:>>>|>>|<<)=?|&&|\|\||,|(?:\+|-|\*|\/|%|&|\||\^|<|>|==)=?|=)/;
-var pointOperatorRegExp = /^\.[a-zA-Z_$][a-zA-Z0-9_$]*/;
+var pointOperatorRegExp = /^\.([a-zA-Z_$][a-zA-Z0-9_$]*)/;
 var propertyRegExp = /^((?:"(?:(?:\\[\s\S])|[^"\n\\])*"|'(?:(?:\\[\s\S])|[^'\n\\])*'|[a-zA-Z_$][a-zA-Z0-9_$]*))\s*:/;
 var shorthandPropertyRegExp = /^([a-zA-Z_$][a-zA-Z0-9_$]*)\s*(?=,|})(,?)/;
 var unaryOperatorRegExp = /^(?:-|~|\+|!)/;
+var keywordsArray = ['do', 'if', 'in', 'for', 'let', 'new', 'try', 'var', 'case', 'else', 'enum', 'null', 'this', 'true', 'void', 'with', 'break', 'catch', 'class', 'const', 'false', 'super', 'throw', 'while', 'yield', 'delete', 'export', 'import', 'public', 'return', 'static', 'switch', 'typeof', 'default', 'extends', 'finally', 'package', 'private', 'continue', 'debugger', 'function', 'arguments', 'interface', 'protected', 'implements', 'instanceof'];
+var keywordsRegExp = new RegExp('^(?:' + keywordsArray.join('|') + ')$');
 
 var EXPRESSION = 'expression';
 var END_OF_FUNC_BODY = 'end of function body';
@@ -14360,6 +14362,10 @@ function parseJS(string, wholeString, curlyError) {
         match = string.match(propertyRegExp);
 
         if (match) {
+          if (keywordsRegExp.test(match[1])) {
+            match[1] = '"' + match[1] + '"';
+          }
+
           toConcat = match[1] + ':';
           expected.expression = true;
           closingExpressions.push({
@@ -14465,6 +14471,10 @@ function parseJS(string, wholeString, curlyError) {
 
           if (match) {
             matched = EXPRESSION;
+
+            if (keywordsRegExp.test(match[1])) {
+              toConcat += '["' + match[1] + '"]';
+            }
           } else {
             match = string.match(operatorRegExp);
 
