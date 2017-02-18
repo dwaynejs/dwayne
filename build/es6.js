@@ -13553,7 +13553,13 @@ function registerDBind(Mixin) {
           return;
         }
 
-        this.off = this.elem.on(this.match, value);
+        if (this.match) {
+          var event = this.match.match(/^[^\-]*/)[0];
+
+          this.off = this.elem.on(event, value);
+        } else {
+          console.error('Provide "d-bind" mixin with an event name!');
+        }
       }
     }, {
       key: 'beforeRemove',
@@ -13561,7 +13567,7 @@ function registerDBind(Mixin) {
         var off = this.off;
 
 
-        if (isFunction(off)) {
+        if (off) {
           off();
         }
       }
@@ -13766,16 +13772,27 @@ function registerDOn(Mixin) {
 
       var _this = possibleConstructorReturn(this, (DOn.__proto__ || Object.getPrototypeOf(DOn)).call(this, opts));
 
-      _this.off = _this.elem.on(_this.match, function () {
-        _this.evaluateOnce();
-      });
+      if (_this.match) {
+        var event = _this.match.match(/^[^\-]*/)[0];
+
+        _this.off = _this.elem.on(event, function () {
+          _this.evaluateOnce();
+        });
+      } else {
+        console.error('Provide "d-on" mixin with an event name!');
+      }
       return _this;
     }
 
     createClass(DOn, [{
       key: 'beforeRemove',
       value: function beforeRemove() {
-        this.off();
+        var off = this.off;
+
+
+        if (off) {
+          off();
+        }
       }
     }]);
     return DOn;
