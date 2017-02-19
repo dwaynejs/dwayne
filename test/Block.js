@@ -102,13 +102,13 @@ class DBlockNamedTest extends Block {
   static template = `
     <div id="d-block-named-test">
       <div id="d-block-a-1">
-        <d-block-a/>
+        <d-block:a/>
       </div>
       <div id="d-block-b">
-        <d-block-b/>
-      </div> 
+        <d-block:b/>
+      </div>
       <div id="d-block-a-2">
-        <d-block-a/>
+        <d-block:a/>
       </div>
     </div>
   `;
@@ -117,12 +117,12 @@ class DBlockNestedTest extends Block {
   static template = `
     <div id="d-block-nested-test">
       <DBlockNestedTestHelper>
-        <d-block-a>
-          <d-block-b/>
-        </d-block-a>
-        <d-block-b>
-          <d-block-a/>
-        </d-block-b>
+        <d-block:a>
+          <d-block:b/>
+        </d-block:a>
+        <d-block:b>
+          <d-block:a/>
+        </d-block:b>
       </DBlockNestedTestHelper>
     </div>
   `;
@@ -130,10 +130,10 @@ class DBlockNestedTest extends Block {
 class DBlockNestedTestHelper extends Block {
   static template = `
     <div id="d-block-a">
-      <d-block-a/>
+      <d-block:a/>
     </div>
     <div id="d-block-b">
-      <d-block-b/>
+      <d-block:b/>
     </div>
   `;
 }
@@ -407,7 +407,7 @@ class DAttrSimpleTest extends Block {
   }
 }
 class DAttrConflictTest extends Block {
-  static template = '<div id="d-attr-conflict-test" d-attr-a="{attrsA}" d-attr-b="{attrsB}"/>';
+  static template = '<div id="d-attr-conflict-test" d-attr#a="{attrsA}" d-attr#b="{attrsB}"/>';
 
   attrsA = {
     a: '1'
@@ -425,7 +425,7 @@ class DAttrConflictTest extends Block {
 
 class DBindTest extends Block {
   static template = `
-    <div id="d-bind-test" d-bind-click="{onClick}"/>
+    <div id="d-bind-test" d-bind:click="{onClick}"/>
   `;
 
   onClick = null;
@@ -452,9 +452,9 @@ class DClassConflictTest extends Block {
   static template = `
     <div
       id="d-class-conflict-test"
-      d-class-string="{stringClasses}"
-      d-class-array="{arrayClasses}"
-      d-class-object="{objectClasses}"
+      d-class#string="{stringClasses}"
+      d-class#array="{arrayClasses}"
+      d-class#object="{objectClasses}"
     />`;
 
   stringClasses = 'a b';
@@ -524,7 +524,7 @@ class DNodeTest extends Block {
 
 class DOnTest extends Block {
   static template = `
-    <div id="d-on-test" d-on-click="{onClick()}"/>
+    <div id="d-on-test" d-on:click="{onClick()}"/>
   `;
 
   onClick = null;
@@ -562,7 +562,7 @@ class DStyleSimpleTest extends Block {
   }
 }
 class DStyleConflictTest extends Block {
-  static template = '<div id="d-style-conflict-test" d-style-a="{stylesA}" d-style-b="{stylesB}"/>';
+  static template = '<div id="d-style-conflict-test" d-style#a="{stylesA}" d-style#b="{stylesB}"/>';
 
   stylesA = {
     left: '10px'
