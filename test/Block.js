@@ -425,7 +425,7 @@ class DAttrConflictTest extends Block {
 
 class DBindTest extends Block {
   static template = `
-    <div id="d-bind-test" d-bind:click="{onClick}"/>
+    <div id="d-bind-test" d-bind(click)="{onClick}"/>
   `;
 
   onClick = null;
@@ -524,7 +524,7 @@ class DNodeTest extends Block {
 
 class DOnTest extends Block {
   static template = `
-    <div id="d-on-test" d-on:click="{onClick()}"/>
+    <div id="d-on-test" d-on(click)="{onClick()}"/>
   `;
 
   onClick = null;

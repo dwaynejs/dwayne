@@ -12999,7 +12999,7 @@ function registerDBlock(Block) {
           if (dBlockName) {
             found = children.find(function (_ref) {
               var nodeName = _ref.name;
-              return nodeName === 'd-block-' + dBlockName;
+              return nodeName === 'd-block:' + dBlockName;
             });
 
             _this2.elems = found && found.value.children.length ? found.value.children : null;
@@ -13556,12 +13556,10 @@ function registerDBind(Mixin) {
           return;
         }
 
-        if (this.match) {
-          var event = this.match.match(/^[^\-]*/)[0];
-
-          this.off = this.elem.on(event, value);
+        if (this.args) {
+          this.off = this.elem.on(this.args.join(','), value);
         } else {
-          console.error('Provide "d-bind" mixin with an event name!');
+          console.error('Provide "d-bind" mixin with an event names (like "d-bind(click)" or "d-bind(keyup, keypress)")!');
         }
       }
     }, {
@@ -13775,14 +13773,12 @@ function registerDOn(Mixin) {
 
       var _this = possibleConstructorReturn(this, (DOn.__proto__ || Object.getPrototypeOf(DOn)).call(this, opts));
 
-      if (_this.match) {
-        var event = _this.match.match(/^[^\-]*/)[0];
-
-        _this.off = _this.elem.on(event, function () {
+      if (_this.args) {
+        _this.off = _this.elem.on(_this.args.join(','), function () {
           _this.evaluateOnce();
         });
       } else {
-        console.error('Provide "d-on" mixin with an event name!');
+        console.error('Provide "d-on" mixin with an event names (like "d-on(click)" or "d-on(keyup, keypress)")!');
       }
       return _this;
     }
@@ -14916,7 +14912,7 @@ var Block = function () {
         this._mixins = Object.create(_this.proto().$._mixins);
       }
 
-      Subclass._match = new RegExp('^' + new Str(name).escapeRegExp().$ + '(?:-([\\s\\S]+))?$');
+      Subclass._match = constructMixinRegExp(name);
 
       this._mixins[name] = Subclass;
     }
@@ -15583,7 +15579,8 @@ var Mixin = function () {
     var value = opts.value;
     var dynamic = opts.dynamic;
     var elem = opts.elem;
-    var match = opts.match;
+    var args = opts.args;
+    var comment = opts.comment;
     var parentBlock = opts.parentBlock;
     var parentScope = opts.parentScope;
 
@@ -15634,7 +15631,8 @@ var Mixin = function () {
       }
     });
 
-    this.match = match;
+    this.args = args;
+    this.comment = comment;
     this.parentScope = parentScope;
     this.elem = elem;
     this.node = elem.$[0];
@@ -15723,7 +15721,7 @@ function registerBuiltIns(set$$1, scope, proto) {
       value._html = transformJSExpressions(markupToJSON('' + (value.template || ''), value.collapseWhiteSpace), variables);
       value._variables = new Super(variables).except('$$', '$').keys();
     } else {
-      value._match = new RegExp('^' + new Str(name).escapeRegExp().$ + '(?:-([\\s\\S]+))?$');
+      value._match = constructMixinRegExp(name);
     }
 
     scope[name] = value;
@@ -15751,7 +15749,7 @@ function createBlock(_ref3) {
   var dBlockChildren = void 0;
   var dElementsName = void 0;
 
-  if (!children.length && ((dBlockMatch = name.match(/^d-block-([\s\S]+)$/)) || name === 'd-block') && !args.name) {
+  if (!children.length && ((dBlockMatch = name.match(/^d-block:([\s\S]+)$/)) || name === 'd-block') && !args.name) {
     constructor = blocks['d-block'];
     dBlockName = dBlockMatch ? dBlockMatch[1] : null;
   } else if (name === 'd-block' && args.name) {
@@ -16015,7 +16013,8 @@ function createMixin(_ref4) {
   var Mixin = _ref4.Mixin;
   var dynamic = _ref4.dynamic;
   var value = _ref4.value;
-  var match = _ref4.match;
+  var args = _ref4.args;
+  var comment = _ref4.comment;
   var elem = _ref4.elem;
   var parentBlock = _ref4.parentBlock;
   var parentScope = _ref4.parentScope;
@@ -16024,7 +16023,8 @@ function createMixin(_ref4) {
     name: name,
     value: value,
     dynamic: dynamic,
-    match: match,
+    args: args,
+    comment: comment,
     elem: elem,
     parentBlock: parentBlock,
     parentScope: parentScope
@@ -16427,7 +16427,10 @@ function mixinMatch(mixins, attr) {
 
     if (localMatch) {
       match = {
-        match: localMatch[1],
+        args: localMatch[1] && new Str(localMatch[1]).split(/,\s*/).map(function (s) {
+          return new Str(s).trim();
+        }).$,
+        comment: localMatch[2],
         Mixin: _Mixin2,
         name: name
       };
@@ -16597,6 +16600,10 @@ function executeMixinWatchers(mixin, value) {
   mixin.$$.watchers.forEach(function (watcher) {
     watcher(value, oldValue);
   });
+}
+
+function constructMixinRegExp(name) {
+  return new RegExp('^' + new Str(name).escapeRegExp().$ + '(?:\\(([^\\)]*)\\))?(?:#([\\s\\S]*))?$');
 }
 
 /**
