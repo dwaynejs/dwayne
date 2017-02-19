@@ -14816,10 +14816,14 @@ var Block = function () {
         }(Block), _class.template = _Subclass, _temp);
       }
 
-      if (!isInstanceOfBlock(_Subclass)) {
-        console.warn('The "' + name + '" class does not extend Block and will not be registered (Block.block)');
+      if (!isFunction(_Subclass)) {
+        console.warn('Block must be a string (representing a block template), a function or a class that extends Block class (name: "' + name + '") (Block.block)');
 
         return;
+      }
+
+      if (!isInstanceOfBlock(_Subclass)) {
+        extendBlock(_Subclass);
       }
 
       if (rootBlocks[name]) {
@@ -16605,6 +16609,11 @@ function executeMixinWatchers(mixin, value) {
 
 function constructMixinRegExp(name) {
   return new RegExp('^' + new Str(name).escapeRegExp().$ + '(?:\\(([^\\)]*)\\))?(?:#([\\s\\S]*))?$');
+}
+
+function extendBlock(cls) {
+  new Super(cls).proto(Block);
+  new Super(cls.prototype).proto(Block.prototype);
 }
 
 /**
