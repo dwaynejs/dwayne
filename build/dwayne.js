@@ -13861,6 +13861,18 @@ function registerDStyle(Mixin) {
         var elem = this.elem;
 
 
+        if (isString(newValue)) {
+          newValue = new Arr(newValue.split(/; ?/)).filter().object(function (css, item) {
+            var _item = slicedToArray(item, 2);
+
+            var prop = _item[0];
+            var value = _item[1];
+
+
+            css[prop] = value;
+          });
+        }
+
         newValue = new Super(newValue || {}).$;
 
         new Super(oldValue).forEach(function (value, prop) {
