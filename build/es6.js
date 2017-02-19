@@ -14692,7 +14692,7 @@ var tagName = new RegExp('^' + htmlAllowedTagSymbols + '$', 'i');
 var attrName = new RegExp('^' + htmlAllowedAttrSymbols + '$');
 var svgNS = 'http://www.w3.org/2000/svg';
 var curlyBracketRegExp = /\{/;
-var dRestRegExp = /^d-rest(?:-|$)/;
+var dRestRegExp = /^d-rest(?:#|$)/;
 var afterElem = new Elem();
 var evalMode = void 0;
 var getting = void 0;
@@ -15468,6 +15468,10 @@ var Block = function () {
     key: 'watch',
     value: function watch() {
       var _this5 = this;
+
+      for (var _len2 = arguments.length, vars = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        vars[_key2] = arguments[_key2];
+      }
 
       var oldWatcher = arguments[arguments.length - 1];
 
