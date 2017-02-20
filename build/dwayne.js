@@ -16563,7 +16563,7 @@ function calculateAttrs(attrs, attrsObject, elem, firstTime) {
 
           if (dynamic) {
             executeMixinWatchers(mixin, value);
-          } else if (!mixin.$$.evaluated) {
+          } else if (!mixin.$$.evaluated && opts.Mixin.evaluate) {
             var newValue = mixin.$$.parentScope.$$.evaluate(value, function (newValue) {
               var _attrs$attr2 = attrs[attr];
               var type = _attrs$attr2.type;
