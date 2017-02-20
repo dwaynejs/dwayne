@@ -16541,19 +16541,25 @@ function calculateAttrs(attrs, attrsObject, elem, firstTime) {
     var nextValue = void 0;
 
     if (attrsObject[attr]) {
-      (function () {
-        var _attrsObject$attr = attrsObject[attr];
-        var prevType = _attrsObject$attr.type;
-        var mixin = _attrsObject$attr.value;
+      var _attrsObject$attr = attrsObject[attr];
+      var prevType = _attrsObject$attr.type;
+      var prevValue = _attrsObject$attr.value;
 
 
-        if (type === 'attr') {
-          if (prevType === 'mixin') {
-            value.$$.remove();
-          }
+      if (type === 'attr') {
+        if (prevType === 'mixin') {
+          prevValue.$$.remove();
+        }
 
+        if (prevValue !== value) {
           elem.attr(attr, value);
-        } else {
+        }
+
+        nextValue = value;
+      } else {
+        (function () {
+          var mixin = prevValue;
+
           if (prevType === 'attr') {
             elem.removeAttr(attr);
           }
@@ -16578,12 +16584,13 @@ function calculateAttrs(attrs, attrsObject, elem, firstTime) {
 
             executeMixinWatchers(mixin, newValue);
           }
-        }
 
-        nextType = type;
-        nextDynamic = dynamic;
-        nextValue = mixin;
-      })();
+          nextValue = mixin;
+        })();
+      }
+
+      nextType = type;
+      nextDynamic = dynamic;
     } else {
       if (type === 'attr') {
         elem.attr(attr, value);
