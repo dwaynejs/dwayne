@@ -13504,24 +13504,52 @@ function registerDAttr(Mixin) {
     inherits(DAttr, _Mixin);
 
     function DAttr() {
+      var _ref;
+
+      var _temp, _this, _ret;
+
       classCallCheck(this, DAttr);
-      return possibleConstructorReturn(this, (DAttr.__proto__ || Object.getPrototypeOf(DAttr)).apply(this, arguments));
+
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = DAttr.__proto__ || Object.getPrototypeOf(DAttr)).call.apply(_ref, [this].concat(args))), _this), _this.attrs = {}, _temp), possibleConstructorReturn(_this, _ret);
     }
 
     createClass(DAttr, [{
       key: 'afterUpdate',
-      value: function afterUpdate(newValue, oldValue) {
+      value: function afterUpdate(newValue) {
         var elem = this.elem;
+        var args = this.args;
+        var attrs = this.attrs;
 
+
+        if (args) {
+          newValue = new Super(args).object(function (attrs, attr) {
+            attrs[attr] = newValue;
+          });
+        }
 
         newValue = new Super(newValue || {}).$;
 
-        new Super(oldValue).forEach(function (value, prop) {
+        new Super(attrs).forEach(function (value, prop) {
           if (!newValue[prop]) {
             elem.removeAttr(prop);
           }
         });
         elem.attr(newValue);
+
+        this.attrs = newValue;
+      }
+    }, {
+      key: 'beforeRemove',
+      value: function beforeRemove() {
+        var elem = this.elem;
+        var attrs = this.attrs;
+
+
+        elem.removeAttr.apply(elem, new Super(attrs).keys().$);
       }
     }]);
     return DAttr;
@@ -13601,11 +13629,16 @@ function registerDClass(Mixin) {
       key: 'afterUpdate',
       value: function afterUpdate(newValue) {
         var elem = this.elem;
+        var args = this.args;
         var classes = this.classes;
 
         var newClasses = [];
 
         newValue = new Super(newValue).$;
+
+        if (args) {
+          newValue = newValue ? args : [];
+        }
 
         if (isString(newValue)) {
           newValue = newValue.split(/\s+/);
@@ -13844,15 +13877,32 @@ function registerDStyle(Mixin) {
     inherits(DStyle, _Mixin);
 
     function DStyle() {
+      var _ref;
+
+      var _temp, _this, _ret;
+
       classCallCheck(this, DStyle);
-      return possibleConstructorReturn(this, (DStyle.__proto__ || Object.getPrototypeOf(DStyle)).apply(this, arguments));
+
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = DStyle.__proto__ || Object.getPrototypeOf(DStyle)).call.apply(_ref, [this].concat(args))), _this), _this.css = {}, _temp), possibleConstructorReturn(_this, _ret);
     }
 
     createClass(DStyle, [{
       key: 'afterUpdate',
       value: function afterUpdate(newValue, oldValue) {
         var elem = this.elem;
+        var args = this.args;
+        var css = this.css;
 
+
+        if (args) {
+          newValue = new Super(args).object(function (css, prop) {
+            css[prop] = newValue;
+          });
+        }
 
         if (isString(newValue)) {
           newValue = new Arr(newValue.split(/; ?/)).filter().object(function (css, item) {
@@ -13868,20 +13918,23 @@ function registerDStyle(Mixin) {
 
         newValue = new Super(newValue || {}).$;
 
-        new Super(oldValue).forEach(function (value, prop) {
+        new Super(css).forEach(function (value, prop) {
           if (!newValue[prop]) {
             elem.removeCSS(prop);
           }
         });
         elem.css(newValue);
+
+        this.css = newValue;
       }
     }, {
       key: 'beforeRemove',
       value: function beforeRemove() {
         var elem = this.elem;
+        var css = this.css;
 
 
-        elem.removeCSS.apply(elem, new Super(this.value).keys().$);
+        elem.removeCSS.apply(elem, new Super(css).keys().$);
       }
     }]);
     return DStyle;
@@ -16431,10 +16484,19 @@ function mixinMatch(mixins, attr) {
     var localMatch = attr.match(_Mixin2._match);
 
     if (localMatch) {
-      match = {
-        args: localMatch[1] && new Str(localMatch[1]).split(/,\s*/).map(function (s) {
+      var argsMatch = localMatch[1];
+      var _args = void 0;
+
+      if (/^\s*$/.test(argsMatch)) {
+        _args = [];
+      } else if (argsMatch) {
+        _args = new Str(argsMatch).split(/,\s*/).map(function (s) {
           return new Str(s).trim();
-        }).$,
+        }).$;
+      }
+
+      match = {
+        args: _args,
         comment: localMatch[2],
         Mixin: _Mixin2,
         name: name
