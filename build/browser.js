@@ -16495,7 +16495,7 @@ function mixinMatch(mixins, attr) {
         _args = [];
       } else if (argsMatch) {
         _args = new Str(argsMatch).split(/,\s*/).map(function (s) {
-          return new Str(s).trim();
+          return new Str(s).trim().$;
         }).$;
       }
 
