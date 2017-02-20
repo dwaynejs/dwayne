@@ -9812,7 +9812,7 @@ function parseCharacterData(string) {
 
 var nativeDocument = global$1.document;
 var emptyDiv = nativeDocument.createElement('div');
-var eventSeparator = /(,| ) */;
+var eventSeparator = /(?:,| ) */;
 var textProperty = new Super(Node.prototype).propertyDescriptor('textContent') ? 'textContent' : 'innerText';
 var classes = {};
 var attrs = {};
@@ -15323,12 +15323,11 @@ var Block = function () {
     var args = Object.create(constructor.defaultArgs || null);
 
     new Super(originalArgs).forEach(function (value, arg) {
-      var isDRest = dRestRegExp.test(arg);
-      var localArgs = isDRest ? Object.create(args) : args;
+      var localArgs = Object.create(args);
 
       args = localArgs;
 
-      if (isDRest) {
+      if (dRestRegExp.test(arg)) {
         var restArgs = parentScope.$$.evaluate(value, function (value) {
           iterate(localArgs, function (value, arg) {
             delete localArgs[arg];
@@ -15840,12 +15839,11 @@ function createBlock(_ref3) {
       };
 
       new Super(args).forEach(function (value, attr) {
-        var isDRest = dRestRegExp.test(attr);
-        var localAttrs = isDRest ? Object.create(attrs) : attrs;
+        var localAttrs = Object.create(attrs);
 
         attrs = localAttrs;
 
-        if (isDRest) {
+        if (dRestRegExp.test(attr)) {
           var restAttrs = parentScope.$$.evaluate(value, function (value) {
             setTimeout(function () {
               iterate(localAttrs, function (value, arg) {
