@@ -16590,6 +16590,8 @@ function calculateAttrs(attrs, attrsObject, elem, firstTime) {
     } else {
       if (type === 'attr') {
         elem.attr(attr, value);
+
+        nextValue = value;
       } else {
         var buildMixin = function buildMixin() {
           opts.dynamic = dynamic;
