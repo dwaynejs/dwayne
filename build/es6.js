@@ -14080,7 +14080,7 @@ var listenerSwitcher$1 = switcher('strictEquals', 'input').case('select', 'chang
   return type === 'radio' || type === 'checkbox' || type === 'color' || type === 'file' ? 'change' : 'change input';
 });
 
-function registerDValue(Mixin) {
+function registerDValue(Mixin, createBlock, Block) {
   var DValue = function (_Mixin) {
     inherits(DValue, _Mixin);
 
@@ -14089,6 +14089,7 @@ function registerDValue(Mixin) {
 
       var _this = possibleConstructorReturn(this, (DValue.__proto__ || Object.getPrototypeOf(DValue)).call(this, opts));
 
+      var args = _this.args;
       var parentScope = _this.parentScope;
       var elem = _this.elem;
       var node = _this.node;
@@ -14103,9 +14104,15 @@ function registerDValue(Mixin) {
       _this.type = type;
       _this.value = value;
       _this.options = elem.find('option');
+      _this.scope = parentScope;
+
+      if (args) {
+        _this.name = args[0];
+        _this.scope = value instanceof Block ? value : parentScope;
+      }
 
       if (!isFunction(value)) {
-        initialScopeValue = parentScope.$$.evaluate(constructEvalFunction('$.' + value, value), function (newValue) {
+        initialScopeValue = _this.scope.$$.evaluate(constructEvalFunction('$.' + value, value), function (newValue) {
           if (_this.currentValue !== newValue) {
             _this.currentValue = newValue;
             _this.setProp(newValue);
@@ -14147,7 +14154,7 @@ function registerDValue(Mixin) {
     createClass(DValue, [{
       key: 'changeScope',
       value: function changeScope() {
-        var parentScope = this.parentScope;
+        var scope = this.scope;
         var value = this.value;
         var currentValue = this.currentValue;
 
@@ -14155,7 +14162,7 @@ function registerDValue(Mixin) {
         if (isFunction(value)) {
           value(currentValue);
         } else {
-          parentScope[value] = currentValue;
+          scope[value] = currentValue;
         }
       }
     }, {
@@ -15766,7 +15773,7 @@ function initApp(block, node) {
 
 function registerBuiltIns(set$$1, scope, proto) {
   iterate(set$$1, function (register) {
-    var _register = register(proto, createBlock);
+    var _register = register(proto, createBlock, Block);
 
     var name = _register.name;
     var value = _register.value;
