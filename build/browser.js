@@ -12990,18 +12990,43 @@ function registerDBlock(Block) {
 
         this.watch('args.children', function () {
           var _$$ = _this2.$$;
+          var parentScope = _$$.parentScope;
           var children = _$$.parentScope.children;
           var dBlockName = _$$.dBlockName;
-          var argsChildren = _this2.args.children;
+          var _args = _this2.args;
+          var argsParentScope = _args.parentScope;
+          var argsChildren = _args.children;
+          var ownChildren = _this2.children;
 
           var eventualChildren = argsChildren || children;
           var found = void 0;
+
+          if (ownChildren.length) {
+            return;
+          }
+
+          _this2.ParentScope = argsParentScope || parentScope.$$.parentScope;
 
           if (dBlockName) {
             found = children.find(function (_ref) {
               var nodeName = _ref.name;
               return nodeName === 'd-block:' + dBlockName;
             });
+
+            if (!found) {
+              var parent = _this2;
+
+              while (!found && (parent = parent.$$.parentScope) && (!parent.$$.parentScope || parent.$$.parentScope.$$.name !== '#d-item')) {
+                found = parent.$$.dBlocks.find(function (_ref2) {
+                  var DBlockName = _ref2.$$.dBlockName;
+                  return DBlockName === dBlockName;
+                });
+              }
+
+              if (found) {
+                _this2.ParentScope = parent;
+              }
+            }
 
             _this2.elems = found && found.value.children.length ? found.value.children : null;
           } else {
@@ -13013,7 +13038,7 @@ function registerDBlock(Block) {
     return DBlock;
   }(Block);
 
-  DBlock.template = '<d-elements value="{elems}" parentScope="{$$.parentScope.$$.parentScope}" />';
+  DBlock.template = '<d-elements value="{elems}" parentScope="{ParentScope}" />';
 
 
   return {
@@ -13703,10 +13728,11 @@ function registerDElem(Mixin) {
 
       var _this = possibleConstructorReturn(this, (DElem.__proto__ || Object.getPrototypeOf(DElem)).call(this, opts));
 
+      var args = _this.args;
       var parentScope = _this.parentScope;
       var elem = _this.elem;
 
-      var value = _this.evaluateOnce();
+      var value = args ? args[0] : _this.evaluateOnce();
 
       if (isFunction(value)) {
         value(elem);
@@ -13773,10 +13799,11 @@ function registerDNode(Mixin) {
 
       var _this = possibleConstructorReturn(this, (DNode.__proto__ || Object.getPrototypeOf(DNode)).call(this, opts));
 
+      var args = _this.args;
       var parentScope = _this.parentScope;
       var node = _this.node;
 
-      var value = _this.evaluateOnce();
+      var value = args ? args[0] : _this.evaluateOnce();
 
       if (isFunction(value)) {
         value(node);
@@ -15067,6 +15094,7 @@ var Block = function () {
       $$: {
         name: name,
         dBlockName: dBlockName,
+        dBlocks: new Arr([]),
         parent: parent,
         parentElem: parentElem,
         parentScope: parentScope,
@@ -15329,13 +15357,15 @@ var Block = function () {
     var argsObject = Object.create(null);
     var $argsObject = new Super(argsObject);
     var args = Object.create(constructor.defaultArgs || null);
+    var wasDRest = void 0;
 
     new Super(originalArgs).forEach(function (value, arg) {
-      var localArgs = Object.create(args);
+      var isDRest = dRestRegExp.test(arg);
+      var localArgs = isDRest || wasDRest ? Object.create(args) : args;
 
       args = localArgs;
 
-      if (dRestRegExp.test(arg)) {
+      if (isDRest) {
         var restArgs = parentScope.$$.evaluate(value, function (value) {
           iterate(localArgs, function (value, arg) {
             delete localArgs[arg];
@@ -15344,11 +15374,15 @@ var Block = function () {
           calculateArgs(args, argsObject, $argsObject);
         }, _this4);
 
+        wasDRest = true;
+
         return defineUsualProperties(localArgs, transformRestArgs(restArgs));
       }
 
       var isDElements = name === 'd-elements';
       var forDElements = isDElements && arg === 'value';
+
+      wasDRest = false;
 
       if (name !== 'd-each' || arg !== 'uid') {
         value = parentScope.$$.evaluate(value, function (value) {
@@ -15817,10 +15851,7 @@ function createBlock(_ref3) {
   var dBlockChildren = void 0;
   var dElementsName = void 0;
 
-  if (!children.length && ((dBlockMatch = name.match(/^d-block:([\s\S]+)$/)) || name === 'd-block') && !args.name) {
-    constructor = blocks['d-block'];
-    dBlockName = dBlockMatch ? dBlockMatch[1] : null;
-  } else if (name === 'd-block' && args.name) {
+  if (name === 'd-block' && args.name) {
     name = 'd-elements';
     constructor = localBlocks[name];
     dElementsName = args.name;
@@ -15828,6 +15859,9 @@ function createBlock(_ref3) {
     dBlockChildren = children;
     children = new Arr([]);
     args = {};
+  } else if ((dBlockMatch = name.match(/^d-block:([\s\S]+)$/)) || name === 'd-block') {
+    constructor = blocks['d-block'];
+    dBlockName = dBlockMatch ? dBlockMatch[1] : null;
   }
 
   if (!constructor) {
@@ -15840,6 +15874,7 @@ function createBlock(_ref3) {
       var element = elem.create(name);
       var currentAttrs = Object.create(null);
       var attrs = Object.create(null);
+      var wasDRest = void 0;
       var mixinDefaultOpts = {
         elem: element,
         parentBlock: parentBlock,
@@ -15847,11 +15882,12 @@ function createBlock(_ref3) {
       };
 
       new Super(args).forEach(function (value, attr) {
-        var localAttrs = Object.create(attrs);
+        var isDRest = dRestRegExp.test(attr);
+        var localAttrs = isDRest || wasDRest ? Object.create(attrs) : attrs;
 
         attrs = localAttrs;
 
-        if (dRestRegExp.test(attr)) {
+        if (isDRest) {
           var restAttrs = parentScope.$$.evaluate(value, function (value) {
             setTimeout(function () {
               iterate(localAttrs, function (value, arg) {
@@ -15862,10 +15898,14 @@ function createBlock(_ref3) {
             }, 0);
           }, parentBlock);
 
+          wasDRest = true;
+
           return assign$1(localAttrs, transformRestAttrs(restAttrs, localMixins, mixinDefaultOpts));
         }
 
         var match = mixinMatch(localMixins, attr);
+
+        wasDRest = false;
 
         if (match) {
           if (value === true) {
@@ -15980,6 +16020,10 @@ function createBlock(_ref3) {
   var locals = objectWithoutProperties(blockInstance, ['$$', 'args', 'global']);
 
 
+  if (dBlockMatch || name === 'd-block') {
+    parentScope.$$.dBlocks.push(blockInstance);
+  }
+
   if (dBlockArgs) {
     node = {
       attrs: dBlockArgs,
@@ -16013,17 +16057,7 @@ function createBlock(_ref3) {
     var _scopeValues;
 
     var scopeValues = (_scopeValues = {}, defineProperty(_scopeValues, node.itemName, node.item), defineProperty(_scopeValues, node.indexName, node.index), _scopeValues);
-    var _parent = blockInstance;
-    var scope = parentScope;
-    var DItemFound = void 0;
-
-    while (!DItemFound && _parent !== parentScope && (_parent = _parent.$$.parentBlock)) {
-      DItemFound = _parent.$$.name === '#d-item';
-    }
-
-    if (DItemFound) {
-      scope = _parent.$$.scope;
-    }
+    var scope = parentScope.$$.name === '#d-item' ? parentScope.$$.scope : parentScope;
 
     $$.ns = parentScope.$$.ns;
     $$.privateScope = constructPrivateScope(scopeValues);
