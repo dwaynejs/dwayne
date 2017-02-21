@@ -14281,7 +14281,7 @@ var stringRegExp = /^(?:"(?:(?:\\[\s\S])|[^"\n\\])*"|'(?:(?:\\[\s\S])|[^'\n\\])*
 var regexpRegExp = /^\/(?:(?:\\[\s\S])|[^\/\n\\])+\/[gimuy]*/;
 var arrowFunctionRegExp = /^(?:(?:\(\s*((?:[a-zA-Z_$][a-zA-Z0-9_$]*\s*,\s*)?(?:[a-zA-Z_$][a-zA-Z0-9_$]*)?)\s*\))|([a-zA-Z_$][a-zA-Z0-9_$]*))\s*=>/;
 var templateStringContentRegExp = /^(?:(?:\\[\s\S])|\$(?!\{)|[^`$\\])+/;
-var operatorRegExp = /^(?:(?:>>>|>>|<<)=?|&&|\|\||,|(?:\+|-|\*|\/|%|&|\||\^|<|>|==)=?|=)/;
+var operatorRegExp = /^(?:(?:>>>|>>|<<)=?|&&|\|\||,|(?:\+|-|\*|\/|%|&|\||\^|<|>|==|!=)=?|=)/;
 var pointOperatorRegExp = /^\.([a-zA-Z_$][a-zA-Z0-9_$]*)/;
 var propertyRegExp = /^((?:"(?:(?:\\[\s\S])|[^"\n\\])*"|'(?:(?:\\[\s\S])|[^'\n\\])*'|[a-zA-Z_$][a-zA-Z0-9_$]*))\s*:/;
 var shorthandPropertyRegExp = /^([a-zA-Z_$][a-zA-Z0-9_$]*)\s*(?=,|})(,?)/;
