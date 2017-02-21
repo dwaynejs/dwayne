@@ -15390,12 +15390,6 @@ var Block = function () {
       defineUsualProperties(localArgs, defineProperty({}, arg, value));
     });
 
-    var realArgs = {};
-
-    for (var arg in args) {
-      realArgs[arg] = args[arg];
-    }
-
     defineFrozenProperties(this, {
       /**
        * @member {Object} Block#args
@@ -16036,7 +16030,7 @@ function createBlock(_ref3) {
     var _html = new Arr([node]);
 
     Args.value = node.name === 'd-if' ? transformDIfChildren(_html) : _html;
-    Args.parentScope = blockInstance;
+    Args.parentScope = parentScope;
   }
 
   var html$$1 = name === 'd-elements' ? new Arr(Args.value || []) : constructor._html;
@@ -16524,18 +16518,18 @@ function mixinMatch(mixins, attr) {
 
     if (localMatch) {
       var argsMatch = localMatch[1];
-      var _args = void 0;
+      var args = void 0;
 
       if (/^\s*$/.test(argsMatch)) {
-        _args = [];
+        args = [];
       } else if (argsMatch) {
-        _args = new Str(argsMatch).split(/,\s*/).map(function (s) {
+        args = new Str(argsMatch).split(/,\s*/).map(function (s) {
           return new Str(s).trim().$;
         }).$;
       }
 
       match = {
-        args: _args,
+        args: args,
         comment: localMatch[2],
         Mixin: _Mixin2,
         name: name
