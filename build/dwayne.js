@@ -18729,7 +18729,7 @@ function initRouter() {
     click: function click(e) {
       var closestLink = new Elem(e.target).closest('a');
 
-      if (closestLink.length && closestLink.attr('target') !== '_blank') {
+      if (closestLink.length && closestLink.attr('target') !== '_blank' && !closestLink.hasAttr('no-routing')) {
         var push = !closestLink.hasAttr('replace');
 
         e.preventDefault();
