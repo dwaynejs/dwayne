@@ -15087,7 +15087,7 @@ var Block = function () {
        * @property {Elem} parentElem - Parent element.
        * @property {Elem} content - Content elements.
        * @property {Function} evaluate - Evaluate function.
-       * @property {Object} global - Private global scope.
+       * @property {Object} globals - Private globals scope.
        * @property {Object} locals - Private locals scope.
        * @property {Arr} watchersToRemove - Watchers to remove before removing element.
        */
@@ -15410,11 +15410,11 @@ var Block = function () {
       children: children || new Arr([]),
 
       /**
-       * @member {Object} Block#global
+       * @member {Object} Block#globals
        * @type {Object}
        * @public
        */
-      global: Object.create(parentScope ? Object.create(parentScope.global) : null),
+      globals: Object.create(parentScope ? Object.create(parentScope.globals) : null),
 
       /**
        * @member {Block|undefined} Block#parentScope
@@ -15528,20 +15528,20 @@ var Block = function () {
     /**
      * @method Block#watch
      * @public
-     * @param {...('args'|'globals'|String)} [vars] - Vars to watch (args, global or local).
+     * @param {...('args'|'globals'|String)} [vars] - Vars to watch (args, globals or locals).
      * If no specified all locals, args and globals are to be watched.
      * If the 'args' string all args are to be watched.
-     * If the 'global' string all globals are to be watched.
+     * If the 'globals' string all globals are to be watched.
      * @param {VarsWatcher} watcher - Called when watched vars are changed.
      * @description Method for watching for vars. If no vars passed in arguments
      * all vars are to be watched. If the 'args' string is in the arguments all args are to be watched.
-     * If the 'global' string is in the arguments all globals are to be watched.
+     * If the 'globals' string is in the arguments all globals are to be watched.
      * Otherwise specified vars will be watched.
      * Watchers should not be put inside the constructor. It is considered best
      * practice to do it inside the {@link Block#afterConstruct} method.
      * Note that these expressions (vars, i.e. "args.arg") are not to be
      * evaluated so you cannot put there things like "a[b]" or any js code,
-     * only expressions like "a", "b", "args.a", "args.b" and "global.a", "global.b".
+     * only expressions like "a", "b", "args.a", "args.b" and "globals.a", "globals.b".
      * Also note that if there are more than one var that are changed at once (synchronously)
      * the watcher is called only once.
      * Note that the watcher is executed right away because in most cases
@@ -15553,7 +15553,7 @@ var Block = function () {
      *
      *   afterConstruct() {
      *     this.watch('a', () => {});
-     *     this.watch('args.a', 'global.r', () => {});
+     *     this.watch('args.a', 'globals.r', () => {});
      *     this.watch(() => {});
      *   }
      * }
@@ -15605,7 +15605,7 @@ var Block = function () {
           return watchForAllArgs(_this5, watcher);
         }
 
-        if (variable === 'global') {
+        if (variable === 'globals') {
           return watchForAllGlobals(_this5, watcher);
         }
 
@@ -15621,14 +15621,14 @@ var Block = function () {
           return;
         }
 
-        if (/^global\./.test(variable)) {
-          variable = variable.replace(/^global\./, '');
+        if (/^globals\./.test(variable)) {
+          variable = variable.replace(/^globals\./, '');
 
-          if (!_this5.$$.global[variable]) {
+          if (!_this5.$$.globals[variable]) {
             return;
           }
 
-          var watchers = _this5.$$.global[variable].watchers;
+          var watchers = _this5.$$.globals[variable].watchers;
 
 
           watchers.perm.push(watcher);
@@ -16010,8 +16010,8 @@ function createBlock(_ref3) {
 
   var $$ = blockInstance.$$;
   var Args = blockInstance.args;
-  var global = blockInstance.global;
-  var locals = objectWithoutProperties(blockInstance, ['$$', 'args', 'global']);
+  var globals = blockInstance.globals;
+  var locals = objectWithoutProperties(blockInstance, ['$$', 'args', 'globals']);
 
 
   if (dBlockMatch || name === 'd-block') {
@@ -16045,7 +16045,7 @@ function createBlock(_ref3) {
 
   $$.args = constructPrivateScope(Args);
   $$.locals = constructPrivateScope(locals);
-  $$.global = constructPrivateScope(global, 'global', parentScope);
+  $$.globals = constructPrivateScope(globals, 'globals', parentScope);
 
   if (name === '#d-item') {
     var _scopeValues;
@@ -16071,7 +16071,7 @@ function createBlock(_ref3) {
   }
 
   constructPublicScope(Args, Args, $$.args);
-  constructPublicScope(global, global, $$.global);
+  constructPublicScope(globals, globals, $$.globals);
   constructPublicScope(blockInstance, locals, $$.locals);
 
   try {
@@ -16329,8 +16329,8 @@ function removeWatchers(watchersToRemove) {
 function constructPrivateScope(object, type, parentScope) {
   var scope = {};
 
-  if (type === 'global') {
-    scope = Object.create(parentScope ? parentScope.$$.global : null);
+  if (type === 'globals') {
+    scope = Object.create(parentScope ? parentScope.$$.globals : null);
   }
 
   return new Super(object).object(function (scope, value, key) {
@@ -16439,7 +16439,7 @@ function constructPublicScope(scope, scopeValues, privateScope) {
 
 function watchForAllGlobals(block, watcher) {
   var _block$$$ = block.$$;
-  var globals = _block$$$.global;
+  var globals = _block$$$.globals;
   var watchersToRemove = _block$$$.watchersToRemove;
 
 
@@ -18826,7 +18826,7 @@ function makeRoute(options) {
         if (root) {
           initRouter();
 
-          _this.global.router = router;
+          _this.globals.router = router;
         }
 
         _this.__routerInstance__ = route;
