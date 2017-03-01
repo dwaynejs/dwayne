@@ -14837,7 +14837,15 @@ var Block = function () {
 
 
     /**
-     * @member {Boolean} [Block.defaultArgs = null]
+     * @member {Object} [Block.defaultLocals = null]
+     * @type {Object}
+     * @public
+     * @description Block default locals.
+     */
+
+
+    /**
+     * @member {Boolean} [Block.collapseWhiteSpace = true]
      * @type {Boolean}
      * @public
      * @description If the whitespace between html elements and
@@ -14856,11 +14864,10 @@ var Block = function () {
 
 
     /**
-     * @member {Boolean} [Block.collapseWhiteSpace = true]
-     * @type {Boolean}
+     * @member {Object} [Block.defaultArgs = null]
+     * @type {Object}
      * @public
-     * @description If the whitespace between html elements and
-     * in the start and the end inside the tag should be omitted during parsing.
+     * @description Block default args.
      */
 
   }, {
@@ -15422,7 +15429,10 @@ var Block = function () {
     });
 
     constructor._variables.forEach(function (variable) {
-      _this5[variable] = isUndefined(_this5[variable]) ? undefined : _this5[variable];
+      _this5[variable] = _this5[variable];
+    });
+    iterate(constructor.defaultLocals, function (value, variable) {
+      _this5[variable] = value;
     });
 
     var argsObject = Object.create(null);
@@ -15728,6 +15738,7 @@ Block._blocks = Object.create(rootBlocks);
 Block._mixins = Object.create(rootMixins);
 Block.collapseWhiteSpace = true;
 Block.defaultArgs = null;
+Block.defaultLocals = null;
 Block.template = '';
 
 
