@@ -15431,11 +15431,11 @@ var Block = function () {
       }
     });
 
-    constructor._variables.forEach(function (variable) {
-      _this5[variable] = _this5[variable];
-    });
     iterate(constructor.defaultLocals, function (value, variable) {
       _this5[variable] = value;
+    });
+    constructor._variables.forEach(function (variable) {
+      _this5[variable] = _this5[variable];
     });
 
     var argsObject = Object.create(null);
