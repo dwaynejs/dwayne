@@ -14879,6 +14879,34 @@ var Block = function () {
     }
 
     /**
+     * @method Block.beforeRegisterBlock
+     * @public
+     * @param {Block} Block - Block which is registering.
+     * @param {String} name - Name of the Block.
+     * @returns {Block|void} Return value is used for registering the block.
+     * If Block subclass returned it's registered instead of the initial block, otherwise
+     * the initial block is used.
+     */
+
+  }, {
+    key: 'beforeRegisterBlock',
+    value: function beforeRegisterBlock(Block, name) {}
+
+    /**
+     * @method Block.beforeRegisterMixin
+     * @public
+     * @param {Mixin} Mixin - Mixin which is registering.
+     * @param {String} name - Name of the Mixin.
+     * @returns {Mixin|void} Return value is used for registering the mixin.
+     * If Mixin subclass returned it's registered instead of the initial mixin, otherwise
+     * the initial mixin is used.
+     */
+
+  }, {
+    key: 'beforeRegisterMixin',
+    value: function beforeRegisterMixin(Mixin, name) {}
+
+    /**
      * @method Block.block
      * @public
      * @param {String} name - Block or mixin name.
@@ -14907,13 +14935,34 @@ var Block = function () {
         }(Block), _class.template = _Subclass, _temp);
       }
 
+      if (isFunction(_Subclass) && !isInstanceOf(Block, _Subclass)) {
+        (function () {
+          var constructor = _Subclass;
+
+          _Subclass = function (_Block2) {
+            inherits(_Subclass, _Block2);
+
+            function _Subclass(opts) {
+              classCallCheck(this, _Subclass);
+
+              var _this3 = possibleConstructorReturn(this, (_Subclass.__proto__ || Object.getPrototypeOf(_Subclass)).call(this, opts));
+
+              constructor.call(_this3, opts);
+              return _this3;
+            }
+
+            return _Subclass;
+          }(Block);
+        })();
+      }
+
       if (!isFunction(_Subclass)) {
         console.warn('Block must be a string (representing a block template), a function or a class that extends Block class (name: "' + name + '") (Block.block)');
 
         return;
       }
 
-      if (!isInstanceOfBlock(_Subclass)) {
+      if (!isInstanceOf(Block, _Subclass)) {
         extendBlock(_Subclass);
       }
 
@@ -14933,8 +14982,21 @@ var Block = function () {
         this._blocks = Object.create(_this.proto().$._blocks);
       }
 
+      var returnValue = void 0;
+
+      try {
+        returnValue = this.beforeRegisterBlock(_Subclass, name);
+      } catch (err) {
+        console.error('Uncaught error in ' + this._name + '.beforeRegisterBlock:', err);
+      }
+
+      if (isInstanceOf(Block, returnValue)) {
+        _Subclass = returnValue;
+      }
+
       var variables = {};
 
+      _Subclass._name = name;
       _Subclass._html = transformDIfChildren(transformJSExpressions(markupToJSON('' + (_Subclass.template || ''), _Subclass.collapseWhiteSpace), variables));
       _Subclass._variables = new Super(variables).except('$$', '$').keys();
 
@@ -14959,7 +15021,7 @@ var Block = function () {
     value: function mixin(name, Subclass) {
       var _this = new Super(this);
 
-      if (isFunction(Subclass) && !isInstanceOfMixin(Subclass)) {
+      if (isFunction(Subclass) && !isInstanceOf(Mixin, Subclass)) {
         (function () {
           var _afterUpdate = Subclass;
 
@@ -14982,7 +15044,7 @@ var Block = function () {
         })();
       }
 
-      if (!isInstanceOfMixin(Subclass)) {
+      if (!isInstanceOf(Mixin, Subclass)) {
         console.warn('The "' + name + '" class does not extend Mixin and will not be registered (Block.mixin)');
 
         return;
@@ -15004,6 +15066,19 @@ var Block = function () {
         this._mixins = Object.create(_this.proto().$._mixins);
       }
 
+      var returnValue = void 0;
+
+      try {
+        returnValue = this.beforeRegisterMixin(Subclass, name);
+      } catch (err) {
+        console.error('Uncaught error in ' + this._name + '.beforeRegisterMixin:', err);
+      }
+
+      if (isInstanceOf(Mixin, returnValue)) {
+        Subclass = returnValue;
+      }
+
+      Subclass._name = name;
       Subclass._match = constructMixinRegExp(name);
 
       this._mixins[name] = Subclass;
@@ -15049,7 +15124,7 @@ var Block = function () {
   }]);
 
   function Block(opts) {
-    var _this4 = this;
+    var _this5 = this;
 
     classCallCheck(this, Block);
     var name = opts.name;
@@ -15113,7 +15188,7 @@ var Block = function () {
           forDElements = !!forDElements;
           forDItem = !!forDItem;
 
-          var scope = name === '#d-item' && !forDItem || forDEach ? (forDEach || _this4).$$.scope : _this4;
+          var scope = name === '#d-item' && !forDItem || forDEach ? (forDEach || _this5).$$.scope : _this5;
 
           var _ref = instance ? instance.$$ : {};
 
@@ -15134,7 +15209,7 @@ var Block = function () {
             } catch (err) {
               err.expression = func.expression;
               err.original = func.original;
-              err.block = _this4;
+              err.block = _this5;
 
               if (isFunction(constructor.onEvalError)) {
                 constructor.onEvalError(err);
@@ -15204,32 +15279,32 @@ var Block = function () {
           });
 
           try {
-            _this4.beforeRemove();
+            _this5.beforeRemove();
           } catch (err) {
             console.error('Uncaught error in ' + name + '#beforeRemove:', err);
           }
 
           if (!isParentSignal && isParentBlock) {
-            parent.$$.removeContent(_this4.$$.content);
+            parent.$$.removeContent(_this5.$$.content);
           }
 
           if (!isParentSignal && parentBlock) {
-            var index = parentBlock.$$.children.indexOf(_this4);
+            var index = parentBlock.$$.children.indexOf(_this5);
 
             if (index !== -1) {
               parentBlock.$$.children.splice(index, 1);
             }
           }
 
-          _this4.$$.content.remove();
+          _this5.$$.content.remove();
         },
         addContent: function addContent(contentToAdd, notRecursive) {
-          var index = _this4.$$.content.indexOf(contentToAdd.$[0].previousSibling) + 1;
+          var index = _this5.$$.content.indexOf(contentToAdd.$[0].previousSibling) + 1;
 
           if (index === 0) {
-            _this4.$$.content = contentToAdd.slice().pushArray(_this4.$$.content.$);
+            _this5.$$.content = contentToAdd.slice().pushArray(_this5.$$.content.$);
           } else {
-            _this4.$$.content = _this4.$$.content.slice(0, index).pushArray(contentToAdd.$).pushArray(_this4.$$.content.slice(index).$);
+            _this5.$$.content = _this5.$$.content.slice(0, index).pushArray(contentToAdd.$).pushArray(_this5.$$.content.slice(index).$);
           }
 
           if (isParentBlock && !notRecursive) {
@@ -15237,15 +15312,15 @@ var Block = function () {
           }
         },
         moveContent: function moveContent(contentToMove, after) {
-          var index = _this4.$$.content.indexOf(contentToMove.$[0]);
-          var indexToPut = _this4.$$.content.indexOf(after.$[0]) + 1;
+          var index = _this5.$$.content.indexOf(contentToMove.$[0]);
+          var indexToPut = _this5.$$.content.indexOf(after.$[0]) + 1;
 
           if (indexToPut === 0) {
-            _this4.$$.content = contentToMove.slice().pushArray(_this4.$$.content.slice(indexToPut, index).$).pushArray(_this4.$$.content.slice(index + contentToMove.length).$);
+            _this5.$$.content = contentToMove.slice().pushArray(_this5.$$.content.slice(indexToPut, index).$).pushArray(_this5.$$.content.slice(index + contentToMove.length).$);
           } else if (index > indexToPut) {
-            _this4.$$.content = _this4.$$.content.slice(0, indexToPut).pushArray(contentToMove.$).pushArray(_this4.$$.content.slice(indexToPut, index).$).pushArray(_this4.$$.content.slice(index + contentToMove.length).$);
+            _this5.$$.content = _this5.$$.content.slice(0, indexToPut).pushArray(contentToMove.$).pushArray(_this5.$$.content.slice(indexToPut, index).$).pushArray(_this5.$$.content.slice(index + contentToMove.length).$);
           } else {
-            _this4.$$.content = _this4.$$.content.slice(0, index).pushArray(_this4.$$.content.slice(index + contentToMove.length, indexToPut).$).pushArray(contentToMove.$).pushArray(_this4.$$.content.slice(indexToPut).$);
+            _this5.$$.content = _this5.$$.content.slice(0, index).pushArray(_this5.$$.content.slice(index + contentToMove.length, indexToPut).$).pushArray(contentToMove.$).pushArray(_this5.$$.content.slice(indexToPut).$);
           }
 
           if (isParentBlock && indexToPut) {
@@ -15253,7 +15328,7 @@ var Block = function () {
           }
         },
         removeContent: function removeContent(contentToRemove) {
-          _this4.$$.content = _this4.$$.content.filter(function (elem) {
+          _this5.$$.content = _this5.$$.content.filter(function (elem) {
             return contentToRemove.indexOf(elem) === -1;
           });
 
@@ -15262,7 +15337,7 @@ var Block = function () {
           }
         },
         insertInStartOfIt: function insertInStartOfIt(contentToInsert, moveFlag) {
-          var prevBlock = _this4.$$.prevBlock;
+          var prevBlock = _this5.$$.prevBlock;
 
           var after = afterElem;
 
@@ -15308,21 +15383,21 @@ var Block = function () {
           }
 
           if (moveFlag) {
-            _this4.$$.moveContent(contentToInsert, after);
+            _this5.$$.moveContent(contentToInsert, after);
           } else {
-            _this4.$$.addContent(contentToInsert, true);
+            _this5.$$.addContent(contentToInsert, true);
           }
 
           return after;
         },
         insertAfterIt: function insertAfterIt(contentToInsert, moveFlag) {
-          var prevBlock = _this4.$$.prevBlock;
+          var prevBlock = _this5.$$.prevBlock;
 
           var after = afterElem;
           var tryToAddOrMove = void 0;
 
-          if (_this4.$$.content.length) {
-            after = _this4.$$.content.last();
+          if (_this5.$$.content.length) {
+            after = _this5.$$.content.last();
             tryToAddOrMove = true;
             contentToInsert.insertAfter(after);
           } else if (prevBlock instanceof Block) {
@@ -15351,7 +15426,7 @@ var Block = function () {
     });
 
     constructor._variables.forEach(function (variable) {
-      _this4[variable] = isUndefined(_this4[variable]) ? undefined : _this4[variable];
+      _this5[variable] = isUndefined(_this5[variable]) ? undefined : _this5[variable];
     });
 
     var argsObject = Object.create(null);
@@ -15372,7 +15447,7 @@ var Block = function () {
           });
           defineUsualProperties(localArgs, transformRestArgs(value));
           calculateArgs(args, argsObject, $argsObject);
-        }, _this4);
+        }, _this5);
 
         wasDRest = true;
 
@@ -15388,7 +15463,7 @@ var Block = function () {
         value = parentScope.$$.evaluate(value, function (value) {
           localArgs[arg] = value;
           calculateArgs(args, argsObject, $argsObject);
-        }, _this4, forDElements, isDElements && parentBlock.$$.name === '#d-item');
+        }, _this5, forDElements, isDElements && parentBlock.$$.name === '#d-item');
       }
 
       defineUsualProperties(localArgs, defineProperty({}, arg, value));
@@ -15562,7 +15637,7 @@ var Block = function () {
   }, {
     key: 'watch',
     value: function watch() {
-      var _this5 = this;
+      var _this6 = this;
 
       for (var _len2 = arguments.length, vars = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
         vars[_key2] = arguments[_key2];
@@ -15602,21 +15677,21 @@ var Block = function () {
         variable = '' + variable;
 
         if (variable === 'args') {
-          return watchForAllArgs(_this5, watcher);
+          return watchForAllArgs(_this6, watcher);
         }
 
         if (variable === 'globals') {
-          return watchForAllGlobals(_this5, watcher);
+          return watchForAllGlobals(_this6, watcher);
         }
 
         if (/^args\./.test(variable)) {
           variable = variable.replace(/^args\./, '');
 
-          if (!_this5.$$.args[variable]) {
+          if (!_this6.$$.args[variable]) {
             return;
           }
 
-          _this5.$$.args[variable].watchers.perm.push(watcher);
+          _this6.$$.args[variable].watchers.perm.push(watcher);
 
           return;
         }
@@ -15624,15 +15699,15 @@ var Block = function () {
         if (/^globals\./.test(variable)) {
           variable = variable.replace(/^globals\./, '');
 
-          if (!_this5.$$.globals[variable]) {
+          if (!_this6.$$.globals[variable]) {
             return;
           }
 
-          var watchers = _this5.$$.globals[variable].watchers;
+          var watchers = _this6.$$.globals[variable].watchers;
 
 
           watchers.perm.push(watcher);
-          _this5.$$.watchersToRemove.push({
+          _this6.$$.watchersToRemove.push({
             watcher: watcher,
             watchers: watchers
           });
@@ -15640,11 +15715,11 @@ var Block = function () {
           return;
         }
 
-        if (!_this5.$$.locals[variable]) {
+        if (!_this6.$$.locals[variable]) {
           return;
         }
 
-        _this5.$$.locals[variable].watchers.perm.push(watcher);
+        _this6.$$.locals[variable].watchers.perm.push(watcher);
       });
 
       oldWatcher();
@@ -15668,7 +15743,7 @@ var blocks = Block._blocks;
 
 var Mixin = function () {
   function Mixin(opts) {
-    var _this6 = this;
+    var _this7 = this;
 
     classCallCheck(this, Mixin);
     var name = opts.name;
@@ -15694,7 +15769,7 @@ var Mixin = function () {
         watchers: watchers,
         watchersToRemove: watchersToRemove,
         evaluate: function evaluate(watcher) {
-          var _$$ = _this6.$$;
+          var _$$ = _this7.$$;
           var isDynamic = _$$.isDynamic;
           var value = _$$.value;
           var _value = _$$._value;
@@ -15711,13 +15786,13 @@ var Mixin = function () {
           removeWatchers(watchersToRemove);
 
           try {
-            _this6.beforeRemove();
+            _this7.beforeRemove();
           } catch (err) {
             console.error('Uncaught error in ' + name + '#beforeRemove:', err);
           }
 
           if (!isParentSignal && parentBlock) {
-            var index = parentBlock.$$.mixins.indexOf(_this6);
+            var index = parentBlock.$$.mixins.indexOf(_this7);
 
             if (index !== -1) {
               parentBlock.$$.mixins.splice(index, 1);
@@ -15791,6 +15866,10 @@ function initApp(block, node) {
 
   parentElem.html('');
 
+  if (!parentElem.length) {
+    throw new Error('No valid element to insert the app into was given! (initApp)');
+  }
+
   parentElem.$[0].DwayneRootBlock = createBlock({
     node: {
       name: block,
@@ -15801,6 +15880,24 @@ function initApp(block, node) {
     parentElem: parentElem
   });
   parentElem.attr('dwayne-root', block);
+}
+
+function removeApp(node) {
+  var elem = new Elem(node);
+
+  elem.html('');
+
+  if (!elem.length) {
+    throw new Error('No valid element to remove the app from was given! (removeApp)');
+  }
+
+  node = elem.$[0];
+
+  if (!node.DwayneRootBlock) {
+    throw new Error('No app registered inside the given element! (removeApp)');
+  }
+
+  delete node.DwayneRootBlock.$$.remove();
 }
 
 function registerBuiltIns(set$$1, scope, proto) {
@@ -15859,7 +15956,7 @@ function createBlock(_ref3) {
   }
 
   if (!constructor) {
-    var _ret3 = function () {
+    var _ret4 = function () {
       var _node = node;
       var value = _node.value;
       var children = _node.children;
@@ -15993,7 +16090,7 @@ function createBlock(_ref3) {
       };
     }();
 
-    if ((typeof _ret3 === 'undefined' ? 'undefined' : _typeof(_ret3)) === "object") return _ret3.v;
+    if ((typeof _ret4 === 'undefined' ? 'undefined' : _typeof(_ret4)) === "object") return _ret4.v;
   }
 
   var blockInstance = new constructor({
@@ -16305,12 +16402,8 @@ function transformJSExpressions(children, variables) {
   }, new Arr([]));
 }
 
-function isInstanceOfBlock(block) {
-  return isPrototypeOf.call(Block, block) && isPrototypeOf.call(Block.prototype, block.prototype);
-}
-
-function isInstanceOfMixin(mixin) {
-  return isPrototypeOf.call(Mixin, mixin) && isPrototypeOf.call(Mixin.prototype, mixin.prototype);
+function isInstanceOf(Class, Subclass) {
+  return isPrototypeOf.call(Class, Subclass) && isPrototypeOf.call(Class.prototype, Subclass.prototype);
 }
 
 function removeWatchers(watchersToRemove) {
@@ -19259,6 +19352,7 @@ var statics = Object.freeze({
 	Block: Block,
 	Mixin: Mixin,
 	initApp: initApp,
+	removeApp: removeApp,
 	Dat: Dat,
 	now: now,
 	date: date,
@@ -19333,6 +19427,7 @@ exports.blob = blob$1;
 exports.Block = Block;
 exports.Mixin = Mixin;
 exports.initApp = initApp;
+exports.removeApp = removeApp;
 exports.Dat = Dat;
 exports.now = now;
 exports.date = date;
