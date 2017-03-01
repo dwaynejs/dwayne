@@ -15965,6 +15965,27 @@ function createBlock(_ref3) {
     dBlockName = dBlockMatch ? dBlockMatch[1] : null;
   }
 
+  var blockInstance = void 0;
+
+  if (constructor) {
+    try {
+      blockInstance = new constructor({
+        name: name,
+        args: args,
+        dBlockName: dBlockName,
+        children: children,
+        parent: parent,
+        parentElem: parentElem,
+        parentBlock: parentBlock,
+        parentScope: parentScope,
+        prevBlock: prevBlock
+      });
+    } catch (err) {
+      console.error('Uncaught error in new ' + name + ':', err);
+      constructor = null;
+    }
+  }
+
   if (!constructor) {
     var _ret4 = function () {
       var _node = node;
@@ -16103,22 +16124,11 @@ function createBlock(_ref3) {
     if ((typeof _ret4 === 'undefined' ? 'undefined' : _typeof(_ret4)) === "object") return _ret4.v;
   }
 
-  var blockInstance = new constructor({
-    name: name,
-    args: args,
-    dBlockName: dBlockName,
-    children: children,
-    parent: parent,
-    parentElem: parentElem,
-    parentBlock: parentBlock,
-    parentScope: parentScope,
-    prevBlock: prevBlock
-  });
-
-  var $$ = blockInstance.$$;
-  var Args = blockInstance.args;
-  var globals = blockInstance.globals;
-  var locals = objectWithoutProperties(blockInstance, ['$$', 'args', 'globals']);
+  var _blockInstance = blockInstance;
+  var $$ = _blockInstance.$$;
+  var Args = _blockInstance.args;
+  var globals = _blockInstance.globals;
+  var locals = objectWithoutProperties(_blockInstance, ['$$', 'args', 'globals']);
 
 
   if (dBlockMatch || name === 'd-block') {

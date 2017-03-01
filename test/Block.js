@@ -34,8 +34,8 @@ class App extends Block {
 
     app = this;
 
-    this.global.forChangingGlobalsTest = null;
-    this.global.forChangingMultipleVariablesTest = 'Hello';
+    this.globals.forChangingGlobalsTest = null;
+    this.globals.forChangingMultipleVariablesTest = 'Hello';
   }
 
   afterRender() {
@@ -73,12 +73,12 @@ class ChangingArgsVariablesTest extends Block {
   static template = '<div id="changing-args-variables-test">{args.caption}</div>';
 }
 class ChangingGlobalsTest extends Block {
-  static template = '<div id="changing-globals-test">{global.forChangingGlobalsTest}</div>';
+  static template = '<div id="changing-globals-test">{globals.forChangingGlobalsTest}</div>';
 }
 class ChangingMultipleVariablesTest extends Block {
   static template = `
     <div id="changing-multiple-variables-test">
-      {global.forChangingMultipleVariablesTest + args.caption + caption}
+      {globals.forChangingMultipleVariablesTest + args.caption + caption}
     </div>
   `;
 
@@ -964,7 +964,7 @@ describe('it should test Block', () => {
         strictEqual(children.elem(0).text(), '');
       });
       it('should re-render caption after the global has been changed', (done) => {
-        const caption = app.global.forChangingGlobalsTest = 'Hello, world!';
+        const caption = app.globals.forChangingGlobalsTest = 'Hello, world!';
 
         setTimeout(() => {
           const children = appElem.children().exceptComments();
@@ -979,7 +979,7 @@ describe('it should test Block', () => {
         }, 0);
       });
       it('should re-render caption again after the global been changed', (done) => {
-        const caption = app.global.forChangingGlobalsTest = 'Hello, world, again!';
+        const caption = app.globals.forChangingGlobalsTest = 'Hello, world, again!';
 
         setTimeout(() => {
           const children = appElem.children().exceptComments();
@@ -1009,7 +1009,7 @@ describe('it should test Block', () => {
         strictEqual(children.elem(0).text(), 'Hello, world!');
       });
       it('should re-render caption after one variable has been changed', (done) => {
-        app.global.forChangingMultipleVariablesTest = 'Goodbye';
+        app.globals.forChangingMultipleVariablesTest = 'Goodbye';
 
         setTimeout(() => {
           const children = appElem.children().exceptComments();
@@ -1024,7 +1024,7 @@ describe('it should test Block', () => {
         }, 0);
       });
       it('should re-render caption after all variables have been changed', (done) => {
-        app.global.forChangingMultipleVariablesTest = 'To be';
+        app.globals.forChangingMultipleVariablesTest = 'To be';
         app.argForChangingMultipleVariablesTest = ' or ';
         currentBlock.caption = 'not to be?';
 
