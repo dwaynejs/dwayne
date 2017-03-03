@@ -14496,7 +14496,11 @@ function parseJS(string, wholeString, curlyError) {
               variables[_variable2] = true;
             }
 
-            toConcat = _variable2 + ':' + getVariable(_variable2, expected.functionScope) + match[2];
+            if (keywordsRegExp.test(_variable2)) {
+              match[1] = '"' + _variable2 + '"';
+            }
+
+            toConcat = match[1] + ':' + getVariable(_variable2, expected.functionScope) + match[2];
 
             if (!match[2]) {
               expected.operator = true;
@@ -14690,7 +14694,11 @@ function parseJS(string, wholeString, curlyError) {
 }
 
 function getVariable(name, functionScope) {
-  return functionScope[name] ? name : '$.' + name;
+  if (functionScope[name]) {
+    return name;
+  }
+
+  return keywordsRegExp.test(name) ? '$["' + name + '"]' : '$.' + name;
 }
 
 function closeFunctionBody(expected) {
@@ -15545,6 +15553,19 @@ var Block = function () {
     value: function beforeRemove() {}
 
     /**
+     * @method Block#changeLocals
+     * @public
+     * @param {Object} locals - Object to assign to this.
+     * @description Method for simple assigning some locals to this.
+     */
+
+  }, {
+    key: 'changeLocals',
+    value: function changeLocals(locals) {
+      assign$1(this, locals);
+    }
+
+    /**
      * @method Block#evaluateAndWatch
      * @public
      * @param {String} expression - Expression to evaluate.
@@ -15594,16 +15615,16 @@ var Block = function () {
     }
 
     /**
-     * @method Block#setLocals
+     * @method Block#setGlobals
      * @public
-     * @param {Object} locals - Object to assign to this.
-     * @description Method for simple assigning some values to this.
+     * @param {Object} globals - Object which keys are global vars and values are their values.
+     * @description Method for setting global variables (use only in constructor!).
      */
 
   }, {
-    key: 'setLocals',
-    value: function setLocals(locals) {
-      assign$1(this, locals);
+    key: 'setGlobals',
+    value: function setGlobals(globals) {
+      defineUsualProperties(this.globals, globals);
     }
 
     /**
@@ -15662,14 +15683,10 @@ var Block = function () {
       };
 
       if (arguments.length === 1) {
-        watchForAllGlobals(this, watcher);
+        watchForAllLocals(this, watcher);
         watchForAllArgs(this, watcher);
+        watchForAllGlobals(this, watcher);
 
-        iterate(this.$$.locals, function (_ref2) {
-          var watchers = _ref2.watchers;
-
-          watchers.perm.push(watcher);
-        });
         oldWatcher();
 
         return;
@@ -15681,6 +15698,10 @@ var Block = function () {
         }
 
         variable = '' + variable;
+
+        if (variable === '$') {
+          return watchForAllLocals(_this6, watcher);
+        }
 
         if (variable === 'args') {
           return watchForAllArgs(_this6, watcher);
@@ -15928,13 +15949,13 @@ function registerBuiltIns(set$$1, scope, proto) {
   });
 }
 
-function createBlock(_ref3) {
-  var node = _ref3.node;
-  var parent = _ref3.parent;
-  var parentElem = _ref3.parentElem;
-  var parentBlock = _ref3.parentBlock;
-  var parentScope = _ref3.parentScope;
-  var prevBlock = _ref3.prevBlock;
+function createBlock(_ref2) {
+  var node = _ref2.node;
+  var parent = _ref2.parent;
+  var parentElem = _ref2.parentElem;
+  var parentBlock = _ref2.parentBlock;
+  var parentScope = _ref2.parentScope;
+  var prevBlock = _ref2.prevBlock;
 
   var elem = parentElem.prop('namespaceURI') === svgNS ? doc.svg() : new Elem(doc.template().$[0].content);
   var localBlocks = parentScope ? parentScope.$$.ns._blocks : blocks;
@@ -16217,16 +16238,16 @@ function createBlock(_ref3) {
   return blockInstance;
 }
 
-function createMixin(_ref4) {
-  var name = _ref4.name;
-  var Mixin = _ref4.Mixin;
-  var dynamic = _ref4.dynamic;
-  var value = _ref4.value;
-  var args = _ref4.args;
-  var comment = _ref4.comment;
-  var elem = _ref4.elem;
-  var parentBlock = _ref4.parentBlock;
-  var parentScope = _ref4.parentScope;
+function createMixin(_ref3) {
+  var name = _ref3.name;
+  var Mixin = _ref3.Mixin;
+  var dynamic = _ref3.dynamic;
+  var value = _ref3.value;
+  var args = _ref3.args;
+  var comment = _ref3.comment;
+  var elem = _ref3.elem;
+  var parentBlock = _ref3.parentBlock;
+  var parentScope = _ref3.parentScope;
 
   var mixin = new Mixin({
     name: name,
@@ -16424,9 +16445,9 @@ function isInstanceOf(Class, Subclass) {
 }
 
 function removeWatchers(watchersToRemove) {
-  watchersToRemove.forEach(function (_ref5) {
-    var watcher = _ref5.watcher;
-    var watchers = _ref5.watchers;
+  watchersToRemove.forEach(function (_ref4) {
+    var watcher = _ref4.watcher;
+    var watchers = _ref4.watchers;
 
     var index = watchers.indexOf(watcher);
 
@@ -16545,6 +16566,14 @@ function constructPublicScope(scope, scopeValues, privateScope) {
       }
     };
   }).$);
+}
+
+function watchForAllLocals(block, watcher) {
+  iterate(block.$$.locals, function (_ref5) {
+    var watchers = _ref5.watchers;
+
+    watchers.perm.push(watcher);
+  });
 }
 
 function watchForAllGlobals(block, watcher) {
