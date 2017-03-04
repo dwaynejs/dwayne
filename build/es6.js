@@ -12982,59 +12982,58 @@ function registerDBlock(Block) {
     createClass(DBlock, [{
       key: 'afterConstruct',
       value: function afterConstruct() {
-        var _this2 = this;
+        var _$$ = this.$$;
+        var _$$$parentScope$$$ = _$$.parentScope.$$;
+        var parentParentScope = _$$$parentScope$$$.parentScope;
+        var parentParentTemplate = _$$$parentScope$$$.parentTemplate;
+        var children = _$$$parentScope$$$.argsChildren;
+        var parentTemplate = _$$.parentTemplate;
+        var dBlockName = _$$.dBlockName;
+        var ownChildren = this.$$.argsChildren;
 
-        this.watch('args.children', function () {
-          var _$$ = _this2.$$;
-          var parentScope = _$$.parentScope;
-          var children = _$$.parentScope.children;
-          var dBlockName = _$$.dBlockName;
-          var _args = _this2.args;
-          var argsParentScope = _args.parentScope;
-          var argsChildren = _args.children;
-          var ownChildren = _this2.children;
+        var found = void 0;
 
-          var eventualChildren = argsChildren || children;
-          var found = void 0;
+        if (ownChildren.length) {
+          return;
+        }
 
-          if (ownChildren.length) {
-            return;
-          }
+        this.ParentScope = parentParentScope;
+        this.ParentTemplate = parentParentTemplate;
 
-          _this2.ParentScope = argsParentScope || parentScope.$$.parentScope;
+        if (dBlockName) {
+          found = children.find(function (_ref) {
+            var nodeName = _ref.name;
+            return nodeName === 'd-block:' + dBlockName;
+          });
 
-          if (dBlockName) {
-            found = children.find(function (_ref) {
-              var nodeName = _ref.name;
-              return nodeName === 'd-block:' + dBlockName;
-            });
+          if (!found) {
+            var parent = this;
 
-            if (!found) {
-              var parent = _this2;
+            /* eslint no-empty: 0 */
+            while ((parent = parent.$$.parentScope) && !(found = parent.$$.dBlocks.find(function (_ref2) {
+              var DBlockName = _ref2.$$.dBlockName;
+              return DBlockName === dBlockName;
+            })) && parent.$$.parentScope.$$.name === '#d-item') {}
 
-              while (!found && (parent = parent.$$.parentScope) && (!parent.$$.parentScope || parent.$$.parentScope.$$.name !== '#d-item')) {
-                found = parent.$$.dBlocks.find(function (_ref2) {
-                  var DBlockName = _ref2.$$.dBlockName;
-                  return DBlockName === dBlockName;
-                });
-              }
-
-              if (found) {
-                _this2.ParentScope = parent;
-              }
+            if (found) {
+              this.ParentScope = parent;
+              this.ParentTemplate = parentTemplate;
+              found.value = {
+                children: found.value.$$.argsChildren
+              };
             }
-
-            _this2.elems = found && found.value.children.length ? found.value.children : null;
-          } else {
-            _this2.elems = eventualChildren;
           }
-        });
+
+          this.elems = found && found.value.children.length ? found.value.children : null;
+        } else {
+          this.elems = children;
+        }
       }
     }]);
     return DBlock;
   }(Block);
 
-  DBlock.template = '<d-elements value="{elems}" parentScope="{ParentScope}" />';
+  DBlock.template = '' + '<d-elements' + '  value="{elems}"' + '  parentScope="{ParentScope}"' + '  parentTemplate="{ParentTemplate}"' + '/>';
 
 
   return {
@@ -13076,14 +13075,15 @@ function registerDEach(Block, createBlock) {
 
         this.watch('args.set', 'args.sortBy', 'args.filterBy', function () {
           var _$$ = _this2.$$;
+          var argsChildren = _$$.argsChildren;
           var uids = _$$.uids;
           var parentScope = _$$.parentScope;
           var parentElem = _$$.parentElem;
+          var parentTemplate = _$$.parentTemplate;
           var scope = _$$.scope;
           var itemName = _$$.itemName;
           var indexName = _$$.indexName;
           var UID = _$$.UID;
-          var children = _this2.children;
           var sortBy = _this2.args.sortBy;
 
           var $uids = uids.$;
@@ -13162,12 +13162,13 @@ function registerDEach(Block, createBlock) {
                   item: item,
                   index: index,
                   name: '#d-item',
-                  children: children
+                  children: argsChildren
                 },
                 parent: _this2,
                 parentElem: parentElem,
                 parentBlock: _this2,
                 parentScope: parentScope,
+                parentTemplate: parentTemplate,
                 prevBlock: prevBlock
               });
             }
@@ -13206,7 +13207,9 @@ function registerDElements(Block, createBlock) {
         var _this2 = this;
 
         var parentElem = this.$$.parentElem;
-        var parentScope = this.args.parentScope;
+        var _args = this.args;
+        var parentScope = _args.parentScope;
+        var parentTemplate = _args.parentTemplate;
 
         var firstTime = true;
 
@@ -13266,6 +13269,7 @@ function registerDElements(Block, createBlock) {
               parentElem: parentElem,
               parentBlock: _this2,
               parentScope: parentScope,
+              parentTemplate: parentTemplate,
               prevBlock: prevBlock
             });
           });
@@ -13293,7 +13297,7 @@ function registerDIf(Block) {
       var parentScope = _this.$$.parentScope;
 
       var index = Infinity;
-      var values = _this.children.map(function (child, i) {
+      var values = _this.$$.argsChildren.map(function (child, i) {
         var name = child.name;
         var attrs = child.attrs;
         var children = child.children;
@@ -13323,7 +13327,7 @@ function registerDIf(Block) {
 
             if (found) {
               index = found.key;
-              _this.elems = _this.children.$[found.key].children;
+              _this.elems = _this.$$.argsChildren.$[found.key].children;
             } else {
               index = Infinity;
               _this.elems = null;
@@ -13346,7 +13350,7 @@ function registerDIf(Block) {
     return DIf;
   }(Block);
 
-  DIf.template = '<d-elements value="{elems}" parentScope="{$$.parentScope}" />';
+  DIf.template = '' + '<d-elements' + '  value="{elems}"' + '  parentScope="{$$.parentScope}"' + '  parentTemplate="{$$.parentTemplate}"' + '/>';
 
 
   return {
@@ -13367,7 +13371,7 @@ function registerDItem(Block) {
     return DItem;
   }(Block);
 
-  DItem.template = '<d-elements value="{children}" parentScope="{this}" />';
+  DItem.template = '' + '<d-elements' + '  value="{$$.argsChildren}"' + '  parentScope="{this}"' + '  parentTemplate="{$$.parentTemplate}"' + '/>';
 
 
   return {
@@ -13392,7 +13396,7 @@ function registerDSwitch(Block) {
 
       var wasDefault = void 0;
 
-      _this.values = _this.children.object(function (values, child, i) {
+      _this.values = _this.$$.argsChildren.object(function (values, child, i) {
         var name = child.name;
         var attrs = child.attrs;
         var children = child.children;
@@ -13508,7 +13512,7 @@ function registerDSwitch(Block) {
     return DSwitch;
   }(Block);
 
-  DSwitch.template = '<d-elements value="{elems}" parentScope="{$$.parentScope}" />';
+  DSwitch.template = '' + '<d-elements' + '  value="{elems}"' + '  parentScope="{$$.parentScope}"' + '  parentTemplate="{$$.parentTemplate}"' + '/>';
 
 
   return {
@@ -14805,13 +14809,13 @@ var changed = void 0;
  * @description Class for dynamic templating.
  *
  * @example
- * import { D, Block, initApp, registerBlock } from 'dwayne';
+ * import { D, Block, initApp } from 'dwayne';
  *
  * class App extends Block {
  *   static template = '<Hello text="{text}"/>';
  *
- *   constructor(args, children) {
- *     super(args, children);
+ *   constructor(opts) {
+ *     super(opts);
  *
  *     this.text = 'world (0)';
  *     this.times = 0;
@@ -14826,12 +14830,8 @@ var changed = void 0;
  *   }
  * }
  *
- * class Hello extends Block {
- *   static template = 'Hello, {args.text}!';
- * }
- *
- * Block.register('App', App);
- * Block.register('Hello', 'Hello, {args.text}!');
+ * Block.block('App', App);
+ * Block.block('Hello', 'Hello, {args.text}!');
  *
  * initApp('App', document.getElementById('root'));
  */
@@ -15133,7 +15133,9 @@ var Block = function () {
       }
 
       return new Arr(arguments).reduce(function (block, wrapper) {
-        return wrapper(block);
+        var returnValue = wrapper(block);
+
+        return isInstanceOf(Block, returnValue) ? returnValue : block;
       }, this);
     }
   }]);
@@ -15150,6 +15152,7 @@ var Block = function () {
     var parentElem = opts.parentElem;
     var parentBlock = opts.parentBlock;
     var parentScope = opts.parentScope;
+    var parentTemplate = opts.parentTemplate;
     var prevBlock = opts.prevBlock;
 
     var watchersToRemove = new Arr([]);
@@ -15172,6 +15175,7 @@ var Block = function () {
        * @type {Object}
        * @protected
        * @property {Object} args - Private args scope.
+       * @property {Arr} argsChildren - Block args children.
        * @property {Arr} children - Child blocks.
        * @property {Arr} mixins - Child mixins.
        * @property {Elem} parentElem - Parent element.
@@ -15189,8 +15193,10 @@ var Block = function () {
         parentElem: parentElem,
         parentScope: parentScope,
         parentBlock: parentBlock,
+        parentTemplate: parentTemplate,
         content: new Elem(),
         ns: constructor,
+        argsChildren: children || new Arr([]),
         children: childrenBlocks,
         mixins: mixins,
         prevBlock: prevBlock,
@@ -15496,13 +15502,6 @@ var Block = function () {
       args: argsObject,
 
       /**
-       * @member {Object} Block#children
-       * @type {Object}
-       * @public
-       */
-      children: children || new Arr([]),
-
-      /**
        * @member {Object} Block#globals
        * @type {Object}
        * @public
@@ -15514,7 +15513,14 @@ var Block = function () {
        * @type {Block|undefined}
        * @public
        */
-      parentScope: parentScope
+      parentScope: parentScope,
+
+      /**
+       * @member {Block|undefined} Block#parentTemplate
+       * @type {Block|undefined}
+       * @public
+       */
+      parentTemplate: parentTemplate
     });
 
     calculateArgs(args, argsObject, $argsObject);
@@ -15959,6 +15965,7 @@ function createBlock(_ref2) {
   var parentElem = _ref2.parentElem;
   var parentBlock = _ref2.parentBlock;
   var parentScope = _ref2.parentScope;
+  var parentTemplate = _ref2.parentTemplate;
   var prevBlock = _ref2.prevBlock;
 
   var elem = parentElem.prop('namespaceURI') === svgNS ? doc.svg() : new Elem(doc.template().$[0].content);
@@ -16000,6 +16007,7 @@ function createBlock(_ref2) {
         parentElem: parentElem,
         parentBlock: parentBlock,
         parentScope: parentScope,
+        parentTemplate: parentTemplate,
         prevBlock: prevBlock
       });
     } catch (err) {
@@ -16114,6 +16122,7 @@ function createBlock(_ref2) {
               parentElem: parentElem,
               parentBlock: parentBlock,
               parentScope: parentScope,
+              parentTemplate: parentTemplate,
               prevBlock: prevBlock
             });
           });
@@ -16179,7 +16188,6 @@ function createBlock(_ref2) {
   var html$$1 = name === 'd-elements' ? new Arr(Args.value || []) : constructor._html;
 
   delete locals.$;
-  delete locals.children;
   delete locals.parentScope;
 
   $$.args = constructPrivateScope(Args);
@@ -16221,6 +16229,7 @@ function createBlock(_ref2) {
 
   prevBlock = undefined;
   parentScope = name === 'd-elements' ? Args.parentScope : blockInstance;
+  parentTemplate = name === 'd-elements' ? Args.parentTemplate : blockInstance;
 
   html$$1.forEach(function (child) {
     prevBlock = createBlock({
@@ -16229,6 +16238,7 @@ function createBlock(_ref2) {
       parentElem: parentElem,
       parentBlock: blockInstance,
       parentScope: parentScope,
+      parentTemplate: parentTemplate,
       prevBlock: prevBlock
     });
   });
