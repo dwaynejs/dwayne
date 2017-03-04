@@ -13094,6 +13094,10 @@ function registerDEach(Block, createBlock) {
           var filterBy = _args.filterBy;
 
 
+          if (isNumber(set$$1)) {
+            set$$1 = array(set$$1).$;
+          }
+
           if (isArray(set$$1) && isFunction(sortBy)) {
             set$$1 = new Arr(set$$1).slice().sort(sortBy).$;
           }
