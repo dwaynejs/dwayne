@@ -13727,7 +13727,7 @@ function registerDClass(Mixin) {
   };
 }
 
-function registerDElem(Mixin) {
+function registerDElem(Mixin, createBlock, Block) {
   var DElem = function (_Mixin) {
     inherits(DElem, _Mixin);
 
@@ -13737,15 +13737,21 @@ function registerDElem(Mixin) {
       var _this = possibleConstructorReturn(this, (DElem.__proto__ || Object.getPrototypeOf(DElem)).call(this, opts));
 
       var args = _this.args;
-      var parentScope = _this.parentScope;
+      var parentTemplate = _this.parentTemplate;
       var elem = _this.elem;
 
-      var value = args ? args[0] : _this.evaluateOnce();
+      var scope = parentTemplate;
+      var value = _this.evaluateOnce();
+
+      if (args) {
+        scope = value instanceof Block ? value : parentTemplate;
+        value = args[0];
+      }
 
       if (isFunction(value)) {
         value(elem);
       } else if (isString(value)) {
-        parentScope[value] = elem;
+        scope[value] = elem;
       }
       return _this;
     }
@@ -13798,7 +13804,7 @@ function registerDHide(Mixin) {
   };
 }
 
-function registerDNode(Mixin) {
+function registerDNode(Mixin, createBlock, Block) {
   var DNode = function (_Mixin) {
     inherits(DNode, _Mixin);
 
@@ -13808,15 +13814,21 @@ function registerDNode(Mixin) {
       var _this = possibleConstructorReturn(this, (DNode.__proto__ || Object.getPrototypeOf(DNode)).call(this, opts));
 
       var args = _this.args;
-      var parentScope = _this.parentScope;
+      var parentTemplate = _this.parentTemplate;
       var node = _this.node;
 
-      var value = args ? args[0] : _this.evaluateOnce();
+      var scope = parentTemplate;
+      var value = _this.evaluateOnce();
+
+      if (args) {
+        scope = value instanceof Block ? value : parentTemplate;
+        value = args[0];
+      }
 
       if (isFunction(value)) {
         value(node);
       } else if (isString(value)) {
-        parentScope[value] = node;
+        scope[value] = node;
       }
       return _this;
     }
@@ -14129,7 +14141,7 @@ function registerDValue(Mixin, createBlock, Block) {
       var _this = possibleConstructorReturn(this, (DValue.__proto__ || Object.getPrototypeOf(DValue)).call(this, opts));
 
       var args = _this.args;
-      var parentScope = _this.parentScope;
+      var parentTemplate = _this.parentTemplate;
       var elem = _this.elem;
       var node = _this.node;
 
@@ -14143,11 +14155,11 @@ function registerDValue(Mixin, createBlock, Block) {
       _this.type = type;
       _this.value = value;
       _this.options = elem.find('option');
-      _this.scope = parentScope;
+      _this.scope = parentTemplate;
 
       if (args) {
         _this.name = args[0];
-        _this.scope = value instanceof Block ? value : parentScope;
+        _this.scope = value instanceof Block ? value : parentTemplate;
       }
 
       if (!isFunction(value)) {
@@ -15796,6 +15808,7 @@ var Mixin = function () {
     var comment = opts.comment;
     var parentBlock = opts.parentBlock;
     var parentScope = opts.parentScope;
+    var parentTemplate = opts.parentTemplate;
 
     var watchersToRemove = new Arr([]);
     var watchers = new Arr([]);
@@ -15808,6 +15821,7 @@ var Mixin = function () {
         isDynamic: dynamic,
         parentScope: parentScope,
         parentBlock: parentBlock,
+        parentTemplate: parentTemplate,
         watchers: watchers,
         watchersToRemove: watchersToRemove,
         evaluate: function evaluate(watcher) {
@@ -15847,6 +15861,7 @@ var Mixin = function () {
     this.args = args;
     this.comment = comment;
     this.parentScope = parentScope;
+    this.parentTemplate = parentTemplate;
     this.elem = elem;
     this.node = elem.$[0];
 
@@ -16034,7 +16049,8 @@ function createBlock(_ref2) {
       var mixinDefaultOpts = {
         elem: element,
         parentBlock: parentBlock,
-        parentScope: parentScope
+        parentScope: parentScope,
+        parentTemplate: parentTemplate
       };
 
       new Super(args).forEach(function (value, attr) {
@@ -16266,6 +16282,7 @@ function createMixin(_ref3) {
   var elem = _ref3.elem;
   var parentBlock = _ref3.parentBlock;
   var parentScope = _ref3.parentScope;
+  var parentTemplate = _ref3.parentTemplate;
 
   var mixin = new Mixin({
     name: name,
@@ -16275,7 +16292,8 @@ function createMixin(_ref3) {
     comment: comment,
     elem: elem,
     parentBlock: parentBlock,
-    parentScope: parentScope
+    parentScope: parentScope,
+    parentTemplate: parentTemplate
   });
 
   if (Mixin.evaluate) {
