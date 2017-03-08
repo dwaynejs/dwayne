@@ -14804,6 +14804,26 @@ function constructErrorInfo(expressionString, wholeString, closingExpressions, c
  * @param {*} mixin - Mixin instance.
  */
 
+/**
+ * @callback BlockRegisterHook
+ * @public
+ * @param {Block} Block - Registering block.
+ * @param {String} name - Block name.
+ * @returns Return value is used for registering the block.
+ * If Block subclass returned it's registered instead of the initial block, otherwise
+ * the initial block is used.
+ */
+
+/**
+ * @callback MixinRegisterHook
+ * @public
+ * @param {Block} Mixin - Registering mixin.
+ * @param {String} name - Mixin name.
+ * @returns Return value is used for registering the mixin.
+ * If Mixin subclass returned it's registered instead of the initial mixin, otherwise
+ * the initial mixin is used.
+ */
+
 var rootBlocks = Object.create(null);
 var rootMixins = Object.create(null);
 var isPrototypeOf = {}.isPrototypeOf;
@@ -14912,30 +14932,34 @@ var Block = function () {
     /**
      * @method Block.beforeRegisterBlock
      * @public
-     * @param {Block} Block - Block which is registering.
-     * @param {String} name - Name of the Block.
-     * @returns {Block|void} Return value is used for registering the block.
-     * If Block subclass returned it's registered instead of the initial block, otherwise
-     * the initial block is used.
+     * @param {BlockRegisterHook} hook - Block register hook.
      */
 
   }, {
     key: 'beforeRegisterBlock',
-    value: function beforeRegisterBlock(Block, name) {}
+    value: function beforeRegisterBlock(hook) {
+      if (!new Super(this).hasOwn('_blockHooks')) {
+        this._blockHooks = new Arr([]);
+      }
+
+      this._blockHooks.push(hook);
+    }
 
     /**
      * @method Block.beforeRegisterMixin
      * @public
-     * @param {Mixin} Mixin - Mixin which is registering.
-     * @param {String} name - Name of the Mixin.
-     * @returns {Mixin|void} Return value is used for registering the mixin.
-     * If Mixin subclass returned it's registered instead of the initial mixin, otherwise
-     * the initial mixin is used.
+     * @param {MixinRegisterHook} hook - Mixin register hook.
      */
 
   }, {
     key: 'beforeRegisterMixin',
-    value: function beforeRegisterMixin(Mixin, name) {}
+    value: function beforeRegisterMixin(hook) {
+      if (!new Super(this).hasOwn('_mixinHooks')) {
+        this._mixinHooks = new Arr([]);
+      }
+
+      this._mixinHooks.push(hook);
+    }
 
     /**
      * @method Block.block
@@ -15016,9 +15040,13 @@ var Block = function () {
       var returnValue = void 0;
 
       try {
-        returnValue = this.beforeRegisterBlock(_Subclass, name);
+        returnValue = (this._blockHooks || new Arr([])).reduce(function (Subclass, hook) {
+          var returnValue = hook(Subclass, name);
+
+          return isInstanceOf(Block, returnValue) ? returnValue : Subclass;
+        }, _Subclass);
       } catch (err) {
-        console.error('Uncaught error in ' + this._name + '.beforeRegisterBlock:', err);
+        console.error('Uncaught error in ' + this._name + ' "beforeRegisterBlock" hook:', err);
       }
 
       if (isInstanceOf(Block, returnValue)) {
@@ -15100,9 +15128,13 @@ var Block = function () {
       var returnValue = void 0;
 
       try {
-        returnValue = this.beforeRegisterMixin(Subclass, name);
+        returnValue = (this._mixinHooks || new Arr([])).reduce(function (Subclass, hook) {
+          var returnValue = hook(Subclass, name);
+
+          return isInstanceOf(Mixin, returnValue) ? returnValue : Subclass;
+        }, Subclass);
       } catch (err) {
-        console.error('Uncaught error in ' + this._name + '.beforeRegisterMixin:', err);
+        console.error('Uncaught error in ' + this._name + ' "beforeRegisterMixin" hook:', err);
       }
 
       if (isInstanceOf(Mixin, returnValue)) {
