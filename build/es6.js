@@ -1996,7 +1996,7 @@ var svgElements = [
  */
 'vkern'];
 
-var voidElements = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
+var voidElements = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr', 'path', 'circle', 'ellipse', 'line', 'rect', 'use', 'stop', 'polyline', 'polygon'];
 
 var htmlAllowedTagSymbols = '[a-z][a-z\\d\\-_.:!@#\\$%\\^&*()\\[\\]{}\\\\=\'"]*';
 var htmlAllowedAttrSymbols = '[^\\u0000-\\u0020\\s"\'>/=]+';
@@ -16143,19 +16143,23 @@ function createBlock(_ref2) {
       }
 
       if (name === '#text') {
-        var text = parentScope.$$.evaluate(value, function (value) {
-          if (isNil(value)) {
-            value = '';
+        if (isFunction(value)) {
+          var text = parentScope.$$.evaluate(value, function (value) {
+            if (isNil(value)) {
+              value = '';
+            }
+
+            element.text('' + value);
+          }, parentBlock);
+
+          if (isNil(text)) {
+            text = '';
           }
 
-          element.text('' + value);
-        }, parentBlock);
-
-        if (isNil(text)) {
-          text = '';
+          element.text('' + text);
+        } else {
+          element.html(value);
         }
-
-        element.text('' + text);
       }
 
       if (children) {
@@ -16925,6 +16929,43 @@ function constructMixinRegExp(name) {
 function extendBlock(cls) {
   new Super(cls).proto(Block);
   new Super(cls.prototype).proto(Block.prototype);
+}
+
+function insertTemplates(template, templates) {
+  var vars = template.vars;
+  var value = template.value;
+
+  var newTemplates = Object.create(null);
+  var newVars = new Super(vars).object(function (vars, variable) {
+    vars[variable] = true;
+  });
+
+  assign$1(newTemplates, templates);
+  iterate(value, forEachNode);
+
+  function forEachNode(_ref8, index, tree) {
+    var type = _ref8.type;
+    var value = _ref8.value;
+    var children = _ref8.children;
+
+    if (type === '#comment') {
+      value = new Str(value).trim().$;
+
+      if (newTemplates[value]) {
+        tree[index] = newTemplates[value].value;
+        newVars.assign(new Super(newTemplates[value].vars).object(function (vars, variable) {
+          vars[variable] = true;
+        }).$);
+      }
+    } else {
+      iterate(children, forEachNode);
+    }
+  }
+
+  vars.length = 0;
+  new Arr(vars).pushArray(newVars.keys().$);
+
+  return template;
 }
 
 /**
@@ -19463,6 +19504,7 @@ var statics = Object.freeze({
 	Mixin: Mixin,
 	initApp: initApp,
 	removeApp: removeApp,
+	insertTemplates: insertTemplates,
 	Dat: Dat,
 	now: now,
 	date: date,
@@ -19503,4 +19545,4 @@ assign$1(D$$1, statics);
 
 delete D$$1.D;
 
-export { D$2 as D, isArray, isArrayLike, isBoolean, isDate, isDateLike, isElement, isFinite, isFunction, isInteger, isIntegerLike, isNaN, isNull, isNil, isNumber, isNumberLike, isObject, isPlainObject, isPrimitive, isRegExp, isString, isSymbol, isUndefined, Alphabet, alphabet, Arr, array, iterate$1 as iterate, BlobObject, blob$1 as blob, Block, Mixin, initApp, removeApp, Dat, now, date, Elem, win, doc, html, body, head$1 as head, _find as find, parseHTML, px, Fetch, fetch, Func, method, noop, prop$1 as prop, self$1 as self, Num, rand, random$1 as random, Promise$1 as Promise, makeRoute, router, Str, parseJSON$1 as parseJSON, Super, Switcher, switcher, when };export default D$$1;
+export { D$2 as D, isArray, isArrayLike, isBoolean, isDate, isDateLike, isElement, isFinite, isFunction, isInteger, isIntegerLike, isNaN, isNull, isNil, isNumber, isNumberLike, isObject, isPlainObject, isPrimitive, isRegExp, isString, isSymbol, isUndefined, Alphabet, alphabet, Arr, array, iterate$1 as iterate, BlobObject, blob$1 as blob, Block, Mixin, initApp, removeApp, insertTemplates, Dat, now, date, Elem, win, doc, html, body, head$1 as head, _find as find, parseHTML, px, Fetch, fetch, Func, method, noop, prop$1 as prop, self$1 as self, Num, rand, random$1 as random, Promise$1 as Promise, makeRoute, router, Str, parseJSON$1 as parseJSON, Super, Switcher, switcher, when };export default D$$1;
