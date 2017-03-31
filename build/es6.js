@@ -12987,9 +12987,9 @@ function registerDBlock(Block) {
         var parentParentScope = _$$$parentScope$$$.parentScope;
         var parentParentTemplate = _$$$parentScope$$$.parentTemplate;
         var children = _$$$parentScope$$$.argsChildren;
+        var ownChildren = _$$.argsChildren;
         var parentTemplate = _$$.parentTemplate;
         var dBlockName = _$$.dBlockName;
-        var ownChildren = this.$$.argsChildren;
 
         var found = void 0;
 
@@ -14822,7 +14822,10 @@ function constructErrorInfo(expressionString, wholeString, closingExpressions, c
 
 var rootBlocks = Object.create(null);
 var rootMixins = Object.create(null);
-var isPrototypeOf = {}.isPrototypeOf;
+var _ref = {};
+var isPrototypeOf = _ref.isPrototypeOf;
+var hasOwnProperty = _ref.hasOwnProperty;
+
 var tagName = new RegExp('^' + htmlAllowedTagSymbols + '$', 'i');
 var attrName = new RegExp('^' + htmlAllowedAttrSymbols + '$');
 var svgNS = 'http://www.w3.org/2000/svg';
@@ -15255,9 +15258,9 @@ var Block = function () {
 
           var scope = name === '#d-item' && !forDItem || forDEach ? (forDEach || _this5).$$.scope : _this5;
 
-          var _ref = instance ? instance.$$ : {};
+          var _ref2 = instance ? instance.$$ : {};
 
-          var watchersToRemove = _ref.watchersToRemove;
+          var watchersToRemove = _ref2.watchersToRemove;
 
           /* eslint no-new-func: 0 */
 
@@ -16006,14 +16009,14 @@ function registerBuiltIns(set$$1, scope, proto) {
   });
 }
 
-function createBlock(_ref2) {
-  var node = _ref2.node;
-  var parent = _ref2.parent;
-  var parentElem = _ref2.parentElem;
-  var parentBlock = _ref2.parentBlock;
-  var parentScope = _ref2.parentScope;
-  var parentTemplate = _ref2.parentTemplate;
-  var prevBlock = _ref2.prevBlock;
+function createBlock(_ref3) {
+  var node = _ref3.node;
+  var parent = _ref3.parent;
+  var parentElem = _ref3.parentElem;
+  var parentBlock = _ref3.parentBlock;
+  var parentScope = _ref3.parentScope;
+  var parentTemplate = _ref3.parentTemplate;
+  var prevBlock = _ref3.prevBlock;
 
   var elem = parentElem.prop('namespaceURI') === svgNS ? doc.svg() : new Elem(doc.template().$[0].content);
   var localBlocks = parentScope ? parentScope.$$.ns._blocks : blocks;
@@ -16036,6 +16039,15 @@ function createBlock(_ref2) {
     dBlockChildren = children;
     children = new Arr([]);
     args = {};
+  } else if (name === 'd-block' && hasOwnProperty.call(args, 'constructor')) {
+    name = 'UnknownBlock';
+    constructor = parentScope.$$.evaluate(args.constructor);
+
+    if (isFunction(constructor)) {
+      args = new Super(args).except('constructor').$;
+    } else {
+      constructor = null;
+    }
   } else if ((dBlockMatch = name.match(/^d-block:([\s\S]+)$/)) || name === 'd-block') {
     constructor = blocks['d-block'];
     dBlockName = dBlockMatch ? dBlockMatch[1] : null;
@@ -16304,17 +16316,17 @@ function createBlock(_ref2) {
   return blockInstance;
 }
 
-function createMixin(_ref3) {
-  var name = _ref3.name;
-  var Mixin = _ref3.Mixin;
-  var dynamic = _ref3.dynamic;
-  var value = _ref3.value;
-  var args = _ref3.args;
-  var comment = _ref3.comment;
-  var elem = _ref3.elem;
-  var parentBlock = _ref3.parentBlock;
-  var parentScope = _ref3.parentScope;
-  var parentTemplate = _ref3.parentTemplate;
+function createMixin(_ref4) {
+  var name = _ref4.name;
+  var Mixin = _ref4.Mixin;
+  var dynamic = _ref4.dynamic;
+  var value = _ref4.value;
+  var args = _ref4.args;
+  var comment = _ref4.comment;
+  var elem = _ref4.elem;
+  var parentBlock = _ref4.parentBlock;
+  var parentScope = _ref4.parentScope;
+  var parentTemplate = _ref4.parentTemplate;
 
   var mixin = new Mixin({
     name: name,
@@ -16513,9 +16525,9 @@ function isInstanceOf(Class, Subclass) {
 }
 
 function removeWatchers(watchersToRemove) {
-  watchersToRemove.forEach(function (_ref4) {
-    var watcher = _ref4.watcher;
-    var watchers = _ref4.watchers;
+  watchersToRemove.forEach(function (_ref5) {
+    var watcher = _ref5.watcher;
+    var watchers = _ref5.watchers;
 
     var index = watchers.indexOf(watcher);
 
@@ -16637,8 +16649,8 @@ function constructPublicScope(scope, scopeValues, privateScope) {
 }
 
 function watchForAllLocals(block, watcher) {
-  iterate(block.$$.locals, function (_ref5) {
-    var watchers = _ref5.watchers;
+  iterate(block.$$.locals, function (_ref6) {
+    var watchers = _ref6.watchers;
 
     watchers.perm.push(watcher);
   });
@@ -16663,8 +16675,8 @@ function watchForAllGlobals(block, watcher) {
 }
 
 function watchForAllArgs(block, watcher) {
-  iterate(block.$$.args, function (_ref6) {
-    var watchers = _ref6.watchers;
+  iterate(block.$$.args, function (_ref7) {
+    var watchers = _ref7.watchers;
 
     watchers.perm.push(watcher);
   });
@@ -16754,9 +16766,9 @@ function mixinMatch(mixins, attr) {
 }
 
 function calculateAttrs(attrs, attrsObject, elem, firstTime) {
-  iterate(attrsObject, function (_ref7, attr) {
-    var type = _ref7.type;
-    var value = _ref7.value;
+  iterate(attrsObject, function (_ref8, attr) {
+    var type = _ref8.type;
+    var value = _ref8.value;
 
     if (!attrs[attr]) {
       if (type === 'attr') {
@@ -16943,10 +16955,10 @@ function insertTemplates(template, templates) {
   assign$1(newTemplates, templates);
   iterate(value, forEachNode);
 
-  function forEachNode(_ref8, index, tree) {
-    var type = _ref8.type;
-    var value = _ref8.value;
-    var children = _ref8.children;
+  function forEachNode(_ref9, index, tree) {
+    var type = _ref9.type;
+    var value = _ref9.value;
+    var children = _ref9.children;
 
     if (type === '#comment') {
       value = new Str(value).trim().$;
