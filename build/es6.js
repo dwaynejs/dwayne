@@ -15827,6 +15827,31 @@ registerBuiltIns(Blocks, rootBlocks, Block);
 var blocks = Block._blocks;
 
 var Mixin = function () {
+  createClass(Mixin, null, [{
+    key: 'wrap',
+
+
+    /**
+     * @method Mixin.wrap
+     * @public
+     * @param {...Wrapper} wrappers - Functions that return wrapped mixin.
+     * @returns {Mixin} New mixin.
+     * @description Method for wrapping mixins.
+     * It is considered best practice to just extends the old mixin with a new one.
+     */
+    value: function wrap() {
+      for (var _len3 = arguments.length, wrappers = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+        wrappers[_key3] = arguments[_key3];
+      }
+
+      return new Arr(arguments).reduce(function (block, wrapper) {
+        var returnValue = wrapper(block);
+
+        return isInstanceOf(Mixin, returnValue) ? returnValue : block;
+      }, this);
+    }
+  }]);
+
   function Mixin(opts) {
     var _this7 = this;
 
