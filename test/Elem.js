@@ -1,96 +1,63 @@
 import { deepStrictEqual, strictEqual } from 'assert';
-import global from '../lib/constants/global';
-import { Elem, find, px, parseHTML } from '../lib/Elem';
-import { Super } from '../lib/Super';
-import { Num } from '../lib/Num';
-import { htmlElements } from '../lib/constants';
+import { Elem, find } from '../src/Elem';
 
-const nativeDocument = global.document;
-const nativeBody = nativeDocument.body;
-const nativeHead = nativeDocument.head;
+const { document } = global;
+const { body } = document;
 
 describe('it should test Elem#', () => {
   describe('add()', () => {
     it('should add elements from arguments', () => {
       const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
       ];
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
       const wrap = new Elem(elem);
+      const newWrap = wrap.add(elem1, elem2);
 
-      wrap.add(elem1, elem2);
-
-      strictEqual(wrap.length, 5);
-      strictEqual(wrap.$[3], elem1);
-      strictEqual(wrap.$[4], elem2);
+      strictEqual(newWrap.length, 5);
+      strictEqual(newWrap[3], elem1);
+      strictEqual(newWrap[4], elem2);
     });
     it('should not duplicate elements', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
       const elem = [
         elem1,
         elem2,
-        nativeDocument.createElement('div')
+        document.createElement('div')
       ];
       const wrap = new Elem(elem);
+      const newWrap = wrap.add(elem1, elem2, document.createElement('div'));
 
-      wrap.add(elem1, elem2);
-
-      strictEqual(wrap.length, 3);
+      strictEqual(newWrap.length, 4);
     });
     it('should support Elem syntax', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
       const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
       ];
       const wrap = new Elem(elem);
       const wrap1 = new Elem(elem1);
       const wrap2 = new Elem(elem2);
+      const newWrap = wrap.add(wrap1, wrap2);
 
-      wrap.add(wrap1, wrap2);
-
-      strictEqual(wrap.length, 5);
-      strictEqual(wrap.$[3], elem1);
-      strictEqual(wrap.$[4], elem2);
-    });
-    it('should support selector syntax', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-
-      elem1.className = 'foo';
-      elem2.className = 'foo';
-
-      nativeBody.appendChild(elem1);
-      nativeBody.appendChild(elem2);
-
-      wrap.add('body .foo');
-
-      strictEqual(wrap.length, 5);
-      strictEqual(wrap.$[3], elem1);
-      strictEqual(wrap.$[4], elem2);
-
-      new Elem(elem1).remove();
-      new Elem(elem2).remove();
+      strictEqual(newWrap.length, 5);
+      strictEqual(newWrap[3], elem1);
+      strictEqual(newWrap[4], elem2);
     });
   });
   describe('addClass()', () => {
     it('should add classes from arguments', (done) => {
       const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
       ];
       const wrap = new Elem(elem);
       let count = 0;
@@ -116,533 +83,12 @@ describe('it should test Elem#', () => {
       }
     });
   });
-  describe('addComment()', () => {
-    it('should add comment to the end with no second argument', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .forEach((elem) => {
-            elem.innerHTML = '123';
-          })
-          .addComment('comment')
-          .forEach((elem) => {
-            strictEqual(elem.innerHTML, '123<!--comment-->');
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
-    it('should add comment to the start with falsey second argument', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .forEach((elem) => {
-            elem.innerHTML = '123';
-          })
-          .addComment('comment', false)
-          .forEach((elem) => {
-            strictEqual(elem.innerHTML, '<!--comment-->123');
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
-  });
-  describe('addHTML()', () => {
-    it('should add html to the end with no second argument', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .forEach((elem) => {
-            elem.innerHTML = '123';
-          })
-          .addHTML('<div></div>')
-          .forEach((elem) => {
-            strictEqual(elem.innerHTML, '123<div></div>');
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
-    it('should add html to the start with falsey second argument', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .forEach((elem) => {
-            elem.innerHTML = '123';
-          })
-          .addHTML('<div></div>', false)
-          .forEach((elem) => {
-            strictEqual(elem.innerHTML, '<div></div>123');
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
-  });
-  describe('addText()', () => {
-    it('should add text to the end with no argument', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .forEach((elem) => {
-            elem.innerHTML = '123';
-          })
-          .addText('<div></div>')
-          .forEach((elem) => {
-            strictEqual(elem.innerHTML, '123&lt;div&gt;&lt;/div&gt;');
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
-    it('should add text to the start with falsey second argument', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .forEach((elem) => {
-            elem.innerHTML = '123';
-          })
-          .addText('<div></div>', false)
-          .forEach((elem) => {
-            strictEqual(elem.innerHTML, '&lt;div&gt;&lt;/div&gt;123');
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
-  });
-  describe('addRule()', () => {
-    it('should add rule to the first style element in the set', () => {
-      const style = nativeDocument.createElement('style');
-      const elem = nativeDocument.createElement('div');
-      const styleWrap = new Elem(style);
-      const elemWrap = new Elem(elem);
-
-      elem.className = 'foo';
-
-      nativeHead.appendChild(style);
-      nativeBody.appendChild(elem);
-
-      styleWrap.addRule('dwayne-style', '.foo', {
-        margin: '2px 1px 3px'
-      });
-
-      const css = elemWrap.calcCSS();
-
-      strictEqual(css.marginTop, '2px');
-      strictEqual(css.marginRight, '1px');
-      strictEqual(css.marginBottom, '3px');
-      strictEqual(css.marginLeft, '1px');
-
-      styleWrap.remove();
-      elemWrap.remove();
-    });
-  });
-  describe('apply()', () => {
-    it('should set id to the value from the string', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .apply('#dwayne')
-          .forEach((elem) => {
-            strictEqual(elem.id, 'dwayne');
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
-    it('should add class from the string', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .apply('.dwayne')
-          .forEach((elem) => {
-            strictEqual(elem.classList.contains('dwayne'), true);
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
-    it('should remove class from the string', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .forEach((elem) => {
-            elem.className = 'foo bar baz';
-          })
-          .apply('-.bar')
-          .forEach((elem) => {
-            strictEqual(elem.classList.contains('bar'), false);
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
-    it('should remove css property from the string', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .forEach((elem) => {
-            elem.style.display = 'inline';
-          })
-          .apply('-@display')
-          .forEach((elem) => {
-            strictEqual(elem.style.display, '');
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
-    it('should remove attribute from the string', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .forEach((elem) => {
-            elem.setAttribute('foo', 'bar');
-          })
-          .apply('-$foo')
-          .forEach((elem) => {
-            strictEqual(elem.hasAttribute('foo'), false);
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
-    it('should set html to the value from the string', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .apply('&(<div>123</div>)')
-          .forEach((elem) => {
-            strictEqual(elem.innerHTML, '<div>123</div>');
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
-    it('should set text to the value from the string', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .apply('*(dwayne text)')
-          .forEach((elem) => {
-            strictEqual(new Elem(elem).text(), 'dwayne text');
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
-    it('should set css property from the string to the value from the string', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .apply('@border-left(1px solid black !important)')
-          .forEach((elem) => {
-            strictEqual(new Elem(elem).css('border-left'), '1px solid black !important');
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
-    it('should set css property from the string to the value from the string', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .apply('@transform(translate(10px))')
-          .forEach((elem) => {
-            strictEqual(new Elem(elem).css('transform'), 'translate(10px)');
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
-    it('should set attribute from the string to the value from the string', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .apply('$dwayne(foo)')
-          .forEach((elem) => {
-            strictEqual(elem.getAttribute('dwayne'), 'foo');
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
-    it('should add attribute from the string', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .apply('$dwayne')
-          .forEach((elem) => {
-            strictEqual(elem.hasAttribute('dwayne'), true);
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
-  });
   describe('attr()', () => {
     it('should return wrap of an object of attributes with no arguments', (done) => {
       const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
       ];
       const wrap = new Elem(elem);
       let count = 0;
@@ -654,7 +100,7 @@ describe('it should test Elem#', () => {
             elem.setAttribute('contentEditable', '');
           })
           .forEach((elem) => {
-            deepStrictEqual(new Elem(elem).attr().$, {
+            deepStrictEqual(new Elem(elem).attr(), {
               attr: '123',
               contenteditable: ''
             });
@@ -673,9 +119,9 @@ describe('it should test Elem#', () => {
     });
     it('should return value of an attribute with first string argument', (done) => {
       const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
       ];
       const wrap = new Elem(elem);
       let count = 0;
@@ -683,8 +129,8 @@ describe('it should test Elem#', () => {
       try {
         wrap
           .forEach((elem) => {
-            elem.setAttributeNS(null, 'attr', '123');
-            elem.setAttributeNS(null, 'contentEditable', '');
+            elem.setAttribute('attr', '123');
+            elem.setAttribute('contentEditable', '');
           })
           .forEach((elem) => {
             strictEqual(new Elem(elem).attr('attr'), '123');
@@ -704,9 +150,9 @@ describe('it should test Elem#', () => {
     });
     it('should support (attr, value) syntax', (done) => {
       const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
       ];
       const wrap = new Elem(elem);
       let count = 0;
@@ -729,41 +175,11 @@ describe('it should test Elem#', () => {
         }
       }
     });
-    it('should support (attr, callback) syntax', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .forEach((elem, index) => {
-            elem.setAttribute('attr', index);
-          })
-          .attr('attr', (value) => +value + 10)
-          .forEach((elem, index) => {
-            strictEqual(elem.getAttribute('attr'), `${ (10 + index) }`);
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
     it('should support object property syntax', (done) => {
       const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
       ];
       const wrap = new Elem(elem);
       let count = 0;
@@ -772,8 +188,8 @@ describe('it should test Elem#', () => {
         wrap
           .attr({ attr: '123', contentEditable: '' })
           .forEach((elem) => {
-            strictEqual(elem.getAttributeNS(null, 'attr'), '123');
-            strictEqual(elem.getAttributeNS(null, 'contentEditable'), '');
+            strictEqual(elem.getAttribute('attr'), '123');
+            strictEqual(elem.getAttribute('contentEditable'), '');
 
             doneAll();
           });
@@ -788,237 +204,15 @@ describe('it should test Elem#', () => {
       }
     });
   });
-  describe('blob()', () => {
-    it('should return a blob promise with canvas context', (done) => {
-      const elem = nativeDocument.createElement('canvas');
-      const wrap = new Elem(elem);
-
-      wrap
-        .width(1)
-        .height(1)
-        .blob({ type: 'image/png' })
-        .then((blob) => blob.readAs('buffer'))
-        .then((buffer) => {
-          deepStrictEqual(new Int8Array(buffer), new Int8Array([
-            -119, 80, 78, 71, 13, 10, 26, 10, 0, 0,
-            0, 13, 73, 72, 68, 82, 0, 0, 0, 1, 0, 0,
-            0, 1, 8, 6, 0, 0, 0, 31, 21, -60, -119,
-            0, 0, 0, 11, 73, 68, 65, 84, 24, 87, 99,
-            96, 0, 2, 0, 0, 5, 0, 1, -86, -43, -56,
-            81, 0, 0, 0, 0, 73, 69, 78, 68, -82, 66,
-            96, -126
-          ]));
-
-          done();
-        })
-        .catch(done);
-    });
-    it('should return a blob promise with image context', (done) => {
-      const elem = nativeDocument.createElement('img');
-      const wrap = new Elem(elem);
-
-      wrap
-        .ref('/test/images/image.png')
-        .blob({ type: 'image/png' })
-        .then((blob) => blob.readAs('buffer'))
-        .then((buffer) => {
-          deepStrictEqual(new Int8Array(buffer), new Int8Array([
-            -119, 80, 78, 71, 13, 10, 26, 10, 0, 0,
-            0, 13, 73, 72, 68, 82, 0, 0, 0, 1, 0, 0,
-            0, 1, 8, 6, 0, 0, 0, 31, 21, -60, -119,
-            0, 0, 0, 11, 73, 68, 65, 84, 24, 87, 99,
-            96, 0, 2, 0, 0, 5, 0, 1, -86, -43, -56,
-            81, 0, 0, 0, 0, 73, 69, 78, 68, -82, 66,
-            96, -126
-          ]));
-
-          done();
-        })
-        .catch(done);
-    });
-  });
-  describe('calcCSS()', () => {
-    it('should calculate css for the first element in the set', () => {
-      const style = nativeDocument.createElement('style');
-      const elem = nativeDocument.createElement('div');
-      const styleWrap = new Elem(style);
-      const elemWrap = new Elem(elem);
-
-      elem.className = 'foo';
-
-      nativeHead.appendChild(style);
-      nativeBody.appendChild(elem);
-
-      styleWrap.addRule('dwayne-style', '.foo', {
-        margin: '2px 1px 3px'
-      });
-
-      const css = elemWrap.calcCSS();
-
-      strictEqual(css.marginTop, '2px');
-      strictEqual(css.marginRight, '1px');
-      strictEqual(css.marginBottom, '3px');
-      strictEqual(css.marginLeft, '1px');
-
-      styleWrap.remove();
-      elemWrap.remove();
-    });
-  });
-  describe('changeRule()', () => {
-    it('should change rule of the first style element in the set', () => {
-      const style = nativeDocument.createElement('style');
-      const elem = nativeDocument.createElement('div');
-      const styleWrap = new Elem(style);
-      const elemWrap = new Elem(elem);
-
-      elem.className = 'foo';
-
-      nativeHead.appendChild(style);
-      nativeBody.appendChild(elem);
-
-      styleWrap.addRule('dwayne-style', '.foo', {
-        margin: '2px 1px 3px'
-      });
-
-      styleWrap.changeRule('dwayne-style', {
-        marginLeft: '4px',
-        padding: '5px 6px 7px 8px'
-      });
-
-      const css = elemWrap.calcCSS();
-
-      strictEqual(css.marginTop, '2px');
-      strictEqual(css.marginRight, '1px');
-      strictEqual(css.marginBottom, '3px');
-      strictEqual(css.marginLeft, '4px');
-      strictEqual(css.paddingTop, '5px');
-      strictEqual(css.paddingRight, '6px');
-      strictEqual(css.paddingBottom, '7px');
-      strictEqual(css.paddingLeft, '8px');
-
-      styleWrap.remove();
-      elemWrap.remove();
-    });
-  });
-  describe('child()', () => {
-    it('should return wrap of n-th child of the first element if argument is non-negative integer', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const child1 = nativeDocument.createElement('div');
-      const child2 = nativeDocument.createElement('div');
-      const elem = [
-        elem1,
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap1 = new Elem(elem);
-      const wrap2 = new Elem();
-
-      elem1.appendChild(child1);
-      elem1.appendChild(child2);
-
-      strictEqual(wrap1.child(0).length, 1);
-      strictEqual(wrap1.child(0).$[0], child1);
-      strictEqual(wrap1.child(1).length, 1);
-      strictEqual(wrap1.child(1).$[0], child2);
-      strictEqual(wrap1.child(2).length, 0);
-      strictEqual(wrap2.child(0).length, 0);
-    });
-    it('should support (element) syntax', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const child = nativeDocument.createElement('div');
-      const elem = [
-        elem1,
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-
-      wrap.child(child);
-
-      strictEqual(elem1.contains(child), true);
-    });
-    it('should support (Elem) syntax', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const child = nativeDocument.createElement('div');
-      const elem = [
-        elem1,
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      const childWrap = new Elem(child);
-
-      wrap.child(childWrap);
-
-      strictEqual(elem1.contains(child), true);
-    });
-    it('should support (selector) syntax', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const child = nativeDocument.createElement('div');
-      const elem = [
-        elem1,
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-
-      child.id = 'dwayne-child';
-      nativeBody.appendChild(child);
-      wrap.child('body #dwayne-child');
-
-      strictEqual(elem1.contains(child), true);
-
-      new Elem(child).remove();
-    });
-    it('should support second parameter', () => {
-      const parent = nativeDocument.createElement('div');
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      const parentWrap = new Elem(parent);
-
-      wrap.text((text, elem, index) => index);
-      parentWrap.child(wrap, false);
-
-      const children = parent.childNodes;
-
-      strictEqual(children[0].innerHTML, '0');
-      strictEqual(children[1].innerHTML, '1');
-      strictEqual(children[2].innerHTML, '2');
-    });
-    it('should support second parameter #2', () => {
-      const parent = nativeDocument.createElement('div');
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      const parentWrap = new Elem(parent);
-
-      parent.appendChild(document.createElement('div'));
-      wrap.text((text, elem, index) => index);
-      parentWrap.child(wrap, false);
-
-      const children = parent.childNodes;
-
-      strictEqual(children[0].innerHTML, '0');
-      strictEqual(children[1].innerHTML, '1');
-      strictEqual(children[2].innerHTML, '2');
-    });
-  });
   describe('children()', () => {
     it('should return wrap of the children of the first element', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const child1 = nativeDocument.createElement('div');
-      const child2 = nativeDocument.createElement('div');
+      const elem1 = document.createElement('div');
+      const child1 = document.createElement('div');
+      const child2 = document.createElement('div');
       const elem = [
         elem1,
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
+        document.createElement('div'),
+        document.createElement('div')
       ];
       const wrap1 = new Elem(elem);
       const wrap2 = new Elem();
@@ -1030,101 +224,19 @@ describe('it should test Elem#', () => {
       const children2 = wrap2.children();
 
       strictEqual(children1.length, 2);
-      strictEqual(children1.$[0], child1);
-      strictEqual(children1.$[1], child2);
+      strictEqual(children1[0], child1);
+      strictEqual(children1[1], child2);
       strictEqual(children2.length, 0);
-    });
-  });
-  describe('class()', () => {
-    it('should return wrap of an array of classes with no arguments', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .forEach((elem) => {
-            elem.className = 'foo bar baz';
-          })
-          .forEach((elem) => {
-            deepStrictEqual(new Elem(elem).class().$, ['foo', 'bar', 'baz']);
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
-    it('should set className with more arguments', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .class('foo bar baz')
-          .forEach((elem) => {
-            strictEqual(elem.className, 'foo bar baz');
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
-  });
-  describe('click()', () => {
-    it('should click the element', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let fired = 0;
-
-      wrap.into(nativeBody);
-      wrap.on('click', doneAll);
-
-      wrap.click();
-
-      function doneAll() {
-        if (++fired === 3) {
-          wrap.remove();
-
-          done();
-        }
-      }
     });
   });
   describe('closest()', () => {
     it('should return a wrap of the set of closest parents that matches selector', () => {
-      const child1 = nativeDocument.createElement('div');
-      const child2 = nativeDocument.createElement('div');
-      const child3 = nativeDocument.createElement('div');
-      const parent1 = nativeDocument.createElement('div');
-      const parent2 = nativeDocument.createElement('div');
-      const parent3 = nativeDocument.createElement('div');
+      const child1 = document.createElement('div');
+      const child2 = document.createElement('div');
+      const child3 = document.createElement('div');
+      const parent1 = document.createElement('div');
+      const parent2 = document.createElement('div');
+      const parent3 = document.createElement('div');
       const elem = [
         child1,
         child2,
@@ -1139,7 +251,7 @@ describe('it should test Elem#', () => {
       parent2.appendChild(child3);
       parent3.appendChild(parent2);
 
-      const closest = wrap.closest('.foo').$;
+      const closest = wrap.closest('.foo');
 
       strictEqual(closest[0], child2);
       strictEqual(closest[1], parent3);
@@ -1147,10 +259,10 @@ describe('it should test Elem#', () => {
   });
   describe('contains()', () => {
     it('should return true, if element contains another, and false if not', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
+      const elem3 = document.createElement('div');
+      const elem4 = document.createElement('div');
       const wrap1 = new Elem(elem1);
       const wrap2 = new Elem(elem2);
       const wrap3 = new Elem(elem3);
@@ -1165,23 +277,9 @@ describe('it should test Elem#', () => {
       strictEqual(wrap3.contains(elem4), false);
       strictEqual(wrap4.contains(elem3), false);
     });
-    it('should support (selector) syntax', () => {
-      const parent = nativeDocument.createElement('div');
-      const child = nativeDocument.createElement('div');
-      const wrap = new Elem(parent);
-  
-      parent.appendChild(child);
-      child.id = 'foo';
-      nativeBody.appendChild(parent);
-      
-      strictEqual(wrap.contains('#foo'), true);
-      strictEqual(wrap.contains('.foo'), false);
-
-      new Elem(parent).remove();
-    });
     it('should support (Elem) syntax', () => {
-      const parent = nativeDocument.createElement('div');
-      const child = nativeDocument.createElement('div');
+      const parent = document.createElement('div');
+      const child = document.createElement('div');
       const parentWrap = new Elem(parent);
       const childWrap = new Elem(parent);
   
@@ -1193,9 +291,9 @@ describe('it should test Elem#', () => {
   describe('create()', () => {
     it('should return wrap of the set of new elements inside context of type of first argument', (done) => {
       const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
       ];
       const wrap = new Elem(elem);
       const inputs = wrap.create('input');
@@ -1203,7 +301,7 @@ describe('it should test Elem#', () => {
 
       try {
         inputs.forEach((input, index) => {
-          strictEqual(input.parentElement, wrap.$[index]);
+          strictEqual(input.parentElement, wrap[index]);
           strictEqual(input.tagName.toLowerCase(), 'input');
 
           doneAll();
@@ -1218,49 +316,22 @@ describe('it should test Elem#', () => {
         }
       }
     });
-    it('should use second argument as applied expression', (done) => {
+    it('should treat "#text" and "#comment" as special arguments', (done) => {
       const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      const input = wrap.create('input', '#id .foo');
-      let count = 0;
-
-      try {
-        input.forEach((input, index) => {
-          strictEqual(input.parentElement, wrap.$[index]);
-          strictEqual(input.tagName.toLowerCase(), 'input');
-          strictEqual(input.id, 'id');
-          strictEqual(input.className, 'foo');
-
-          doneAll();
-        });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
-    it('should treat "#text" and "comment" as special arguments', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
       ];
       const wrap = new Elem(elem);
       let count = 0;
 
       try {
         wrap
-          .createComment('comment')
+          .create('#comment')
+          .text('comment')
           .parent()
-          .createText('123')
+          .create('#text')
+          .text('123')
           .parent()
           .forEach((elem) => {
             strictEqual(elem.innerHTML, '<!--comment-->123');
@@ -1278,75 +349,12 @@ describe('it should test Elem#', () => {
       }
     });
   });
-  describe('[html-element]()', () => {
-    it('should return wrap of a new element inside context', (done) => {
-      let count = 0;
-
-      new Super(htmlElements).forEach((type) => {
-        const elem = [
-          nativeDocument.createElement('div'),
-          nativeDocument.createElement('div'),
-          nativeDocument.createElement('div')
-        ];
-        const wrap = new Elem(elem);
-        const created = wrap[type]();
-
-        try {
-          created.forEach((elem, index) => {
-            strictEqual(elem.parentElement, wrap.$[index]);
-            strictEqual(elem.tagName.toLowerCase(), type);
-
-            doneAll();
-          });
-        } catch (err) {
-          done(err);
-        }
-
-        function doneAll() {
-          if (++count === elem.length * htmlElements.length) {
-            done();
-          }
-        }
-      });
-    });
-    it('should use first argument as applied expression', (done) => {
-      let count = 0;
-
-      new Super(htmlElements).forEach((type) => {
-        const elem = [
-          nativeDocument.createElement('div'),
-          nativeDocument.createElement('div'),
-          nativeDocument.createElement('div')
-        ];
-        const wrap = new Elem(elem);
-        const created = wrap[type](`.${ type }`);
-
-        try {
-          created.forEach((elem, index) => {
-            strictEqual(elem.parentElement, wrap.$[index]);
-            strictEqual(elem.tagName.toLowerCase(), type);
-            strictEqual(elem.className, type);
-
-            doneAll();
-          });
-        } catch (err) {
-          done(err);
-        }
-
-        function doneAll() {
-          if (++count === elem.length * htmlElements.length) {
-            done();
-          }
-        }
-      });
-    });
-  });
   describe('createComment()', () => {
     it('should create comment node inside elements', (done) => {
       const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
       ];
       const wrap = new Elem(elem);
       let count = 0;
@@ -1377,9 +385,9 @@ describe('it should test Elem#', () => {
   describe('createText()', () => {
     it('should create comment node inside elements', (done) => {
       const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
       ];
       const wrap = new Elem(elem);
       let count = 0;
@@ -1409,11 +417,11 @@ describe('it should test Elem#', () => {
   });
   describe('css()', () => {
     it('should return wrap of an object of css properties with no arguments', () => {
-      const elem1 = nativeDocument.createElement('div');
+      const elem1 = document.createElement('div');
       const elem = [
         elem1,
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
+        document.createElement('div'),
+        document.createElement('div')
       ];
       const wrap1 = new Elem(elem);
       const wrap2 = new Elem();
@@ -1422,15 +430,15 @@ describe('it should test Elem#', () => {
       elem1.style.textAlign = 'center';
       elem1.style.border = '1px solid black';
 
-      deepStrictEqual(wrap1.css().$, {
+      deepStrictEqual(wrap1.css(), {
         display: 'inline',
         textAlign: 'center',
         border: '1px solid black'
       });
-      deepStrictEqual(wrap2.css().$, {});
+      deepStrictEqual(wrap2.css(), {});
     });
     it('should return value of css property with first string argument', () => {
-      const elem = nativeDocument.createElement('div');
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
 
       elem.style.setProperty('margin-left', '1px', 'important');
@@ -1440,7 +448,7 @@ describe('it should test Elem#', () => {
       strictEqual(wrap.css('marginRight'), '2px');
     });
     it('should support (prop, value) syntax', () => {
-      const elem = nativeDocument.createElement('div');
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
 
       wrap.css('margin-left', '1px !important');
@@ -1451,38 +459,8 @@ describe('it should test Elem#', () => {
       strictEqual(elem.style.getPropertyValue('margin-right'), '2px');
       strictEqual(elem.style.getPropertyPriority('margin-right'), '');
     });
-    it('should support (prop, callback) syntax', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .forEach((elem, index) => {
-            elem.style.setProperty('margin-left', `${ index }px`, '');
-          })
-          .css('margin-left', (value) => `${ px(value) + 10 }px`)
-          .forEach((elem, index) => {
-            strictEqual(elem.style.marginLeft, `${ index + 10 }px`);
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
     it('should support object property syntax', () => {
-      const elem = nativeDocument.createElement('div');
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
 
       wrap.css({
@@ -1499,9 +477,9 @@ describe('it should test Elem#', () => {
   describe('data()', () => {
     it('should return wrap of an dataset object with no arguments', (done) => {
       const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
       ];
       const wrap = new Elem(elem);
       let count = 0;
@@ -1513,7 +491,7 @@ describe('it should test Elem#', () => {
             elem.setAttribute('data-dwayne-power', 'Infinity');
           })
           .forEach((elem) => {
-            deepStrictEqual(new Elem(elem).data().$, {
+            deepStrictEqual(new Elem(elem).data(), {
               dwayneAttr: '123',
               dwaynePower: 'Infinity'
             });
@@ -1532,9 +510,9 @@ describe('it should test Elem#', () => {
     });
     it('should return value of dataset parameter', (done) => {
       const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
       ];
       const wrap = new Elem(elem);
       let count = 0;
@@ -1563,9 +541,9 @@ describe('it should test Elem#', () => {
     });
     it('should support (key, value) setter syntax', (done) => {
       const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
       ];
       const wrap = new Elem(elem);
       let count = 0;
@@ -1588,41 +566,11 @@ describe('it should test Elem#', () => {
         }
       }
     });
-    it('should support (attr, callback) syntax', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .forEach((elem, index) => {
-            elem.setAttribute('data-dwayne-power', index);
-          })
-          .data('dwaynePower', (value) => +value + 10)
-          .forEach((elem, index) => {
-            strictEqual(elem.getAttribute('data-dwayne-power'), `${ (10 + index) }`);
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
     it('should support object property syntax', (done) => {
       const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
       ];
       const wrap = new Elem(elem);
       let count = 0;
@@ -1650,46 +598,17 @@ describe('it should test Elem#', () => {
       }
     });
   });
-  describe('deleteRule()', () => {
-    it('should add rule to the first style element in the set', () => {
-      const style = nativeDocument.createElement('style');
-      const elem = nativeDocument.createElement('div');
-      const styleWrap = new Elem(style);
-      const elemWrap = new Elem(elem);
-
-      elem.className = 'foo';
-
-      nativeHead.appendChild(style);
-      nativeBody.appendChild(elem);
-
-      styleWrap.addRule('dwayne-style', '.foo', {
-        margin: '2px 1px 3px'
-      });
-
-      styleWrap.deleteRule('dwayne-style');
-
-      const css = elemWrap.calcCSS();
-
-      strictEqual(css.marginTop, '0px');
-      strictEqual(css.marginRight, '0px');
-      strictEqual(css.marginBottom, '0px');
-      strictEqual(css.marginLeft, '0px');
-
-      styleWrap.remove();
-      elemWrap.remove();
-    });
-  });
   describe('dispatch()', () => {
     it('should dispatch event on element', (done) => {
       const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
       ];
       const wrap = new Elem(elem);
       let fired = 0;
 
-      wrap.into(nativeBody);
+      wrap.into(body);
       wrap.on('click', doneAll);
 
       wrap.dispatch('click');
@@ -1704,9 +623,9 @@ describe('it should test Elem#', () => {
     });
     it('should dispatch already constructed event', (done) => {
       const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
       ];
       const wrap = new Elem(elem);
       let fired = 0;
@@ -1715,11 +634,11 @@ describe('it should test Elem#', () => {
       try {
         event = new Event('click');
       } catch (err) {
-        event = nativeDocument.createEvent('Event');
+        event = document.createEvent('Event');
         event.initEvent('click', false, false);
       }
 
-      wrap.into(nativeBody);
+      wrap.into(body);
       wrap.on('click', (e) => {
         try {
           strictEqual(e, event);
@@ -1744,11 +663,11 @@ describe('it should test Elem#', () => {
       }
     });
     it('should add details to event', (done) => {
-      const elem = nativeDocument.createElement('div');
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
       const unique = {};
 
-      wrap.into(nativeBody);
+      wrap.into(body);
       wrap.on('click', (e) => {
         try {
           strictEqual(e.detail, unique);
@@ -1761,7 +680,7 @@ describe('it should test Elem#', () => {
           done(err);
         }
       });
-      wrap.dispatch('click', {}, {
+      wrap.dispatch('click', {
         detail: unique,
         data: unique
       });
@@ -1769,8 +688,8 @@ describe('it should test Elem#', () => {
   });
   describe('elem()', () => {
     it('should return wrap of the n-th element', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
       const elem = [
         elem1,
         elem2
@@ -1779,25 +698,25 @@ describe('it should test Elem#', () => {
       const wrap2 = new Elem();
 
       strictEqual(wrap1.elem().length, 1);
-      strictEqual(wrap1.elem().$[0], elem1);
+      strictEqual(wrap1.elem()[0], elem1);
       strictEqual(wrap1.elem(0).length, 1);
-      strictEqual(wrap1.elem(0).$[0], elem1);
+      strictEqual(wrap1.elem(0)[0], elem1);
       strictEqual(wrap1.elem(1).length, 1);
-      strictEqual(wrap1.elem(1).$[0], elem2);
+      strictEqual(wrap1.elem(1)[0], elem2);
       strictEqual(wrap2.elem().length, 0);
     });
   });
   describe('find()', () => {
     it('should find a wrap of all elements in nested children, that matches selector', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const child1 = nativeDocument.createElement('div');
-      const child2 = nativeDocument.createElement('div');
-      const child3 = nativeDocument.createElement('div');
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
+      const child1 = document.createElement('div');
+      const child2 = document.createElement('div');
+      const child3 = document.createElement('div');
       const elem = [
         elem1,
         elem2,
-        nativeDocument.createElement('div')
+        document.createElement('div')
       ];
       const wrap = new Elem(elem);
 
@@ -1809,7 +728,7 @@ describe('it should test Elem#', () => {
       child2.className = 'foo';
       child3.className = 'foo';
 
-      const found = wrap.find('.foo').$;
+      const found = wrap.find('.foo');
 
       strictEqual(found.length, 3);
       strictEqual(found[0], child1);
@@ -1818,126 +737,11 @@ describe('it should test Elem#', () => {
     });
   });
   describe('filter()', () => {
-    it('should find a wrap of all elements in nested children, that matches selector', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem = [
-        elem1,
-        elem2,
-        elem3
-      ];
-      const wrap = new Elem(elem);
-
-      elem1.className = 'foo';
-      elem3.className = 'foo';
-
-      const filtered = wrap.filter('.foo').$;
-
-      strictEqual(filtered.length, 2);
-      strictEqual(filtered[0], elem1);
-      strictEqual(filtered[1], elem3);
-    });
-  });
-  describe('first()', () => {
-    it('should return wrap of the first element', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem = [
-        elem1,
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap1 = new Elem(elem);
-      const wrap2 = new Elem();
-
-      strictEqual(wrap1.first().length, 1);
-      strictEqual(wrap1.first().$[0], elem1);
-      strictEqual(wrap2.first().length, 0);
-    });
-  });
-  describe('firstChild()', () => {
-    it('should return a wrap of the first children of all elements in the set with no arguments', () => {
-      const parent1 = nativeDocument.createElement('div');
-      const parent2 = nativeDocument.createElement('div');
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const wrap = new Elem([
-        parent1,
-        parent2
-      ]);
-
-      parent1.appendChild(elem1);
-      parent1.appendChild(elem2);
-      parent2.appendChild(elem3);
-      parent2.appendChild(elem4);
-
-      const firstChildren = wrap.firstChild().$;
-
-      strictEqual(firstChildren.length, 2);
-      strictEqual(firstChildren[0], elem1);
-      strictEqual(firstChildren[1], elem3);
-    });
-    it('should return a wrap of the first children of all elements in the set that match selector with selector argument', () => {
-      const parent1 = nativeDocument.createElement('div');
-      const parent2 = nativeDocument.createElement('div');
-      const parent3 = nativeDocument.createElement('div');
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const elem5 = nativeDocument.createElement('div');
-      const elem6 = nativeDocument.createElement('div');
-      const wrap = new Elem([
-        parent1,
-        parent2,
-        parent3
-      ]);
-
-      parent1.appendChild(elem1);
-      parent1.appendChild(elem2);
-      parent1.appendChild(elem3);
-      parent2.appendChild(elem4);
-      parent2.appendChild(elem5);
-      parent3.appendChild(elem6);
-
-      elem3.className = 'foo';
-      elem6.className = 'foo';
-
-      const firstChildren = wrap.firstChild('.foo').$;
-
-      strictEqual(firstChildren.length, 2);
-      strictEqual(firstChildren[0], elem3);
-      strictEqual(firstChildren[1], elem6);
-    });
-  });
-  describe('getRule()', () => {
-    it('should add rule to the first style element in the set', () => {
-      const style = nativeDocument.createElement('style');
-      const styleWrap = new Elem(style);
-
-      nativeHead.appendChild(style);
-
-      styleWrap.addRule('dwayne-style', '.foo', {
-        margin: '2px 1px 3px !important',
-        padding: '5px 6px 7px 8px'
-      });
-
-      deepStrictEqual(styleWrap.getRule('dwayne-style'), {
-        selector: '.foo',
-        rules: {
-          margin: '2px 1px 3px !important',
-          padding: '5px 6px 7px 8px'
-        }
-      });
-
-      styleWrap.remove();
-    });
+    // TODO: function filter
   });
   describe('hasAttr()', () => {
     it('should return true if the element has class', () => {
-      const elem = nativeDocument.createElement('div');
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
 
       elem.setAttribute('foo', 'bar');
@@ -1947,7 +751,7 @@ describe('it should test Elem#', () => {
       strictEqual(wrap.hasAttr('bar'), true);
     });
     it('should return false if the element does not have class', () => {
-      const elem = nativeDocument.createElement('div');
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
 
       elem.setAttribute('foo', 'bar');
@@ -1959,7 +763,7 @@ describe('it should test Elem#', () => {
   });
   describe('hasClass()', () => {
     it('should return true if the element has class', () => {
-      const elem = nativeDocument.createElement('div');
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
 
       elem.className = 'foo bar baz';
@@ -1967,7 +771,7 @@ describe('it should test Elem#', () => {
       strictEqual(wrap.hasClass('bar'), true);
     });
     it('should return false if the element does not have class', () => {
-      const elem = nativeDocument.createElement('div');
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
 
       elem.className = 'foo bar baz';
@@ -1976,140 +780,41 @@ describe('it should test Elem#', () => {
     });
   });
   describe('hide()', () => {
-    it('should set display to none and set element.dwayneData.previousDisplay to previous display', () => {
-      const elem = nativeDocument.createElement('div');
+    it('should hide the element', () => {
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
 
       elem.style.display = 'inline';
       wrap.hide();
 
-      strictEqual(elem.style.display, 'none');
-      strictEqual(elem.dwayneData.previousDisplay, 'inline');
+      strictEqual(elem.className, '__dwayne-hidden__');
     });
   });
   describe('html()', () => {
     it('should return innerHTML with no arguments', () => {
-      const elem = nativeDocument.createElement('div');
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
 
       elem.innerHTML = '<div></div>';
 
       strictEqual(wrap.html(), '<div></div>');
     });
-    it('should set innerHTML with non-function argument', () => {
-      const elem = nativeDocument.createElement('div');
+    it('should set innerHTML with an argument', () => {
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
 
       wrap.html('<div></div>');
 
       strictEqual(elem.innerHTML, '<div></div>');
     });
-    it('should support callback', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .forEach((elem, index) => {
-            elem.innerHTML = `<div>${ index }</div>`;
-          })
-          .html((html) => `x${ html }x`)
-          .forEach((elem, index) => {
-            strictEqual(elem.innerHTML, `x<div>${ index }</div>x`);
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
-  });
-  describe('id()', () => {
-    it('should return id with no arguments', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
-
-      elem.id = 'dwayne';
-
-      strictEqual(wrap.id(), 'dwayne');
-    });
-    it('should set id with more arguments', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
-
-      wrap.id('dwayne');
-
-      strictEqual(elem.id, 'dwayne');
-    });
-  });
-  describe('innerHeight', () => {
-    it('should return inner height', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
-
-      nativeBody.appendChild(elem);
-
-      wrap.css({
-        boxSizing: 'border-box',
-        height: '200px',
-        paddingTop: '2px',
-        paddingBottom: '3px',
-        borderTop: '1px solid black',
-        borderBottom: '4px solid black'
-      });
-
-      strictEqual(wrap.innerHeight, 190);
-
-      wrap.css('box-sizing', 'content-box');
-
-      strictEqual(wrap.innerHeight, 200);
-
-      wrap.remove();
-    });
-  });
-  describe('innerWidth', () => {
-    it('should return inner width', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
-
-      nativeBody.appendChild(elem);
-
-      wrap.css({
-        boxSizing: 'border-box',
-        width: '200px',
-        paddingLeft: '2px',
-        paddingRight: '3px',
-        borderLeft: '1px solid black',
-        borderRight: '4px solid black'
-      });
-
-      strictEqual(wrap.innerWidth, 190);
-
-      wrap.css('box-sizing', 'content-box');
-
-      strictEqual(wrap.innerWidth, 200);
-
-      wrap.remove();
-    });
   });
   describe('insertAfter()', () => {
     it('should support (element) syntax', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const elem5 = nativeDocument.createElement('div');
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
+      const elem3 = document.createElement('div');
+      const elem4 = document.createElement('div');
+      const elem5 = document.createElement('div');
       const elem = [
         elem1,
         elem2,
@@ -2122,7 +827,7 @@ describe('it should test Elem#', () => {
 
       wrap.insertAfter(elem5);
 
-      const children = wrap2.children().$;
+      const children = wrap2.children();
 
       strictEqual(children.length, 4);
       strictEqual(children[0], elem5);
@@ -2131,11 +836,11 @@ describe('it should test Elem#', () => {
       strictEqual(children[3], elem3);
     });
     it('should support (Elem) syntax', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const elem5 = nativeDocument.createElement('div');
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
+      const elem3 = document.createElement('div');
+      const elem4 = document.createElement('div');
+      const elem5 = document.createElement('div');
       const elem = [
         elem1,
         elem2,
@@ -2149,53 +854,22 @@ describe('it should test Elem#', () => {
 
       wrap.insertAfter(wrap3);
 
-      const children = wrap2.children().$;
+      const children = wrap2.children();
 
       strictEqual(children.length, 4);
       strictEqual(children[0], elem5);
       strictEqual(children[1], elem1);
       strictEqual(children[2], elem2);
       strictEqual(children[3], elem3);
-    });
-    it('should support (selector) syntax', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const elem5 = nativeDocument.createElement('div');
-      const elem = [
-        elem1,
-        elem2,
-        elem3
-      ];
-      const wrap = new Elem(elem);
-      const wrap2 = new Elem(elem4);
-
-      elem4.appendChild(elem5);
-      nativeBody.appendChild(elem4);
-
-      elem5.className = 'insert-after-selector';
-
-      wrap.insertAfter('.insert-after-selector');
-
-      const children = wrap2.children().$;
-
-      strictEqual(children.length, 4);
-      strictEqual(children[0], elem5);
-      strictEqual(children[1], elem1);
-      strictEqual(children[2], elem2);
-      strictEqual(children[3], elem3);
-
-      new Elem(elem4).remove();
     });
   });
   describe('insertBefore()', () => {
     it('should support (element) syntax', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const elem5 = nativeDocument.createElement('div');
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
+      const elem3 = document.createElement('div');
+      const elem4 = document.createElement('div');
+      const elem5 = document.createElement('div');
       const elem = [
         elem1,
         elem2,
@@ -2208,7 +882,7 @@ describe('it should test Elem#', () => {
 
       wrap.insertBefore(elem5);
 
-      const children = wrap2.children().$;
+      const children = wrap2.children();
 
       strictEqual(children.length, 4);
       strictEqual(children[0], elem1);
@@ -2217,11 +891,11 @@ describe('it should test Elem#', () => {
       strictEqual(children[3], elem5);
     });
     it('should support (Elem) syntax', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const elem5 = nativeDocument.createElement('div');
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
+      const elem3 = document.createElement('div');
+      const elem4 = document.createElement('div');
+      const elem5 = document.createElement('div');
       const elem = [
         elem1,
         elem2,
@@ -2235,53 +909,22 @@ describe('it should test Elem#', () => {
 
       wrap.insertBefore(wrap3);
 
-      const children = wrap2.children().$;
+      const children = wrap2.children();
 
       strictEqual(children.length, 4);
       strictEqual(children[0], elem1);
       strictEqual(children[1], elem2);
       strictEqual(children[2], elem3);
       strictEqual(children[3], elem5);
-    });
-    it('should support (selector) syntax', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const elem5 = nativeDocument.createElement('div');
-      const elem = [
-        elem1,
-        elem2,
-        elem3
-      ];
-      const wrap = new Elem(elem);
-      const wrap2 = new Elem(elem4);
-
-      elem4.appendChild(elem5);
-      nativeBody.appendChild(elem4);
-
-      elem5.className = 'insert-before-selector';
-
-      wrap.insertBefore('.insert-before-selector');
-
-      const children = wrap2.children().$;
-
-      strictEqual(children.length, 4);
-      strictEqual(children[0], elem1);
-      strictEqual(children[1], elem2);
-      strictEqual(children[2], elem3);
-      strictEqual(children[3], elem5);
-
-      new Elem(elem4).remove();
     });
   });
   describe('into()', () => {
     it('should support (element) syntax', (done) => {
-      const parent = nativeDocument.createElement('div');
+      const parent = document.createElement('div');
       const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
       ];
       const wrap = new Elem(elem);
       let count = 0;
@@ -2305,11 +948,11 @@ describe('it should test Elem#', () => {
       }
     });
     it('should support (Elem) syntax', (done) => {
-      const parent = nativeDocument.createElement('div');
+      const parent = document.createElement('div');
       const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
       ];
       const wrap = new Elem(elem);
       const parentWrap = new Elem(parent);
@@ -2333,83 +976,29 @@ describe('it should test Elem#', () => {
         }
       }
     });
-    it('should support (selector) syntax', (done) => {
-      const parent = nativeDocument.createElement('div');
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      parent.id = 'dwayne-parent';
-      nativeBody.appendChild(parent);
-
-      try {
-        wrap
-          .into('body #dwayne-parent')
-          .forEach((elem) => {
-            strictEqual(parent.contains(elem), true);
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      } finally {
-        new Elem(parent).remove();
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
     it('should support second parameter', () => {
-      const parent = nativeDocument.createElement('div');
+      const parent = document.createElement('div');
       const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-
-      wrap
-        .text((text, elem, index) => index)
-        .into(parent, false);
-
-      const children = parent.childNodes;
-
-      strictEqual(children[0].innerHTML, '0');
-      strictEqual(children[1].innerHTML, '1');
-      strictEqual(children[2].innerHTML, '2');
-    });
-    it('should support second parameter #2', () => {
-      const parent = nativeDocument.createElement('div');
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
       ];
       const wrap = new Elem(elem);
 
       parent.appendChild(document.createElement('div'));
 
-      wrap
-        .text((text, elem, index) => index)
-        .into(parent, false);
+      wrap.into(parent, false);
 
       const children = parent.childNodes;
 
-      strictEqual(children[0].innerHTML, '0');
-      strictEqual(children[1].innerHTML, '1');
-      strictEqual(children[2].innerHTML, '2');
+      strictEqual(children[0], elem[0]);
+      strictEqual(children[1], elem[1]);
+      strictEqual(children[2], elem[2]);
     });
   });
   describe('is()', () => {
     it('should return if context matches selector', () => {
-      const elem = nativeDocument.createElement('div');
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
 
       elem.id = 'foo';
@@ -2420,236 +1009,28 @@ describe('it should test Elem#', () => {
       strictEqual(wrap.is('#foo.bar[bar]'), false);
     });
   });
-  describe('isBroken()', () => {
-    it('should return if the image is broken', (done) => {
-      const proper = nativeDocument.createElement('img');
-      const broken = nativeDocument.createElement('img');
-      const elem = [
-        proper,
-        broken
-      ];
-      const wrap = new Elem(elem);
-      const properWrap = new Elem(proper);
-      const brokenWrap = new Elem(broken);
-
-      wrap.into(nativeBody);
-      properWrap.ref('/test/images/image.png');
-      brokenWrap.ref('/some/broken/image');
-
-      strictEqual(properWrap.isBroken(), false);
-      strictEqual(brokenWrap.isBroken(), false);
-
-      wrap
-        .load()
-        .then(() => {
-          strictEqual(properWrap.isBroken(), false);
-          strictEqual(brokenWrap.isBroken(), true);
-
-          wrap.remove();
-          done();
-        })
-        .catch(done);
-    });
-  });
-  describe('isWithinDocument()', () => {
-    it('should return false if the element is not within document', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
-
-      strictEqual(wrap.isWithinDocument(), false);
-    });
-    it('should return true if the element is within document', () => {
-      const elem = nativeBody;
-      const wrap = new Elem(elem);
-
-      strictEqual(wrap.isWithinDocument(), true);
-    });
-  });
-  describe('last()', () => {
-    it('should return wrap of the last element', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        elem1
-      ];
-      const wrap1 = new Elem(elem);
-      const wrap2 = new Elem();
-
-      strictEqual(wrap1.last().length, 1);
-      strictEqual(wrap1.last().$[0], elem1);
-      strictEqual(wrap2.last().length, 0);
-    });
-  });
-  describe('lastChild()', () => {
-    it('should return a wrap of the last children of all elements in the set with no arguments', () => {
-      const parent1 = nativeDocument.createElement('div');
-      const parent2 = nativeDocument.createElement('div');
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const wrap = new Elem([
-        parent1,
-        parent2
-      ]);
-
-      parent1.appendChild(elem1);
-      parent1.appendChild(elem2);
-      parent2.appendChild(elem3);
-      parent2.appendChild(elem4);
-
-      const lastChildren = wrap.lastChild().$;
-
-      strictEqual(lastChildren.length, 2);
-      strictEqual(lastChildren[0], elem2);
-      strictEqual(lastChildren[1], elem4);
-    });
-    it('should return a wrap of the last children of all elements in the set that match selector with selector argument', () => {
-      const parent1 = nativeDocument.createElement('div');
-      const parent2 = nativeDocument.createElement('div');
-      const parent3 = nativeDocument.createElement('div');
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const elem5 = nativeDocument.createElement('div');
-      const elem6 = nativeDocument.createElement('div');
-      const wrap = new Elem([
-        parent1,
-        parent2,
-        parent3
-      ]);
-
-      parent1.appendChild(elem1);
-      parent1.appendChild(elem2);
-      parent1.appendChild(elem3);
-      parent2.appendChild(elem4);
-      parent2.appendChild(elem5);
-      parent3.appendChild(elem6);
-
-      elem1.className = 'foo';
-      elem5.className = 'foo';
-
-      const lastChildren = wrap.lastChild('.foo').$;
-
-      strictEqual(lastChildren.length, 2);
-      strictEqual(lastChildren[0], elem1);
-      strictEqual(lastChildren[1], elem5);
-    });
-  });
-  describe('load()', () => {
-    it('should load all the images in the set', (done) => {
-      const properImage = nativeDocument.createElement('img');
-      const brokenImage = nativeDocument.createElement('img');
-      const elem = [
-        properImage,
-        brokenImage
-      ];
-      const wrap = new Elem(elem);
-
-      properImage.src = '/test/images/image.png';
-      brokenImage.src = '/some/broken/image';
-
-      wrap
-        .load()
-        .then(({ proper, broken }) => {
-          strictEqual(proper.length, 1);
-          strictEqual(proper.$[0], properImage);
-          strictEqual(broken.length, 1);
-          strictEqual(broken.$[0], brokenImage);
-
-          done();
-        })
-        .catch(done);
-    });
-  });
-  describe('moveAttr()', () => {
-    it('should add attribute and set value to "" with 1 argument', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
-
-      wrap.moveAttr('dwayne1');
-
-      strictEqual(elem.getAttribute('dwayne1'), '');
-    });
-    it('should add attribute and set value to the second argument with 2 arguments', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
-
-      wrap.moveAttr('dwayne2', 'value');
-
-      strictEqual(elem.getAttribute('dwayne2'), 'value');
-    });
-    it('should move attribute and set value to previous with 1 argument', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const wrap1 = new Elem(elem1);
-      const wrap2 = new Elem(elem2);
-
-      wrap1.moveAttr('dwayne3', 'value');
-      wrap2.moveAttr('dwayne3');
-
-      strictEqual(elem1.hasAttribute('dwayne3'), false);
-      strictEqual(elem2.getAttribute('dwayne3'), 'value');
-    });
-    it('should move attribute and set value to the second argument with 2 arguments', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const wrap1 = new Elem(elem1);
-      const wrap2 = new Elem(elem2);
-
-      wrap1.moveAttr('dwayne4', 'oldValue');
-      wrap2.moveAttr('dwayne4', 'newValue');
-
-      strictEqual(elem1.hasAttribute('dwayne4'), false);
-      strictEqual(elem2.getAttribute('dwayne4'), 'newValue');
-    });
-  });
-  describe('moveClass()', () => {
-    it('should add class if there was no last element', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
-
-      wrap.moveClass('dwayne1');
-
-      strictEqual(elem.classList.contains('dwayne1'), true);
-    });
-    it('should move class if there was last element', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const wrap1 = new Elem(elem1);
-      const wrap2 = new Elem(elem2);
-
-      wrap1.moveClass('dwayne3');
-      wrap2.moveClass('dwayne3');
-
-      strictEqual(elem1.classList.contains('dwayne3'), false);
-      strictEqual(elem2.classList.contains('dwayne3'), true);
-    });
-  });
-  describe('name', () => {
+  describe('name()', () => {
     it('should return tagName.toLowerCase()', () => {
-      const div = nativeDocument.createElement('div');
-      const input = nativeDocument.createElement('input');
-      const fieldset = nativeDocument.createElement('fieldset');
+      const div = document.createElement('div');
+      const input = document.createElement('input');
+      const fieldset = document.createElement('fieldset');
       const divWrap = new Elem(div);
       const inputWrap = new Elem(input);
       const fieldsetWrap = new Elem(fieldset);
 
-      strictEqual(divWrap.name, 'div');
-      strictEqual(inputWrap.name, 'input');
-      strictEqual(fieldsetWrap.name, 'fieldset');
+      strictEqual(divWrap.name(), 'div');
+      strictEqual(inputWrap.name(), 'input');
+      strictEqual(fieldsetWrap.name(), 'fieldset');
     });
   });
   describe('next()', () => {
     it('should return a wrap of the next elements to all elements in the set with no arguments', () => {
-      const parent1 = nativeDocument.createElement('div');
-      const parent2 = nativeDocument.createElement('div');
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
+      const parent1 = document.createElement('div');
+      const parent2 = document.createElement('div');
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
+      const elem3 = document.createElement('div');
+      const elem4 = document.createElement('div');
       const wrap = new Elem([
         elem1,
         elem2,
@@ -2662,98 +1043,19 @@ describe('it should test Elem#', () => {
       parent2.appendChild(elem3);
       parent2.appendChild(elem4);
 
-      const next = wrap.next().$;
+      const next = wrap.next();
 
       strictEqual(next.length, 2);
       strictEqual(next[0], elem2);
       strictEqual(next[1], elem4);
     });
-    it('should return a wrap of the next elements that match selector to all elements in the set with selector argument', () => {
-      const parent1 = nativeDocument.createElement('div');
-      const parent2 = nativeDocument.createElement('div');
-      const parent3 = nativeDocument.createElement('div');
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const elem5 = nativeDocument.createElement('div');
-      const elem6 = nativeDocument.createElement('div');
-      const wrap = new Elem([
-        elem1,
-        elem2,
-        elem3,
-        elem4,
-        elem5,
-        elem6
-      ]);
-
-      parent1.appendChild(elem1);
-      parent1.appendChild(elem2);
-      parent1.appendChild(elem3);
-      parent2.appendChild(elem4);
-      parent2.appendChild(elem5);
-      parent3.appendChild(elem6);
-
-      elem3.className = 'foo';
-      elem5.className = 'foo';
-
-      const next = wrap.next('.foo').$;
-
-      strictEqual(next.length, 2);
-      strictEqual(next[0], elem3);
-      strictEqual(next[1], elem5);
-    });
-  });
-  describe('off()', () => {
-    it('should support (event) syntax', (done) => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
-      let times = 0;
-
-      wrap.into(nativeBody);
-      wrap.on('click', () => {
-        if (++times === 1) {
-          wrap.remove();
-
-          done();
-
-          return wrap.off('click');
-        }
-
-        done('Hasn\'t been cleared');
-      });
-      wrap
-        .dispatch('click')
-        .dispatch('click');
-    });
-    it('should support (events) syntax', (done) => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
-      let times = 0;
-
-      wrap.into(nativeBody);
-      wrap.on('click', () => {
-        if (++times === 1) {
-          wrap.remove();
-
-          done();
-
-          return wrap.off('click, contextmenu');
-        }
-
-        done('Hasn\'t been cleared');
-      });
-      wrap
-        .dispatch('click')
-        .dispatch('contextmenu');
-    });
   });
   describe('on()', () => {
     it('should support (event, listener) syntax', (done) => {
-      const elem = nativeDocument.createElement('div');
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
 
-      wrap.into(nativeBody);
+      wrap.into(body);
       wrap.on('click', () => {
         wrap.remove();
 
@@ -2762,11 +1064,11 @@ describe('it should test Elem#', () => {
       wrap.dispatch('click');
     });
     it('should support (events, listener) syntax', (done) => {
-      const elem = nativeDocument.createElement('div');
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
       let times = 0;
 
-      wrap.into(nativeBody);
+      wrap.into(body);
       wrap.on('click, contextmenu', () => {
         if (++times === 2) {
           wrap.remove();
@@ -2782,7 +1084,7 @@ describe('it should test Elem#', () => {
     it('should support ({ [event]: listener, ... }) syntax', (done) => {
       let times = 0;
 
-      const elem = nativeDocument.createElement('div');
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
       const listener = () => {
         if (++times === 2) {
@@ -2792,51 +1094,17 @@ describe('it should test Elem#', () => {
         }
       };
 
-      wrap.into(nativeBody);
+      wrap.into(body);
       wrap.on({
         click: listener,
         contextmenu: listener
       });
       wrap.dispatch('click').dispatch('contextmenu');
     });
-    it('should support (event, selector, listener) syntax', (done) => {
-      const elem = nativeDocument.createElement('div');
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
-      let times = 0;
-
-      elem1.className = 'foo';
-      elem2.className = 'foo';
-
-      elem.appendChild(elem1);
-      elem.appendChild(elem2);
-      elem.appendChild(elem3);
-
-      wrap.into(nativeBody);
-      wrap.on('click', '.foo', () => {
-        if (++times === 2) {
-          wrap.remove();
-
-          return done();
-        }
-
-        if (times < 3) {
-          return;
-        }
-
-        done(new Error('Hasn\'t been filtered'));
-      });
-
-      elem1.click();
-      elem2.click();
-      elem3.click();
-    });
     it('should return removeEventListeners function', (done) => {
       let times = 0;
 
-      const elem = nativeDocument.createElement('div');
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
       const removeListener = wrap.on('click', () => {
         if (++times === 1) {
@@ -2850,7 +1118,7 @@ describe('it should test Elem#', () => {
         done(new Error('Not removed'));
       });
 
-      wrap.into(nativeBody);
+      wrap.into(body);
       wrap
         .dispatch('click')
         .dispatch('click');
@@ -2858,7 +1126,7 @@ describe('it should test Elem#', () => {
     it('should return removeEventListeners function that supports arguments', (done) => {
       let times = 0;
 
-      const elem = nativeDocument.createElement('div');
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
       const removeListener = wrap.on('click, contextmenu', () => {
         if (++times === 2) {
@@ -2876,78 +1144,24 @@ describe('it should test Elem#', () => {
         done(new Error('Not removed'));
       });
 
-      wrap.into(nativeBody);
+      wrap.into(body);
       wrap
         .dispatch('click')
         .dispatch('contextmenu')
         .dispatch('click');
     });
   });
-  describe('outerHeight', () => {
-    it('should return outer height', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
-
-      nativeBody.appendChild(elem);
-
-      wrap.css({
-        boxSizing: 'border-box',
-        height: '200px',
-        paddingTop: '2px',
-        paddingBottom: '3px',
-        borderTop: '1px solid black',
-        borderBottom: '4px solid black',
-        marginTop: '0px',
-        marginBottom: '5px'
-      });
-
-      strictEqual(wrap.outerHeight, 205);
-
-      wrap.css('box-sizing', 'content-box');
-
-      strictEqual(wrap.outerHeight, 215);
-
-      wrap.remove();
-    });
-  });
-  describe('outerWidth', () => {
-    it('should return outer width', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
-
-      nativeBody.appendChild(elem);
-
-      wrap.css({
-        boxSizing: 'border-box',
-        width: '200px',
-        paddingLeft: '2px',
-        paddingRight: '3px',
-        borderLeft: '1px solid black',
-        borderRight: '4px solid black',
-        marginLeft: '0px',
-        marginRight: '5px'
-      });
-
-      strictEqual(wrap.outerWidth, 205);
-
-      wrap.css('box-sizing', 'content-box');
-
-      strictEqual(wrap.outerWidth, 215);
-
-      wrap.remove();
-    });
-  });
   describe('parent()', () => {
     it('should return a wrap of the parent elements of all the elements in the set', () => {
-      const parent1 = nativeDocument.createElement('div');
-      const parent2 = nativeDocument.createElement('div');
-      const parent3 = nativeDocument.createElement('div');
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const elem5 = nativeDocument.createElement('div');
-      const elem6 = nativeDocument.createElement('div');
+      const parent1 = document.createElement('div');
+      const parent2 = document.createElement('div');
+      const parent3 = document.createElement('div');
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
+      const elem3 = document.createElement('div');
+      const elem4 = document.createElement('div');
+      const elem5 = document.createElement('div');
+      const elem6 = document.createElement('div');
       const wrap = new Elem([
         elem1,
         elem2,
@@ -2964,7 +1178,7 @@ describe('it should test Elem#', () => {
       parent2.appendChild(elem5);
       parent3.appendChild(elem6);
 
-      const parents = wrap.parent().$;
+      const parents = wrap.parent();
 
       strictEqual(parents.length, 3);
       strictEqual(parents[0], parent1);
@@ -2972,58 +1186,14 @@ describe('it should test Elem#', () => {
       strictEqual(parents[2], parent3);
     });
   });
-  describe('parentTree()', () => {
-    it('should return the whole tree of parents', () => {
-      const parent1 = nativeDocument.createElement('div');
-      const parent2 = nativeDocument.createElement('div');
-      const parent3 = nativeDocument.createElement('div');
-      const parent4 = nativeDocument.createElement('div');
-      const parent5 = nativeDocument.createElement('div');
-      const parent6 = nativeDocument.createElement('div');
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const elem5 = nativeDocument.createElement('div');
-      const elem6 = nativeDocument.createElement('div');
-      const wrap = new Elem([
-        elem1,
-        elem2,
-        elem3,
-        elem4,
-        elem5,
-        elem6
-      ]);
-
-      parent1.appendChild(elem1);
-      parent1.appendChild(elem2);
-      parent1.appendChild(elem3);
-      parent2.appendChild(elem4);
-      parent2.appendChild(elem5);
-      parent3.appendChild(elem6);
-      parent4.appendChild(parent1);
-      parent5.appendChild(parent4);
-      parent6.appendChild(parent2);
-
-      const tree = wrap.parentTree().$;
-
-      strictEqual(tree.length, 6);
-      strictEqual(tree[0], parent1);
-      strictEqual(tree[1], parent4);
-      strictEqual(tree[2], parent5);
-      strictEqual(tree[3], parent2);
-      strictEqual(tree[4], parent6);
-      strictEqual(tree[5], parent3);
-    });
-  });
   describe('prev()', () => {
     it('should return a wrap of the previous elements to all elements in the set with no arguments', () => {
-      const parent1 = nativeDocument.createElement('div');
-      const parent2 = nativeDocument.createElement('div');
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
+      const parent1 = document.createElement('div');
+      const parent2 = document.createElement('div');
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
+      const elem3 = document.createElement('div');
+      const elem4 = document.createElement('div');
       const wrap = new Elem([
         elem1,
         elem2,
@@ -3036,92 +1206,27 @@ describe('it should test Elem#', () => {
       parent2.appendChild(elem3);
       parent2.appendChild(elem4);
 
-      const prev = wrap.prev().$;
+      const prev = wrap.prev();
 
       strictEqual(prev.length, 2);
       strictEqual(prev[0], elem1);
       strictEqual(prev[1], elem3);
     });
-    it('should return a wrap of the previous elements that match selector to all elements in the set with selector argument', () => {
-      const parent1 = nativeDocument.createElement('div');
-      const parent2 = nativeDocument.createElement('div');
-      const parent3 = nativeDocument.createElement('div');
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const elem5 = nativeDocument.createElement('div');
-      const elem6 = nativeDocument.createElement('div');
-      const wrap = new Elem([
-        elem1,
-        elem2,
-        elem3,
-        elem4,
-        elem5,
-        elem6
-      ]);
-
-      parent1.appendChild(elem1);
-      parent1.appendChild(elem2);
-      parent1.appendChild(elem3);
-      parent2.appendChild(elem4);
-      parent2.appendChild(elem5);
-      parent3.appendChild(elem6);
-
-      elem1.className = 'foo';
-      elem4.className = 'foo';
-
-      const prev = wrap.prev('.foo').$;
-
-      strictEqual(prev.length, 2);
-      strictEqual(prev[0], elem1);
-      strictEqual(prev[1], elem4);
-    });
-  });
-  describe('ref()', () => {
-    it('should set references to elements', () => {
-      const elem1 = nativeDocument.createElement('img');
-      const elem2 = nativeDocument.createElement('form');
-      const elem3 = nativeDocument.createElement('script');
-      const elem4 = nativeDocument.createElement('link');
-      const elem5 = nativeDocument.createElement('iframe');
-      const elem6 = nativeDocument.createElement('audio');
-      const elem7 = nativeDocument.createElement('video');
-      const wrap = new Elem([
-        elem1,
-        elem2,
-        elem3,
-        elem4,
-        elem5,
-        elem6,
-        elem7
-      ]);
-
-      wrap.ref('http://google.com/');
-
-      strictEqual(elem1.src, 'http://google.com/');
-      strictEqual(elem2.action, 'http://google.com/');
-      strictEqual(elem3.src, 'http://google.com/');
-      strictEqual(elem4.href, 'http://google.com/');
-      strictEqual(elem5.src, 'http://google.com/');
-      strictEqual(elem6.src, 'http://google.com/');
-      strictEqual(elem7.src, 'http://google.com/');
-    });
   });
   describe('remove()', () => {
     it('should remove the element', () => {
-      const elem = nativeDocument.createElement('div');
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
 
-      nativeBody.appendChild(elem);
+      body.appendChild(elem);
       wrap.remove();
 
-      strictEqual(nativeDocument.body.contains(elem), false);
+      strictEqual(body.contains(elem), false);
     });
   });
   describe('removeAttr()', () => {
     it('should remove attributes from arguments', () => {
-      const elem = nativeDocument.createElement('div');
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
 
       elem.setAttribute('foo', 'bar');
@@ -3136,7 +1241,7 @@ describe('it should test Elem#', () => {
   });
   describe('removeClass()', () => {
     it('should remove classes from arguments', () => {
-      const elem = nativeDocument.createElement('div');
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
 
       elem.className = 'foo bar baz';
@@ -3149,7 +1254,7 @@ describe('it should test Elem#', () => {
   });
   describe('removeCSS()', () => {
     it('should remove css properties from arguments', () => {
-      const elem = nativeDocument.createElement('div');
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
 
       elem.style.display = 'inline';
@@ -3169,13 +1274,13 @@ describe('it should test Elem#', () => {
   });
   describe('replace()', () => {
     it('should replace the element with a set of elements if it\'s not the only, first or last child', () => {
-      const parent = nativeDocument.createElement('div');
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const elem5 = nativeDocument.createElement('div');
-      const elem6 = nativeDocument.createElement('div');
+      const parent = document.createElement('div');
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
+      const elem3 = document.createElement('div');
+      const elem4 = document.createElement('div');
+      const elem5 = document.createElement('div');
+      const elem6 = document.createElement('div');
       const elem = [
         elem4,
         elem5,
@@ -3191,7 +1296,7 @@ describe('it should test Elem#', () => {
 
       wrap2.replace(wrap);
 
-      const children = parentWrap.children().$;
+      const children = parentWrap.children();
 
       strictEqual(children.length, 5);
       strictEqual(children[0], elem1);
@@ -3201,13 +1306,13 @@ describe('it should test Elem#', () => {
       strictEqual(children[4], elem3);
     });
     it('should replace the element with a set of elements if it\'s a first child', () => {
-      const parent = nativeDocument.createElement('div');
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const elem5 = nativeDocument.createElement('div');
-      const elem6 = nativeDocument.createElement('div');
+      const parent = document.createElement('div');
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
+      const elem3 = document.createElement('div');
+      const elem4 = document.createElement('div');
+      const elem5 = document.createElement('div');
+      const elem6 = document.createElement('div');
       const elem = [
         elem4,
         elem5,
@@ -3223,7 +1328,7 @@ describe('it should test Elem#', () => {
 
       wrap2.replace(wrap);
 
-      const children = parentWrap.children().$;
+      const children = parentWrap.children();
 
       strictEqual(children.length, 5);
       strictEqual(children[0], elem4);
@@ -3233,13 +1338,13 @@ describe('it should test Elem#', () => {
       strictEqual(children[4], elem3);
     });
     it('should replace the element with a set of elements if it\'s a last child', () => {
-      const parent = nativeDocument.createElement('div');
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const elem5 = nativeDocument.createElement('div');
-      const elem6 = nativeDocument.createElement('div');
+      const parent = document.createElement('div');
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
+      const elem3 = document.createElement('div');
+      const elem4 = document.createElement('div');
+      const elem5 = document.createElement('div');
+      const elem6 = document.createElement('div');
       const elem = [
         elem4,
         elem5,
@@ -3255,7 +1360,7 @@ describe('it should test Elem#', () => {
 
       wrap2.replace(wrap);
 
-      const children = parentWrap.children().$;
+      const children = parentWrap.children();
 
       strictEqual(children.length, 5);
       strictEqual(children[0], elem1);
@@ -3265,11 +1370,11 @@ describe('it should test Elem#', () => {
       strictEqual(children[4], elem6);
     });
     it('should replace the element with a set of elements if it\'s an only child', () => {
-      const parent = nativeDocument.createElement('div');
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
+      const parent = document.createElement('div');
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
+      const elem3 = document.createElement('div');
+      const elem4 = document.createElement('div');
       const elem = [
         elem2,
         elem3,
@@ -3283,7 +1388,7 @@ describe('it should test Elem#', () => {
 
       wrap2.replace(wrap);
 
-      const children = parentWrap.children().$;
+      const children = parentWrap.children();
 
       strictEqual(children.length, 3);
       strictEqual(children[0], elem2);
@@ -3291,124 +1396,28 @@ describe('it should test Elem#', () => {
       strictEqual(children[2], elem4);
     });
     it('should support (element) syntax', () => {
-      const parent = nativeDocument.createElement('div');
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const wrap = new Elem(elem2);
-      const wrap2 = new Elem(elem1);
+      const parent = document.createElement('div');
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
+      const wrap = new Elem(elem1);
       const parentWrap = new Elem(parent);
 
       parent.appendChild(elem1);
 
-      wrap2.replace(elem2);
+      wrap.replace(elem2);
 
-      const children = parentWrap.children().$;
+      const children = parentWrap.children();
 
       strictEqual(children.length, 1);
       strictEqual(children[0], elem2);
     });
-    it('should support (selector) syntax', () => {
-      const parent = nativeDocument.createElement('div');
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const elem = [
-        elem2,
-        elem3,
-        elem4
-      ];
-      const wrap = new Elem(elem);
-      const wrap2 = new Elem(elem1);
-      const parentWrap = new Elem(parent);
-
-      parent.appendChild(elem1);
-
-      wrap
-        .into(nativeBody)
-        .class('replace-selector');
-
-      wrap2.replace('.replace-selector');
-
-      const children = parentWrap.children().$;
-
-      strictEqual(children.length, 3);
-      strictEqual(children[0], elem2);
-      strictEqual(children[1], elem3);
-      strictEqual(children[2], elem4);
-
-      wrap.remove();
-    });
-  });
-  describe('setOf()', () => {
-    it('should add set of elements of specified type', (done) => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem = [
-        elem1,
-        elem2,
-        elem3
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .setOf('div', 3, (elem, index) => {
-            elem.className = index;
-          })
-          .forEach((elem, index) => {
-            const index1 = new Num(index / 3).floor;
-
-            index %= 3;
-
-            strictEqual(elem.parentElement, wrap.elem(index1).$[0]);
-            strictEqual(elem.className, String(index));
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length * 3) {
-          done();
-        }
-      }
-    });
   });
   describe('show()', () => {
-    it('should not change display if it is not none and set element.dwayneData.previousDisplay to \'\'', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
-
-      wrap
-        .css('display', 'inline-block')
-        .hide()
-        .css('display', 'inline')
-        .show();
-
-      strictEqual(elem.style.display, 'inline');
-      strictEqual(elem.dwayneData.previousDisplay, '');
-    });
-    it('should set display to element.dwayneData.previousDisplay', () => {
-      const elem = nativeDocument.createElement('div');
+    it('should show the element', () => {
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
 
       elem.style.display = 'inline';
-      wrap.hide();
-      wrap.show();
-
-      strictEqual(elem.style.display, 'inline');
-    });
-    it('should support double hiding', () => {
-      const elem = nativeDocument.createElement('div');
-      const wrap = new Elem(elem);
-
-      elem.style.display = 'inline';
-      wrap.hide();
       wrap.hide();
       wrap.show();
 
@@ -3417,7 +1426,7 @@ describe('it should test Elem#', () => {
   });
   describe('text()', () => {
     it('should get text of the element with no arguments', () => {
-      const elem = nativeDocument.createElement('div');
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
 
       elem.innerHTML = '123';
@@ -3425,48 +1434,18 @@ describe('it should test Elem#', () => {
       strictEqual(wrap.text(), '123');
     });
     it('should set text of the element', () => {
-      const elem = nativeDocument.createElement('div');
+      const elem = document.createElement('div');
       const wrap = new Elem(elem);
 
       wrap.text('123');
 
       strictEqual(elem.innerHTML, '123');
     });
-    it('should support callback', (done) => {
-      const elem = [
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div'),
-        nativeDocument.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .forEach((elem, index) => {
-            new Elem(elem).text(`y${ index }y`);
-          })
-          .text((text) => `x${ text }x`)
-          .forEach((elem, index) => {
-            strictEqual(new Elem(elem).text(), `xy${ index }yx`);
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
   });
   describe('toggleAttr()', () => {
     it('should toggle attribute from argument if it is one', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
       const wrap1 = new Elem(elem1);
       const wrap2 = new Elem(elem2);
 
@@ -3479,10 +1458,10 @@ describe('it should test Elem#', () => {
       strictEqual(elem2.hasAttribute('baz'), true);
     });
     it('should add attribute from the first argument if the second is truthy and remove if not', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
+      const elem3 = document.createElement('div');
+      const elem4 = document.createElement('div');
       const wrap1 = new Elem(elem1);
       const wrap2 = new Elem(elem2);
       const wrap3 = new Elem(elem3);
@@ -3506,8 +1485,8 @@ describe('it should test Elem#', () => {
   });
   describe('toggleClass()', () => {
     it('should toggle class from argument if it is one', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
       const wrap1 = new Elem(elem1);
       const wrap2 = new Elem(elem2);
 
@@ -3520,10 +1499,10 @@ describe('it should test Elem#', () => {
       strictEqual(elem2.classList.contains('baz'), true);
     });
     it('should add class from the first argument if the second is truthy and remove if not', () => {
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
+      const elem3 = document.createElement('div');
+      const elem4 = document.createElement('div');
       const wrap1 = new Elem(elem1);
       const wrap2 = new Elem(elem2);
       const wrap3 = new Elem(elem3);
@@ -3545,351 +1524,17 @@ describe('it should test Elem#', () => {
       strictEqual(elem4.classList.contains('baz'), true);
     });
   });
-  describe('up()', () => {
-    it('should return a wrap of the parent elements with no arguments', () => {
-      const parent1 = nativeDocument.createElement('div');
-      const parent2 = nativeDocument.createElement('div');
-      const parent3 = nativeDocument.createElement('div');
-      const parent4 = nativeDocument.createElement('div');
-      const parent5 = nativeDocument.createElement('div');
-      const parent6 = nativeDocument.createElement('div');
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const elem5 = nativeDocument.createElement('div');
-      const elem6 = nativeDocument.createElement('div');
-      const wrap = new Elem([
-        elem1,
-        elem2,
-        elem3,
-        elem4,
-        elem5,
-        elem6
-      ]);
-
-      parent1.appendChild(elem1);
-      parent1.appendChild(elem2);
-      parent1.appendChild(elem3);
-      parent2.appendChild(elem4);
-      parent2.appendChild(elem5);
-      parent3.appendChild(elem6);
-      parent4.appendChild(parent1);
-      parent5.appendChild(parent4);
-      parent6.appendChild(parent2);
-
-      const parents = wrap.up().$;
-
-      strictEqual(parents.length, 3);
-      strictEqual(parents[0], parent1);
-      strictEqual(parents[1], parent2);
-      strictEqual(parents[2], parent3);
-    });
-    it('should return a wrap of the elements with 0 argument', () => {
-      const parent1 = nativeDocument.createElement('div');
-      const parent2 = nativeDocument.createElement('div');
-      const parent3 = nativeDocument.createElement('div');
-      const parent4 = nativeDocument.createElement('div');
-      const parent5 = nativeDocument.createElement('div');
-      const parent6 = nativeDocument.createElement('div');
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const elem5 = nativeDocument.createElement('div');
-      const elem6 = nativeDocument.createElement('div');
-      const wrap = new Elem([
-        elem1,
-        elem2,
-        elem3,
-        elem4,
-        elem5,
-        elem6
-      ]);
-
-      parent1.appendChild(elem1);
-      parent1.appendChild(elem2);
-      parent1.appendChild(elem3);
-      parent2.appendChild(elem4);
-      parent2.appendChild(elem5);
-      parent3.appendChild(elem6);
-      parent4.appendChild(parent1);
-      parent5.appendChild(parent4);
-      parent6.appendChild(parent2);
-
-      const parents = wrap.up(0).$;
-
-      strictEqual(parents.length, 6);
-      strictEqual(parents[0], elem1);
-      strictEqual(parents[1], elem2);
-      strictEqual(parents[2], elem3);
-      strictEqual(parents[3], elem4);
-      strictEqual(parents[4], elem5);
-      strictEqual(parents[5], elem6);
-    });
-    it('should return a wrap of the n-th parent elements with n argument', () => {
-      const parent1 = nativeDocument.createElement('div');
-      const parent2 = nativeDocument.createElement('div');
-      const parent3 = nativeDocument.createElement('div');
-      const parent4 = nativeDocument.createElement('div');
-      const parent5 = nativeDocument.createElement('div');
-      const parent6 = nativeDocument.createElement('div');
-      const elem1 = nativeDocument.createElement('div');
-      const elem2 = nativeDocument.createElement('div');
-      const elem3 = nativeDocument.createElement('div');
-      const elem4 = nativeDocument.createElement('div');
-      const elem5 = nativeDocument.createElement('div');
-      const elem6 = nativeDocument.createElement('div');
-      const wrap = new Elem([
-        elem1,
-        elem2,
-        elem3,
-        elem4,
-        elem5,
-        elem6
-      ]);
-
-      parent1.appendChild(elem1);
-      parent1.appendChild(elem2);
-      parent1.appendChild(elem3);
-      parent2.appendChild(elem4);
-      parent2.appendChild(elem5);
-      parent3.appendChild(elem6);
-      parent4.appendChild(parent1);
-      parent5.appendChild(parent4);
-      parent6.appendChild(parent2);
-
-      const parents = wrap.up(2).$;
-
-      strictEqual(parents.length, 2);
-      strictEqual(parents[0], parent4);
-      strictEqual(parents[1], parent6);
-    });
-  });
-  describe('validate()', () => {
-    it('should validate inputs and forms', () => {
-      const form = nativeDocument.createElement('form');
-      const input = nativeDocument.createElement('input');
-      const inputRequired = nativeDocument.createElement('input');
-      const formWrap = new Elem(form);
-      const inputWrap = new Elem(input);
-      let errors;
-
-      form.appendChild(input);
-
-      inputWrap.attr({
-        name: 'input1',
-        required: ''
-      });
-
-      inputRequired.setAttribute('required', '');
-
-      errors = inputWrap.validate();
-
-      strictEqual(errors.input1.message, inputRequired.validationMessage);
-
-      errors = formWrap.validate();
-
-      strictEqual(errors.input1.message, inputRequired.validationMessage);
-
-      inputWrap.validate((text) => {
-        if (text[0].toLowerCase() === text[0]) {
-          throw new Error('Input must be capitilized.');
-        }
-      });
-
-      errors = inputWrap
-        .prop('value', 't')
-        .validate();
-
-      strictEqual(errors.input1.message, 'Input must be capitilized.');
-
-      errors = formWrap.validate();
-
-      strictEqual(errors.input1.message, 'Input must be capitilized.');
-
-      errors = inputWrap
-        .prop('value', 'T')
-        .validate();
-
-      strictEqual(errors, null);
-    });
-    it('should fire a validate event on inputs', (done) => {
-      const input = nativeDocument.createElement('input');
-      const inputRequired = nativeDocument.createElement('input');
-      const inputWrap = new Elem(input);
-      let times = 0;
-      let error;
-
-      inputRequired.setAttribute('required', '');
-
-      inputWrap.attr({
-        name: 'input1',
-        required: ''
-      });
-
-      inputWrap.on('validate', (e) => {
-        /* eslint indent: 0 */
-        switch (times) {
-          case 0: {
-            try {
-              strictEqual(e.valid, false);
-              strictEqual(e.error.message, inputRequired.validationMessage);
-
-              doneAll();
-            } catch (err) {
-              doneAll(err);
-            }
-
-            return;
-          }
-          case 1: {
-            try {
-              strictEqual(e.valid, true);
-              strictEqual(e.error, null);
-
-              doneAll();
-            } catch (err) {
-              doneAll(err);
-            }
-
-            return;
-          }
-        }
-      });
-
-      inputWrap.validate();
-
-      inputWrap.prop('value', '1');
-
-      inputWrap.validate();
-
-      function doneAll(err) {
-        if (err) {
-          error = err;
-
-          return done(err);
-        }
-
-        if (++times === 2 && !error) {
-          done();
-        }
-      }
-    });
-    it('should fire a validate event on forms', (done) => {
-      const form = nativeDocument.createElement('form');
-      const input1 = nativeDocument.createElement('input');
-      const input2 = nativeDocument.createElement('input');
-      const inputRequired = nativeDocument.createElement('input');
-      const formWrap = new Elem(form);
-      const inputWrap1 = new Elem(input1);
-      const inputWrap2 = new Elem(input2);
-      let times = 0;
-      let error;
-
-      inputRequired.setAttribute('required', '');
-      form.appendChild(input1);
-      form.appendChild(input2);
-
-      inputWrap1.attr({
-        name: 'input1',
-        required: ''
-      });
-
-      inputWrap2.attr({
-        name: 'input2',
-        required: ''
-      });
-
-      inputWrap2.validate((text) => {
-        if (text[0].toLowerCase() === text[0]) {
-          throw new Error('Input must be capitilized.');
-        }
-      });
-
-      formWrap.on('validate', (e) => {
-        if (e.target !== form) {
-          return;
-        }
-
-        switch (times) {
-          case 0: {
-            try {
-              strictEqual(e.valid, false);
-              deepStrictEqual(Object.keys(e.errors), ['input1', 'input2']);
-              strictEqual(e.errors.input1.message, inputRequired.validationMessage);
-              strictEqual(e.errors.input2.message, inputRequired.validationMessage);
-
-              doneAll();
-            } catch (err) {
-              doneAll(err);
-            }
-
-            return;
-          }
-          case 1: {
-            try {
-              strictEqual(e.valid, false);
-              deepStrictEqual(Object.keys(e.errors), ['input2']);
-              strictEqual(e.errors.input2.message, 'Input must be capitilized.');
-
-              doneAll();
-            } catch (err) {
-              doneAll(err);
-            }
-
-            return;
-          }
-          case 2: {
-            try {
-              strictEqual(e.valid, true);
-              strictEqual(e.errors, null);
-
-              doneAll();
-            } catch (err) {
-              doneAll(err);
-            }
-
-            return;
-          }
-        }
-      });
-
-      formWrap.validate();
-
-      inputWrap1.prop('value', '1');
-      inputWrap2.prop('value', 't');
-
-      formWrap.validate();
-
-      inputWrap2.prop('value', 'T');
-
-      formWrap.validate();
-
-      function doneAll(err) {
-        if (err) {
-          error = err;
-
-          return done(err);
-        }
-
-        if (++times === 3 && !error) {
-          done();
-        }
-      }
-    });
-  });
 });
 
 describe('it should test exported methods from Elem', () => {
   describe('find()', () => {
     it('should find a wrap of all elements in nested children, that matches selector', () => {
-      const elem = nativeDocument.createElement('div');
-      const child1 = nativeDocument.createElement('div');
-      const child2 = nativeDocument.createElement('div');
-      const child3 = nativeDocument.createElement('div');
+      const elem = document.createElement('div');
+      const child1 = document.createElement('div');
+      const child2 = document.createElement('div');
+      const child3 = document.createElement('div');
 
-      nativeBody.appendChild(elem);
+      body.appendChild(elem);
       elem.appendChild(child1);
       elem.appendChild(child2);
       child2.appendChild(child3);
@@ -3897,165 +1542,13 @@ describe('it should test exported methods from Elem', () => {
       child1.className = 'dwayne-unique-class';
       child3.className = 'dwayne-unique-class';
 
-      const found = find('.dwayne-unique-class').$;
+      const found = find('.dwayne-unique-class');
 
       strictEqual(found.length, 2);
       strictEqual(found[0], child1);
       strictEqual(found[1], child3);
 
       new Elem(elem).remove();
-    });
-  });
-  describe('parseHTML()', () => {
-    it('should parse HTML', () => {
-      const html = `
-        <title  >
-          <span>&dagger;</span><!-- not comment -->
-        </title  >
-        <template>
-          <div>123</div>
-        </template>
-        <style type="text/css">
-          div:after {
-            content: "&dagger;";
-          }
-      
-          span:after {
-            content: "<html>123</html>"
-          }
-      
-          title:after {
-            content: "<!-- not comment -->";
-          }
-        </style>
-        123
-        &dagger;
-        &#8224;
-        &#x2020;
-        <div a="'123'" b="&apos;123&apos;" c="&quot;123&quot;"></div>
-        <script type="text/javascript">
-          var t = '<div>&dagger;</div>';
-      
-          alert(123);
-        </script>
-        <div  a b = 3 c ='123'  d ="456"e="789">
-          <!-- i'm a comment -->
-          1345<
-          <input type = "text">
-          <div>
-            <span>123</span>
-            <self-closing attr="123"/>
-            <i>567</i>
-          </div>
-        </div>
-        456
-      `;
-      const parsed = parseHTML(html).children();
-
-      /* eslint newline-per-chained-call: 0 */
-      strictEqual(parsed.length, 13);
-      strictEqual(parsed.elem(0).name, '#text');
-      strictEqual(parsed.elem(0).text(), '\n        ');
-      strictEqual(parsed.elem(1).name, 'title');
-      strictEqual(parsed.elem(1).text(), '\n          <span>\u2020</span><!-- not comment -->\n        ');
-      strictEqual(parsed.elem(2).name, '#text');
-      strictEqual(parsed.elem(2).text(), '\n        ');
-      strictEqual(parsed.elem(3).name, 'template');
-      strictEqual(new Elem(parsed.elem(3).prop('content')).children().length, 3);
-      strictEqual(new Elem(parsed.elem(3).prop('content')).child(0).name, '#text');
-      strictEqual(new Elem(parsed.elem(3).prop('content')).child(0).text(), '\n          ');
-      strictEqual(new Elem(parsed.elem(3).prop('content')).child(1).name, 'div');
-      strictEqual(new Elem(parsed.elem(3).prop('content')).child(1).text(), '123');
-      strictEqual(new Elem(parsed.elem(3).prop('content')).child(2).name, '#text');
-      strictEqual(new Elem(parsed.elem(3).prop('content')).child(2).text(), '\n        ');
-      strictEqual(parsed.elem(4).name, '#text');
-      strictEqual(parsed.elem(4).text(), '\n        ');
-      strictEqual(parsed.elem(5).name, 'style');
-      deepStrictEqual(parsed.elem(5).attr().$, { type: 'text/css' });
-      strictEqual(parsed.elem(5).text(), `
-          div:after {
-            content: "&dagger;";
-          }
-      
-          span:after {
-            content: "<html>123</html>"
-          }
-      
-          title:after {
-            content: "<!-- not comment -->";
-          }
-        `);
-      strictEqual(parsed.elem(6).name, '#text');
-      strictEqual(parsed.elem(6).text(), ['', '123', '\u2020', '\u2020', '\u2020', ''].join('\n        '));
-      strictEqual(parsed.elem(7).name, 'div');
-      deepStrictEqual(parsed.elem(7).attr().$, {
-        a: '\'123\'',
-        b: '\'123\'',
-        c: '"123"'
-      });
-      strictEqual(parsed.elem(8).name, '#text');
-      strictEqual(parsed.elem(8).text(), '\n        ');
-      strictEqual(parsed.elem(9).name, 'script');
-      deepStrictEqual(parsed.elem(9).attr().$, { type: 'text/javascript' });
-      strictEqual(parsed.elem(9).text(), `
-          var t = '<div>&dagger;</div>';
-      
-          alert(123);
-        `);
-      strictEqual(parsed.elem(10).name, '#text');
-      strictEqual(parsed.elem(10).text(), '\n        ');
-      strictEqual(parsed.elem(11).name, 'div');
-      deepStrictEqual(parsed.elem(11).attr().$, {
-        a: '',
-        b: '3',
-        c: '123',
-        d: '456',
-        e: '789'
-      });
-      strictEqual(parsed.elem(11).children().length, 7);
-      strictEqual(parsed.elem(11).child(0).name, '#text');
-      strictEqual(parsed.elem(11).child(0).text(), '\n          ');
-      strictEqual(parsed.elem(11).child(1).name, '#comment');
-      strictEqual(parsed.elem(11).child(1).text(), ' i\'m a comment ');
-      strictEqual(parsed.elem(11).child(2).name, '#text');
-      strictEqual(parsed.elem(11).child(2).text(), '\n          1345<\n          ');
-      strictEqual(parsed.elem(11).child(3).name, 'input');
-      deepStrictEqual(parsed.elem(11).child(3).attr().$, { type: 'text' });
-      strictEqual(parsed.elem(11).child(4).name, '#text');
-      strictEqual(parsed.elem(11).child(4).text(), '\n          ');
-      strictEqual(parsed.elem(11).child(5).name, 'div');
-      strictEqual(parsed.elem(11).child(5).children().length, 7);
-      strictEqual(parsed.elem(11).child(5).child(0).name, '#text');
-      strictEqual(parsed.elem(11).child(5).child(0).text(), '\n            ');
-      strictEqual(parsed.elem(11).child(5).child(1).name, 'span');
-      strictEqual(parsed.elem(11).child(5).child(1).text(), '123');
-      strictEqual(parsed.elem(11).child(5).child(2).name, '#text');
-      strictEqual(parsed.elem(11).child(5).child(2).text(), '\n            ');
-      strictEqual(parsed.elem(11).child(5).child(3).name, 'self-closing');
-      deepStrictEqual(parsed.elem(11).child(5).child(3).attr().$, { attr: '123' });
-      strictEqual(parsed.elem(11).child(5).child(4).name, '#text');
-      strictEqual(parsed.elem(11).child(5).child(4).text(), '\n            ');
-      strictEqual(parsed.elem(11).child(5).child(5).name, 'i');
-      strictEqual(parsed.elem(11).child(5).child(5).text(), '567');
-      strictEqual(parsed.elem(11).child(5).child(6).name, '#text');
-      strictEqual(parsed.elem(11).child(5).child(6).text(), '\n          ');
-      strictEqual(parsed.elem(11).child(6).name, '#text');
-      strictEqual(parsed.elem(11).child(6).text(), '\n        ');
-      strictEqual(parsed.elem(12).name, '#text');
-      strictEqual(parsed.elem(12).text(), '\n        456\n      ');
-    });
-  });
-  describe('px()', () => {
-    it('should return number of px from the string', () => {
-      const px1 = '';
-      const px2 = 0;
-      const px3 = '0px';
-      const px4 = '42px';
-
-      strictEqual(px(px1), 0);
-      strictEqual(px(px2), 0);
-      strictEqual(px(px3), 0);
-      strictEqual(px(px4), 42);
     });
   });
 });

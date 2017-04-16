@@ -7,7 +7,6 @@ const sourcemaps = require('gulp-sourcemaps');
 const buffer = require('vinyl-buffer');
 const source = require('vinyl-source-stream');
 const watch = require('rollup-watch');
-const babel = require('rollup-plugin-babel');
 const uglify = require('rollup-plugin-uglify');
 
 const createServer = require('./server');
@@ -15,28 +14,14 @@ const createServer = require('./server');
 const rollupDevConfig = require('./rollup.dev.config');
 const rollupBuildConfig = require('./rollup.build.config');
 const rollupTestConfig = require('./rollup.test.config');
-const config = require('./config.json');
 
 const devServer = createServer();
 const testServer = createServer();
 
 const modules = [
   '',
-  'D',
-  'Alphabet',
-  'Arr',
-  'BlobObject',
   'Block',
-  'Dat',
-  'Elem',
-  'Fetch',
-  'Func',
-  'Num',
-  'Promise',
-  'Router',
-  'Str',
-  'Super',
-  'Switcher'
+  'Elem'
 ];
 
 gulp.task('default', ['server:dev'], () => {
@@ -55,19 +40,7 @@ gulp.task('default', ['server:dev'], () => {
   });
 });
 
-gulp.task('build', ['build:default', 'build:min', 'build:browser', 'build:node', 'build:es6']);
-
-gulp.task('jsdoc', ['server:dev', 'jsdoc:compile'], () => (
-  gulp.watch(['./lib/**/*.js'], ['jsdoc:compile'])
-));
-
-gulp.task('jsdoc:public', ['server:dev', 'jsdoc:public:compile'], () => (
-  gulp.watch(['./lib/**/*.js'], ['jsdoc:public:compile'])
-));
-
-gulp.task('test:node', () => (
-  run('mocha test/node.js --reporter dot').exec()
-));
+gulp.task('build', ['build:default', 'build:min', 'build:browser', 'build:es6']);
 
 modules.forEach((module) => {
   const taskName = `test${ module ? `:${ module }` : '' }`;
@@ -95,11 +68,11 @@ modules.forEach((module) => {
 });
 
 gulp.task('server:dev', () => (
-  devServer.listen(config.devServer.port)
+  devServer.listen(7777)
 ));
 
 gulp.task('server:test', () => (
-  testServer.listen(config.testServer.port)
+  testServer.listen(8888)
 ));
 
 gulp.task('build:default', () => {
@@ -129,43 +102,21 @@ gulp.task('build:min', () => {
 gulp.task('build:browser', () => {
   const config = _.cloneDeep(rollupBuildConfig);
 
-  config.entry = './dwayne.js';
   config.format = 'cjs';
   config.sourceMap = false;
 
   return rollupStream(config)
-    .pipe(source('browser.js'))
-    .pipe(gulp.dest('./build'));
+    .pipe(source('index.js'))
+    .pipe(gulp.dest('./lib'));
 });
 
 gulp.task('build:es6', () => {
   const config = _.cloneDeep(rollupBuildConfig);
 
-  config.entry = './dwayne.js';
   config.format = 'es';
   config.sourceMap = false;
 
   return rollupStream(config)
     .pipe(source('es6.js'))
-    .pipe(gulp.dest('./build'));
+    .pipe(gulp.dest('./lib'));
 });
-
-gulp.task('build:node', () => {
-  const config = _.cloneDeep(rollupBuildConfig);
-
-  config.entry = './node.js';
-  config.format = 'cjs';
-  config.sourceMap = false;
-
-  return rollupStream(config)
-    .pipe(source('node.js'))
-    .pipe(gulp.dest('./build'));
-});
-
-gulp.task('jsdoc:compile', () => (
-  run('./node_modules/jsdoc/jsdoc.js -c conf.json').exec()
-));
-
-gulp.task('jsdoc:public:compile', () => (
-  run('./node_modules/jsdoc/jsdoc.js -c conf.public.json').exec()
-));

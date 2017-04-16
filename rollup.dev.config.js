@@ -9,13 +9,13 @@ const inject = require('rollup-plugin-inject');
 
 module.exports = {
   entry: [
-    './browser.js',
+    './src/index.js',
     './livereload.js',
     './entry.js'
   ],
   dest: './bundle.js',
   format: 'iife',
-  moduleName: 'D',
+  moduleName: 'Dwayne',
   sourceMap: true,
   plugins: [
     multi(),
@@ -36,26 +36,12 @@ module.exports = {
     }),
     babel({
       include: './**/*.js',
-      exclude: 'node_modules/**',
-      presets: [
-        [
-          'es2015',
-          {
-            modules: false
-          }
-        ],
-        'stage-0'
-      ],
-      plugins: [
-        'transform-class-properties',
-        'transform-object-rest-spread',
-        'external-helpers'
-      ]
+      exclude: 'node_modules/**'
     }),
     inject({
-      exclude: './lib/constants/global.js',
+      exclude: './src/global.js',
       modules: {
-        global: path.resolve('./lib/constants/global.js')
+        global: path.resolve('./src/global.js')
       }
     })
   ]

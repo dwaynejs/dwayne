@@ -1,13 +1,2 @@
-import './D';
-import './Alphabet';
-import './Arr';
-import './BlobObject';
-import './Dat';
+import './Block';
 import './Elem';
-import './Fetch';
-import './Func';
-import './Num';
-import './Promise';
-import './Str';
-import './Super';
-import './Switcher';

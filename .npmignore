@@ -2,33 +2,26 @@
 
 node_modules/
 .idea/
-/docs/
-/docs_public/
-/test/
 
-/.editorconfig
-/.eslintrc
+src/
+test/
 
-/conf.json
-/conf.public.json
-/config.example.json
-/config.json
+.babelrc
+.editorconfig
+.eslintrc
 
-/browser.js
-/dwayne.js
-/entry.js
-/bundle.js
-/bundle.js.map
-/node.js
-/test.js
-/test.js.map
+entry.js
+bundle.js
+bundle.js.map
+test.js
+test.js.map
 
-/index.html
-/test.html
+index.html
+test.html
 
-/gulpfile.js
-/livereload.js
-/rollup.build.config.js
-/rollup.dev.config.js
-/rollup.test.config.js
-/server.js
+gulpfile.js
+livereload.js
+rollup.build.config.js
+rollup.dev.config.js
+rollup.test.config.js
+server.js

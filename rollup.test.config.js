@@ -5,18 +5,18 @@ const npm = require('rollup-plugin-node-resolve');
 const cjs = require('rollup-plugin-commonjs');
 const eslint = require('rollup-plugin-eslint');
 const babel = require('rollup-plugin-babel');
-const pug = require('rollup-plugin-pug');
+const dwayneHTML = require('rollup-plugin-dwayne-html');
 const inject = require('rollup-plugin-inject');
 
 module.exports = {
   entry: [
-    './browser.js',
+    './src/index.js',
     './test/forAll.js',
     './livereload.js'
   ],
   dest: './test.js',
   format: 'iife',
-  moduleName: 'D',
+  moduleName: 'Dwayne',
   sourceMap: true,
   plugins: [
     multi(),
@@ -25,9 +25,8 @@ module.exports = {
       browser: true,
       preferBuiltins: false
     }),
-    pug({
-      include: './**/*.pug',
-      inlineFunctions: true
+    dwayneHTML({
+      include: './**/*.html'
     }),
     cjs({
       include: 'node_modules/**',
@@ -50,27 +49,13 @@ module.exports = {
       include: './**/*.js'
     }),
     babel({
-      include: './**/*.@(js|pug)',
-      exclude: 'node_modules/**',
-      presets: [
-        [
-          'es2015',
-          {
-            modules: false
-          }
-        ],
-        'stage-0'
-      ],
-      plugins: [
-        'transform-class-properties',
-        'transform-object-rest-spread',
-        'external-helpers'
-      ]
+      include: './**/*.@(js|html)',
+      exclude: 'node_modules/**'
     }),
     inject({
-      exclude: './lib/constants/global.js',
+      exclude: './src/global.js',
       modules: {
-        global: path.resolve('./lib/constants/global.js')
+        global: path.resolve('./src/global.js')
       }
     })
   ]
