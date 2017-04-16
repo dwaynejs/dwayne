@@ -91,118 +91,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 
 
-var asyncGenerator = function () {
-  function AwaitValue(value) {
-    this.value = value;
-  }
 
-  function AsyncGenerator(gen) {
-    var front, back;
-
-    function send(key, arg) {
-      return new Promise(function (resolve, reject) {
-        var request = {
-          key: key,
-          arg: arg,
-          resolve: resolve,
-          reject: reject,
-          next: null
-        };
-
-        if (back) {
-          back = back.next = request;
-        } else {
-          front = back = request;
-          resume(key, arg);
-        }
-      });
-    }
-
-    function resume(key, arg) {
-      try {
-        var result = gen[key](arg);
-        var value = result.value;
-
-        if (value instanceof AwaitValue) {
-          Promise.resolve(value.value).then(function (arg) {
-            resume("next", arg);
-          }, function (arg) {
-            resume("throw", arg);
-          });
-        } else {
-          settle(result.done ? "return" : "normal", result.value);
-        }
-      } catch (err) {
-        settle("throw", err);
-      }
-    }
-
-    function settle(type, value) {
-      switch (type) {
-        case "return":
-          front.resolve({
-            value: value,
-            done: true
-          });
-          break;
-
-        case "throw":
-          front.reject(value);
-          break;
-
-        default:
-          front.resolve({
-            value: value,
-            done: false
-          });
-          break;
-      }
-
-      front = front.next;
-
-      if (front) {
-        resume(front.key, front.arg);
-      } else {
-        back = null;
-      }
-    }
-
-    this._invoke = send;
-
-    if (typeof gen.return !== "function") {
-      this.return = undefined;
-    }
-  }
-
-  if (typeof Symbol === "function" && Symbol.asyncIterator) {
-    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
-      return this;
-    };
-  }
-
-  AsyncGenerator.prototype.next = function (arg) {
-    return this._invoke("next", arg);
-  };
-
-  AsyncGenerator.prototype.throw = function (arg) {
-    return this._invoke("throw", arg);
-  };
-
-  AsyncGenerator.prototype.return = function (arg) {
-    return this._invoke("return", arg);
-  };
-
-  return {
-    wrap: function (fn) {
-      return function () {
-        return new AsyncGenerator(fn.apply(this, arguments));
-      };
-    },
-    await: function (value) {
-      return new AwaitValue(value);
-    }
-  };
-}();
 
 
 
@@ -251,30 +140,7 @@ var defineProperty = function (obj, key, value) {
   return obj;
 };
 
-var get$1 = function get$1(object, property, receiver) {
-  if (object === null) object = Function.prototype;
-  var desc = Object.getOwnPropertyDescriptor(object, property);
 
-  if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
-
-    if (parent === null) {
-      return undefined;
-    } else {
-      return get$1(parent, property, receiver);
-    }
-  } else if ("value" in desc) {
-    return desc.value;
-  } else {
-    var getter = desc.get;
-
-    if (getter === undefined) {
-      return undefined;
-    }
-
-    return getter.call(receiver);
-  }
-};
 
 var inherits = function (subClass, superClass) {
   if (typeof superClass !== "function" && superClass !== null) {
@@ -308,30 +174,6 @@ var possibleConstructorReturn = function (self, call) {
   }
 
   return call && (typeof call === "object" || typeof call === "function") ? call : self;
-};
-
-
-
-var set$1 = function set$1(object, property, value, receiver) {
-  var desc = Object.getOwnPropertyDescriptor(object, property);
-
-  if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
-
-    if (parent !== null) {
-      set$1(parent, property, value, receiver);
-    }
-  } else if ("value" in desc && desc.writable) {
-    desc.value = value;
-  } else {
-    var setter = desc.set;
-
-    if (setter !== undefined) {
-      setter.call(receiver, value);
-    }
-  }
-
-  return value;
 };
 
 /**
@@ -1038,7 +880,7 @@ function iterate(object, callback) {
  * @param {...Object} objects - Objects that are assigned to the target.
  * @returns {Object} Target.
  */
-function assign$1(target) {
+function assign(target) {
   for (var _len = arguments.length, objects = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
     objects[_key - 1] = arguments[_key];
   }
@@ -1281,7 +1123,7 @@ var Alphabet = function () {
     for (var i = 0, length = alphabet.length; i < length; i++) {
       var char = alphabet[i];
 
-      if (!check$1(char)) {
+      if (!check(char)) {
         throw new Error('Each element of an array must be a single char! (in Alphabet)');
       }
 
@@ -1322,7 +1164,7 @@ var Alphabet = function () {
       for (var i = 0, length = chars.length; i < length; i++) {
         var char = chars[i];
 
-        if (!check$1(char)) {
+        if (!check(char)) {
           throw new Error('Each argument must be a single char! (in Alphabet#add)');
         }
 
@@ -1392,7 +1234,7 @@ var Alphabet = function () {
       for (var i = 0, length = chars.length; i < length; i++) {
         var char = chars[i];
 
-        if (!check$1(char)) {
+        if (!check(char)) {
           throw new Error('Each argument must be a single char! (in Alphabet#delete)');
         }
 
@@ -1413,7 +1255,7 @@ var Alphabet = function () {
 
   }, {
     key: 'get',
-    value: function get() {
+    value: function get$$1() {
       return Object.keys(this.$$);
     }
 
@@ -1449,7 +1291,7 @@ var Alphabet = function () {
 
 defineProperties(Alphabet.prototype, defineProperty({}, _Symbol.toStringTag, 'Alphabet'));
 
-function check$1(char) {
+function check(char) {
   return isString(char) && char.length === 1;
 }
 
@@ -1600,15 +1442,15 @@ var Switcher = function (_Function) {
 
     function switcher(value) {
       var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-      var _switcher$$$ = switcher.$$;
-      var mode = _switcher$$$.mode;
-      var def = _switcher$$$.default;
-      var cases = _switcher$$$.cases;
+      var _switcher$$$ = switcher.$$,
+          mode = _switcher$$$.mode,
+          def = _switcher$$$.default,
+          cases = _switcher$$$.cases;
 
 
       var ret = iterate(cases, function (_ref) {
-        var val = _ref.value;
-        var Case = _ref.case;
+        var val = _ref.value,
+            Case = _ref.case;
 
         if (mode === 'boolean' && Case ||
         /* eslint eqeqeq: 0 */
@@ -1994,7 +1836,7 @@ var Super = function () {
      * @example
      * new Super({ a: 1, b: 2 }).assign({ a: 3 }, { c: 3, d: 4 }, { d: 5 }).$; // { a: 3, b: 2, c: 3, d: 5 }
      */
-    value: function assign() {
+    value: function assign$$1() {
       for (var _len = arguments.length, objects = Array(_len), _key = 0; _key < _len; _key++) {
         objects[_key] = arguments[_key];
       }
@@ -2791,7 +2633,7 @@ var Super = function () {
 
   }, {
     key: 'get',
-    value: function get(property, getter) {
+    value: function get$$1(property, getter) {
       if (arguments.length >= 2) {
         property = defineProperty({}, property, getter);
       }
@@ -3320,7 +3162,7 @@ var Super = function () {
 
   }, {
     key: 'set',
-    value: function set(property, setter) {
+    value: function set$$1(property, setter) {
       if (arguments.length >= 2) {
         property = defineProperty({}, property, setter);
       }
@@ -3410,7 +3252,7 @@ var Super = function () {
     }
   }, {
     key: 'toJSON',
-    value: function toJSON() {
+    value: function toJSON$$1() {
       return this.$;
     }
 
@@ -3509,7 +3351,7 @@ var Super = function () {
     }
   }, {
     key: 'count',
-    get: function get() {
+    get: function get$$1() {
       var object = this.$;
 
       if (!isObject(object)) {
@@ -3520,7 +3362,7 @@ var Super = function () {
     }
   }, {
     key: 'toStringTag',
-    get: function get() {
+    get: function get$$1() {
       return toStringTag(this.$);
     }
 
@@ -3541,7 +3383,7 @@ var Super = function () {
 
   }, {
     key: 'type',
-    get: function get() {
+    get: function get$$1() {
       return _typeof(this.$);
     }
   }], [{
@@ -4041,10 +3883,10 @@ var Promise$1 = function () {
      */
     defineProperties(this.$$ = {}, {
       'get/set handled': {
-        get: function get() {
+        get: function get$$1() {
           return hiddenPromise.handled;
         },
-        set: function set(key) {
+        set: function set$$1(key) {
           if (key === secret) {
             hiddenPromise.handled = true;
           }
@@ -4087,30 +3929,28 @@ var Promise$1 = function () {
 
     function reject(err) {
       if (hiddenPromise.status === 'pending') {
-        (function () {
-          hiddenPromise.status = 'rejected';
-          hiddenPromise.value = err;
+        hiddenPromise.status = 'rejected';
+        hiddenPromise.value = err;
 
-          for (var i = 0, length = onReject.length; i < length; i++) {
-            hiddenPromise.handled = true;
+        for (var i = 0, length = onReject.length; i < length; i++) {
+          hiddenPromise.handled = true;
 
-            onReject[i](err);
+          onReject[i](err);
+        }
+
+        var onUnhandledRejection = Promise.onUnhandledRejection,
+            onError = Promise.onError;
+
+
+        if (isFunction(onError)) {
+          onError(err);
+        }
+
+        setTimeout(function () {
+          if (!hiddenPromise.handled && isFunction(onUnhandledRejection)) {
+            onUnhandledRejection(err);
           }
-
-          var onUnhandledRejection = Promise.onUnhandledRejection;
-          var onError = Promise.onError;
-
-
-          if (isFunction(onError)) {
-            onError(err);
-          }
-
-          setTimeout(function () {
-            if (!hiddenPromise.handled && isFunction(onUnhandledRejection)) {
-              onUnhandledRejection(err);
-            }
-          }, 1);
-        })();
+        }, 1);
       }
     }
 
@@ -4436,65 +4276,54 @@ var Func = function (_Super) {
     var _this = possibleConstructorReturn(this, (Func.__proto__ || Object.getPrototypeOf(Func)).call(this));
 
     function proxy() {
-      var _this2 = this,
-          _arguments = arguments;
-
       if (++proxy.$$.called < proxy.$$.canBeCalled) {
-        var _ret2 = function () {
-          var _proxy$$$ = proxy.$$;
-          var before = _proxy$$$.before;
-          var after = _proxy$$$.after;
-          var sync = _proxy$$$.sync;
-          var contextLocked = _proxy$$$.contextLocked;
-          var _proxy$$$2 = proxy.$$;
-          var context = _proxy$$$2.context;
-          var args = _proxy$$$2.args;
+        var _proxy$$$ = proxy.$$,
+            before = _proxy$$$.before,
+            after = _proxy$$$.after,
+            sync = _proxy$$$.sync,
+            contextLocked = _proxy$$$.contextLocked;
+        var _proxy$$$2 = proxy.$$,
+            context = _proxy$$$2.context,
+            args = _proxy$$$2.args;
 
-          var ret = void 0;
+        var ret = void 0;
 
-          context = contextLocked ? context : context || _this2;
-          args = args.concat(toArray$1(_arguments));
+        context = contextLocked ? context : context || this;
+        args = args.concat(toArray$1(arguments));
 
-          if (sync) {
-            iterate(before, function (middleware) {
-              args = middleware.call(context, toArray$1(args), proxy);
-            });
-
-            ret = func.apply(context, toArray$1(args));
-
-            iterate(after, function (middleware) {
-              ret = middleware.call(context, ret, proxy);
-            });
-
-            return {
-              v: ret
-            };
-          }
-
-          var promise = Promise$1.resolve(args);
-
+        if (sync) {
           iterate(before, function (middleware) {
-            promise = promise.then(function (args) {
-              return middleware.call(context, toArray$1(args), proxy);
-            });
+            args = middleware.call(context, toArray$1(args), proxy);
           });
 
-          promise = promise.then(function (args) {
-            return func.apply(context, toArray$1(args));
-          });
+          ret = func.apply(context, toArray$1(args));
 
           iterate(after, function (middleware) {
-            promise = promise.then(function (ret) {
-              return middleware.call(context, ret, proxy);
-            });
+            ret = middleware.call(context, ret, proxy);
           });
 
-          return {
-            v: promise
-          };
-        }();
+          return ret;
+        }
 
-        if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
+        var promise = Promise$1.resolve(args);
+
+        iterate(before, function (middleware) {
+          promise = promise.then(function (args) {
+            return middleware.call(context, toArray$1(args), proxy);
+          });
+        });
+
+        promise = promise.then(function (args) {
+          return func.apply(context, toArray$1(args));
+        });
+
+        iterate(after, function (middleware) {
+          promise = promise.then(function (ret) {
+            return middleware.call(context, ret, proxy);
+          });
+        });
+
+        return promise;
       }
     }
 
@@ -5072,7 +4901,7 @@ var Func = function (_Super) {
     }
   }, {
     key: 'called',
-    get: function get() {
+    get: function get$$1() {
       return this.$$.called;
     }
   }]);
@@ -5124,7 +4953,7 @@ function noop() {}
  * @example
  * ['foo', '12', '7890'].map(prop('length')); // [3, 2, 4]
  */
-function prop$1(prop) {
+function prop(prop) {
   return function (_ref) {
     var value = _ref[prop];
     return value;
@@ -5616,12 +5445,12 @@ var Num = function (_Super) {
     }
   }, {
     key: 'abs',
-    get: function get() {
+    get: function get$$1() {
       return Math.abs(this.$);
     }
   }, {
     key: 'acosh',
-    get: function get() {
+    get: function get$$1() {
       var number = this.$;
 
       return Math.log(number + Math.sqrt(number * number - 1));
@@ -5639,14 +5468,14 @@ var Num = function (_Super) {
 
   }, {
     key: 'asinh',
-    get: function get() {
+    get: function get$$1() {
       var number = this.$;
 
       return Math.log(number + Math.sqrt(number * number + 1));
     }
   }, {
     key: 'atanh',
-    get: function get() {
+    get: function get$$1() {
       var number = this.$;
 
       return Math.log((1 + number) / (1 - number)) / 2;
@@ -5664,7 +5493,7 @@ var Num = function (_Super) {
 
   }, {
     key: 'cbrt',
-    get: function get() {
+    get: function get$$1() {
       var cbrt = Math.pow(Math.abs(this.$), 1 / 3);
 
       return this.$ > 0 ? cbrt : -cbrt;
@@ -5686,12 +5515,12 @@ var Num = function (_Super) {
 
   }, {
     key: 'ceil',
-    get: function get() {
+    get: function get$$1() {
       return Math.ceil(this.$);
     }
   }, {
     key: 'cosh',
-    get: function get() {
+    get: function get$$1() {
       var exp = this.exp;
 
       return (exp + 1 / exp) / 2;
@@ -5711,7 +5540,7 @@ var Num = function (_Super) {
 
   }, {
     key: 'cube',
-    get: function get() {
+    get: function get$$1() {
       return this.$ * this.$ * this.$;
     }
 
@@ -5727,7 +5556,7 @@ var Num = function (_Super) {
 
   }, {
     key: 'exp',
-    get: function get() {
+    get: function get$$1() {
       return Math.exp(this.$);
     }
 
@@ -5747,17 +5576,17 @@ var Num = function (_Super) {
 
   }, {
     key: 'floor',
-    get: function get() {
+    get: function get$$1() {
       return Math.floor(this.$);
     }
   }, {
     key: 'ln',
-    get: function get() {
+    get: function get$$1() {
       return Math.log(this.$);
     }
   }, {
     key: 'log2',
-    get: function get() {
+    get: function get$$1() {
       return this.ln / ln2;
     }
 
@@ -5773,12 +5602,12 @@ var Num = function (_Super) {
 
   }, {
     key: 'log10',
-    get: function get() {
+    get: function get$$1() {
       return this.ln / ln10;
     }
   }, {
     key: 'round',
-    get: function get() {
+    get: function get$$1() {
       return Math.round(this.$);
     }
 
@@ -5794,7 +5623,7 @@ var Num = function (_Super) {
 
   }, {
     key: 'sign',
-    get: function get() {
+    get: function get$$1() {
       var number = this.$;
 
       if (!number) {
@@ -5805,7 +5634,7 @@ var Num = function (_Super) {
     }
   }, {
     key: 'sinh',
-    get: function get() {
+    get: function get$$1() {
       var exp = this.exp;
 
       return (exp - 1 / exp) / 2;
@@ -5825,7 +5654,7 @@ var Num = function (_Super) {
 
   }, {
     key: 'sq',
-    get: function get() {
+    get: function get$$1() {
       return this.$ * this.$;
     }
 
@@ -5841,12 +5670,12 @@ var Num = function (_Super) {
 
   }, {
     key: 'sqrt',
-    get: function get() {
+    get: function get$$1() {
       return Math.sqrt(this.$);
     }
   }, {
     key: 'tanh',
-    get: function get() {
+    get: function get$$1() {
       var number = this.$;
 
       if (!isFinite(number)) {
@@ -5899,7 +5728,7 @@ function rand() {
  * random(1, 5); // 3
  * random(1, 5); // 1
  */
-function random$1(start, end) {
+function random(start, end) {
   validate([start, end], ['intLike', 'intLike'], 'random');
 
   if (end <= start) {
@@ -6210,8 +6039,8 @@ var Arr = function (_Super) {
 
   }, {
     key: 'random',
-    value: function random() {
-      return this.$[random$1(0, this.$.length - 1)];
+    value: function random$$1() {
+      return this.$[random(0, this.$.length - 1)];
     }
 
     /**
@@ -6403,12 +6232,12 @@ var Arr = function (_Super) {
     }
   }, {
     key: 'first',
-    get: function get() {
+    get: function get$$1() {
       return this.$[0];
     }
   }, {
     key: 'last',
-    get: function get() {
+    get: function get$$1() {
       var array = this.$;
 
       return array[array.length - 1];
@@ -6426,7 +6255,7 @@ var Arr = function (_Super) {
 
   }, {
     key: 'length',
-    get: function get() {
+    get: function get$$1() {
       return this.$.length;
     }
   }]);
@@ -7136,7 +6965,7 @@ var Str = function (_Super) {
     }
   }, {
     key: 'length',
-    get: function get() {
+    get: function get$$1() {
       return this.$.length;
     }
   }]);
@@ -7185,9 +7014,9 @@ function parseJSON$1() {
     options = {};
   }
 
-  var _options = options;
-  var numbers = _options.numbers;
-  var dates = _options.dates;
+  var _options = options,
+      numbers = _options.numbers,
+      dates = _options.dates;
 
   var parsed = JSON.parse(json, function (key, value) {
     if (dates && /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.\d\d\dZ?$/.test(value)) {
@@ -7614,7 +7443,7 @@ var Dat = function (_Super) {
 
   }, {
     key: 'get',
-    value: function get(what) {
+    value: function get$$1(what) {
       return getSwitcher(what, [this.$, 'get']);
     }
 
@@ -7797,7 +7626,7 @@ var Dat = function (_Super) {
 
   }, {
     key: 'set',
-    value: function set(what, number) {
+    value: function set$$1(what, number) {
       var date = this.$;
 
       if (arguments.length >= 2) {
@@ -7972,11 +7801,11 @@ var statics = Object.freeze({
 	Func: Func,
 	method: method,
 	noop: noop,
-	prop: prop$1,
+	prop: prop,
 	self: self$1,
 	Num: Num,
 	rand: rand,
-	random: random$1,
+	random: random,
 	Promise: Promise$1,
 	Str: Str,
 	parseJSON: parseJSON$1,
@@ -7989,7 +7818,7 @@ var statics = Object.freeze({
 var D$$1 = D$2;
 
 
-assign$1(D$$1, statics);
+assign(D$$1, statics);
 
 delete D$$1.D;
 

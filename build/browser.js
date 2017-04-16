@@ -2044,118 +2044,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 
 
-var asyncGenerator = function () {
-  function AwaitValue(value) {
-    this.value = value;
-  }
 
-  function AsyncGenerator(gen) {
-    var front, back;
-
-    function send(key, arg) {
-      return new Promise(function (resolve, reject) {
-        var request = {
-          key: key,
-          arg: arg,
-          resolve: resolve,
-          reject: reject,
-          next: null
-        };
-
-        if (back) {
-          back = back.next = request;
-        } else {
-          front = back = request;
-          resume(key, arg);
-        }
-      });
-    }
-
-    function resume(key, arg) {
-      try {
-        var result = gen[key](arg);
-        var value = result.value;
-
-        if (value instanceof AwaitValue) {
-          Promise.resolve(value.value).then(function (arg) {
-            resume("next", arg);
-          }, function (arg) {
-            resume("throw", arg);
-          });
-        } else {
-          settle(result.done ? "return" : "normal", result.value);
-        }
-      } catch (err) {
-        settle("throw", err);
-      }
-    }
-
-    function settle(type, value) {
-      switch (type) {
-        case "return":
-          front.resolve({
-            value: value,
-            done: true
-          });
-          break;
-
-        case "throw":
-          front.reject(value);
-          break;
-
-        default:
-          front.resolve({
-            value: value,
-            done: false
-          });
-          break;
-      }
-
-      front = front.next;
-
-      if (front) {
-        resume(front.key, front.arg);
-      } else {
-        back = null;
-      }
-    }
-
-    this._invoke = send;
-
-    if (typeof gen.return !== "function") {
-      this.return = undefined;
-    }
-  }
-
-  if (typeof Symbol === "function" && Symbol.asyncIterator) {
-    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
-      return this;
-    };
-  }
-
-  AsyncGenerator.prototype.next = function (arg) {
-    return this._invoke("next", arg);
-  };
-
-  AsyncGenerator.prototype.throw = function (arg) {
-    return this._invoke("throw", arg);
-  };
-
-  AsyncGenerator.prototype.return = function (arg) {
-    return this._invoke("return", arg);
-  };
-
-  return {
-    wrap: function (fn) {
-      return function () {
-        return new AsyncGenerator(fn.apply(this, arguments));
-      };
-    },
-    await: function (value) {
-      return new AwaitValue(value);
-    }
-  };
-}();
 
 
 
@@ -2218,7 +2107,7 @@ var _extends = Object.assign || function (target) {
   return target;
 };
 
-var get$1 = function get$1(object, property, receiver) {
+var get = function get(object, property, receiver) {
   if (object === null) object = Function.prototype;
   var desc = Object.getOwnPropertyDescriptor(object, property);
 
@@ -2228,7 +2117,7 @@ var get$1 = function get$1(object, property, receiver) {
     if (parent === null) {
       return undefined;
     } else {
-      return get$1(parent, property, receiver);
+      return get(parent, property, receiver);
     }
   } else if ("value" in desc) {
     return desc.value;
@@ -2289,27 +2178,7 @@ var possibleConstructorReturn = function (self, call) {
 
 
 
-var set$1 = function set$1(object, property, value, receiver) {
-  var desc = Object.getOwnPropertyDescriptor(object, property);
 
-  if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
-
-    if (parent !== null) {
-      set$1(parent, property, value, receiver);
-    }
-  } else if ("value" in desc && desc.writable) {
-    desc.value = value;
-  } else {
-    var setter = desc.set;
-
-    if (setter !== undefined) {
-      setter.call(receiver, value);
-    }
-  }
-
-  return value;
-};
 
 var slicedToArray = function () {
   function sliceIterator(arr, i) {
@@ -3075,7 +2944,7 @@ function iterate(object, callback) {
  * @param {...Object} objects - Objects that are assigned to the target.
  * @returns {Object} Target.
  */
-function assign$1(target) {
+function assign(target) {
   for (var _len = arguments.length, objects = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
     objects[_key - 1] = arguments[_key];
   }
@@ -3309,7 +3178,7 @@ var numbers = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th'];
  * @returns {void}
  * @description Function for checking arguments of other functions.
  */
-function validate$1(args, options, name) {
+function validate(args, options, name) {
   iterate(options, function (array, number) {
     if (!isArray(array)) {
       array = [array];
@@ -3360,7 +3229,7 @@ var Alphabet = function () {
     for (var i = 0, length = alphabet.length; i < length; i++) {
       var char = alphabet[i];
 
-      if (!check$1(char)) {
+      if (!check(char)) {
         throw new Error('Each element of an array must be a single char! (in Alphabet)');
       }
 
@@ -3401,7 +3270,7 @@ var Alphabet = function () {
       for (var i = 0, length = chars.length; i < length; i++) {
         var char = chars[i];
 
-        if (!check$1(char)) {
+        if (!check(char)) {
           throw new Error('Each argument must be a single char! (in Alphabet#add)');
         }
 
@@ -3429,7 +3298,7 @@ var Alphabet = function () {
   }, {
     key: 'contains',
     value: function contains(word) {
-      validate$1([word], ['string'], 'Alphabet#contains');
+      validate([word], ['string'], 'Alphabet#contains');
 
       var alphabet = this.$$;
 
@@ -3471,7 +3340,7 @@ var Alphabet = function () {
       for (var i = 0, length = chars.length; i < length; i++) {
         var char = chars[i];
 
-        if (!check$1(char)) {
+        if (!check(char)) {
           throw new Error('Each argument must be a single char! (in Alphabet#delete)');
         }
 
@@ -3492,7 +3361,7 @@ var Alphabet = function () {
 
   }, {
     key: 'get',
-    value: function get() {
+    value: function get$$1() {
       return Object.keys(this.$$);
     }
 
@@ -3510,7 +3379,7 @@ var Alphabet = function () {
   }, {
     key: 'token',
     value: function token(length) {
-      validate$1([length], [['intLike', '>0']], 'Alphabet#token');
+      validate([length], [['intLike', '>0']], 'Alphabet#token');
 
       var alphabet = Object.keys(this.$$);
       var len = alphabet.length;
@@ -3528,7 +3397,7 @@ var Alphabet = function () {
 
 defineProperties(Alphabet.prototype, defineProperty({}, _Symbol.toStringTag, 'Alphabet'));
 
-function check$1(char) {
+function check(char) {
   return isString(char) && char.length === 1;
 }
 
@@ -3548,7 +3417,7 @@ function check$1(char) {
  * a2.get().$; // ['5', 'f', 'g']
  */
 function alphabet(string) {
-  validate$1([string], ['string']);
+  validate([string], ['string']);
 
   var ranges = string.split(/([\s\S]-+[\s\S])?/g);
   var length = ranges.length;
@@ -3679,15 +3548,15 @@ var Switcher = function (_Function) {
 
     function switcher(value) {
       var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-      var _switcher$$$ = switcher.$$;
-      var mode = _switcher$$$.mode;
-      var def = _switcher$$$.default;
-      var cases = _switcher$$$.cases;
+      var _switcher$$$ = switcher.$$,
+          mode = _switcher$$$.mode,
+          def = _switcher$$$.default,
+          cases = _switcher$$$.cases;
 
 
       var ret = iterate(cases, function (_ref) {
-        var val = _ref.value;
-        var Case = _ref.case;
+        var val = _ref.value,
+            Case = _ref.case;
 
         if (mode === 'boolean' && Case ||
         /* eslint eqeqeq: 0 */
@@ -4073,7 +3942,7 @@ var Super = function () {
      * @example
      * new Super({ a: 1, b: 2 }).assign({ a: 3 }, { c: 3, d: 4 }, { d: 5 }).$; // { a: 3, b: 2, c: 3, d: 5 }
      */
-    value: function assign() {
+    value: function assign$$1() {
       for (var _len = arguments.length, objects = Array(_len), _key = 0; _key < _len; _key++) {
         objects[_key] = arguments[_key];
       }
@@ -4106,7 +3975,7 @@ var Super = function () {
     value: function average() {
       var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
-      validate$1([callback], ['function||!'], 'Super#average');
+      validate([callback], ['function||!'], 'Super#average');
 
       return this.sum(callback) / this.count;
     }
@@ -4128,7 +3997,7 @@ var Super = function () {
   }, {
     key: 'call',
     value: function call(func) {
-      validate$1([func], ['function'], 'Super#call');
+      validate([func], ['function'], 'Super#call');
 
       for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
         args[_key2 - 1] = arguments[_key2];
@@ -4328,7 +4197,7 @@ var Super = function () {
         callback = Boolean;
       }
 
-      validate$1([callback, n], ['function', ['numberLike', '>0']], 'Super#deepEvery');
+      validate([callback, n], ['function', ['numberLike', '>0']], 'Super#deepEvery');
 
       n = Number(n);
 
@@ -4363,7 +4232,7 @@ var Super = function () {
         callback = Boolean;
       }
 
-      validate$1([callback, n], ['function', ['numberLike', '>0']], 'Super#deepFilter');
+      validate([callback, n], ['function', ['numberLike', '>0']], 'Super#deepFilter');
 
       var filtered = _deepFilter(this.$, callback, n, [{ key: null, value: this.$ }]);
 
@@ -4402,7 +4271,7 @@ var Super = function () {
         callback = Boolean;
       }
 
-      validate$1([callback, n], ['function', ['numberLike', '>0']], 'Super#deepFind');
+      validate([callback, n], ['function', ['numberLike', '>0']], 'Super#deepFind');
 
       return _deepFind(this.$, callback, n, [{ key: null, value: this.$ }]);
     }
@@ -4425,7 +4294,7 @@ var Super = function () {
     value: function deepForEach(callback) {
       var n = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Infinity;
 
-      validate$1([callback, n], ['function', ['numberLike', '>0']], 'Super#deepForEach');
+      validate([callback, n], ['function', ['numberLike', '>0']], 'Super#deepForEach');
 
       n = Number(n);
 
@@ -4453,7 +4322,7 @@ var Super = function () {
     value: function deepForEachEntry(callback) {
       var n = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Infinity;
 
-      validate$1([callback, n], ['function', ['numberLike', '>0']], 'Super#deepForEach');
+      validate([callback, n], ['function', ['numberLike', '>0']], 'Super#deepForEach');
 
       n = Number(n);
 
@@ -4499,7 +4368,7 @@ var Super = function () {
     value: function deepMap(callback) {
       var n = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Infinity;
 
-      validate$1([callback, n], ['function', ['numberLike', '>0']], 'Super#deepMap');
+      validate([callback, n], ['function', ['numberLike', '>0']], 'Super#deepMap');
 
       n = Number(n);
 
@@ -4526,7 +4395,7 @@ var Super = function () {
       var n = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Infinity;
       var IV = arguments[2];
 
-      validate$1([callback, n], ['function', ['numberLike', '>0']], 'Super#deepReduce');
+      validate([callback, n], ['function', ['numberLike', '>0']], 'Super#deepReduce');
 
       n = Number(n);
 
@@ -4568,7 +4437,7 @@ var Super = function () {
         callback = Boolean;
       }
 
-      validate$1([callback, n], ['function', ['numberLike', '>0']], 'Super#deepSome');
+      validate([callback, n], ['function', ['numberLike', '>0']], 'Super#deepSome');
 
       n = Number(n);
 
@@ -4708,7 +4577,7 @@ var Super = function () {
     value: function every() {
       var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Boolean;
 
-      validate$1([callback], ['function'], 'Super#every');
+      validate([callback], ['function'], 'Super#every');
 
       return iterate(this.$, function (value, key, object) {
         if (!callback(value, key, object)) {
@@ -4759,7 +4628,7 @@ var Super = function () {
     value: function filter() {
       var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Boolean;
 
-      validate$1([callback], ['function'], 'Super#filter');
+      validate([callback], ['function'], 'Super#filter');
 
       var object = this.$;
       var array = isArrayLike(object);
@@ -4796,7 +4665,7 @@ var Super = function () {
   }, {
     key: 'find',
     value: function find(callback) {
-      validate$1([callback], ['function'], 'Super#find');
+      validate([callback], ['function'], 'Super#find');
 
       return iterate(this.$, function (value, key, object) {
         if (callback(value, key, object)) {
@@ -4821,7 +4690,7 @@ var Super = function () {
   }, {
     key: 'forEach',
     value: function forEach(callback) {
-      validate$1([callback], ['function'], 'Super#forEach');
+      validate([callback], ['function'], 'Super#forEach');
 
       iterate(this.$, function (value, key, object) {
         callback(value, key, object);
@@ -4870,7 +4739,7 @@ var Super = function () {
 
   }, {
     key: 'get',
-    value: function get(property, getter) {
+    value: function get$$1(property, getter) {
       if (arguments.length >= 2) {
         property = defineProperty({}, property, getter);
       }
@@ -5097,7 +4966,7 @@ var Super = function () {
   }, {
     key: 'map',
     value: function map(callback) {
-      validate$1([callback], ['function'], 'Super#map');
+      validate([callback], ['function'], 'Super#map');
 
       var object = this.$;
       var o = isArrayLike(object) ? [] : isNull(object) ? null : {};
@@ -5129,7 +4998,7 @@ var Super = function () {
     value: function max() {
       var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
-      validate$1([callback], ['function||!'], 'Super#max');
+      validate([callback], ['function||!'], 'Super#max');
 
       return this.object(function (max, value, key, object) {
         var val = Number(callback ? callback(value, key, object) : value);
@@ -5161,7 +5030,7 @@ var Super = function () {
     value: function min() {
       var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
-      validate$1([callback], ['function||!'], 'Super#min');
+      validate([callback], ['function||!'], 'Super#min');
 
       return this.object(function (min, value, key, object) {
         var val = Number(callback ? callback(value, key, object) : value);
@@ -5194,7 +5063,7 @@ var Super = function () {
     value: function object(callback) {
       var _object = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-      validate$1([callback], ['function'], 'Super#object');
+      validate([callback], ['function'], 'Super#object');
 
       iterate(this.$, function (value, key, obj) {
         callback(_object, value, key, obj);
@@ -5343,7 +5212,7 @@ var Super = function () {
   }, {
     key: 'reduce',
     value: function reduce(callback, IV) {
-      validate$1([callback], ['function'], 'Super#reduce');
+      validate([callback], ['function'], 'Super#reduce');
 
       var object = this.$;
 
@@ -5399,7 +5268,7 @@ var Super = function () {
 
   }, {
     key: 'set',
-    value: function set(property, setter) {
+    value: function set$$1(property, setter) {
       if (arguments.length >= 2) {
         property = defineProperty({}, property, setter);
       }
@@ -5431,7 +5300,7 @@ var Super = function () {
     value: function some() {
       var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Boolean;
 
-      validate$1([callback], ['function'], 'Super#some');
+      validate([callback], ['function'], 'Super#some');
 
       return iterate(this.$, function (value, key, object) {
         if (callback(value, key, object)) {
@@ -5481,7 +5350,7 @@ var Super = function () {
     value: function sum() {
       var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
-      validate$1([callback], ['function||!'], 'Super#sum');
+      validate([callback], ['function||!'], 'Super#sum');
 
       return this.reduce(function (sum, value, key, object) {
         return sum + Number(callback ? callback(value, key, object) : value);
@@ -5489,7 +5358,7 @@ var Super = function () {
     }
   }, {
     key: 'toJSON',
-    value: function toJSON() {
+    value: function toJSON$$1() {
       return this.$;
     }
 
@@ -5580,7 +5449,7 @@ var Super = function () {
     value: function word() {
       var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
-      validate$1([callback], ['function||!'], 'Super#word');
+      validate([callback], ['function||!'], 'Super#word');
 
       return this.reduce(function (word, value, key, object) {
         return word + String(callback ? callback(value, key, object) : value);
@@ -5588,7 +5457,7 @@ var Super = function () {
     }
   }, {
     key: 'count',
-    get: function get() {
+    get: function get$$1() {
       var object = this.$;
 
       if (!isObject(object)) {
@@ -5599,7 +5468,7 @@ var Super = function () {
     }
   }, {
     key: 'toStringTag',
-    get: function get() {
+    get: function get$$1() {
       return toStringTag(this.$);
     }
 
@@ -5620,7 +5489,7 @@ var Super = function () {
 
   }, {
     key: 'type',
-    get: function get() {
+    get: function get$$1() {
       return _typeof(this.$);
     }
   }], [{
@@ -6120,10 +5989,10 @@ var Promise$1 = function () {
      */
     defineProperties(this.$$ = {}, {
       'get/set handled': {
-        get: function get() {
+        get: function get$$1() {
           return hiddenPromise.handled;
         },
-        set: function set(key) {
+        set: function set$$1(key) {
           if (key === secret) {
             hiddenPromise.handled = true;
           }
@@ -6166,30 +6035,28 @@ var Promise$1 = function () {
 
     function reject(err) {
       if (hiddenPromise.status === 'pending') {
-        (function () {
-          hiddenPromise.status = 'rejected';
-          hiddenPromise.value = err;
+        hiddenPromise.status = 'rejected';
+        hiddenPromise.value = err;
 
-          for (var i = 0, length = onReject.length; i < length; i++) {
-            hiddenPromise.handled = true;
+        for (var i = 0, length = onReject.length; i < length; i++) {
+          hiddenPromise.handled = true;
 
-            onReject[i](err);
+          onReject[i](err);
+        }
+
+        var onUnhandledRejection = Promise.onUnhandledRejection,
+            onError = Promise.onError;
+
+
+        if (isFunction(onError)) {
+          onError(err);
+        }
+
+        setTimeout(function () {
+          if (!hiddenPromise.handled && isFunction(onUnhandledRejection)) {
+            onUnhandledRejection(err);
           }
-
-          var onUnhandledRejection = Promise.onUnhandledRejection;
-          var onError = Promise.onError;
-
-
-          if (isFunction(onError)) {
-            onError(err);
-          }
-
-          setTimeout(function () {
-            if (!hiddenPromise.handled && isFunction(onUnhandledRejection)) {
-              onUnhandledRejection(err);
-            }
-          }, 1);
-        })();
+        }, 1);
       }
     }
 
@@ -6515,65 +6382,54 @@ var Func = function (_Super) {
     var _this = possibleConstructorReturn(this, (Func.__proto__ || Object.getPrototypeOf(Func)).call(this));
 
     function proxy() {
-      var _this2 = this,
-          _arguments = arguments;
-
       if (++proxy.$$.called < proxy.$$.canBeCalled) {
-        var _ret2 = function () {
-          var _proxy$$$ = proxy.$$;
-          var before = _proxy$$$.before;
-          var after = _proxy$$$.after;
-          var sync = _proxy$$$.sync;
-          var contextLocked = _proxy$$$.contextLocked;
-          var _proxy$$$2 = proxy.$$;
-          var context = _proxy$$$2.context;
-          var args = _proxy$$$2.args;
+        var _proxy$$$ = proxy.$$,
+            before = _proxy$$$.before,
+            after = _proxy$$$.after,
+            sync = _proxy$$$.sync,
+            contextLocked = _proxy$$$.contextLocked;
+        var _proxy$$$2 = proxy.$$,
+            context = _proxy$$$2.context,
+            args = _proxy$$$2.args;
 
-          var ret = void 0;
+        var ret = void 0;
 
-          context = contextLocked ? context : context || _this2;
-          args = args.concat(toArray$1(_arguments));
+        context = contextLocked ? context : context || this;
+        args = args.concat(toArray$1(arguments));
 
-          if (sync) {
-            iterate(before, function (middleware) {
-              args = middleware.call(context, toArray$1(args), proxy);
-            });
-
-            ret = func.apply(context, toArray$1(args));
-
-            iterate(after, function (middleware) {
-              ret = middleware.call(context, ret, proxy);
-            });
-
-            return {
-              v: ret
-            };
-          }
-
-          var promise = Promise$1.resolve(args);
-
+        if (sync) {
           iterate(before, function (middleware) {
-            promise = promise.then(function (args) {
-              return middleware.call(context, toArray$1(args), proxy);
-            });
+            args = middleware.call(context, toArray$1(args), proxy);
           });
 
-          promise = promise.then(function (args) {
-            return func.apply(context, toArray$1(args));
-          });
+          ret = func.apply(context, toArray$1(args));
 
           iterate(after, function (middleware) {
-            promise = promise.then(function (ret) {
-              return middleware.call(context, ret, proxy);
-            });
+            ret = middleware.call(context, ret, proxy);
           });
 
-          return {
-            v: promise
-          };
-        }();
+          return ret;
+        }
 
-        if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
+        var promise = Promise$1.resolve(args);
+
+        iterate(before, function (middleware) {
+          promise = promise.then(function (args) {
+            return middleware.call(context, toArray$1(args), proxy);
+          });
+        });
+
+        promise = promise.then(function (args) {
+          return func.apply(context, toArray$1(args));
+        });
+
+        iterate(after, function (middleware) {
+          promise = promise.then(function (ret) {
+            return middleware.call(context, ret, proxy);
+          });
+        });
+
+        return promise;
       }
     }
 
@@ -6641,7 +6497,7 @@ var Func = function (_Super) {
     value: function after(middleware) {
       var afterAll = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
-      validate$1([middleware], ['function'], 'Func#after');
+      validate([middleware], ['function'], 'Func#after');
 
       var after = this.$$.after;
 
@@ -6719,7 +6575,7 @@ var Func = function (_Super) {
     value: function before(middleware) {
       var beforeAll = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
-      validate$1([middleware], ['function'], 'Func#before');
+      validate([middleware], ['function'], 'Func#before');
 
       var before = this.$$.before;
 
@@ -7151,7 +7007,7 @@ var Func = function (_Super) {
     }
   }, {
     key: 'called',
-    get: function get() {
+    get: function get$$1() {
       return this.$$.called;
     }
   }]);
@@ -7203,7 +7059,7 @@ function noop() {}
  * @example
  * ['foo', '12', '7890'].map(prop('length')); // [3, 2, 4]
  */
-function prop$1(prop) {
+function prop(prop) {
   return function (_ref) {
     var value = _ref[prop];
     return value;
@@ -7402,7 +7258,7 @@ var Num = function (_Super) {
     value: function interval(func) {
       var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
-      validate$1([func], ['function'], 'Num#interval');
+      validate([func], ['function'], 'Num#interval');
 
       func = new Func(func).bindContext({ abort: abort });
       args = toArray$1(args);
@@ -7695,12 +7551,12 @@ var Num = function (_Super) {
     }
   }, {
     key: 'abs',
-    get: function get() {
+    get: function get$$1() {
       return Math.abs(this.$);
     }
   }, {
     key: 'acosh',
-    get: function get() {
+    get: function get$$1() {
       var number = this.$;
 
       return Math.log(number + Math.sqrt(number * number - 1));
@@ -7718,14 +7574,14 @@ var Num = function (_Super) {
 
   }, {
     key: 'asinh',
-    get: function get() {
+    get: function get$$1() {
       var number = this.$;
 
       return Math.log(number + Math.sqrt(number * number + 1));
     }
   }, {
     key: 'atanh',
-    get: function get() {
+    get: function get$$1() {
       var number = this.$;
 
       return Math.log((1 + number) / (1 - number)) / 2;
@@ -7743,7 +7599,7 @@ var Num = function (_Super) {
 
   }, {
     key: 'cbrt',
-    get: function get() {
+    get: function get$$1() {
       var cbrt = Math.pow(Math.abs(this.$), 1 / 3);
 
       return this.$ > 0 ? cbrt : -cbrt;
@@ -7765,12 +7621,12 @@ var Num = function (_Super) {
 
   }, {
     key: 'ceil',
-    get: function get() {
+    get: function get$$1() {
       return Math.ceil(this.$);
     }
   }, {
     key: 'cosh',
-    get: function get() {
+    get: function get$$1() {
       var exp = this.exp;
 
       return (exp + 1 / exp) / 2;
@@ -7790,7 +7646,7 @@ var Num = function (_Super) {
 
   }, {
     key: 'cube',
-    get: function get() {
+    get: function get$$1() {
       return this.$ * this.$ * this.$;
     }
 
@@ -7806,7 +7662,7 @@ var Num = function (_Super) {
 
   }, {
     key: 'exp',
-    get: function get() {
+    get: function get$$1() {
       return Math.exp(this.$);
     }
 
@@ -7826,17 +7682,17 @@ var Num = function (_Super) {
 
   }, {
     key: 'floor',
-    get: function get() {
+    get: function get$$1() {
       return Math.floor(this.$);
     }
   }, {
     key: 'ln',
-    get: function get() {
+    get: function get$$1() {
       return Math.log(this.$);
     }
   }, {
     key: 'log2',
-    get: function get() {
+    get: function get$$1() {
       return this.ln / ln2;
     }
 
@@ -7852,12 +7708,12 @@ var Num = function (_Super) {
 
   }, {
     key: 'log10',
-    get: function get() {
+    get: function get$$1() {
       return this.ln / ln10;
     }
   }, {
     key: 'round',
-    get: function get() {
+    get: function get$$1() {
       return Math.round(this.$);
     }
 
@@ -7873,7 +7729,7 @@ var Num = function (_Super) {
 
   }, {
     key: 'sign',
-    get: function get() {
+    get: function get$$1() {
       var number = this.$;
 
       if (!number) {
@@ -7884,7 +7740,7 @@ var Num = function (_Super) {
     }
   }, {
     key: 'sinh',
-    get: function get() {
+    get: function get$$1() {
       var exp = this.exp;
 
       return (exp - 1 / exp) / 2;
@@ -7904,7 +7760,7 @@ var Num = function (_Super) {
 
   }, {
     key: 'sq',
-    get: function get() {
+    get: function get$$1() {
       return this.$ * this.$;
     }
 
@@ -7920,12 +7776,12 @@ var Num = function (_Super) {
 
   }, {
     key: 'sqrt',
-    get: function get() {
+    get: function get$$1() {
       return Math.sqrt(this.$);
     }
   }, {
     key: 'tanh',
-    get: function get() {
+    get: function get$$1() {
       var number = this.$;
 
       if (!isFinite(number)) {
@@ -7978,8 +7834,8 @@ function rand() {
  * random(1, 5); // 3
  * random(1, 5); // 1
  */
-function random$1(start, end) {
-  validate$1([start, end], ['intLike', 'intLike'], 'random');
+function random(start, end) {
+  validate([start, end], ['intLike', 'intLike'], 'random');
 
   if (end <= start) {
     throw new Error('The second argument must be greater than the first!', 'random');
@@ -8114,7 +7970,7 @@ var Arr = function (_Super) {
      * }).$; // { a: 1, b: { c: 4, d: 5 } }
      */
     value: function forEachReverse(callback) {
-      validate$1([callback], ['function'], 'Arr#forEachReverse');
+      validate([callback], ['function'], 'Arr#forEachReverse');
 
       var array = this.$;
 
@@ -8289,8 +8145,8 @@ var Arr = function (_Super) {
 
   }, {
     key: 'random',
-    value: function random() {
-      return this.$[random$1(0, this.$.length - 1)];
+    value: function random$$1() {
+      return this.$[random(0, this.$.length - 1)];
     }
 
     /**
@@ -8379,7 +8235,7 @@ var Arr = function (_Super) {
   }, {
     key: 'sort',
     value: function sort(compareFunction) {
-      validate$1([compareFunction], ['function||!'], 'Arr#sort');
+      validate([compareFunction], ['function||!'], 'Arr#sort');
 
       this.$.sort(compareFunction);
 
@@ -8482,12 +8338,12 @@ var Arr = function (_Super) {
     }
   }, {
     key: 'first',
-    get: function get() {
+    get: function get$$1() {
       return this.$[0];
     }
   }, {
     key: 'last',
-    get: function get() {
+    get: function get$$1() {
       var array = this.$;
 
       return array[array.length - 1];
@@ -8505,7 +8361,7 @@ var Arr = function (_Super) {
 
   }, {
     key: 'length',
-    get: function get() {
+    get: function get$$1() {
       return this.$.length;
     }
   }]);
@@ -8568,7 +8424,7 @@ constructors[1].push({
  * array(3, (i) => i * 2).$; // [0, 2, 4]
  */
 function array(number, callback) {
-  validate$1([number, callback], [['intLike', '>=0'], 'function||!'], 'array');
+  validate([number, callback], [['intLike', '>=0'], 'function||!'], 'array');
 
   var array = [];
 
@@ -8591,7 +8447,7 @@ function array(number, callback) {
  * iterate();
  */
 function iterate$1(number, callback) {
-  validate$1([number, callback], [['intLike', '>=0'], 'function'], 'iterate');
+  validate([number, callback], [['intLike', '>=0'], 'function'], 'iterate');
 
   for (var i = 0; i < number; i++) {
     callback(i);
@@ -8768,7 +8624,7 @@ var BlobObject = function (_Super) {
      * @readonly
      * @description Returns dataURL representation of the blob.
      */
-    get: function get() {
+    get: function get$$1() {
       return URL.createObjectURL(this.$);
     }
   }]);
@@ -8795,7 +8651,7 @@ constructors[1].push({
  * @returns {BlobObject} New instance of BlobObject.
  * @description Function for creating blobs not involving BlobObject and Blob constructors.
  */
-function blob$1(blobParts) {
+function blob(blobParts) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   if (!isArray(blobParts)) {
@@ -9028,7 +8884,7 @@ var Str = function (_Super) {
   }, {
     key: 'repeat',
     value: function repeat(times) {
-      validate$1([times], [['intLike', '>=0']], 'Str#repeat');
+      validate([times], [['intLike', '>=0']], 'Str#repeat');
 
       times = +times;
 
@@ -9083,7 +8939,7 @@ var Str = function (_Super) {
 
       string = new Super(string).$;
 
-      validate$1([string], ['string'], 'Str#replaceString');
+      validate([string], ['string'], 'Str#replaceString');
 
       return new Str(this.$.split(string).join(replacer));
     }
@@ -9124,7 +8980,7 @@ var Str = function (_Super) {
   }, {
     key: 'search',
     value: function search(regexp) {
-      validate$1([regexp], ['regexp']);
+      validate([regexp], ['regexp']);
 
       return this.$.search.apply(this.$, arguments);
     }
@@ -9422,7 +9278,7 @@ var Str = function (_Super) {
     }
   }, {
     key: 'length',
-    get: function get() {
+    get: function get$$1() {
       return this.$.length;
     }
   }]);
@@ -9471,9 +9327,9 @@ function parseJSON$1() {
     options = {};
   }
 
-  var _options = options;
-  var numbers = _options.numbers;
-  var dates = _options.dates;
+  var _options = options,
+      numbers = _options.numbers,
+      dates = _options.dates;
 
   var parsed = JSON.parse(json, function (key, value) {
     if (dates && /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.\d\d\dZ?$/.test(value)) {
@@ -9515,9 +9371,9 @@ var div = document.createElement('div');
 var nodeSwitcher = switcher('strictEquals', function (elem) {
   return elem;
 }).case('tag-open', function (elem, node) {
-  var _node = node;
-  var name = _node.value;
-  var selfClosing = _node.selfClosing;
+  var _node = node,
+      name = _node.value,
+      selfClosing = _node.selfClosing;
 
 
   node = {
@@ -9615,7 +9471,7 @@ var markupToJSON = (function (markup, collapseWhiteSpace) {
 
   while (markup.length) {
     try {
-      found = find$1(markup, elem);
+      found = find(markup, elem);
     } catch (err) {
       if (!(err instanceof InternalParsingError)) {
         throwUnexpectedError();
@@ -9624,12 +9480,12 @@ var markupToJSON = (function (markup, collapseWhiteSpace) {
       throw new ParsingError('Parsing error near index ' + nearString(startMarkup, globalIndex + err.index));
     }
 
-    var _found = found;
-    var type = _found.type;
-    var attrs = _found.attrs;
-    var selfClosing = _found.selfClosing;
-    var index = _found.index;
-    var value = _found.value;
+    var _found = found,
+        type = _found.type,
+        attrs = _found.attrs,
+        selfClosing = _found.selfClosing,
+        index = _found.index,
+        value = _found.value;
 
 
     globalIndex += index;
@@ -9660,7 +9516,7 @@ var markupToJSON = (function (markup, collapseWhiteSpace) {
   }
 });
 
-function find$1(markup, elem) {
+function find(markup, elem) {
   var name = elem.name;
 
   var matches = void 0;
@@ -9718,10 +9574,8 @@ function find$1(markup, elem) {
 
   var _matches$min = matches.min(function (match) {
     return match ? match.index : NaN;
-  });
-
-  var index = _matches$min.value;
-
+  }),
+      index = _matches$min.value;
 
   if (index === Infinity) {
     index = markup.length;
@@ -9819,7 +9673,6 @@ var classes = {};
 var attrs = {};
 var windowsDwayneData = new Arr([]);
 var inputElements = 'input, select, textarea, datalist, keygen, output';
-var click$1 = method('click');
 var svgNS$1 = 'http://www.w3.org/2000/svg';
 var xmlNS = 'http://www.w3.org/2000/xmlns/';
 var xlinkNS = 'http://www.w3.org/1999/xlink';
@@ -10295,7 +10148,7 @@ var Elem = function (_Arr) {
 
   }, {
     key: 'blob',
-    value: function blob() {
+    value: function blob$$1() {
       var _this4 = this;
 
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -10337,7 +10190,7 @@ var Elem = function (_Arr) {
           ia[i] = byteString.charCodeAt(i);
         });
 
-        return blob$1(ab, options);
+        return blob(ab, options);
       });
     }
 
@@ -10400,10 +10253,8 @@ var Elem = function (_Arr) {
         if (getName(elem) === 'style') {
           var _ref = new Arr(elem.sheet.cssRules).find(function (rule) {
             return rule.dwayneData && rule.dwayneData.name === name;
-          }) || {};
-
-          var rule = _ref.value;
-
+          }) || {},
+              rule = _ref.value;
 
           if (rule) {
             new Elem(rule).css(style);
@@ -10499,7 +10350,7 @@ var Elem = function (_Arr) {
 
   }, {
     key: 'click',
-    value: function click$1() {
+    value: function click() {
       return this.forEach(function (elem) {
         if (isElement(elem)) {
           elem.click();
@@ -10762,7 +10613,7 @@ var Elem = function (_Arr) {
           property = defineProperty({}, property, value);
         }
 
-        assign$1(ctx, property);
+        assign(ctx, property);
       }
 
       return this;
@@ -10901,12 +10752,11 @@ var Elem = function (_Arr) {
       var eventInit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
       var details = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-      var _ref2 = eventInit || {};
-
-      var _ref2$bubbles = _ref2.bubbles;
-      var bubbles = _ref2$bubbles === undefined ? true : _ref2$bubbles;
-      var _ref2$cancelable = _ref2.cancelable;
-      var cancelable = _ref2$cancelable === undefined ? true : _ref2$cancelable;
+      var _ref2 = eventInit || {},
+          _ref2$bubbles = _ref2.bubbles,
+          bubbles = _ref2$bubbles === undefined ? true : _ref2$bubbles,
+          _ref2$cancelable = _ref2.cancelable,
+          cancelable = _ref2$cancelable === undefined ? true : _ref2$cancelable;
 
       var finalEvent = event;
 
@@ -10918,7 +10768,7 @@ var Elem = function (_Arr) {
           finalEvent.initEvent(event, bubbles, cancelable);
         }
 
-        assign$1(finalEvent, details);
+        assign(finalEvent, details);
       }
 
       return this.forEach(function (elem) {
@@ -10971,7 +10821,7 @@ var Elem = function (_Arr) {
     value: function filter() {
       var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Boolean;
 
-      return new Elem(get$1(Elem.prototype.__proto__ || Object.getPrototypeOf(Elem.prototype), 'filter', this).call(this, filterSwitcher(selector)));
+      return new Elem(get(Elem.prototype.__proto__ || Object.getPrototypeOf(Elem.prototype), 'filter', this).call(this, filterSwitcher(selector)));
     }
 
     /**
@@ -10988,7 +10838,7 @@ var Elem = function (_Arr) {
     key: 'find',
     value: function find(selector) {
       if (!isString(selector)) {
-        return get$1(Elem.prototype.__proto__ || Object.getPrototypeOf(Elem.prototype), 'find', this).call(this, selector);
+        return get(Elem.prototype.__proto__ || Object.getPrototypeOf(Elem.prototype), 'find', this).call(this, selector);
       }
 
       return this.object(function (elems, elem) {
@@ -11030,10 +10880,8 @@ var Elem = function (_Arr) {
       return this.object(function (elems, elem) {
         var _ref3 = new Elem(elem).children().find(function (elem) {
           return new Elem(elem).is(selector);
-        }) || {};
-
-        var found = _ref3.value;
-
+        }) || {},
+            found = _ref3.value;
 
         elems.add(found);
       }, new Elem());
@@ -11092,10 +10940,8 @@ var Elem = function (_Arr) {
         if (getName(elem) === 'style') {
           var _ref4 = new Arr(elem.sheet.cssRules).find(function (rule) {
             return rule.dwayneData && rule.dwayneData.name === name;
-          }) || {};
-
-          var rule = _ref4.value;
-
+          }) || {},
+              rule = _ref4.value;
 
           if (rule) {
             found = {
@@ -11514,10 +11360,8 @@ var Elem = function (_Arr) {
       return this.object(function (elems, elem) {
         var _ref5 = new Elem(elem).children().reverse().find(function (elem) {
           return new Elem(elem).is(selector);
-        }) || {};
-
-        var found = _ref5.value;
-
+        }) || {},
+            found = _ref5.value;
 
         elems.add(found);
       }, new Elem());
@@ -11790,13 +11634,11 @@ var Elem = function (_Arr) {
           return;
         }
 
-        var _ref7 = (windowsDwayneData.find(function (_ref9) {
-          var element = _ref9.element;
+        var _ref7 = (windowsDwayneData.find(function (_ref8) {
+          var element = _ref8.element;
           return element === elem;
-        }) || {}).value || elem.dwayneData;
-
-        var listeners = _ref7.listeners;
-
+        }) || {}).value || elem.dwayneData,
+            listeners = _ref7.listeners;
 
         event.forEach(function (listener, event) {
           var removeEventListeners = listeners[event] = listeners[event] || new Super({}).define('index', {
@@ -11808,9 +11650,9 @@ var Elem = function (_Arr) {
 
           if (!removeEventListeners.has('listener')) {
             var newListener = function newListener(e) {
-              removeEventListeners.forEach(function (_ref8) {
-                var selector = _ref8.selector;
-                var listener = _ref8.listener;
+              removeEventListeners.forEach(function (_ref9) {
+                var selector = _ref9.selector,
+                    listener = _ref9.listener;
 
                 if (new Elem(e.target).is(selector)) {
                   listener.call(elem, e, elem, index);
@@ -11980,7 +11822,7 @@ var Elem = function (_Arr) {
 
   }, {
     key: 'prop',
-    value: function prop(property, value) {
+    value: function prop$$1(property, value) {
       if (arguments.length <= 1 && isString(property)) {
         return this.$[0] ? this.$[0][property] : undefined;
       }
@@ -12210,13 +12052,13 @@ var Elem = function (_Arr) {
   }, {
     key: 'setOf',
     value: function setOf(type, iterator, callback) {
-      validate$1({ 2: callback }, { 2: ['function'] }, 'Elem#setOf');
+      validate({ 2: callback }, { 2: ['function'] }, 'Elem#setOf');
 
       iterator = new Super(iterator).$;
 
       if (isNumber(iterator)) {
         try {
-          validate$1({ 1: iterator }, { 1: ['intLike', '>=0'] }, 'Elem#setOf');
+          validate({ 1: iterator }, { 1: ['intLike', '>=0'] }, 'Elem#setOf');
         } catch (e) {
           throw new Error('2nd argument must be either or non-negative integer, or object! (at Elem#setOf)');
         }
@@ -12250,8 +12092,8 @@ var Elem = function (_Arr) {
     key: 'show',
     value: function show() {
       return this.forEach(function (elem) {
-        var _elem = elem;
-        var dwayneData = _elem.dwayneData;
+        var _elem = elem,
+            dwayneData = _elem.dwayneData;
 
 
         elem = new Elem(elem);
@@ -12360,7 +12202,7 @@ var Elem = function (_Arr) {
     value: function up() {
       var level = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-      validate$1([level], [['intLike', '>=0']], 'Elem#up');
+      validate([level], [['intLike', '>=0']], 'Elem#up');
 
       level = Number(level);
 
@@ -12403,8 +12245,8 @@ var Elem = function (_Arr) {
 
   }, {
     key: 'validate',
-    value: function validate(validator) {
-      validate$1([validator], ['function||!'], 'Elem#validate');
+    value: function validate$$1(validator) {
+      validate([validator], ['function||!'], 'Elem#validate');
 
       if (validator) {
         return this.forEach(function (_ref10) {
@@ -12418,37 +12260,31 @@ var Elem = function (_Arr) {
 
       this.filter(inputElements + ', form').forEach(function (elem, index) {
         if (getName(elem) === 'form') {
-          var _ret = function () {
-            var formErrors = { errors: null };
-            var form = new Elem(elem);
-            var inputs = form.find(inputElements);
+          var formErrors = { errors: null };
+          var form = new Elem(elem);
+          var inputs = form.find(inputElements);
 
-            inputs.forEach(function (input, index) {
-              validatorWrap(input, index, formErrors);
+          inputs.forEach(function (input, index) {
+            validatorWrap(input, index, formErrors);
+          });
+
+          errors.deepAssign(formErrors);
+
+          formErrors = formErrors.errors;
+
+          form.dispatch('validate', {}, {
+            valid: !formErrors,
+            errors: formErrors
+          });
+
+          return inputs.forEach(function (input) {
+            var inputError = (formErrors || {})[input.name];
+
+            new Elem(input).dispatch('validate', {}, {
+              valid: !inputError,
+              error: inputError || null
             });
-
-            errors.deepAssign(formErrors);
-
-            formErrors = formErrors.errors;
-
-            form.dispatch('validate', {}, {
-              valid: !formErrors,
-              errors: formErrors
-            });
-
-            return {
-              v: inputs.forEach(function (input) {
-                var inputError = (formErrors || {})[input.name];
-
-                new Elem(input).dispatch('validate', {}, {
-                  valid: !inputError,
-                  error: inputError || null
-                });
-              })
-            };
-          }();
-
-          if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+          });
         }
 
         var inputError = { errors: null };
@@ -12507,21 +12343,20 @@ var Elem = function (_Arr) {
     }
   }, {
     key: 'innerHeight',
-    get: function get() {
+    get: function get$$1() {
       var elem = this.$[0];
 
       if (isWindow(elem)) {
         return elem.innerHeight;
       }
 
-      var _calcCSS = this.calcCSS();
-
-      var borderTopWidth = _calcCSS.borderTopWidth;
-      var borderBottomWidth = _calcCSS.borderBottomWidth;
-      var boxSizing = _calcCSS.boxSizing;
-      var height = _calcCSS.height;
-      var paddingTop = _calcCSS.paddingTop;
-      var paddingBottom = _calcCSS.paddingBottom;
+      var _calcCSS = this.calcCSS(),
+          borderTopWidth = _calcCSS.borderTopWidth,
+          borderBottomWidth = _calcCSS.borderBottomWidth,
+          boxSizing = _calcCSS.boxSizing,
+          height = _calcCSS.height,
+          paddingTop = _calcCSS.paddingTop,
+          paddingBottom = _calcCSS.paddingBottom;
 
       var borders = px(borderTopWidth) + px(borderBottomWidth);
       var paddings = px(paddingTop) + px(paddingBottom);
@@ -12555,21 +12390,20 @@ var Elem = function (_Arr) {
 
   }, {
     key: 'innerWidth',
-    get: function get() {
+    get: function get$$1() {
       var elem = this.$[0];
 
       if (isWindow(elem)) {
         return elem.innerWidth;
       }
 
-      var _calcCSS2 = this.calcCSS();
-
-      var borderLeftWidth = _calcCSS2.borderLeftWidth;
-      var borderRightWidth = _calcCSS2.borderRightWidth;
-      var boxSizing = _calcCSS2.boxSizing;
-      var paddingLeft = _calcCSS2.paddingLeft;
-      var paddingRight = _calcCSS2.paddingRight;
-      var width = _calcCSS2.width;
+      var _calcCSS2 = this.calcCSS(),
+          borderLeftWidth = _calcCSS2.borderLeftWidth,
+          borderRightWidth = _calcCSS2.borderRightWidth,
+          boxSizing = _calcCSS2.boxSizing,
+          paddingLeft = _calcCSS2.paddingLeft,
+          paddingRight = _calcCSS2.paddingRight,
+          width = _calcCSS2.width;
 
       var borders = px(borderLeftWidth) + px(borderRightWidth);
       var paddings = px(paddingLeft) + px(paddingRight);
@@ -12578,28 +12412,27 @@ var Elem = function (_Arr) {
     }
   }, {
     key: 'name',
-    get: function get() {
+    get: function get$$1() {
       return getName(this.$[0]);
     }
   }, {
     key: 'outerHeight',
-    get: function get() {
+    get: function get$$1() {
       var elem = this.$[0];
 
       if (isWindow(elem)) {
         return elem.outerHeight;
       }
 
-      var _calcCSS3 = this.calcCSS();
-
-      var borderTopWidth = _calcCSS3.borderTopWidth;
-      var borderBottomWidth = _calcCSS3.borderBottomWidth;
-      var boxSizing = _calcCSS3.boxSizing;
-      var height = _calcCSS3.height;
-      var marginTop = _calcCSS3.marginTop;
-      var marginBottom = _calcCSS3.marginBottom;
-      var paddingTop = _calcCSS3.paddingTop;
-      var paddingBottom = _calcCSS3.paddingBottom;
+      var _calcCSS3 = this.calcCSS(),
+          borderTopWidth = _calcCSS3.borderTopWidth,
+          borderBottomWidth = _calcCSS3.borderBottomWidth,
+          boxSizing = _calcCSS3.boxSizing,
+          height = _calcCSS3.height,
+          marginTop = _calcCSS3.marginTop,
+          marginBottom = _calcCSS3.marginBottom,
+          paddingTop = _calcCSS3.paddingTop,
+          paddingBottom = _calcCSS3.paddingBottom;
 
       var borders = px(borderTopWidth) + px(borderBottomWidth);
       var paddings = px(paddingTop) + px(paddingBottom);
@@ -12635,23 +12468,22 @@ var Elem = function (_Arr) {
 
   }, {
     key: 'outerWidth',
-    get: function get() {
+    get: function get$$1() {
       var elem = this.$[0];
 
       if (isWindow(elem)) {
         return elem.outerWidth;
       }
 
-      var _calcCSS4 = this.calcCSS();
-
-      var borderLeftWidth = _calcCSS4.borderLeftWidth;
-      var borderRightWidth = _calcCSS4.borderRightWidth;
-      var boxSizing = _calcCSS4.boxSizing;
-      var marginLeft = _calcCSS4.marginLeft;
-      var marginRight = _calcCSS4.marginRight;
-      var paddingLeft = _calcCSS4.paddingLeft;
-      var paddingRight = _calcCSS4.paddingRight;
-      var width = _calcCSS4.width;
+      var _calcCSS4 = this.calcCSS(),
+          borderLeftWidth = _calcCSS4.borderLeftWidth,
+          borderRightWidth = _calcCSS4.borderRightWidth,
+          boxSizing = _calcCSS4.boxSizing,
+          marginLeft = _calcCSS4.marginLeft,
+          marginRight = _calcCSS4.marginRight,
+          paddingLeft = _calcCSS4.paddingLeft,
+          paddingRight = _calcCSS4.paddingRight,
+          width = _calcCSS4.width;
 
       var borders = px(borderLeftWidth) + px(borderRightWidth);
       var paddings = px(paddingLeft) + px(paddingRight);
@@ -12660,7 +12492,7 @@ var Elem = function (_Arr) {
     }
   }, {
     key: 'toStringTag',
-    get: function get() {
+    get: function get$$1() {
       return toStringTag(this.$$);
     }
   }]);
@@ -12707,7 +12539,7 @@ var body = new Elem(nativeDocument.body);
  * @public
  * @description Elem instance of document.head.
  */
-var head$1 = new Elem(nativeDocument.head);
+var head = new Elem(nativeDocument.head);
 
 var elements = new Arr(htmlElements).concat(svgElements).$;
 var props = new Arr(elements).map(function (type) {
@@ -12925,11 +12757,11 @@ function parseHTML(html, collapseWhiteSpace) {
   var elem = new Elem(template.$[0].content);
 
   json.forEach(function forEachNode(node) {
-    var name = node.name;
-    var attrs = node.attrs;
-    var value = node.value;
-    var parent = node.parent;
-    var children = node.children;
+    var name = node.name,
+        attrs = node.attrs,
+        value = node.value,
+        parent = node.parent,
+        children = node.children;
 
 
     var parentNode = parent.elem || elem;
@@ -12986,14 +12818,14 @@ function registerDBlock(Block) {
     createClass(DBlock, [{
       key: 'afterConstruct',
       value: function afterConstruct() {
-        var _$$ = this.$$;
-        var _$$$parentScope$$$ = _$$.parentScope.$$;
-        var parentParentScope = _$$$parentScope$$$.parentScope;
-        var parentParentTemplate = _$$$parentScope$$$.parentTemplate;
-        var children = _$$$parentScope$$$.argsChildren;
-        var ownChildren = _$$.argsChildren;
-        var parentTemplate = _$$.parentTemplate;
-        var dBlockName = _$$.dBlockName;
+        var _$$ = this.$$,
+            _$$$parentScope$$$ = _$$.parentScope.$$,
+            parentParentScope = _$$$parentScope$$$.parentScope,
+            parentParentTemplate = _$$$parentScope$$$.parentTemplate,
+            children = _$$$parentScope$$$.argsChildren,
+            ownChildren = _$$.argsChildren,
+            parentTemplate = _$$.parentTemplate,
+            dBlockName = _$$.dBlockName;
 
         var found = void 0;
 
@@ -13055,14 +12887,14 @@ function registerDEach(Block, createBlock) {
 
       var _this = possibleConstructorReturn(this, (DEach.__proto__ || Object.getPrototypeOf(DEach)).call(this, opts));
 
-      var _this$args = _this.args;
-      var _this$args$item = _this$args.item;
-      var itemName = _this$args$item === undefined ? '$item' : _this$args$item;
-      var _this$args$index = _this$args.index;
-      var indexName = _this$args$index === undefined ? '$index' : _this$args$index;
+      var _this$args = _this.args,
+          _this$args$item = _this$args.item,
+          itemName = _this$args$item === undefined ? '$item' : _this$args$item,
+          _this$args$index = _this$args.index,
+          indexName = _this$args$index === undefined ? '$index' : _this$args$index;
 
 
-      assign$1(_this.$$, {
+      assign(_this.$$, {
         uids: new Super({}),
         items: new Arr([]),
         UID: _this.args.uid || undefined,
@@ -13078,24 +12910,24 @@ function registerDEach(Block, createBlock) {
         var _this2 = this;
 
         this.watch('args.set', 'args.sortBy', 'args.filterBy', function () {
-          var _$$ = _this2.$$;
-          var argsChildren = _$$.argsChildren;
-          var uids = _$$.uids;
-          var parentScope = _$$.parentScope;
-          var parentElem = _$$.parentElem;
-          var parentTemplate = _$$.parentTemplate;
-          var scope = _$$.scope;
-          var itemName = _$$.itemName;
-          var indexName = _$$.indexName;
-          var UID = _$$.UID;
+          var _$$ = _this2.$$,
+              argsChildren = _$$.argsChildren,
+              uids = _$$.uids,
+              parentScope = _$$.parentScope,
+              parentElem = _$$.parentElem,
+              parentTemplate = _$$.parentTemplate,
+              scope = _$$.scope,
+              itemName = _$$.itemName,
+              indexName = _$$.indexName,
+              UID = _$$.UID;
           var sortBy = _this2.args.sortBy;
 
           var $uids = uids.$;
           var newKeys = {};
           var newUIDs = {};
-          var _args = _this2.args;
-          var set$$1 = _args.set;
-          var filterBy = _args.filterBy;
+          var _args = _this2.args,
+              set$$1 = _args.set,
+              filterBy = _args.filterBy;
 
 
           if (isNumber(set$$1)) {
@@ -13211,9 +13043,9 @@ function registerDElements(Block, createBlock) {
         var _this2 = this;
 
         var parentElem = this.$$.parentElem;
-        var _args = this.args;
-        var parentScope = _args.parentScope;
-        var parentTemplate = _args.parentTemplate;
+        var _args = this.args,
+            parentScope = _args.parentScope,
+            parentTemplate = _args.parentTemplate;
 
         var firstTime = true;
 
@@ -13224,12 +13056,12 @@ function registerDElements(Block, createBlock) {
             return;
           }
 
-          var _$$ = _this2.$$;
-          var children = _$$.children;
-          var mixins = _$$.mixins;
-          var parent = _$$.parent;
-          var watchersToRemove = _$$.watchersToRemove;
-          var content = _$$.content;
+          var _$$ = _this2.$$,
+              children = _$$.children,
+              mixins = _$$.mixins,
+              parent = _$$.parent,
+              watchersToRemove = _$$.watchersToRemove,
+              content = _$$.content;
           var value = _this2.args.value;
 
 
@@ -13248,9 +13080,9 @@ function registerDElements(Block, createBlock) {
           _this2.$$.children = new Arr([]);
           _this2.$$.mixins = new Arr([]);
           _this2.$$.watchersToRemove = watchersToRemove.filter(function (_ref) {
-            var watchers = _ref.watchers;
-            var watcher = _ref.watcher;
-            var forDElements = _ref.forDElements;
+            var watchers = _ref.watchers,
+                watcher = _ref.watcher,
+                forDElements = _ref.forDElements;
 
             if (forDElements) {
               return true;
@@ -13302,9 +13134,9 @@ function registerDIf(Block) {
 
       var index = Infinity;
       var values = _this.$$.argsChildren.map(function (child, i) {
-        var name = child.name;
-        var attrs = child.attrs;
-        var children = child.children;
+        var name = child.name,
+            attrs = child.attrs,
+            children = child.children;
 
         var cond = attrs.if;
 
@@ -13394,16 +13226,16 @@ function registerDSwitch(Block) {
       var _this = possibleConstructorReturn(this, (DSwitch.__proto__ || Object.getPrototypeOf(DSwitch)).call(this, opts));
 
       _this.index = Infinity;
-      var parentScope = _this.$$.parentScope;
-      var args = _this.args;
-      var value = _this.args.value;
+      var parentScope = _this.$$.parentScope,
+          args = _this.args,
+          value = _this.args.value;
 
       var wasDefault = void 0;
 
       _this.values = _this.$$.argsChildren.object(function (values, child, i) {
-        var name = child.name;
-        var attrs = child.attrs;
-        var children = child.children;
+        var name = child.name,
+            attrs = child.attrs,
+            children = child.children;
 
         var val = attrs.if;
 
@@ -13490,9 +13322,9 @@ function registerDSwitch(Block) {
 
           _this2.index = Infinity;
           _this2.values.forEach(function (_ref2, i) {
-            var name = _ref2.name;
-            var value = _ref2.value;
-            var children = _ref2.children;
+            var name = _ref2.name,
+                value = _ref2.value,
+                children = _ref2.children;
 
             var val = name === 'd-default' ? newValue : value;
 
@@ -13557,9 +13389,9 @@ function registerDAttr(Mixin) {
     createClass(DAttr, [{
       key: 'afterUpdate',
       value: function afterUpdate(newValue) {
-        var elem = this.elem;
-        var args = this.args;
-        var attrs = this.attrs;
+        var elem = this.elem,
+            args = this.args,
+            attrs = this.attrs;
 
 
         if (args) {
@@ -13582,8 +13414,8 @@ function registerDAttr(Mixin) {
     }, {
       key: 'beforeRemove',
       value: function beforeRemove() {
-        var elem = this.elem;
-        var attrs = this.attrs;
+        var elem = this.elem,
+            attrs = this.attrs;
 
 
         elem.removeAttr.apply(elem, new Super(attrs).keys().$);
@@ -13665,9 +13497,9 @@ function registerDClass(Mixin) {
     createClass(DClass, [{
       key: 'afterUpdate',
       value: function afterUpdate(newValue) {
-        var elem = this.elem;
-        var args = this.args;
-        var classes = this.classes;
+        var elem = this.elem,
+            args = this.args,
+            classes = this.classes;
 
         var newClasses = [];
 
@@ -13736,9 +13568,9 @@ function registerDElem(Mixin, createBlock, Block) {
 
       var _this = possibleConstructorReturn(this, (DElem.__proto__ || Object.getPrototypeOf(DElem)).call(this, opts));
 
-      var args = _this.args;
-      var parentTemplate = _this.parentTemplate;
-      var elem = _this.elem;
+      var args = _this.args,
+          parentTemplate = _this.parentTemplate,
+          elem = _this.elem;
 
       var scope = parentTemplate;
       var value = _this.evaluateOnce();
@@ -13813,9 +13645,9 @@ function registerDNode(Mixin, createBlock, Block) {
 
       var _this = possibleConstructorReturn(this, (DNode.__proto__ || Object.getPrototypeOf(DNode)).call(this, opts));
 
-      var args = _this.args;
-      var parentTemplate = _this.parentTemplate;
-      var node = _this.node;
+      var args = _this.args,
+          parentTemplate = _this.parentTemplate,
+          node = _this.node;
 
       var scope = parentTemplate;
       var value = _this.evaluateOnce();
@@ -13944,9 +13776,9 @@ function registerDStyle(Mixin) {
     createClass(DStyle, [{
       key: 'afterUpdate',
       value: function afterUpdate(newValue, oldValue) {
-        var elem = this.elem;
-        var args = this.args;
-        var css = this.css;
+        var elem = this.elem,
+            args = this.args,
+            css = this.css;
 
 
         if (args) {
@@ -13957,11 +13789,9 @@ function registerDStyle(Mixin) {
 
         if (isString(newValue)) {
           newValue = new Arr(newValue.split(/; ?/)).filter().object(function (css, item) {
-            var _item = slicedToArray(item, 2);
-
-            var prop = _item[0];
-            var value = _item[1];
-
+            var _item = slicedToArray(item, 2),
+                prop = _item[0],
+                value = _item[1];
 
             css[prop] = value;
           });
@@ -13981,8 +13811,8 @@ function registerDStyle(Mixin) {
     }, {
       key: 'beforeRemove',
       value: function beforeRemove() {
-        var elem = this.elem;
-        var css = this.css;
+        var elem = this.elem,
+            css = this.css;
 
 
         elem.removeCSS.apply(elem, new Super(css).keys().$);
@@ -14087,8 +13917,8 @@ var getValueSwitcher = switcher('strictEquals', function (value) {
   }
 
   return options.object(function (values, _ref) {
-    var selected = _ref.selected;
-    var value = _ref.value;
+    var selected = _ref.selected,
+        value = _ref.value;
 
     if (selected && values.indexOf(value) === -1) {
       values.push(value);
@@ -14140,10 +13970,10 @@ function registerDValue(Mixin, createBlock, Block) {
 
       var _this = possibleConstructorReturn(this, (DValue.__proto__ || Object.getPrototypeOf(DValue)).call(this, opts));
 
-      var args = _this.args;
-      var parentTemplate = _this.parentTemplate;
-      var elem = _this.elem;
-      var node = _this.node;
+      var args = _this.args,
+          parentTemplate = _this.parentTemplate,
+          elem = _this.elem,
+          node = _this.node;
 
       var name = elem.name;
       var type = elem.prop('type');
@@ -14205,9 +14035,9 @@ function registerDValue(Mixin, createBlock, Block) {
     createClass(DValue, [{
       key: 'changeScope',
       value: function changeScope() {
-        var scope = this.scope;
-        var value = this.value;
-        var currentValue = this.currentValue;
+        var scope = this.scope,
+            value = this.value,
+            currentValue = this.currentValue;
 
 
         if (isFunction(value)) {
@@ -14219,12 +14049,12 @@ function registerDValue(Mixin, createBlock, Block) {
     }, {
       key: 'setProp',
       value: function setProp(value) {
-        var elem = this.elem;
-        var name = this.name;
-        var prop = this.prop;
-        var type = this.type;
-        var node = this.node;
-        var options = this.options;
+        var elem = this.elem,
+            name = this.name,
+            prop = this.prop,
+            type = this.type,
+            node = this.node,
+            options = this.options;
 
 
         if (prop === 'text') {
@@ -14240,12 +14070,12 @@ function registerDValue(Mixin, createBlock, Block) {
     }, {
       key: 'getProp',
       value: function getProp(values, init) {
-        var elem = this.elem;
-        var name = this.name;
-        var prop = this.prop;
-        var type = this.type;
-        var node = this.node;
-        var options = this.options;
+        var elem = this.elem,
+            name = this.name,
+            prop = this.prop,
+            type = this.type,
+            node = this.node,
+            options = this.options;
 
 
         return prop === 'text' ? elem.text() : getValueSwitcher(name, [elem.prop(prop), type, node.value, values, elem, options, init, prop === 'multiple-select']);
@@ -14296,9 +14126,9 @@ var properEscapedRegExp = /\\|u|n|f|r|t|b|v|`[0-7]/;
 var thisRegExp = /^this(?![a-zA-Z_$])/;
 var simpleExpressionRegExp = /^(?:true|false|null|undefined)(?![a-zA-Z_$])/;
 var variableRegExp = /^[a-zA-Z_$][a-zA-Z0-9_$]*/;
-var numberRegExp = /^(?:NaN|-?(?:(?:\d+|\d*\.\d+)(?:[E|e][+|\-]?\d+)?|Infinity))/;
+var numberRegExp = /^(?:NaN|-?(?:(?:\d+|\d*\.\d+)(?:[E|e][+|-]?\d+)?|Infinity))/;
 var stringRegExp = /^(?:"(?:(?:\\[\s\S])|[^"\n\\])*"|'(?:(?:\\[\s\S])|[^'\n\\])*')/;
-var regexpRegExp = /^\/(?:(?:\\[\s\S])|[^\/\n\\])+\/[gimuy]*/;
+var regexpRegExp = /^\/(?:(?:\\[\s\S])|[^/\n\\])+\/[gimuy]*/;
 var arrowFunctionRegExp = /^(?:(?:\(\s*((?:[a-zA-Z_$][a-zA-Z0-9_$]*\s*,\s*)?(?:[a-zA-Z_$][a-zA-Z0-9_$]*)?)\s*\))|([a-zA-Z_$][a-zA-Z0-9_$]*))\s*=>/;
 var templateStringContentRegExp = /^(?:(?:\\[\s\S])|\$(?!\{)|[^`$\\])+/;
 var operatorRegExp = /^(?:(?:>>>|>>|<<)=?|&&|\|\||,|(?:\+|-|\*|\/|%|&|\||\^|<|>|==|!=)=?|=)/;
@@ -14335,10 +14165,9 @@ function parseJS(string, wholeString, curlyError) {
     var matched = void 0;
     var isEmptySpace = void 0;
 
-    var _ref = closingExpressions[closingExpressions.length - 1] || {};
-
-    var properType = _ref.type;
-    var properSymbol = _ref.symbol;
+    var _ref = closingExpressions[closingExpressions.length - 1] || {},
+        properType = _ref.type,
+        properSymbol = _ref.symbol;
 
     var firstSymbol = string[0];
 
@@ -14744,9 +14573,8 @@ function closeFunctionBody(expected) {
 }
 
 function constructErrorInfo(expressionString, wholeString, closingExpressions, curlyError) {
-  var _ref4 = closingExpressions[closingExpressions.length - 1] || {};
-
-  var last = _ref4.symbol;
+  var _ref4 = closingExpressions[closingExpressions.length - 1] || {},
+      last = _ref4.symbol;
 
   var wholeStringString = '';
 
@@ -14994,24 +14822,22 @@ var Block = function () {
       }
 
       if (isFunction(_Subclass) && !isInstanceOf(Block, _Subclass)) {
-        (function () {
-          var constructor = _Subclass;
+        var _constructor = _Subclass;
 
-          _Subclass = function (_Block2) {
-            inherits(_Subclass, _Block2);
+        _Subclass = function (_Block2) {
+          inherits(_Subclass, _Block2);
 
-            function _Subclass(opts) {
-              classCallCheck(this, _Subclass);
+          function _Subclass(opts) {
+            classCallCheck(this, _Subclass);
 
-              var _this3 = possibleConstructorReturn(this, (_Subclass.__proto__ || Object.getPrototypeOf(_Subclass)).call(this, opts));
+            var _this3 = possibleConstructorReturn(this, (_Subclass.__proto__ || Object.getPrototypeOf(_Subclass)).call(this, opts));
 
-              constructor.call(_this3, opts);
-              return _this3;
-            }
+            _constructor.call(_this3, opts);
+            return _this3;
+          }
 
-            return _Subclass;
-          }(Block);
-        })();
+          return _Subclass;
+        }(Block);
       }
 
       if (!isFunction(_Subclass)) {
@@ -15084,26 +14910,24 @@ var Block = function () {
       var _this = new Super(this);
 
       if (isFunction(Subclass) && !isInstanceOf(Mixin, Subclass)) {
-        (function () {
-          var _afterUpdate = Subclass;
+        var _afterUpdate = Subclass;
 
-          Subclass = function (_Mixin) {
-            inherits(Subclass, _Mixin);
+        Subclass = function (_Mixin) {
+          inherits(Subclass, _Mixin);
 
-            function Subclass() {
-              classCallCheck(this, Subclass);
-              return possibleConstructorReturn(this, (Subclass.__proto__ || Object.getPrototypeOf(Subclass)).apply(this, arguments));
+          function Subclass() {
+            classCallCheck(this, Subclass);
+            return possibleConstructorReturn(this, (Subclass.__proto__ || Object.getPrototypeOf(Subclass)).apply(this, arguments));
+          }
+
+          createClass(Subclass, [{
+            key: 'afterUpdate',
+            value: function afterUpdate(newValue, oldValue) {
+              _afterUpdate.call(this, newValue, oldValue, this);
             }
-
-            createClass(Subclass, [{
-              key: 'afterUpdate',
-              value: function afterUpdate(newValue, oldValue) {
-                _afterUpdate.call(this, newValue, oldValue, this);
-              }
-            }]);
-            return Subclass;
-          }(Mixin);
-        })();
+          }]);
+          return Subclass;
+        }(Mixin);
       }
 
       if (!isInstanceOf(Mixin, Subclass)) {
@@ -15195,16 +15019,16 @@ var Block = function () {
     var _this5 = this;
 
     classCallCheck(this, Block);
-    var name = opts.name;
-    var originalArgs = opts.args;
-    var dBlockName = opts.dBlockName;
-    var children = opts.children;
-    var parent = opts.parent;
-    var parentElem = opts.parentElem;
-    var parentBlock = opts.parentBlock;
-    var parentScope = opts.parentScope;
-    var parentTemplate = opts.parentTemplate;
-    var prevBlock = opts.prevBlock;
+    var name = opts.name,
+        originalArgs = opts.args,
+        dBlockName = opts.dBlockName,
+        children = opts.children,
+        parent = opts.parent,
+        parentElem = opts.parentElem,
+        parentBlock = opts.parentBlock,
+        parentScope = opts.parentScope,
+        parentTemplate = opts.parentTemplate,
+        prevBlock = opts.prevBlock;
 
     var watchersToRemove = new Arr([]);
     var constructor = new Super(this).proto().$.constructor;
@@ -15262,11 +15086,11 @@ var Block = function () {
 
           var scope = name === '#d-item' && !forDItem || forDEach ? (forDEach || _this5).$$.scope : _this5;
 
-          var _ref2 = instance ? instance.$$ : {};
-
-          var watchersToRemove = _ref2.watchersToRemove;
+          var _ref2 = instance ? instance.$$ : {},
+              watchersToRemove = _ref2.watchersToRemove;
 
           /* eslint no-new-func: 0 */
+
 
           var evaluate = function evaluate() {
             var result = void 0;
@@ -15289,49 +15113,47 @@ var Block = function () {
             }
 
             if (onChange) {
-              (function () {
-                var localWatchers = new Arr([]);
+              var localWatchers = new Arr([]);
 
-                getting.forEach(function (watchers) {
-                  var watcher = function watcher() {
-                    var newResult = evaluate();
+              getting.forEach(function (watchers) {
+                var watcher = function watcher() {
+                  var newResult = evaluate();
 
-                    if (newResult !== result) {
-                      onChange(newResult, result);
+                  if (newResult !== result) {
+                    onChange(newResult, result);
+                  }
+                };
+                var watcherBlock = {
+                  forDElements: forDElements,
+                  watcher: watcher,
+                  watchers: watchers
+                };
+
+                watcher.onRemove = function () {
+                  localWatchers.forEach(function (watcherBlock) {
+                    var watcher = watcherBlock.watcher,
+                        watchers = watcherBlock.watchers;
+
+                    var index1 = watchersToRemove.indexOf(watcherBlock);
+                    var index2 = watchers.indexOf(watcher);
+
+                    if (index1 !== -1) {
+                      watchersToRemove.splice(index1, 1);
                     }
-                  };
-                  var watcherBlock = {
-                    forDElements: forDElements,
-                    watcher: watcher,
-                    watchers: watchers
-                  };
 
-                  watcher.onRemove = function () {
-                    localWatchers.forEach(function (watcherBlock) {
-                      var watcher = watcherBlock.watcher;
-                      var watchers = watcherBlock.watchers;
+                    if (index2 !== -1) {
+                      watchers.splice(index2, 1);
+                    }
+                  });
+                };
 
-                      var index1 = watchersToRemove.indexOf(watcherBlock);
-                      var index2 = watchers.indexOf(watcher);
+                localWatchers.push(watcherBlock);
+                watchersToRemove.push(watcherBlock);
+                watchers.push(watcher);
+              });
 
-                      if (index1 !== -1) {
-                        watchersToRemove.splice(index1, 1);
-                      }
-
-                      if (index2 !== -1) {
-                        watchers.splice(index2, 1);
-                      }
-                    });
-                  };
-
-                  localWatchers.push(watcherBlock);
-                  watchersToRemove.push(watcherBlock);
-                  watchers.push(watcher);
-                });
-
-                evalMode = false;
-                getting = new Arr([]);
-              })();
+              evalMode = false;
+              getting = new Arr([]);
             }
 
             return result;
@@ -15623,7 +15445,7 @@ var Block = function () {
   }, {
     key: 'changeLocals',
     value: function changeLocals(locals) {
-      assign$1(this, locals);
+      assign(this, locals);
     }
 
     /**
@@ -15638,13 +15460,11 @@ var Block = function () {
   }, {
     key: 'evaluateAndWatch',
     value: function evaluateAndWatch(expression, callback) {
-      validate$1([expression], ['string'], 'Block#evaluateAndWatch');
+      validate([expression], ['string'], 'Block#evaluateAndWatch');
 
-      var _parseJS = parseJS(expression, expression, true);
-
-      var code = _parseJS.expression;
-      var original = _parseJS.original;
-
+      var _parseJS = parseJS(expression, expression, true),
+          code = _parseJS.expression,
+          original = _parseJS.original;
 
       var func = constructEvalFunction(code, original);
 
@@ -15662,13 +15482,11 @@ var Block = function () {
   }, {
     key: 'evaluateOnce',
     value: function evaluateOnce(expression) {
-      validate$1([expression], ['string'], 'Block#evaluateOnce');
+      validate([expression], ['string'], 'Block#evaluateOnce');
 
-      var _parseJS2 = parseJS(expression, expression, true);
-
-      var code = _parseJS2.expression;
-      var original = _parseJS2.original;
-
+      var _parseJS2 = parseJS(expression, expression, true),
+          code = _parseJS2.expression,
+          original = _parseJS2.original;
 
       var func = constructEvalFunction(code, original);
 
@@ -15860,15 +15678,15 @@ var Mixin = function () {
     var _this7 = this;
 
     classCallCheck(this, Mixin);
-    var name = opts.name;
-    var value = opts.value;
-    var dynamic = opts.dynamic;
-    var elem = opts.elem;
-    var args = opts.args;
-    var comment = opts.comment;
-    var parentBlock = opts.parentBlock;
-    var parentScope = opts.parentScope;
-    var parentTemplate = opts.parentTemplate;
+    var name = opts.name,
+        value = opts.value,
+        dynamic = opts.dynamic,
+        elem = opts.elem,
+        args = opts.args,
+        comment = opts.comment,
+        parentBlock = opts.parentBlock,
+        parentScope = opts.parentScope,
+        parentTemplate = opts.parentTemplate;
 
     var watchersToRemove = new Arr([]);
     var watchers = new Arr([]);
@@ -15885,10 +15703,10 @@ var Mixin = function () {
         watchers: watchers,
         watchersToRemove: watchersToRemove,
         evaluate: function evaluate(watcher) {
-          var _$$ = _this7.$$;
-          var isDynamic = _$$.isDynamic;
-          var value = _$$.value;
-          var _value = _$$._value;
+          var _$$ = _this7.$$,
+              isDynamic = _$$.isDynamic,
+              value = _$$.value,
+              _value = _$$._value;
 
           var currentValue = isDynamic ? value : parentScope.$$.evaluate(_value);
 
@@ -16019,11 +15837,9 @@ function removeApp(node) {
 
 function registerBuiltIns(set$$1, scope, proto) {
   iterate(set$$1, function (register) {
-    var _register = register(proto, createBlock, Block);
-
-    var name = _register.name;
-    var value = _register.value;
-
+    var _register = register(proto, createBlock, Block),
+        name = _register.name,
+        value = _register.value;
 
     if (proto === Block) {
       var variables = {};
@@ -16039,13 +15855,13 @@ function registerBuiltIns(set$$1, scope, proto) {
 }
 
 function createBlock(_ref3) {
-  var node = _ref3.node;
-  var parent = _ref3.parent;
-  var parentElem = _ref3.parentElem;
-  var parentBlock = _ref3.parentBlock;
-  var parentScope = _ref3.parentScope;
-  var parentTemplate = _ref3.parentTemplate;
-  var prevBlock = _ref3.prevBlock;
+  var node = _ref3.node,
+      parent = _ref3.parent,
+      parentElem = _ref3.parentElem,
+      parentBlock = _ref3.parentBlock,
+      parentScope = _ref3.parentScope,
+      parentTemplate = _ref3.parentTemplate,
+      prevBlock = _ref3.prevBlock;
 
   var elem = parentElem.prop('namespaceURI') === svgNS ? doc.svg() : new Elem(doc.template().$[0].content);
   var localBlocks = parentScope ? parentScope.$$.ns._blocks : blocks;
@@ -16105,154 +15921,146 @@ function createBlock(_ref3) {
   }
 
   if (!constructor) {
-    var _ret4 = function () {
-      var _node = node;
-      var value = _node.value;
-      var children = _node.children;
+    var _node = node,
+        value = _node.value,
+        _children = _node.children;
 
 
-      var element = elem.create(name);
-      var currentAttrs = Object.create(null);
-      var attrs = Object.create(null);
-      var wasDRest = void 0;
-      var mixinDefaultOpts = {
-        elem: element,
-        parentBlock: parentBlock,
-        parentScope: parentScope,
-        parentTemplate: parentTemplate
-      };
+    var element = elem.create(name);
+    var currentAttrs = Object.create(null);
+    var attrs = Object.create(null);
+    var wasDRest = void 0;
+    var mixinDefaultOpts = {
+      elem: element,
+      parentBlock: parentBlock,
+      parentScope: parentScope,
+      parentTemplate: parentTemplate
+    };
 
-      new Super(args).forEach(function (value, attr) {
-        var isDRest = dRestRegExp.test(attr);
-        var localAttrs = isDRest || wasDRest ? Object.create(attrs) : attrs;
+    new Super(args).forEach(function (value, attr) {
+      var isDRest = dRestRegExp.test(attr);
+      var localAttrs = isDRest || wasDRest ? Object.create(attrs) : attrs;
 
-        attrs = localAttrs;
+      attrs = localAttrs;
 
-        if (isDRest) {
-          var restAttrs = parentScope.$$.evaluate(value, function (value) {
-            setTimeout(function () {
-              iterate(localAttrs, function (value, arg) {
-                delete localAttrs[arg];
-              });
-              assign$1(localAttrs, transformRestAttrs(value, localMixins, mixinDefaultOpts));
-              calculateAttrs(attrs, currentAttrs, element, false);
-            }, 0);
-          }, parentBlock);
+      if (isDRest) {
+        var restAttrs = parentScope.$$.evaluate(value, function (value) {
+          setTimeout(function () {
+            iterate(localAttrs, function (value, arg) {
+              delete localAttrs[arg];
+            });
+            assign(localAttrs, transformRestAttrs(value, localMixins, mixinDefaultOpts));
+            calculateAttrs(attrs, currentAttrs, element, false);
+          }, 0);
+        }, parentBlock);
 
-          wasDRest = true;
+        wasDRest = true;
 
-          return assign$1(localAttrs, transformRestAttrs(restAttrs, localMixins, mixinDefaultOpts));
-        }
+        return assign(localAttrs, transformRestAttrs(restAttrs, localMixins, mixinDefaultOpts));
+      }
 
-        var match = mixinMatch(localMixins, attr);
+      var match = mixinMatch(localMixins, attr);
 
-        wasDRest = false;
+      wasDRest = false;
 
-        if (match) {
-          if (value === true) {
-            value = 'true';
-          }
-
-          localAttrs[attr] = {
-            type: 'mixin',
-            dynamic: false,
-            opts: _extends({
-              value: value
-            }, match, mixinDefaultOpts),
-            value: value
-          };
-
-          return;
+      if (match) {
+        if (value === true) {
+          value = 'true';
         }
 
         localAttrs[attr] = {
-          type: 'attr',
-          value: parentScope.$$.evaluate(value, function (value) {
-            localAttrs[attr] = {
-              type: 'attr',
-              value: value
-            };
-            calculateAttrs(attrs, currentAttrs, element, false);
-          }, parentBlock)
+          type: 'mixin',
+          dynamic: false,
+          opts: _extends({
+            value: value
+          }, match, mixinDefaultOpts),
+          value: value
         };
-      });
 
-      var createMixins = calculateAttrs(attrs, currentAttrs, element, true);
-
-      if (name === '#comment') {
-        element.text(value);
+        return;
       }
 
-      if (name === '#text') {
-        if (isFunction(value)) {
-          var text = parentScope.$$.evaluate(value, function (value) {
-            if (isNil(value)) {
-              value = '';
-            }
+      localAttrs[attr] = {
+        type: 'attr',
+        value: parentScope.$$.evaluate(value, function (value) {
+          localAttrs[attr] = {
+            type: 'attr',
+            value: value
+          };
+          calculateAttrs(attrs, currentAttrs, element, false);
+        }, parentBlock)
+      };
+    });
 
-            element.text('' + value);
-          }, parentBlock);
+    var createMixins = calculateAttrs(attrs, currentAttrs, element, true);
 
-          if (isNil(text)) {
-            text = '';
+    if (name === '#comment') {
+      element.text(value);
+    }
+
+    if (name === '#text') {
+      if (isFunction(value)) {
+        var text = parentScope.$$.evaluate(value, function (value) {
+          if (isNil(value)) {
+            value = '';
           }
 
-          element.text('' + text);
-        } else {
-          element.html(value);
+          element.text('' + value);
+        }, parentBlock);
+
+        if (isNil(text)) {
+          text = '';
         }
-      }
 
-      if (children) {
-        (function () {
-          var parentElem = name === 'template' ? new Elem(element.$[0].content) : element;
-          var prevBlock = void 0;
-
-          children.forEach(function (child) {
-            prevBlock = createBlock({
-              node: child,
-              parent: parentElem,
-              parentElem: parentElem,
-              parentBlock: parentBlock,
-              parentScope: parentScope,
-              parentTemplate: parentTemplate,
-              prevBlock: prevBlock
-            });
-          });
-        })();
-      }
-
-      var isParentBlock = parent instanceof Block;
-
-      if (prevBlock instanceof Block) {
-        prevBlock.$$.insertAfterIt(element, false);
-      } else if (prevBlock) {
-        element.insertAfter(prevBlock);
-
-        if (isParentBlock) {
-          parent.$$.addContent(element);
-        }
-      } else if (isParentBlock) {
-        parent.$$.insertInStartOfIt(element, false);
+        element.text('' + text);
       } else {
-        element.into(parentElem, false);
+        element.text(value);
       }
+    }
 
-      createMixins();
+    if (_children) {
+      var _parentElem = name === 'template' ? new Elem(element.$[0].content) : element;
+      var _prevBlock2 = void 0;
 
-      return {
-        v: element
-      };
-    }();
+      _children.forEach(function (child) {
+        _prevBlock2 = createBlock({
+          node: child,
+          parent: _parentElem,
+          parentElem: _parentElem,
+          parentBlock: parentBlock,
+          parentScope: parentScope,
+          parentTemplate: parentTemplate,
+          prevBlock: _prevBlock2
+        });
+      });
+    }
 
-    if ((typeof _ret4 === 'undefined' ? 'undefined' : _typeof(_ret4)) === "object") return _ret4.v;
+    var isParentBlock = parent instanceof Block;
+
+    if (prevBlock instanceof Block) {
+      prevBlock.$$.insertAfterIt(element, false);
+    } else if (prevBlock) {
+      element.insertAfter(prevBlock);
+
+      if (isParentBlock) {
+        parent.$$.addContent(element);
+      }
+    } else if (isParentBlock) {
+      parent.$$.insertInStartOfIt(element, false);
+    } else {
+      element.into(parentElem, false);
+    }
+
+    createMixins();
+
+    return element;
   }
 
-  var _blockInstance = blockInstance;
-  var $$ = _blockInstance.$$;
-  var Args = _blockInstance.args;
-  var globals = _blockInstance.globals;
-  var locals = objectWithoutProperties(_blockInstance, ['$$', 'args', 'globals']);
+  var _blockInstance = blockInstance,
+      $$ = _blockInstance.$$,
+      Args = _blockInstance.args,
+      globals = _blockInstance.globals,
+      locals = objectWithoutProperties(_blockInstance, ['$$', 'args', 'globals']);
 
 
   if (dBlockMatch || name === 'd-block') {
@@ -16346,16 +16154,16 @@ function createBlock(_ref3) {
 }
 
 function createMixin(_ref4) {
-  var name = _ref4.name;
-  var Mixin = _ref4.Mixin;
-  var dynamic = _ref4.dynamic;
-  var value = _ref4.value;
-  var args = _ref4.args;
-  var comment = _ref4.comment;
-  var elem = _ref4.elem;
-  var parentBlock = _ref4.parentBlock;
-  var parentScope = _ref4.parentScope;
-  var parentTemplate = _ref4.parentTemplate;
+  var name = _ref4.name,
+      Mixin = _ref4.Mixin,
+      dynamic = _ref4.dynamic,
+      value = _ref4.value,
+      args = _ref4.args,
+      comment = _ref4.comment,
+      elem = _ref4.elem,
+      parentBlock = _ref4.parentBlock,
+      parentScope = _ref4.parentScope,
+      parentTemplate = _ref4.parentTemplate;
 
   var mixin = new Mixin({
     name: name,
@@ -16389,8 +16197,8 @@ function createMixin(_ref4) {
 function transformDIfChildren(children) {
   return new Arr(children || []).concat({}).object(function (object, child) {
     var name = child.name;
-    var html$$1 = object.html;
-    var ifElse = object.ifElse;
+    var html$$1 = object.html,
+        ifElse = object.ifElse;
 
 
     if (name !== 'd-else-if' && name !== 'd-else') {
@@ -16434,10 +16242,10 @@ function transformJSExpressions(children, variables) {
   var exclude = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   return new Arr(children || []).object(function (children, child) {
-    var name = child.name;
-    var attrs = child.attrs;
-    var ownChildren = child.children;
-    var initialValue = child.value;
+    var name = child.name,
+        attrs = child.attrs,
+        ownChildren = child.children,
+        initialValue = child.value;
 
     var isDEach = name === 'd-each';
     var value = child.value;
@@ -16481,7 +16289,7 @@ function transformJSExpressions(children, variables) {
         }
       }).$;
 
-      assign$1(variables, usedVariables);
+      assign(variables, usedVariables);
 
       return constructEvalFunction(parsed.expression, parsed.original);
     }).$;
@@ -16538,7 +16346,7 @@ function transformJSExpressions(children, variables) {
         }
       }).$;
 
-      assign$1(variables, usedVariables);
+      assign(variables, usedVariables);
 
       children.push({
         name: '#text',
@@ -16555,8 +16363,8 @@ function isInstanceOf(Class, Subclass) {
 
 function removeWatchers(watchersToRemove) {
   watchersToRemove.forEach(function (_ref5) {
-    var watcher = _ref5.watcher;
-    var watchers = _ref5.watchers;
+    var watcher = _ref5.watcher,
+        watchers = _ref5.watchers;
 
     var index = watchers.indexOf(watcher);
 
@@ -16591,7 +16399,7 @@ function constructPublicScope(scope, scopeValues, privateScope) {
     return {
       configurable: false,
       enumerable: true,
-      get: function get() {
+      get: function get$$1() {
         if (evalMode) {
           if (getting.indexOf(scope.watchers.temp) === -1) {
             getting.push(scope.watchers.temp);
@@ -16600,7 +16408,7 @@ function constructPublicScope(scope, scopeValues, privateScope) {
 
         return scope.value;
       },
-      set: function set(value) {
+      set: function set$$1(value) {
         if (value === scope.value) {
           return;
         }
@@ -16634,10 +16442,10 @@ function constructPublicScope(scope, scopeValues, privateScope) {
           var values = [];
 
           var _loop = function _loop(i) {
-            var _changed$i = changed[i];
-            var scope = _changed$i.scope;
-            var value = _changed$i.value;
-            var oldValue = _changed$i.oldValue;
+            var _changed$i = changed[i],
+                scope = _changed$i.scope,
+                value = _changed$i.value,
+                oldValue = _changed$i.oldValue;
 
 
             scope.watchers.perm.forEach(function (watcher) {
@@ -16664,9 +16472,9 @@ function constructPublicScope(scope, scopeValues, privateScope) {
           changed = null;
 
           was.forEach(function (watcher, i) {
-            var _values$i = values[i];
-            var value = _values$i.value;
-            var oldValue = _values$i.oldValue;
+            var _values$i = values[i],
+                value = _values$i.value,
+                oldValue = _values$i.oldValue;
 
 
             watcher(value, oldValue);
@@ -16686,9 +16494,9 @@ function watchForAllLocals(block, watcher) {
 }
 
 function watchForAllGlobals(block, watcher) {
-  var _block$$$ = block.$$;
-  var globals = _block$$$.globals;
-  var watchersToRemove = _block$$$.watchersToRemove;
+  var _block$$$ = block.$$,
+      globals = _block$$$.globals,
+      watchersToRemove = _block$$$.watchersToRemove;
 
 
   for (var global in globals) {
@@ -16726,7 +16534,7 @@ function calculateArgs(args, argsObject, $argsObject) {
 function transformRestArgs(args) {
   return new Super(args).object(function (args, value, arg) {
     if (dRestRegExp.test(arg)) {
-      assign$1(args, transformRestArgs(value));
+      assign(args, transformRestArgs(value));
     } else {
       args[arg] = value;
     }
@@ -16736,7 +16544,7 @@ function transformRestArgs(args) {
 function transformRestAttrs(attrs, mixins, mixinDefaultOpts) {
   return new Super(attrs).object(function (eventualAttrs, value, attr) {
     if (dRestRegExp.test(attr)) {
-      return assign$1(eventualAttrs, transformRestAttrs(value, mixins, mixinDefaultOpts));
+      return assign(eventualAttrs, transformRestAttrs(value, mixins, mixinDefaultOpts));
     }
 
     var match = mixinMatch(mixins, attr);
@@ -16796,8 +16604,8 @@ function mixinMatch(mixins, attr) {
 
 function calculateAttrs(attrs, attrsObject, elem, firstTime) {
   iterate(attrsObject, function (_ref8, attr) {
-    var type = _ref8.type;
-    var value = _ref8.value;
+    var type = _ref8.type,
+        value = _ref8.value;
 
     if (!attrs[attr]) {
       if (type === 'attr') {
@@ -16813,20 +16621,20 @@ function calculateAttrs(attrs, attrsObject, elem, firstTime) {
   var mixins = new Arr([]);
 
   var _loop2 = function _loop2(attr) {
-    var _attrs$attr = attrs[attr];
-    var type = _attrs$attr.type;
-    var dynamic = _attrs$attr.dynamic;
-    var value = _attrs$attr.value;
-    var opts = _attrs$attr.opts;
+    var _attrs$attr = attrs[attr],
+        type = _attrs$attr.type,
+        dynamic = _attrs$attr.dynamic,
+        value = _attrs$attr.value,
+        opts = _attrs$attr.opts;
 
     var nextType = void 0;
     var nextDynamic = void 0;
     var nextValue = void 0;
 
     if (attrsObject[attr]) {
-      var _attrsObject$attr = attrsObject[attr];
-      var prevType = _attrsObject$attr.type;
-      var prevValue = _attrsObject$attr.value;
+      var _attrsObject$attr = attrsObject[attr],
+          prevType = _attrsObject$attr.type,
+          prevValue = _attrsObject$attr.value;
 
 
       if (type === 'attr') {
@@ -16840,36 +16648,34 @@ function calculateAttrs(attrs, attrsObject, elem, firstTime) {
 
         nextValue = value;
       } else {
-        (function () {
-          var mixin = prevValue;
+        var mixin = prevValue;
 
-          if (prevType === 'attr') {
-            elem.removeAttr(attr);
-          }
+        if (prevType === 'attr') {
+          elem.removeAttr(attr);
+        }
 
-          mixin.$$.isDynamic = dynamic;
+        mixin.$$.isDynamic = dynamic;
 
-          if (dynamic) {
-            executeMixinWatchers(mixin, value);
-          } else if (!mixin.$$.evaluated && opts.Mixin.evaluate) {
-            var newValue = mixin.$$.parentScope.$$.evaluate(value, function (newValue) {
-              var _attrs$attr2 = attrs[attr];
-              var type = _attrs$attr2.type;
-              var dynamic = _attrs$attr2.dynamic;
+        if (dynamic) {
+          executeMixinWatchers(mixin, value);
+        } else if (!mixin.$$.evaluated && opts.Mixin.evaluate) {
+          var newValue = mixin.$$.parentScope.$$.evaluate(value, function (newValue) {
+            var _attrs$attr2 = attrs[attr],
+                type = _attrs$attr2.type,
+                dynamic = _attrs$attr2.dynamic;
 
 
-              if (type === 'mixin' && !dynamic) {
-                executeMixinWatchers(mixin, newValue);
-              }
-            }, mixin);
+            if (type === 'mixin' && !dynamic) {
+              executeMixinWatchers(mixin, newValue);
+            }
+          }, mixin);
 
-            mixin.$$.evaluated = true;
+          mixin.$$.evaluated = true;
 
-            executeMixinWatchers(mixin, newValue);
-          }
+          executeMixinWatchers(mixin, newValue);
+        }
 
-          nextValue = mixin;
-        })();
+        nextValue = mixin;
       }
 
       nextType = type;
@@ -16886,13 +16692,13 @@ function calculateAttrs(attrs, attrsObject, elem, firstTime) {
           var mixin = createMixin(opts);
 
           if (!dynamic && opts.Mixin.evaluate) {
-            var parentScope = opts.parentScope;
-            var _value3 = opts.value;
+            var parentScope = opts.parentScope,
+                _value3 = opts.value;
 
             var firstValue = parentScope.$$.evaluate(_value3, function (newValue) {
-              var _attrs$attr3 = attrs[attr];
-              var type = _attrs$attr3.type;
-              var dynamic = _attrs$attr3.dynamic;
+              var _attrs$attr3 = attrs[attr],
+                  type = _attrs$attr3.type,
+                  dynamic = _attrs$attr3.dynamic;
 
 
               if (type === 'mixin' && !dynamic) {
@@ -16941,11 +16747,9 @@ function calculateAttrs(attrs, attrsObject, elem, firstTime) {
   if (firstTime) {
     return function () {
       mixins.forEach(function (buildMixin) {
-        var _buildMixin = buildMixin();
-
-        var attr = _buildMixin.attr;
-        var opts = _buildMixin.opts;
-
+        var _buildMixin = buildMixin(),
+            attr = _buildMixin.attr,
+            opts = _buildMixin.opts;
 
         attrsObject[attr] = opts;
       });
@@ -16973,21 +16777,21 @@ function extendBlock(cls) {
 }
 
 function insertTemplates(template, templates) {
-  var vars = template.vars;
-  var value = template.value;
+  var vars = template.vars,
+      value = template.value;
 
   var newTemplates = Object.create(null);
   var newVars = new Super(vars).object(function (vars, variable) {
     vars[variable] = true;
   });
 
-  assign$1(newTemplates, templates);
+  assign(newTemplates, templates);
   iterate(value, forEachNode);
 
   function forEachNode(_ref9, index, tree) {
-    var type = _ref9.type;
-    var value = _ref9.value;
-    var children = _ref9.children;
+    var type = _ref9.type,
+        value = _ref9.value,
+        children = _ref9.children;
 
     if (type === '#comment') {
       value = new Str(value).trim().$;
@@ -17421,7 +17225,7 @@ var Dat = function (_Super) {
 
   }, {
     key: 'get',
-    value: function get(what) {
+    value: function get$$1(what) {
       return getSwitcher(what, [this.$, 'get']);
     }
 
@@ -17604,7 +17408,7 @@ var Dat = function (_Super) {
 
   }, {
     key: 'set',
-    value: function set(what, number) {
+    value: function set$$1(what, number) {
       var date = this.$;
 
       if (arguments.length >= 2) {
@@ -17807,10 +17611,10 @@ var querySwitcher = switcher('call', function () {
 var constructURL = (function (baseURL, url, params, query) {
   var hash = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : '';
   var encodeOptions = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {};
-  var _encodeOptions$params = encodeOptions.params;
-  var encodeParams = _encodeOptions$params === undefined ? true : _encodeOptions$params;
-  var _encodeOptions$query = encodeOptions.query;
-  var encodeQuery = _encodeOptions$query === undefined ? true : _encodeOptions$query;
+  var _encodeOptions$params = encodeOptions.params,
+      encodeParams = _encodeOptions$params === undefined ? true : _encodeOptions$params,
+      _encodeOptions$query = encodeOptions.query,
+      encodeQuery = _encodeOptions$query === undefined ? true : _encodeOptions$query;
 
   var URL = isAbsolute(url) ? url : String(baseURL).replace(/\/+$/, '') + '/' + String(url).replace(/^\/+/, '');
 
@@ -17822,8 +17626,8 @@ var constructURL = (function (baseURL, url, params, query) {
 
   if (queryParams.length) {
     URL += (URL.indexOf('?') === -1 ? '?' : '&') + queryParams.map(function (_ref) {
-      var param = _ref.param;
-      var value = _ref.value;
+      var param = _ref.param,
+          value = _ref.value;
       return encode(param, encodeQuery) + '=' + encode(value, encodeQuery);
     }).join('&');
   }
@@ -18086,7 +17890,7 @@ var Fetch = function (_Function) {
     value: function after(middleware) {
       var afterAll = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
-      validate$1([middleware], ['function'], 'Fetch#after');
+      validate([middleware], ['function'], 'Fetch#after');
 
       var after = this.$$.after;
 
@@ -18130,7 +17934,7 @@ var Fetch = function (_Function) {
     value: function before(middleware) {
       var beforeAll = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
-      validate$1([middleware], ['function'], 'Fetch#before');
+      validate([middleware], ['function'], 'Fetch#before');
 
       var before = this.$$.before;
 
@@ -18212,7 +18016,7 @@ var Fetch = function (_Function) {
         url = undefined;
       }
 
-      return this.request(url, assign$1({ method: 'delete' }, config));
+      return this.request(url, assign({ method: 'delete' }, config));
     }
 
     /**
@@ -18231,7 +18035,7 @@ var Fetch = function (_Function) {
 
   }, {
     key: 'get',
-    value: function get(url) {
+    value: function get$$1(url) {
       var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
       if (!isString(url)) {
@@ -18239,7 +18043,7 @@ var Fetch = function (_Function) {
         url = undefined;
       }
 
-      return this.request(url, assign$1({ method: 'get' }, config));
+      return this.request(url, assign({ method: 'get' }, config));
     }
 
     /**
@@ -18266,7 +18070,7 @@ var Fetch = function (_Function) {
         url = undefined;
       }
 
-      return this.request(url, assign$1({ method: 'head' }, config));
+      return this.request(url, assign({ method: 'head' }, config));
     }
 
     /**
@@ -18367,7 +18171,7 @@ var Fetch = function (_Function) {
         url = undefined;
       }
 
-      return this.request(url, assign$1({ method: 'patch', data: data }, config));
+      return this.request(url, assign({ method: 'patch', data: data }, config));
     }
 
     /**
@@ -18397,7 +18201,7 @@ var Fetch = function (_Function) {
         url = undefined;
       }
 
-      return this.request(url, assign$1({ method: 'post', data: data }, config));
+      return this.request(url, assign({ method: 'post', data: data }, config));
     }
 
     /**
@@ -18427,7 +18231,7 @@ var Fetch = function (_Function) {
         url = undefined;
       }
 
-      return this.request(url, assign$1({ method: 'put', data: data }, config));
+      return this.request(url, assign({ method: 'put', data: data }, config));
     }
 
     /**
@@ -18496,18 +18300,18 @@ var Fetch = function (_Function) {
 
       promise = promise.then(function () {
         return new Promise$1(function (resolve, reject) {
-          var after = conf.after;
-          var _conf$auth = conf.auth;
-          var username = _conf$auth.username;
-          var password = _conf$auth.password;
-          var data = conf.data;
-          var headers = conf.headers;
-          var method = conf.method;
-          var onprogress = conf.onprogress;
-          var responseType = conf.responseType;
-          var timeout = conf.timeout;
-          var url = conf.url;
-          var withCredentials = conf.withCredentials;
+          var after = conf.after,
+              _conf$auth = conf.auth,
+              username = _conf$auth.username,
+              password = _conf$auth.password,
+              data = conf.data,
+              headers = conf.headers,
+              method = conf.method,
+              onprogress = conf.onprogress,
+              responseType = conf.responseType,
+              timeout = conf.timeout,
+              url = conf.url,
+              withCredentials = conf.withCredentials;
 
 
           xhr = new XMLHttpRequest();
@@ -18636,13 +18440,13 @@ defineProperties(Fetch.prototype, defineProperty({}, _Symbol.toStringTag, 'Fetch
  * @description Built-in before middleware for url, data, method, headers construction.
  */
 function fetchBeforeMiddleware(config) {
-  var baseURL = config.baseURL;
-  var data = config.data;
-  var headers = config.headers;
-  var method = config.method;
-  var params = config.params;
-  var query = config.query;
-  var url = config.url;
+  var baseURL = config.baseURL,
+      data = config.data,
+      headers = config.headers,
+      method = config.method,
+      params = config.params,
+      query = config.query,
+      url = config.url;
 
   var METHOD = method.toUpperCase();
 
@@ -18675,8 +18479,8 @@ var location$1 = _global$2.location;
 
 
 var resolveURL = (function (decodeQuery) {
-  var query = location$1.search;
-  var hash = location$1.hash;
+  var query = location$1.search,
+      hash = location$1.hash;
 
   var params = {
     query: {},
@@ -18688,14 +18492,11 @@ var resolveURL = (function (decodeQuery) {
   }
 
   new Str(query.replace(/^\?/, '')).split('&').forEach(function (rawParam) {
-    var _rawParam$split = rawParam.split('=');
-
-    var _rawParam$split2 = slicedToArray(_rawParam$split, 2);
-
-    var param = _rawParam$split2[0];
-    var _rawParam$split2$ = _rawParam$split2[1];
-    var value = _rawParam$split2$ === undefined ? '' : _rawParam$split2$;
-
+    var _rawParam$split = rawParam.split('='),
+        _rawParam$split2 = slicedToArray(_rawParam$split, 2),
+        param = _rawParam$split2[0],
+        _rawParam$split2$ = _rawParam$split2[1],
+        value = _rawParam$split2$ === undefined ? '' : _rawParam$split2$;
 
     param = decodeQuery ? decodeURIComponent(param) : param;
     value = decodeQuery ? decodeURIComponent(value) : value;
@@ -18794,12 +18595,10 @@ var pathSwitcher = switcher('call', function () {
       };
     }
 
-    var _resolveParameter = resolveParameter(part.slice(1), 'URL parameter must not be an empty string or contain characters besides "a-zA-Z_$"! (at makeRoute)', 'URL parameter regexp validator must be within parentheses (e.g. :userId(\\d+) and not contain ones)! (at makeRoute)');
-
-    var name = _resolveParameter.name;
-    var _resolveParameter$reg = _resolveParameter.regexp;
-    var regexp = _resolveParameter$reg === undefined ? /[^/]*/ : _resolveParameter$reg;
-
+    var _resolveParameter = resolveParameter(part.slice(1), 'URL parameter must not be an empty string or contain characters besides "a-zA-Z_$"! (at makeRoute)', 'URL parameter regexp validator must be within parentheses (e.g. :userId(\\d+) and not contain ones)! (at makeRoute)'),
+        name = _resolveParameter.name,
+        _resolveParameter$reg = _resolveParameter.regexp,
+        regexp = _resolveParameter$reg === undefined ? /[^/]*/ : _resolveParameter$reg;
 
     params.$[name] = params.count;
 
@@ -18809,9 +18608,9 @@ var pathSwitcher = switcher('call', function () {
       value: regexp
     };
   }).word(function (_ref) {
-    var type = _ref.type;
-    var url = _ref.url;
-    var value = _ref.value;
+    var type = _ref.type,
+        url = _ref.url,
+        value = _ref.value;
 
     var newPath = void 0;
 
@@ -18848,28 +18647,26 @@ var Route = function Route(options) {
 
   options = options || {};
 
-  var _ref2 = options || {};
+  var _ref2 = options || {},
+      name = _ref2.name,
+      _ref2$path = _ref2.path,
+      path = _ref2$path === undefined ? '/' : _ref2$path,
+      _ref2$abstract = _ref2.abstract,
+      abstract = _ref2$abstract === undefined ? false : _ref2$abstract,
+      parent = _ref2.parent,
+      _ref2$decodeQuery = _ref2.decodeQuery,
+      decodeQuery = _ref2$decodeQuery === undefined ? true : _ref2$decodeQuery,
+      _ref2$encodeQuery = _ref2.encodeQuery,
+      encodeQuery = _ref2$encodeQuery === undefined ? true : _ref2$encodeQuery,
+      _ref2$decodeParams = _ref2.decodeParams,
+      decodeParams = _ref2$decodeParams === undefined ? true : _ref2$decodeParams,
+      _ref2$encodeParams = _ref2.encodeParams,
+      encodeParams = _ref2$encodeParams === undefined ? true : _ref2$encodeParams;
 
-  var name = _ref2.name;
-  var _ref2$path = _ref2.path;
-  var path = _ref2$path === undefined ? '/' : _ref2$path;
-  var _ref2$abstract = _ref2.abstract;
-  var abstract = _ref2$abstract === undefined ? false : _ref2$abstract;
-  var parent = _ref2.parent;
-  var _ref2$decodeQuery = _ref2.decodeQuery;
-  var decodeQuery = _ref2$decodeQuery === undefined ? true : _ref2$decodeQuery;
-  var _ref2$encodeQuery = _ref2.encodeQuery;
-  var encodeQuery = _ref2$encodeQuery === undefined ? true : _ref2$encodeQuery;
-  var _ref2$decodeParams = _ref2.decodeParams;
-  var decodeParams = _ref2$decodeParams === undefined ? true : _ref2$decodeParams;
-  var _ref2$encodeParams = _ref2.encodeParams;
-  var encodeParams = _ref2$encodeParams === undefined ? true : _ref2$encodeParams;
-
-  var _pathSwitcher = pathSwitcher(path);
-
-  var relativeURL = _pathSwitcher.url;
-  var relativePath = _pathSwitcher.path;
-  var params = _pathSwitcher.params;
+  var _pathSwitcher = pathSwitcher(path),
+      relativeURL = _pathSwitcher.url,
+      relativePath = _pathSwitcher.path,
+      params = _pathSwitcher.params;
 
   var query = {};
 
@@ -18892,12 +18689,10 @@ var Route = function Route(options) {
 
   if (index !== -1) {
     new Str(path).replace(/&$/).slice(index + 1).split('&').forEach(function (param) {
-      var _resolveParameter2 = resolveParameter(param, 'Query parameter must not be an empty string or contain characters besides "a-zA-Z_$"! (at makeRoute)', 'Query parameter regexp validator must be within parentheses (e.g. :userId(\\d+)) and not contain them! (at makeRoute)');
-
-      var name = _resolveParameter2.name;
-      var _resolveParameter2$re = _resolveParameter2.regexp;
-      var regexp = _resolveParameter2$re === undefined ? /[\s\S]*/ : _resolveParameter2$re;
-
+      var _resolveParameter2 = resolveParameter(param, 'Query parameter must not be an empty string or contain characters besides "a-zA-Z_$"! (at makeRoute)', 'Query parameter regexp validator must be within parentheses (e.g. :userId(\\d+)) and not contain them! (at makeRoute)'),
+          name = _resolveParameter2.name,
+          _resolveParameter2$re = _resolveParameter2.regexp,
+          regexp = _resolveParameter2$re === undefined ? /[\s\S]*/ : _resolveParameter2$re;
 
       query[name] = new RegExp('^' + regexp.source.replace(/\\\//g, '/') + '$');
     });
@@ -18930,18 +18725,16 @@ function initRouter() {
   }
 
   Routes.forEach(function (route) {
-    var parentName = route.parentName;
-    var name = route.name;
+    var parentName = route.parentName,
+        name = route.name;
 
     var ParentName = parentName || rootRoute;
 
     var _ref5 = Routes.find(function (_ref6) {
       var name = _ref6.name;
       return name === ParentName;
-    }) || {};
-
-    var parent = _ref5.value;
-
+    }) || {},
+        parent = _ref5.value;
 
     if (!parent) {
       throw new Error('No such parent route ("' + ParentName + '") found for the route ("' + name + '")! (at initRouter)');
@@ -18957,15 +18750,15 @@ function initRouter() {
 
     route.parent = name === rootRoute ? baseRoute : parent;
   }).forEach(function (route) {
-    var name = route.name;
-    var _route$parent = route.parent;
-    var parentParams = _route$parent.params;
-    var parentQuery = _route$parent.query;
-    var path = _route$parent.path;
-    var params = route.params;
-    var query = route.query;
-    var relativeURL = route.relativeURL;
-    var relativePath = route.relativePath;
+    var name = route.name,
+        _route$parent = route.parent,
+        parentParams = _route$parent.params,
+        parentQuery = _route$parent.query,
+        path = _route$parent.path,
+        params = route.params,
+        query = route.query,
+        relativeURL = route.relativeURL,
+        relativePath = route.relativePath;
 
     var proto = route;
     var count = 0;
@@ -19030,19 +18823,17 @@ function makeRoute(options) {
   return function (Block) {
     var _class, _temp;
 
-    options = assign$1({}, options, Block.routerOptions);
+    options = assign({}, options, Block.routerOptions);
 
-    var _ref7 = options || {};
-
-    var name = _ref7.name;
-    var path = _ref7.path;
-    var abstract = _ref7.abstract;
-    var root = _ref7.root;
-    var fallbackTo = _ref7.fallbackTo;
-    var _ref7$replace = _ref7.replace;
-    var replace = _ref7$replace === undefined ? true : _ref7$replace;
-    var isDefault = _ref7.default;
-
+    var _ref7 = options || {},
+        name = _ref7.name,
+        path = _ref7.path,
+        abstract = _ref7.abstract,
+        root = _ref7.root,
+        fallbackTo = _ref7.fallbackTo,
+        _ref7$replace = _ref7.replace,
+        replace = _ref7$replace === undefined ? true : _ref7$replace,
+        isDefault = _ref7.default;
 
     if (initialized) {
       console.warn('Router was already initialized (at makeRoute)');
@@ -19151,7 +18942,7 @@ function makeRoute(options) {
           unsubscribe();
           unsubscribe = null;
           callBeforeLeave(this);
-          get$1(_class.prototype.__proto__ || Object.getPrototypeOf(_class.prototype), 'beforeRemove', this).call(this);
+          get(_class.prototype.__proto__ || Object.getPrototypeOf(_class.prototype), 'beforeRemove', this).call(this);
         }
       }]);
       return _class;
@@ -19178,10 +18969,10 @@ function makeRoute(options) {
           wasRoute = true;
         }
 
-        var _block$$$ = block.$$;
-        var name = _block$$$.name;
-        var children = _block$$$.children;
-        var mixins = _block$$$.mixins;
+        var _block$$$ = block.$$,
+            name = _block$$$.name,
+            children = _block$$$.children,
+            mixins = _block$$$.mixins;
 
 
         if (children) {
@@ -19225,10 +19016,10 @@ function makeRoute(options) {
           wasRoute = true;
         }
 
-        var _block$$$2 = block.$$;
-        var name = _block$$$2.name;
-        var children = _block$$$2.children;
-        var mixins = _block$$$2.mixins;
+        var _block$$$2 = block.$$,
+            name = _block$$$2.name,
+            children = _block$$$2.children,
+            mixins = _block$$$2.mixins;
 
 
         if (children) {
@@ -19270,10 +19061,11 @@ function changeRoute() {
   var route = findRouteByURL();
 
   if (route) {
-    currentRoute = route.route;
-    currentRouteParams = objectWithoutProperties(route, ['route']);
+    var _route = route;
+    currentRoute = _route.route;
+    currentRouteParams = objectWithoutProperties(_route, ['route']);
 
-    assign$1(currentRouteParams, {
+    assign(currentRouteParams, {
       name: currentRoute.name,
       host: location.host,
       hostname: location.hostname,
@@ -19286,10 +19078,10 @@ function changeRoute() {
     });
   } else {
     if (redirectRoute) {
-      var _RedirectRoute = RedirectRoute;
-      var url = _RedirectRoute.url;
-      var encodeParams = _RedirectRoute.encodeParams;
-      var encodeQuery = _RedirectRoute.encodeQuery;
+      var _RedirectRoute = RedirectRoute,
+          url = _RedirectRoute.url,
+          encodeParams = _RedirectRoute.encodeParams,
+          encodeQuery = _RedirectRoute.encodeQuery;
 
 
       return forward(constructURL('', url, {}, {}, '', {
@@ -19307,13 +19099,13 @@ function changeRoute() {
   var parent = void 0;
 
   while (currentRoutes.length && !parent) {
-    var _route = currentRoutes.pop();
+    var _route2 = currentRoutes.pop();
 
-    if (_route.children.includes(currentRoute)) {
-      currentRoutes.push(_route);
-      parent = _route;
+    if (_route2.children.includes(currentRoute)) {
+      currentRoutes.push(_route2);
+      parent = _route2;
     } else {
-      routesToLeave.push(_route);
+      routesToLeave.push(_route2);
     }
   }
 
@@ -19355,12 +19147,12 @@ function findRouteByURL() {
       return;
     }
 
-    var routeURL = route.url;
-    var validatePath = route.validatePath;
-    var params = route.params;
-    var requiredQuery = route.query;
-    var decodeParams = route.decodeParams;
-    var decodeQuery = route.decodeQuery;
+    var routeURL = route.url,
+        validatePath = route.validatePath,
+        params = route.params,
+        requiredQuery = route.query,
+        decodeParams = route.decodeParams,
+        decodeQuery = route.decodeQuery;
 
     var resolved = resolveURL(decodeQuery);
     var query = new Super(resolved.query);
@@ -19452,30 +19244,28 @@ function buildURL(name) {
   var _ref10 = Routes.find(function (_ref11) {
     var n = _ref11.name;
     return n === name;
-  }) || {};
-
-  var route = _ref10.value;
-
+  }) || {},
+      route = _ref10.value;
 
   if (!route) {
     throw new Error('There are no routes with name "' + name + '"! (at router.buildURL)');
   }
 
-  var url = route.url;
-  var encodeParams = route.encodeParams;
-  var encodeQuery = route.encodeQuery;
+  var url = route.url,
+      encodeParams = route.encodeParams,
+      encodeQuery = route.encodeQuery;
 
 
   if (isRegExp(url)) {
     throw new Error('URL can be built only from the string URLs! (at router.buildURL)');
   }
 
-  var _options$params = options.params;
-  var params = _options$params === undefined ? {} : _options$params;
-  var _options$query = options.query;
-  var query = _options$query === undefined ? {} : _options$query;
-  var _options$hash = options.hash;
-  var hash = _options$hash === undefined ? '' : _options$hash;
+  var _options$params = options.params,
+      params = _options$params === undefined ? {} : _options$params,
+      _options$query = options.query,
+      query = _options$query === undefined ? {} : _options$query,
+      _options$hash = options.hash,
+      hash = _options$hash === undefined ? '' : _options$hash;
 
 
   return constructURL('', url, params, query, hash, {
@@ -19540,7 +19330,7 @@ var statics = Object.freeze({
 	array: array,
 	iterate: iterate$1,
 	BlobObject: BlobObject,
-	blob: blob$1,
+	blob: blob,
 	Block: Block,
 	Mixin: Mixin,
 	initApp: initApp,
@@ -19554,7 +19344,7 @@ var statics = Object.freeze({
 	doc: doc,
 	html: html,
 	body: body,
-	head: head$1,
+	head: head,
 	find: _find,
 	parseHTML: parseHTML,
 	px: px,
@@ -19563,11 +19353,11 @@ var statics = Object.freeze({
 	Func: Func,
 	method: method,
 	noop: noop,
-	prop: prop$1,
+	prop: prop,
 	self: self$1,
 	Num: Num,
 	rand: rand,
-	random: random$1,
+	random: random,
 	Promise: Promise$1,
 	makeRoute: makeRoute,
 	router: router,
@@ -19582,7 +19372,7 @@ var statics = Object.freeze({
 var D$$1 = D$2;
 
 
-assign$1(D$$1, statics);
+assign(D$$1, statics);
 
 delete D$$1.D;
 
@@ -19616,7 +19406,7 @@ exports.Arr = Arr;
 exports.array = array;
 exports.iterate = iterate$1;
 exports.BlobObject = BlobObject;
-exports.blob = blob$1;
+exports.blob = blob;
 exports.Block = Block;
 exports.Mixin = Mixin;
 exports.initApp = initApp;
@@ -19630,7 +19420,7 @@ exports.win = win;
 exports.doc = doc;
 exports.html = html;
 exports.body = body;
-exports.head = head$1;
+exports.head = head;
 exports.find = _find;
 exports.parseHTML = parseHTML;
 exports.px = px;
@@ -19639,11 +19429,11 @@ exports.fetch = fetch;
 exports.Func = Func;
 exports.method = method;
 exports.noop = noop;
-exports.prop = prop$1;
+exports.prop = prop;
 exports.self = self$1;
 exports.Num = Num;
 exports.rand = rand;
-exports.random = random$1;
+exports.random = random;
 exports.Promise = Promise$1;
 exports.makeRoute = makeRoute;
 exports.router = router;
