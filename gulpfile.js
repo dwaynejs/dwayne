@@ -19,7 +19,7 @@ const devServer = createServer();
 const testServer = createServer();
 
 const modules = [
-  '',
+  'all',
   'Block',
   'Elem'
 ];
@@ -46,10 +46,9 @@ modules.forEach((module) => {
   const taskName = `test${ module ? `:${ module }` : '' }`;
   
   gulp.task(taskName, ['server:test'], () => {
-    const fileName = module || 'all';
     const config = _.cloneDeep(rollupTestConfig);
 
-    config.entry.push(`./test/${ fileName }.js`);
+    config.entry.push(`./test/${ module }.js`);
 
     const watcher = watch(rollup, config);
 

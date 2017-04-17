@@ -9,6 +9,7 @@ import {
   removeArrayElem, create,
   getProto, setProto, keys
 } from './utils';
+import { SVG_NS } from './constants';
 import * as Blocks from './blocks';
 import * as Mixins from './mixins';
 
@@ -73,7 +74,6 @@ const mixinHooks = [];
 const { isPrototypeOf } = {};
 const TAG_NAME_REGEX = /^[a-z][a-z\d\-_.:!@#$%^&*()[\]{}='"\\]*$/i;
 const ATTR_NAME_REGEX = /^[\u0000-\u0020\s'">/=]+$/;
-const SVG_NS = 'http://www.w3.org/2000/svg';
 const D_REST_REGEX = /^d-rest(?:#|$)/;
 const WATCHED_ARG_PREFIX_REGEX = /^args\./;
 const WATCHED_GLOBAL_PREFIX_REGEX = /^globals\./;

@@ -4,9 +4,18 @@ import {
   defineProperties,
   collectFromArray, collectFromObject,
   iterateArray, iterateObject,
-  toCamelCase, toHyphenCase, toStringTag,
+  toHyphenCase, toStringTag,
   setToStringTag, setProto
 } from './utils';
+import {
+  isHTMLDocument, isValidNode,
+  createHideStyleNode, remove,
+  addAttr, addCSSProp, addDataAttr,
+  addNext, addParent, addPrev
+} from './helpers/Elem';
+import {
+  HIDE_CLASS, SVG_NS
+} from './constants';
 
 /**
  * @typedef {String} ElemEventString
@@ -29,20 +38,24 @@ import {
  * by the events in the arguments.
  */
 
+/**
+ * @callback IterationCallback
+ * @public
+ * @param {Element|Node} node - Iteration element.
+ * @param {Number} index - Iteration index.
+ * @param {Elem} elem - Initial set.
+ */
+
 const {
   document = {},
   Symbol
 } = global;
-const HIDE_CLASS = '__dwayne-hidden__';
 const EVENT_SEPARATOR_REGEX = /(?:,| ) */;
 const CSS_STYLES_SEPARATOR_REGEX = /; ?/;
-const CSS_PROP_VALUE_SEPARATOR_REGEX = /: /;
 const CSS_IMPORTANT_REGEX = / ?!important$/;
 const EVENT_REGEX = /Event$/;
-const ELEMENT_REGEX = /Element$/;
 const HTML_COLLECTION_REGEX = /^(HTMLCollection|NodeList)$/;
 const X_LINK_ATTR_REGEX = /^xlink:\w/;
-const SVG_NS = 'http://www.w3.org/2000/svg';
 const XML_NS = 'http://www.w3.org/2000/xmlns/';
 const X_LINK_NS = 'http://www.w3.org/1999/xlink';
 const XHTML_NS = 'http://www.w3.org/1999/xhtml';
@@ -807,15 +820,18 @@ class Elem extends [].constructor {
   /**
    * @method Elem#name
    * @public
-   * @returns {String} nodeName (lowercased) of the first element in the set.
+   * @returns {String|void} nodeName (lowercased) of the first element in the set.
    * @description Method for getting name of the first element in the set.
    *
    * @example
-   * const elem1 = elem.create('div');
-   * elem1.name() // 'div'
+   * elem.create('div').name() // 'div'
    */
   name() {
-    return getName(this[0]);
+    const elem = this[0];
+
+    return elem && elem.nodeName
+      ? elem.nodeName.toLowerCase()
+      : undefined;
   }
 
   /**
@@ -1243,17 +1259,6 @@ function isElem(value) {
 }
 
 /**
- * @function isHTMLDocument
- * @private
- * @param {*} value - Value to check if it's HTMLDocument.
- * @returns {Boolean} If the value is HTMLDocument.
- * @description Returns if the value is HTMLDocument or not.
- */
-function isHTMLDocument(value) {
-  return toStringTag(value) === 'HTMLDocument';
-}
-
-/**
  * @function isElementsCollection
  * @private
  * @param {*} value - Value to check if it's Comment or Text.
@@ -1266,28 +1271,6 @@ function isElementsCollection(value) {
     || isElem(value)
     || isArray(value)
   );
-}
-
-function isValidNode(value) {
-  const tag = toStringTag(value);
-
-  return (
-    ELEMENT_REGEX.test(tag)
-    || tag === 'HTMLDocument'
-    || tag === 'Text'
-    || tag === 'DocumentFragment'
-    || tag === 'Comment'
-  );
-}
-
-/**
- * @function getName
- * @private
- * @param {Element} [elem] - Element which name is needed to know.
- * @returns {String} Element name.
- */
-function getName(elem) {
-  return (elem && elem.nodeName && elem.nodeName.toLowerCase()) || '';
 }
 
 function getAttrNS(attr, elem) {
@@ -1304,58 +1287,9 @@ function getAttrNS(attr, elem) {
   }
 }
 
-function createHideStyleNode(head) {
-  const style = head.find(`style#${ HIDE_CLASS }`);
-
-  if (style.length) {
-    return;
-  }
-
-  head
-    .create('style')
-    .prop('id', HIDE_CLASS)
-    .text(`.${ HIDE_CLASS }{display:none !important;}`);
-}
-
-function addAttr(attrs, attr) {
-  attrs[attr.name] = attr.value;
-}
-
-function addCSSProp(css, value) {
-  if (value) {
-    const property = value.split(CSS_PROP_VALUE_SEPARATOR_REGEX);
-
-    css[toCamelCase(property[0])] = property[1];
-  }
-}
-
-function addDataAttr(data, value, key) {
-  data[key] = value;
-}
-
 function hide(elem) {
   createHideStyleNode(new Elem(elem.ownerDocument.head));
   new Elem(elem).addClass(HIDE_CLASS);
-}
-
-function addNext(add, elem) {
-  add(elem.nextSibling);
-}
-
-function addParent(add, elem) {
-  add(elem.parentNode);
-}
-
-function addPrev(add, elem) {
-  add(elem.previousSibling);
-}
-
-function remove(elem) {
-  const parent = elem.parentNode;
-
-  if (parent) {
-    parent.removeChild(elem);
-  }
 }
 
 function show(elem) {
@@ -1366,7 +1300,7 @@ function show(elem) {
  * @function find
  * @public
  * @param {String} selector - Selector to find.
- * @param {Element} [base = document] - Base to find in.
+ * @param {Element|Node} [base = document] - Base to find in.
  * @returns {Elem} New instance of Elem.
  * @description Synonym for
  * [Document#querySelectorAll]{@link https://developer.mozilla.org/en/docs/Web/API/Document/querySelectorAll}.
