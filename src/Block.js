@@ -1,14 +1,7 @@
-/**
- * @module Block
- * @private
- * @mixin
- * @description Exports Block class.
- */
-
 import { Elem } from './Elem';
 import {
   defineFrozenProperties, defineProperties,
-  assign, escapeRegex, mapObject,
+  assign, escapeRegex, mapObject, except,
   toObjectKeys, collectFromObject,
   iterateArray, iterateObject,
   isFunction, isNil, isArray,
@@ -41,8 +34,8 @@ import * as Mixins from './mixins';
 /**
  * @callback Wrapper
  * @public
- * @param {Block} Block class to wrap.
- * @returns {Block} New Block class.
+ * @param {typeof Block|typeof Mixin} Block class to wrap.
+ * @returns {typeof Block} New Block class.
  */
 
 /**
@@ -125,7 +118,7 @@ let changed;
  * Block.block('App', App);
  * Block.block('Hello', 'Hello, {args.text}!');
  *
- * initApp('App', document.getElementById('root'));
+ * initApp(html`<App/>`, document.getElementById('root'));
  */
 class Block {
   static _blocks = create(rootBlocks);
@@ -414,7 +407,7 @@ class Block {
        * @type {Object}
        * @protected
        * @property {Object} args - Private args scope.
-       * @property {Object[]} argsChildren - Block args children.
+       * @property {Object[]} htmlChildren - Block html children.
        * @property {Block[]} children - Child blocks.
        * @property {Mixin[]} mixins - Child mixins.
        * @property {Elem} parentElem - Parent element.
@@ -435,12 +428,13 @@ class Block {
         parentTemplate,
         content: new Elem(),
         ns: constructor,
-        argsChildren: children,
+        htmlChildren: children,
         children: childrenBlocks,
         mixins,
         prevBlock,
         watchersToRemove,
         isRemoved: false,
+        isRendered: false,
         evaluate: (func, onChange, targetBlock, forDElements, forDItem, forDEach) => {
           if (!isFunction(func)) {
             return func;
@@ -547,56 +541,75 @@ class Block {
 
           this.$$.content.remove();
         },
+        changeContent: (newContent) => {
+          this.$$.content = newContent;
+
+          if (this.$$.isRendered) {
+            try {
+              this.afterDOMChange();
+            } catch (err) {
+              console.error(`Uncaught error in ${ name }#afterContentChange:`, err);
+            }
+          }
+        },
         addContent: (contentToAdd, notRecursive) => {
-          const index = this.$$.content.indexOf(contentToAdd[0].previousSibling) + 1;
+          const oldContent = this.$$.content;
+          const index = oldContent.indexOf(contentToAdd[0].previousSibling) + 1;
+          let newContent;
 
           if (index === 0) {
-            this.$$.content = contentToAdd.add(this.$$.content);
+            newContent = contentToAdd.add(oldContent);
           } else {
-            this.$$.content = this.$$.content
+            newContent = oldContent
               .slice(0, index)
-              .add(contentToAdd, this.$$.content.slice(index));
+              .add(contentToAdd, oldContent.slice(index));
           }
+
+          this.$$.changeContent(newContent);
 
           if (isParentBlock && !notRecursive) {
             parent.$$.addContent(contentToAdd);
           }
         },
         moveContent: (contentToMove, after) => {
-          const index = this.$$.content.indexOf(contentToMove[0]);
-          const indexToPut = this.$$.content.indexOf(after[0]) + 1;
+          const oldContent = this.$$.content;
+          const index = oldContent.indexOf(contentToMove[0]);
+          const indexToPut = oldContent.indexOf(after[0]) + 1;
+          let newContent;
 
           if (indexToPut === 0) {
-            this.$$.content = contentToMove.add(
-              this.$$.content.slice(indexToPut, index),
-              this.$$.content.slice(index + contentToMove.length)
+            newContent = contentToMove.add(
+              oldContent.slice(indexToPut, index),
+              oldContent.slice(index + contentToMove.length)
             );
           } else if (index > indexToPut) {
-            this.$$.content = this.$$.content
+            newContent = oldContent
               .slice(0, indexToPut)
               .add(
                 contentToMove,
-                this.$$.content.slice(indexToPut, index),
-                this.$$.content.slice(index + contentToMove.length)
+                oldContent.slice(indexToPut, index),
+                oldContent.slice(index + contentToMove.length)
               );
           } else {
-            this.$$.content = this.$$.content
+            newContent = oldContent
               .slice(0, index)
               .add(
-                this.$$.content.slice(index + contentToMove.length, indexToPut),
+                oldContent.slice(index + contentToMove.length, indexToPut),
                 contentToMove,
-                this.$$.content.slice(indexToPut)
+                oldContent.slice(indexToPut)
               );
           }
+
+          this.$$.changeContent(newContent);
 
           if (isParentBlock && indexToPut) {
             parent.$$.moveContent(contentToMove, after);
           }
         },
         removeContent: (contentToRemove) => {
-          this.$$.content = this.$$.content.filter((elem) => (
+          this.$$.changeContent(this.$$.content.filter((elem) => (
             contentToRemove.indexOf(elem) === -1
-          ));
+          )));
 
           if (isParentBlock) {
             parent.$$.removeContent(contentToRemove);
@@ -751,21 +764,7 @@ class Block {
         parentScope
           ? parentScope.globals
           : null
-      ),
-
-      /**
-       * @member {Block|undefined} Block#parentScope
-       * @type {Block|undefined}
-       * @public
-       */
-      parentScope,
-
-      /**
-       * @member {Block|undefined} Block#parentTemplate
-       * @type {Block|undefined}
-       * @public
-       */
-      parentTemplate
+      )
     });
 
     calculateArgs(args, argsObject);
@@ -784,6 +783,13 @@ class Block {
   afterConstruct() {}
 
   /**
+   * @method Block#afterDOMChange
+   * @public
+   * @description Is called after block DOM structure has changed.
+   */
+  afterDOMChange() {}
+
+  /**
    * @method Block#afterRender
    * @public
    * @description Is called after block has been rendered.
@@ -798,13 +804,73 @@ class Block {
   beforeRemove() {}
 
   /**
-   * @method Block#getContent
+   * @method Block#getChildBlocks
+   * @public
+   * @returns {Block[]}
+   * @description Returns child blocks.
+   */
+  getChildBlocks() {
+    return this.$$.blocks.slice();
+  }
+
+  /**
+   * @method Block#getChildBlocks
+   * @public
+   * @returns {Mixin[]}
+   * @description Returns child mixins.
+   */
+  getChildMixins() {
+    return this.$$.mixins.slice();
+  }
+
+  /**
+   * @method Block#getChildren
+   * @public
+   * @returns {Object[]}
+   * @description Returns Block HTML children.
+   */
+  getChildren() {
+    return this.$$.htmlChildren;
+  }
+
+  /**
+   * @method Block#getDOM
    * @public
    * @returns {Elem}
-   * @description Returns contents of the block.
+   * @description Returns DOM contents of the block.
    */
-  getContent() {
+  getDOM() {
     return this.$$.content.slice();
+  }
+
+  /**
+   * @method Block#getParentBlock
+   * @public
+   * @returns {Block|void}
+   * @description Returns parent block.
+   */
+  getParentBlock() {
+    return this.$$.parentBlock;
+  }
+
+  /**
+   * @method Block#getParentScope
+   * @public
+   * @returns {Block|void}
+   * @description Returns parent scope.
+   */
+  getParentScope() {
+    return this.$$.parentScope;
+  }
+
+  /**
+   * @method Block#getParentTemplate
+   * @public
+   * @returns {Block|void}
+   * @description Returns parent template.
+   */
+  getParentTemplate() {
+    return this.$$.parentTemplate;
   }
 
   /**
@@ -949,7 +1015,7 @@ class Mixin {
    * @method Mixin.wrap
    * @public
    * @param {...Wrapper} wrappers - Functions that return wrapped mixin.
-   * @returns {Mixin} New mixin.
+   * @returns {typeof Mixin} New mixin.
    * @description Method for wrapping mixins.
    * It is considered best practice to just extends the old mixin with a new one.
    */
@@ -1146,8 +1212,8 @@ function createBlock({ node, Constructor, parent, parentElem, parentBlock, paren
   const elem = parentElem[0].namespaceURI === SVG_NS
     ? doc.create('svg')
     : doc;
-  const localBlocks = parentScope ? parentScope.$$.ns._blocks : blocks;
-  const localMixins = parentScope ? parentScope.$$.ns._mixins : mixins;
+  const localBlocks = parentTemplate ? parentTemplate.$$.ns._blocks : blocks;
+  const localMixins = parentTemplate ? parentTemplate.$$.ns._mixins : mixins;
   let children = node.children = node.children || emptyChildren;
   let args = node.attrs = node.attrs || emptyAttrs;
   let name = node.name || 'UnknownBlock';
@@ -1157,26 +1223,24 @@ function createBlock({ node, Constructor, parent, parentElem, parentBlock, paren
   let dBlockArgs;
   let dBlockChildren;
   let dElementsName;
+  let dElementsConstructor;
 
   if (name === 'd-block' && args.name) {
     name = 'd-elements';
     constructor = localBlocks[name];
     dElementsName = args.name;
-    dBlockArgs = args;
+    dBlockArgs = except(args, 'name');
     dBlockChildren = children;
     children = emptyChildren;
-
-    delete args.name;
     args = {};
-  } else if (name === 'd-block' && hasOwnProperty(args, 'constructor')) {
+  } else if (name === 'd-block' && args.Constructor) {
     name = 'UnknownBlock';
-    constructor = parentScope.$$.evaluate(args.constructor);
-
-    if (isFunction(constructor)) {
-      delete args.constructor;
-    } else {
-      constructor = null;
-    }
+    constructor = localBlocks[name];
+    dElementsConstructor = args.Constructor;
+    dBlockArgs = except(args, 'Constructor');
+    dBlockChildren = children;
+    children = emptyChildren;
+    args = {};
   } else if ((dBlockMatch = name.match(NAMED_D_BLOCK_REGEX)) || name === 'd-block') {
     constructor = blocks['d-block'];
     dBlockName = dBlockMatch ? dBlockMatch[1] : null;
@@ -1351,11 +1415,7 @@ function createBlock({ node, Constructor, parent, parentElem, parentBlock, paren
     ...locals
   } = blockInstance;
 
-  if (dBlockMatch || name === 'd-block') {
-    parentScope.$$.dBlocks.push(blockInstance);
-  }
-
-  if (dBlockArgs) {
+  if (dElementsName) {
     node = {
       attrs: dBlockArgs,
       children: dBlockChildren
@@ -1368,6 +1428,23 @@ function createBlock({ node, Constructor, parent, parentElem, parentBlock, paren
 
     Args.value = [node];
     Args.parentScope = parentScope;
+    Args.parentTemplate = parentTemplate;
+  }
+
+  if (dElementsConstructor) {
+    node = {
+      name,
+      attrs: dBlockArgs,
+      children: dBlockChildren
+    };
+
+    Args.Constructor = parentScope.$$.evaluate(dElementsConstructor, (newConstructor) => {
+      Args.Constructor = newConstructor;
+      Args.value = [node];
+    }, blockInstance, true);
+    Args.value = [node];
+    Args.parentScope = parentScope;
+    Args.parentTemplate = parentTemplate;
   }
 
   const html = name === 'd-elements'
@@ -1434,6 +1511,8 @@ function createBlock({ node, Constructor, parent, parentElem, parentBlock, paren
       prevBlock
     });
   });
+
+  blockInstance.$$.isRendered = true;
 
   try {
     blockInstance.afterRender();

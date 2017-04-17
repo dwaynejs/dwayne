@@ -8,6 +8,7 @@ export function registerDElements(Block, createBlock) {
     afterConstruct() {
       const { parentElem } = this.$$;
       const {
+        Constructor,
         parentScope,
         parentTemplate
       } = this.args;
@@ -46,6 +47,7 @@ export function registerDElements(Block, createBlock) {
         iterateArray(value || [], (child) => {
           prevBlock = createBlock({
             node: child,
+            Constructor,
             parent: this,
             parentElem,
             parentBlock: this,

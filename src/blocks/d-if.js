@@ -15,10 +15,10 @@ export function registerDIf(Block) {
 
       const {
         parentScope,
-        argsChildren
+        htmlChildren
       } = this.$$;
       let index = Infinity;
-      const values = argsChildren.map((child, i) => {
+      const values = htmlChildren.map((child, i) => {
         const {
           name,
           attrs = {},
@@ -49,7 +49,7 @@ export function registerDIf(Block) {
 
             if (found) {
               index = found.key;
-              this.elems = argsChildren[found.key].children;
+              this.elems = htmlChildren[found.key].children;
             } else {
               index = Infinity;
               this.elems = null;

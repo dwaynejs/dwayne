@@ -19,7 +19,7 @@ export function registerDSwitch(Block) {
 
       const {
         $$: {
-          argsChildren,
+          htmlChildren,
           parentScope
         },
         args,
@@ -27,7 +27,7 @@ export function registerDSwitch(Block) {
       } = this;
       let wasDefault;
 
-      this.values = collectFromArray(argsChildren, (values, child, i) => {
+      this.values = collectFromArray(htmlChildren, (values, child, i) => {
         const {
           name,
           attrs,

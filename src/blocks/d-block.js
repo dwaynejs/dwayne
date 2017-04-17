@@ -16,10 +16,10 @@ export function registerDBlock(Block) {
           $$: {
             parentScope: parentParentScope,
             parentTemplate: parentParentTemplate,
-            argsChildren: children
+            htmlChildren: children
           }
         },
-        argsChildren: ownChildren,
+        htmlChildren: ownChildren,
         parentTemplate,
         dBlockName
       } = this.$$;
@@ -49,7 +49,7 @@ export function registerDBlock(Block) {
             this.ParentScope = parent;
             this.ParentTemplate = parentTemplate;
             found.value = {
-              children: found.value.$$.argsChildren
+              children: found.value.$$.htmlChildren
             };
           }
         }

@@ -36,7 +36,7 @@ export function registerDEach(Block, createBlock) {
 
     renderSet = () => {
       const {
-        argsChildren,
+        htmlChildren,
         itemsByUIDs,
         parentScope,
         parentElem,
@@ -122,7 +122,7 @@ export function registerDEach(Block, createBlock) {
               item,
               index,
               name: '#d-item',
-              children: argsChildren
+              children: htmlChildren
             },
             parent: this,
             parentElem,

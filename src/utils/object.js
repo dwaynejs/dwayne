@@ -3,15 +3,9 @@ import { iterateArray } from './array';
 const {
   hasOwnProperty: has
 } = {};
+const { slice } = [];
 
-/**
- * @const
- * @function assign
- * @param {Object} target - Object to assign rest of arguments to.
- * @param {...Object} objects - Objects that are assigned to the target.
- * @returns {Object} Target.
- */
-export function assign(target, ...objects) {
+export function assign(target) {
   iterateArray(arguments, (source, index) => {
     if (index) {
       iterateObject(source, (value, key) => {
@@ -29,6 +23,19 @@ export function collectFromObject(object, callback, initialValue = {}) {
   });
 
   return initialValue;
+}
+
+export function except(object) {
+  const newObject = {};
+  const paths = arguments::slice(1);
+
+  iterateObject(object, (value, key) => {
+    if (paths.indexOf(key) === -1) {
+      newObject[key] = value;
+    }
+  });
+
+  return newObject;
 }
 
 export function hasOwnProperty(object, key) {
