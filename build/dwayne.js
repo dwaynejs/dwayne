@@ -4694,23 +4694,19 @@ function createBlock(_ref3) {
     }
 
     if (name === '#text') {
-      if (isFunction(value)) {
-        var text = parentScope.$$.evaluate(value, function (value) {
-          if (isNil(value)) {
-            value = '';
-          }
-
-          element.text('' + value);
-        }, parentBlock);
-
-        if (isNil(text)) {
-          text = '';
+      var text = parentScope.$$.evaluate(value, function (value) {
+        if (isNil(value)) {
+          value = '';
         }
 
-        element.text('' + text);
-      } else {
-        element.text(value);
+        element.text('' + value);
+      }, parentBlock);
+
+      if (isNil(text)) {
+        text = '';
       }
+
+      element.text('' + text);
     }
 
     if (_children) {

@@ -1289,23 +1289,19 @@ function createBlock({ node, Constructor, parent, parentElem, parentBlock, paren
     }
 
     if (name === '#text') {
-      if (isFunction(value)) {
-        let text = parentScope.$$.evaluate(value, (value) => {
-          if (isNil(value)) {
-            value = '';
-          }
-
-          element.text(`${ value }`);
-        }, parentBlock);
-
-        if (isNil(text)) {
-          text = '';
+      let text = parentScope.$$.evaluate(value, (value) => {
+        if (isNil(value)) {
+          value = '';
         }
 
-        element.text(`${ text }`);
-      } else {
-        element.text(value);
+        element.text(`${ value }`);
+      }, parentBlock);
+
+      if (isNil(text)) {
+        text = '';
       }
+
+      element.text(`${ text }`);
     }
 
     if (children) {
