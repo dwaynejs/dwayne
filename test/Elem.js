@@ -1,6 +1,5 @@
 import { deepStrictEqual, strictEqual } from 'assert';
-import { Elem } from '../src/Elem';
-import { find } from '../src/find';
+import { Elem, find } from '../src';
 
 const { document } = global;
 const { body } = document;
