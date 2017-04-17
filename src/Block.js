@@ -854,6 +854,16 @@ class Block {
   }
 
   /**
+   * @method Block#getParentElem
+   * @public
+   * @returns {Elem|void}
+   * @description Returns parent Elem.
+   */
+  getParentElem() {
+    return this.$$.parentElem.slice();
+  }
+
+  /**
    * @method Block#getParentScope
    * @public
    * @returns {Block|void}
