@@ -1,22 +1,18 @@
-export function registerDHide(Mixin) {
-  class DHide extends Mixin {
-    afterUpdate(value) {
-      const { elem } = this;
+import { Mixin } from '../Mixin';
+import { rootMixins } from '../constants';
 
-      if (value) {
-        elem.hide();
-      } else {
-        elem.show();
-      }
-    }
+rootMixins['d-hide'] = class DHide extends Mixin {
+  afterUpdate(value) {
+    const { elem } = this;
 
-    beforeRemove() {
-      this.elem.show();
+    if (value) {
+      elem.hide();
+    } else {
+      elem.show();
     }
   }
 
-  return {
-    name: 'd-hide',
-    value: DHide
-  };
-}
+  beforeRemove() {
+    this.elem.show();
+  }
+};

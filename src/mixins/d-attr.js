@@ -1,45 +1,40 @@
 import { collectFromObject, iterateObject, keys } from '../utils';
+import { Mixin } from '../Mixin';
+import { rootMixins } from '../constants';
 
-export function registerDAttr(Mixin) {
-  class DAttr extends Mixin {
-    attrs = {};
+rootMixins['d-attr'] = class DAttr extends Mixin {
+  attrs = {};
 
-    afterUpdate(newValue) {
-      const {
-        elem,
-        args,
-        attrs
-      } = this;
+  afterUpdate(newValue) {
+    const {
+      elem,
+      args,
+      attrs
+    } = this;
 
-      if (args) {
-        newValue = collectFromObject(args, (attrs, attr) => {
-          attrs[attr] = newValue;
-        });
-      }
-
-      iterateObject(attrs, (value, prop) => {
-        if (!(prop in newValue)) {
-          elem.removeAttr(prop);
-        }
+    if (args) {
+      newValue = collectFromObject(args, (attrs, attr) => {
+        attrs[attr] = newValue;
       });
-      elem.attr(newValue);
-
-      this.attrs = newValue;
     }
 
-    beforeRemove() {
-      const {
-        elem,
-        attrs
-      } = this;
+    iterateObject(attrs, (value, prop) => {
+      if (!(prop in newValue)) {
+        elem.removeAttr(prop);
+      }
+    });
+    elem.attr(newValue);
 
-      elem.removeAttr.apply(elem, keys(attrs));
-    }
+    this.attrs = newValue;
   }
 
-  return {
-    name: 'd-attr',
-    value: DAttr
-  };
-}
+  beforeRemove() {
+    const {
+      elem,
+      attrs
+    } = this;
+
+    elem.removeAttr.apply(elem, keys(attrs));
+  }
+};
 

@@ -1,7 +1,6 @@
 import {
-  isArray, isNil, isString,
-  assign, definePrototypeProperties,
-  defineProperties,
+  isNil, isString, assign,
+  definePrototypeProperties, defineProperties,
   collectFromArray, collectFromObject,
   iterateArray, iterateObject,
   toHyphenCase, toStringTag,
@@ -9,13 +8,13 @@ import {
 } from './utils';
 import {
   isHTMLDocument, isValidNode,
-  createHideStyleNode, remove,
   addAttr, addCSSProp, addDataAttr,
-  addNext, addParent, addPrev
+  addNext, addParent, addPrev,
+  toElem, isElementsCollection,
+  getAttrNS, hide, show, remove
 } from './helpers/Elem';
-import {
-  HIDE_CLASS, SVG_NS
-} from './constants';
+import { SVG_NS } from './constants';
+import { find } from './find';
 
 /**
  * @typedef {String} ElemEventString
@@ -46,18 +45,11 @@ import {
  * @param {Elem} elem - Initial set.
  */
 
-const {
-  document = {},
-  Symbol
-} = global;
+const { Symbol } = global;
 const EVENT_SEPARATOR_REGEX = /(?:,| ) */;
 const CSS_STYLES_SEPARATOR_REGEX = /; ?/;
 const CSS_IMPORTANT_REGEX = / ?!important$/;
 const EVENT_REGEX = /Event$/;
-const HTML_COLLECTION_REGEX = /^(HTMLCollection|NodeList)$/;
-const X_LINK_ATTR_REGEX = /^xlink:\w/;
-const XML_NS = 'http://www.w3.org/2000/xmlns/';
-const X_LINK_NS = 'http://www.w3.org/1999/xlink';
 const XHTML_NS = 'http://www.w3.org/1999/xhtml';
 const emptyCollection = [];
 
@@ -74,7 +66,7 @@ const emptyCollection = [];
  * new Elem(document.querySelectorAll('.cls'));
  * new Elem(document.getElementsByClassName('cls'));
  */
-class Elem extends [].constructor {
+class Elem extends Array {
   static addMethods(property, value) {
     if (arguments.length >= 2) {
       property = { [property]: value };
@@ -1203,112 +1195,4 @@ if (Symbol && Symbol.species) {
   });
 }
 
-/**
- * @const {Elem} doc
- * @type {Elem}
- * @public
- * @description Elem instance of document.
- */
-const doc = new Elem(document);
-
-/**
- * @const {Elem} html
- * @type {Elem}
- * @public
- * @description Elem instance of document.documentElement.
- */
-const html = new Elem(document.documentElement);
-
-/**
- * @const {Elem} body
- * @type {Elem}
- * @public
- * @description Elem instance of document.body.
- */
-const body = new Elem(document.body);
-
-/**
- * @const {Elem} head
- * @type {Elem}
- * @public
- * @description Elem instance of document.head.
- */
-const head = new Elem(document.head);
-
-/**
- * @function toElem
- * @private
- * @param {Element|Elem} elem - Element or Elem.
- * @returns {Elem} Instance of Elem.
- */
-function toElem(elem) {
-  return isElem(elem)
-    ? elem
-    : new Elem(elem);
-}
-
-/**
- * @function isElem
- * @private
- * @param {*} value - Value to check if it's Elem.
- * @returns {Boolean} If the value is Elem.
- * @description Returns if the value is Elem or not.
- */
-function isElem(value) {
-  return value instanceof Elem;
-}
-
-/**
- * @function isElementsCollection
- * @private
- * @param {*} value - Value to check if it's Comment or Text.
- * @returns {Boolean} If the value is HTMLDocument.
- * @description Returns if the value is Comment or Text or not.
- */
-function isElementsCollection(value) {
-  return (
-    HTML_COLLECTION_REGEX.test(toStringTag(value))
-    || isElem(value)
-    || isArray(value)
-  );
-}
-
-function getAttrNS(attr, elem) {
-  if (attr === 'xmlns' || attr === 'xmlns:xlink') {
-    return elem.nodeName === 'SVG'
-      ? XML_NS
-      : null;
-  }
-
-  if (X_LINK_ATTR_REGEX.test(attr)) {
-    return new Elem(elem).closest('svg').length
-      ? X_LINK_NS
-      : null;
-  }
-}
-
-function hide(elem) {
-  createHideStyleNode(new Elem(elem.ownerDocument.head));
-  new Elem(elem).addClass(HIDE_CLASS);
-}
-
-function show(elem) {
-  new Elem(elem).removeClass(HIDE_CLASS);
-}
-
-/**
- * @function find
- * @public
- * @param {String} selector - Selector to find.
- * @param {Element|Node} [base = document] - Base to find in.
- * @returns {Elem} New instance of Elem.
- * @description Synonym for
- * [Document#querySelectorAll]{@link https://developer.mozilla.org/en/docs/Web/API/Document/querySelectorAll}.
- */
-function find(selector, base = document) {
-  return new Elem(base.querySelectorAll(String(selector)));
-}
-
-createHideStyleNode(head);
-
-export { Elem, doc, html, body, head, find };
+export { Elem };

@@ -1,22 +1,18 @@
-export function registerDShow(Mixin) {
-  class DShow extends Mixin {
-    afterUpdate(value) {
-      const { elem } = this;
+import { Mixin } from '../Mixin';
+import { rootMixins } from '../constants';
 
-      if (value) {
-        elem.show();
-      } else {
-        elem.hide();
-      }
-    }
+rootMixins['d-show'] = class DShow extends Mixin {
+  afterUpdate(value) {
+    const { elem } = this;
 
-    beforeRemove() {
-      this.elem.show();
+    if (value) {
+      elem.show();
+    } else {
+      elem.hide();
     }
   }
 
-  return {
-    name: 'd-show',
-    value: DShow
-  };
-}
+  beforeRemove() {
+    this.elem.show();
+  }
+};

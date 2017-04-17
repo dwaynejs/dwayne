@@ -1,6 +1,6 @@
-export * from './d-block';
-export * from './d-each';
-export * from './d-elements';
-export * from './d-if';
-export * from './d-item';
-export * from './d-switch';
+import './d-block';
+import './d-each';
+import './d-elements';
+import './d-if';
+import './d-item';
+import './d-switch';

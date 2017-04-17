@@ -1,5 +1,5 @@
 import io from 'socket.io-client';
-import { find, body, doc, Elem } from './src/Elem';
+import { find, body, doc, Elem } from './src';
 
 body.css({
   margin: '0px',

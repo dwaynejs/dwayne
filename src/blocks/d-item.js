@@ -1,16 +1,17 @@
-export function registerDItem(Block) {
-  class DItem extends Block {
-    static template = html`
-      <d-elements
-        value="{$$.htmlChildren}"
-        parentScope="{this}"
-        parentTemplate="{$$.parentTemplate}"
-      />
-    `;
-  }
+import { Block } from '../Block';
 
-  return {
-    name: '#d-item',
-    value: DItem
-  };
+const template = html`
+  <d-elements
+    value="{$$.htmlChildren}"
+    parentScope="{this}"
+    parentTemplate="{$$.parentTemplate}"
+  />
+`;
+
+class DItem extends Block {
+  static template = template;
+  static _vars = template.vars;
+  static _html = template.value;
 }
+
+export { DItem };

@@ -2,139 +2,134 @@ import {
   isArray, isFunction, isNil,
   collectFromArray
 } from '../utils';
+import { Mixin } from '../Mixin';
+import { rootMixins } from '../constants';
 
-export function registerDValue(Mixin, createBlock, Block) {
-  class DValue extends Mixin {
-    static evaluate = false;
+rootMixins['d-value'] = class DValue extends Mixin {
+  static evaluate = false;
 
-    constructor(opts) {
-      super(opts);
+  constructor(opts) {
+    super(opts);
 
-      const {
-        args,
-        parentTemplate,
-        elem,
-        node
-      } = this;
-      const name = elem.name();
-      const type = elem.prop('type');
-      const value = this.evaluate();
-      let initialScopeValue = null;
+    const {
+      args,
+      parentTemplate,
+      elem,
+      node
+    } = this;
+    const name = elem.name();
+    const type = elem.prop('type');
+    const value = this.evaluate();
+    let initialScopeValue = null;
 
-      this.prop = getProp(name, type, elem);
-      this.name = name;
-      this.type = type;
-      this.value = value;
-      this.options = elem.find('option');
-      this.scope = parentTemplate;
+    this.prop = getProp(name, type, elem);
+    this.name = name;
+    this.type = type;
+    this.value = value;
+    this.options = elem.find('option');
+    this.scope = parentTemplate;
 
-      if (args) {
-        this.name = args[0];
-        this.scope = value instanceof Block
-          ? value
-          : parentTemplate;
-      }
+    if (args) {
+      this.name = args[0];
+      this.scope = value instanceof Block
+        ? value
+        : parentTemplate;
+    }
 
-      if (!isFunction(value)) {
-        initialScopeValue = this.scope.$$.evaluate(getEvalFunction(value), (newValue) => {
-          if (this.currentValue !== newValue) {
-            this.currentValue = newValue;
-            this.setProp(newValue);
-          }
-        }, this);
-      }
-
-      const initialElemValue = this.getProp(initialScopeValue, true);
-      const isInitialScopeValueNull = isNil(initialScopeValue);
-      const isCheckbox = type === 'checkbox';
-      const changeScope = () => {
-        this.currentValue = this.getProp(this.currentValue);
-        this.changeScope();
-      };
-
-      if (isInitialScopeValueNull || isCheckbox) {
-        this.currentValue = initialElemValue;
-        this.changeScope();
-
-        if (!isInitialScopeValueNull && isCheckbox) {
-          this.setProp(initialScopeValue);
+    if (!isFunction(value)) {
+      initialScopeValue = this.scope.$$.evaluate(getEvalFunction(value), (newValue) => {
+        if (this.currentValue !== newValue) {
+          this.currentValue = newValue;
+          this.setProp(newValue);
         }
-      } else {
-        this.currentValue = initialScopeValue;
+      }, this);
+    }
+
+    const initialElemValue = this.getProp(initialScopeValue, true);
+    const isInitialScopeValueNull = isNil(initialScopeValue);
+    const isCheckbox = type === 'checkbox';
+    const changeScope = () => {
+      this.currentValue = this.getProp(this.currentValue);
+      this.changeScope();
+    };
+
+    if (isInitialScopeValueNull || isCheckbox) {
+      this.currentValue = initialElemValue;
+      this.changeScope();
+
+      if (!isInitialScopeValueNull && isCheckbox) {
         this.setProp(initialScopeValue);
       }
-
-      this.offElemListener = elem.on(getListenerName(name, type), (e) => {
-        if (e.target === node) {
-          changeScope();
-        }
-      });
-      this.offFormListener = elem.closest('form').on('reset', () => {
-        setTimeout(changeScope, 0);
-      });
+    } else {
+      this.currentValue = initialScopeValue;
+      this.setProp(initialScopeValue);
     }
 
-    changeScope() {
-      const {
-        scope,
-        value,
-        currentValue
-      } = this;
-
-      if (isFunction(value)) {
-        value(currentValue);
-      } else {
-        scope[value] = currentValue;
+    this.offElemListener = elem.on(getListenerName(name, type), (e) => {
+      if (e.target === node) {
+        changeScope();
       }
-    }
+    });
+    this.offFormListener = elem.closest('form').on('reset', () => {
+      setTimeout(changeScope, 0);
+    });
+  }
 
-    setProp(value) {
-      const {
-        elem,
-        name,
-        prop,
-        type,
-        node,
-        options
-      } = this;
+  changeScope() {
+    const {
+      scope,
+      value,
+      currentValue
+    } = this;
 
-      if (prop === 'text') {
-        elem.text(value);
-      } else if (prop === 'multiple-select') {
-        options.forEach((option) => {
-          option.selected = value.indexOf(option.value) !== -1;
-        });
-      } else {
-        elem.prop(prop, getValueForSetting(name, value, type, node.value));
-      }
-    }
-
-    getProp(values, init) {
-      const {
-        elem,
-        name,
-        prop,
-        type,
-        node,
-        options
-      } = this;
-
-      return prop === 'text'
-        ? elem.text()
-        : getValueForGetting(name, elem.prop(prop), type, node.value, values, options, init, prop === 'multiple-select');
-    }
-
-    beforeRemove() {
-      this.offElemListener();
-      this.offFormListener();
+    if (isFunction(value)) {
+      value(currentValue);
+    } else {
+      scope[value] = currentValue;
     }
   }
 
-  return {
-    name: 'd-value',
-    value: DValue
-  };
-}
+  setProp(value) {
+    const {
+      elem,
+      name,
+      prop,
+      type,
+      node,
+      options
+    } = this;
+
+    if (prop === 'text') {
+      elem.text(value);
+    } else if (prop === 'multiple-select') {
+      options.forEach((option) => {
+        option.selected = value.indexOf(option.value) !== -1;
+      });
+    } else {
+      elem.prop(prop, getValueForSetting(name, value, type, node.value));
+    }
+  }
+
+  getProp(values, init) {
+    const {
+      elem,
+      name,
+      prop,
+      type,
+      node,
+      options
+    } = this;
+
+    return prop === 'text'
+      ? elem.text()
+      : getValueForGetting(name, elem.prop(prop), type, node.value, values, options, init, prop === 'multiple-select');
+  }
+
+  beforeRemove() {
+    this.offElemListener();
+    this.offFormListener();
+  }
+};
 
 function getProp(name, type, elem) {
   switch (name) {

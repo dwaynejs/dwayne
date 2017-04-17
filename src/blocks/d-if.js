@@ -1,76 +1,71 @@
 import { findInArray } from '../utils';
+import { Block } from '../Block';
+import { rootBlocks } from '../constants';
 
-export function registerDIf(Block) {
-  class DIf extends Block {
-    static template = html`
-      <d-elements
-        value="{elems}"
-        parentScope="{$$.parentScope}"
-        parentTemplate="{$$.parentTemplate}"
-      />
-    `;
+rootBlocks['d-if'] = class DIf extends Block {
+  static template = html`
+    <d-elements
+      value="{elems}"
+      parentScope="{$$.parentScope}"
+      parentTemplate="{$$.parentTemplate}"
+    />
+  `;
 
-    constructor(opts) {
-      super(opts);
+  constructor(opts) {
+    super(opts);
 
+    const {
+      parentScope,
+      htmlChildren
+    } = this.$$;
+    let index = Infinity;
+    const values = htmlChildren.map((child, i) => {
       const {
-        parentScope,
-        htmlChildren
-      } = this.$$;
-      let index = Infinity;
-      const values = htmlChildren.map((child, i) => {
-        const {
-          name,
-          attrs = {},
-          children
-        } = child;
-        let cond = attrs.if;
+        name,
+        attrs = {},
+        children
+      } = child;
+      let cond = attrs.if;
 
-        if (name !== 'd-else' && cond) {
-          cond = parentScope.$$.evaluate(cond, (newValue) => {
-            if (!!newValue === values[i]) {
-              return;
-            }
+      if (name !== 'd-else' && cond) {
+        cond = parentScope.$$.evaluate(cond, (newValue) => {
+          if (!!newValue === values[i]) {
+            return;
+          }
 
-            values[i] = !!newValue;
+          values[i] = !!newValue;
 
-            if (i > index) {
-              return;
-            }
+          if (i > index) {
+            return;
+          }
 
-            if (i < index) {
-              index = i;
-              this.elems = children;
+          if (i < index) {
+            index = i;
+            this.elems = children;
 
-              return;
-            }
+            return;
+          }
 
-            const found = findInArray(values, Boolean);
+          const found = findInArray(values, Boolean);
 
-            if (found) {
-              index = found.key;
-              this.elems = htmlChildren[found.key].children;
-            } else {
-              index = Infinity;
-              this.elems = null;
-            }
-          }, this);
-        } else {
-          cond = true;
-        }
+          if (found) {
+            index = found.key;
+            this.elems = htmlChildren[found.key].children;
+          } else {
+            index = Infinity;
+            this.elems = null;
+          }
+        }, this);
+      } else {
+        cond = true;
+      }
 
-        if (cond && index === Infinity) {
-          index = i;
-          this.elems = children;
-        }
+      if (cond && index === Infinity) {
+        index = i;
+        this.elems = children;
+      }
 
-        return !!cond;
-      });
-    }
+      return !!cond;
+    });
   }
-
-  return {
-    name: 'd-if',
-    value: DIf
-  };
-}
+};

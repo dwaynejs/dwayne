@@ -1,30 +1,26 @@
-export function registerDOn(Mixin) {
-  class DOn extends Mixin {
-    static evaluate = false;
+import { Mixin } from '../Mixin';
+import { rootMixins } from '../constants';
 
-    constructor(opts) {
-      super(opts);
+rootMixins['d-on'] = class DOn extends Mixin {
+  static evaluate = false;
 
-      if (this.args) {
-        this.off = this.elem.on(this.args.join(','), () => {
-          this.evaluate();
-        });
-      } else {
-        console.error('Provide "d-on" mixin with an event names (like "d-on(click)" or "d-on(keyup, keypress)")!');
-      }
-    }
+  constructor(opts) {
+    super(opts);
 
-    beforeRemove() {
-      const { off } = this;
-
-      if (off) {
-        off();
-      }
+    if (this.args) {
+      this.off = this.elem.on(this.args.join(','), () => {
+        this.evaluate();
+      });
+    } else {
+      console.error('Provide "d-on" mixin with an event names (like "d-on(click)" or "d-on(keyup, keypress)")!');
     }
   }
 
-  return {
-    name: 'd-on',
-    value: DOn
-  };
-}
+  beforeRemove() {
+    const { off } = this;
+
+    if (off) {
+      off();
+    }
+  }
+};
