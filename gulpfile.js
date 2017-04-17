@@ -68,11 +68,11 @@ modules.forEach((module) => {
 });
 
 gulp.task('server:dev', () => (
-  devServer.listen(7777)
+  devServer.listen(8888)
 ));
 
 gulp.task('server:test', () => (
-  testServer.listen(8888)
+  testServer.listen(7777)
 ));
 
 gulp.task('build:default', () => {
