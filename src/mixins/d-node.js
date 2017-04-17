@@ -13,7 +13,7 @@ export function registerDNode(Mixin, createBlock, Block) {
         node
       } = this;
       let scope = parentTemplate;
-      let value = this.evaluateOnce();
+      let value = this.evaluate();
 
       if (args) {
         scope = value instanceof Block

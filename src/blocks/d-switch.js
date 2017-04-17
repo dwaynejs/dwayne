@@ -98,7 +98,7 @@ export function registerDSwitch(Block) {
     }
 
     afterConstruct() {
-      this.evaluateAndWatch(watchArgs, () => {
+      this.evaluate(watchArgs, () => {
         const {
           value: newValue
         } = this.args;

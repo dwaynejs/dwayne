@@ -884,15 +884,16 @@ class Block {
   }
 
   /**
-   * @method Block#evaluateAndWatch
+   * @method Block#evaluate
    * @public
    * @param {Function} func - Function to evaluate.
-   * @param {Watcher} callback - Callback which is called when the expression value is changed.
+   * @param {Watcher} [callback] - If present, callback which is called when the expression value is changed.
+   * @param {Block|Mixin} [target = this] - What block or mixin requests the value.
    * @returns {*} Evaluation result.
    * @description Method for evaluating an expression in context of the block and watching for the changes.
    */
-  evaluateAndWatch(func, callback) {
-    return this.$$.evaluate(func, callback, this);
+  evaluate(func, callback, target = this) {
+    return this.$$.evaluate(func, callback, target);
   }
 
   /**
@@ -1111,24 +1112,14 @@ class Mixin {
   beforeRemove() {}
 
   /**
-   * @method Block#evaluateAndWatch
+   * @method Block#evaluate
    * @public
-   * @param {Watcher} callback - Callback which is called when the mixin value is changed.
+   * @param {Watcher} [callback] - If present, callback which is called when the mixin value is changed.
    * @returns {*} Evaluation result.
    * @description Method for evaluating the mixin value and watching for the changes.
    */
-  evaluateAndWatch(callback) {
+  evaluate(callback) {
     return this.$$.evaluate(callback);
-  }
-
-  /**
-   * @method Block#evaluateOnce
-   * @public
-   * @returns {*} Evaluation result.
-   * @description Method for evaluating the mixin value once.
-   */
-  evaluateOnce() {
-    return this.$$.evaluate();
   }
 }
 
@@ -1547,7 +1538,7 @@ function createMixin({ name, Mixin, dynamic, value, args, comment, elem, parentB
   });
 
   if (Mixin.evaluate) {
-    const value = mixin.value = mixin.evaluateAndWatch((newValue, oldValue) => {
+    const value = mixin.value = mixin.evaluate((newValue, oldValue) => {
       mixin.value = newValue;
 
       try {

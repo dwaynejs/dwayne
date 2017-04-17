@@ -7,7 +7,7 @@ export function registerDOn(Mixin) {
 
       if (this.args) {
         this.off = this.elem.on(this.args.join(','), () => {
-          this.evaluateOnce();
+          this.evaluate();
         });
       } else {
         console.error('Provide "d-on" mixin with an event names (like "d-on(click)" or "d-on(keyup, keypress)")!');

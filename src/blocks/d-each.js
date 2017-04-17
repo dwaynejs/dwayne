@@ -30,7 +30,7 @@ export function registerDEach(Block, createBlock) {
     }
 
     afterRender() {
-      this.evaluateAndWatch(watchArgs, this.renderSet);
+      this.evaluate(watchArgs, this.renderSet);
       this.renderSet();
     }
 

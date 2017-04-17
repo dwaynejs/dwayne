@@ -13,7 +13,7 @@ export function registerDElem(Mixin, createBlock, Block) {
         elem
       } = this;
       let scope = parentTemplate;
-      let value = this.evaluateOnce();
+      let value = this.evaluate();
 
       if (args) {
         scope = value instanceof Block

@@ -18,7 +18,7 @@ export function registerDValue(Mixin, createBlock, Block) {
       } = this;
       const name = elem.name();
       const type = elem.prop('type');
-      const value = this.evaluateOnce();
+      const value = this.evaluate();
       let initialScopeValue = null;
 
       this.prop = getProp(name, type, elem);
