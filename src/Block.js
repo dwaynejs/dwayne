@@ -18,6 +18,7 @@ import {
   D_REST_REGEX, Scope,
   rootBlocks, rootMixins
 } from './constants';
+import { initApp } from './initApp';
 
 /**
  * @typedef {Error} EvaluationError
@@ -279,6 +280,19 @@ class Block {
     this._blocks[name] = Subclass;
 
     return Subclass;
+  }
+
+  /**
+   * @method Block.init
+   * @public
+   * @param {Elem|Element} container - Container of the app.
+   * @returns {void}
+   * @description Method for initializing app.
+   */
+  static init(container) {
+    const klass = this;
+
+    initApp(htmlScopeless`<d-block Constructor="{klass}"/>`, container);
   }
 
   /**

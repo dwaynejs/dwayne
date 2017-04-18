@@ -2862,6 +2862,51 @@ function wrapMixin(mixin, wrapper) {
   return isInstanceOf(Mixin$1, returnValue) ? returnValue : mixin;
 }
 
+function initApp(html, container) {
+  var parentElem = new Elem(container).elem(0);
+
+  if (!parentElem.length) {
+    throw new Error('No valid element to insert the app into was given! (initApp)');
+  }
+
+  if (parentElem.prop('DwayneRootBlock')) {
+    throw new Error('There already exists a Dwayne app inside the given element! (initApp)');
+  }
+
+  if (isArray(html)) {
+    html = {
+      vars: [],
+      value: html
+    };
+  }
+
+  var RootBlock = function (_Block) {
+    inherits(RootBlock, _Block);
+
+    function RootBlock() {
+      classCallCheck(this, RootBlock);
+      return possibleConstructorReturn(this, (RootBlock.__proto__ || Object.getPrototypeOf(RootBlock)).apply(this, arguments));
+    }
+
+    return RootBlock;
+  }(Block$1);
+
+  RootBlock._vars = html.vars;
+  RootBlock._html = html.value;
+
+
+  var block = createBlock({
+    node: {
+      name: '#RootBlock'
+    },
+    Constructor: RootBlock,
+    parent: parentElem,
+    parentElem: parentElem
+  });
+
+  parentElem.prop('DwayneRootBlock', block).attr('dwayne-root', '');
+}
+
 /**
  * @typedef {Error} EvaluationError
  * @public
@@ -3155,6 +3200,31 @@ var Block$1 = function () {
       this._blocks[name] = _Subclass2;
 
       return _Subclass2;
+    }
+
+    /**
+     * @method Block.init
+     * @public
+     * @param {Elem|Element} container - Container of the app.
+     * @returns {void}
+     * @description Method for initializing app.
+     */
+
+  }, {
+    key: 'init',
+    value: function init(container) {
+      var _func;
+
+      var klass = this;
+
+      initApp([{
+        "name": "d-block",
+        "attrs": {
+          "Constructor": function _(_$) {
+            return klass;
+          }
+        }
+      }], container);
     }
 
     /**
@@ -5264,51 +5334,6 @@ function insertTemplates(template, templates) {
   vars.push.apply(vars, toConsumableArray(keys(newVars)));
 
   return template;
-}
-
-function initApp(html, node) {
-  var parentElem = new Elem(node).elem(0);
-
-  if (!parentElem.length) {
-    throw new Error('No valid element to insert the app into was given! (initApp)');
-  }
-
-  if (parentElem.prop('DwayneRootBlock')) {
-    throw new Error('There already exists a Dwayne app inside the given element! (initApp)');
-  }
-
-  if (isArray(html)) {
-    html = {
-      vars: [],
-      value: html
-    };
-  }
-
-  var RootBlock = function (_Block) {
-    inherits(RootBlock, _Block);
-
-    function RootBlock() {
-      classCallCheck(this, RootBlock);
-      return possibleConstructorReturn(this, (RootBlock.__proto__ || Object.getPrototypeOf(RootBlock)).apply(this, arguments));
-    }
-
-    return RootBlock;
-  }(Block$1);
-
-  RootBlock._vars = html.vars;
-  RootBlock._html = html.value;
-
-
-  var block = createBlock({
-    node: {
-      name: '#RootBlock'
-    },
-    Constructor: RootBlock,
-    parent: parentElem,
-    parentElem: parentElem
-  });
-
-  parentElem.prop('DwayneRootBlock', block).attr('dwayne-root', '');
 }
 
 function removeApp(node) {

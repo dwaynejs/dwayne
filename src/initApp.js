@@ -3,8 +3,8 @@ import { createBlock } from './helpers/Block';
 import { Block } from './Block';
 import { Elem } from './Elem';
 
-export function initApp(html, node) {
-  const parentElem = new Elem(node).elem(0);
+export function initApp(html, container) {
+  const parentElem = new Elem(container).elem(0);
 
   if (!parentElem.length) {
     throw new Error('No valid element to insert the app into was given! (initApp)');
