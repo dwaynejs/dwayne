@@ -283,9 +283,19 @@ class Block {
   }
 
   /**
+   * @method Block.get
+   * @public
+   * @param {String} name - Block name.
+   * @returns {typeof Block|undefined} Returns registered Block with specified name.
+   */
+  static get(name) {
+    return (this._blocks || {})[name];
+  }
+
+  /**
    * @method Block.init
    * @public
-   * @param {Elem|Element} container - Container of the app.
+   * @param {Elem|Element} [container] - Container of the app.
    * @returns {void}
    * @description Method for initializing app.
    */
