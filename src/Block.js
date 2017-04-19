@@ -19,6 +19,7 @@ import {
   rootBlocks, rootMixins
 } from './constants';
 import { initApp } from './initApp';
+import { Mixin } from './Mixin';
 
 /**
  * @typedef {Error} EvaluationError
