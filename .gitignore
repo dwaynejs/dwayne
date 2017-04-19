@@ -4,6 +4,7 @@ node_modules/
 .idea/
 
 lib/
+coverage/
 
 /entry.js
 /bundle.js

@@ -1,78 +1,14 @@
 const gulp = require('gulp');
 const _ = require('lodash');
-const run = require('gulp-run');
-const rollup = require('rollup');
 const rollupStream = require('rollup-stream');
 const sourcemaps = require('gulp-sourcemaps');
 const buffer = require('vinyl-buffer');
 const source = require('vinyl-source-stream');
-const watch = require('rollup-watch');
 const uglify = require('rollup-plugin-uglify');
 
-const createServer = require('./server');
-
-const rollupDevConfig = require('./rollup.dev.config');
 const rollupBuildConfig = require('./rollup.build.config');
-const rollupTestConfig = require('./rollup.test.config');
-
-const devServer = createServer();
-const testServer = createServer();
-
-const modules = [
-  'all',
-  'Block',
-  'Elem'
-];
-
-gulp.task('default', ['server:dev'], () => {
-  const watcher = watch(rollup, rollupDevConfig);
-
-  watcher.on('event', (event) => {
-    console.log(event);
-
-    if (event.code === 'BUILD_START') {
-      devServer.io.emit('toreload');
-    }
-
-    if (event.code === 'BUILD_END') {
-      devServer.io.emit('reload');
-    }
-  });
-});
 
 gulp.task('build', ['build:default', 'build:min', 'build:browser', 'build:es6']);
-
-modules.forEach((module) => {
-  const taskName = `test${ module ? `:${ module }` : '' }`;
-  
-  gulp.task(taskName, ['server:test'], () => {
-    const config = _.cloneDeep(rollupTestConfig);
-
-    config.entry.push(`./test/${ module }.js`);
-
-    const watcher = watch(rollup, config);
-
-    watcher.on('event', (event) => {
-      console.log(event);
-
-      if (event.code === 'BUILD_START') {
-        testServer.io.emit('toreload');
-      }
-
-      if (event.code === 'BUILD_END') {
-        testServer.io.emit('reload');
-      }
-    });
-  });
-});
-
-gulp.task('server:dev', () => (
-  devServer.listen(8888)
-));
-
-gulp.task('server:test', () => (
-  testServer.listen(7777)
-));
 
 gulp.task('build:default', () => {
   const config = _.cloneDeep(rollupBuildConfig);
