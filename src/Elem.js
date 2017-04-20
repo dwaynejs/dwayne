@@ -45,6 +45,12 @@ import { find } from './find';
  * @param {Elem} elem - Initial set.
  */
 
+/**
+ * @callback ElemMethod
+ * @public
+ * @this Elem
+ */
+
 const { Symbol } = global;
 const EVENT_SEPARATOR_REGEX = /(?:,| ) */;
 const CSS_STYLES_SEPARATOR_REGEX = /; ?/;
@@ -55,7 +61,7 @@ const emptyCollection = [];
 
 /**
  * @class Elem
- * @extends Array
+ * @extends Array.<Element|Node>
  * @public
  * @param {Element|Element[]} [elem = []] - An element or an array of elements to wrap.
  * @returns {Elem} Instance of Elem.
@@ -67,12 +73,20 @@ const emptyCollection = [];
  * new Elem(document.getElementsByClassName('cls'));
  */
 class Elem extends Array {
-  static addMethods(property, value) {
+  /**
+   * @method Elem.addMethods
+   * @public
+   * @param {String|Object.<String, ElemMethod>} methodName - Name of the method or object of
+   * method names and methods.
+   * @param {ElemMethod} [method] - If the first argument is a string this should be the method itself.
+   * @returns {typeof Elem}
+   */
+  static addMethods(methodName, method) {
     if (arguments.length >= 2) {
-      property = { [property]: value };
+      methodName = { [methodName]: method };
     }
 
-    definePrototypeProperties(this.prototype, property);
+    definePrototypeProperties(this.prototype, methodName);
 
     return this;
   }
@@ -181,7 +195,7 @@ class Elem extends Array {
 
     if (arguments.length <= 1 && isString(attr)) {
       if (!elem) {
-        return null;
+        return;
       }
 
       const ns = getAttrNS(attr, elem);
@@ -480,7 +494,7 @@ class Elem extends Array {
       bubbles = true,
       cancelable = true,
       ...realDetails
-    } = details || {};
+    } = details;
     let finalEvent = event;
 
     if (!EVENT_REGEX.test(toStringTag(finalEvent))) {
@@ -800,13 +814,7 @@ class Elem extends Array {
       || elem.oMatchesSelector
     );
 
-    try {
-      return matches.call(elem, selector);
-    } catch (err) {
-      console.error(`Selector '${ selector }' is not a valid selector (Elem#is)`);
-
-      return false;
-    }
+    return elem::matches(selector);
   }
 
   /**
@@ -821,7 +829,7 @@ class Elem extends Array {
   name() {
     const elem = this[0];
 
-    return elem && elem.nodeName
+    return elem
       ? elem.nodeName.toLowerCase()
       : undefined;
   }

@@ -12,18 +12,30 @@ export function insertTemplates(template, templates) {
   const newVars = toObjectKeys(vars);
 
   assign(newTemplates, templates);
-  iterateArray(value, forEachNode);
+  iterateAndChangeChildren(value);
 
-  function forEachNode({ type, value, children }, index, tree) {
-    if (type === '#comment') {
-      value = value.trim();
+  function iterateAndChangeChildren(nodes = []) {
+    for (let i = 0; i < nodes.length; i++) {
+      const {
+        name,
+        value,
+        children
+      } = nodes[i];
 
-      if (newTemplates[value]) {
-        tree[index] = newTemplates[value].value;
-        assign(newVars, toObjectKeys(newTemplates[value].vars));
+      if (name === '#comment') {
+        const trimmed = value.trim();
+
+        if (newTemplates[trimmed]) {
+          const newTemplate = newTemplates[trimmed].value;
+
+          nodes.splice(i, 1, ...newTemplate);
+          assign(newVars, toObjectKeys(newTemplates[trimmed].vars));
+
+          i += newTemplate.length - 1;
+        }
+      } else {
+        iterateAndChangeChildren(children);
       }
-    } else {
-      iterateArray(children, forEachNode);
     }
   }
 

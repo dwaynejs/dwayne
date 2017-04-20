@@ -1,9 +1,6 @@
 import { Elem } from './Elem';
 import { createHideStyleNode } from './helpers/Elem';
-
-const {
-  document = {}
-} = global;
+import { document } from './constants';
 
 /**
  * @const {Elem} doc

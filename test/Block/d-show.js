@@ -1,4 +1,4 @@
-import assert from 'assert';
+import { strictEqual } from 'assert';
 import { Block, doc, initApp, removeApp } from '../../src';
 
 let app;
@@ -32,17 +32,17 @@ export default () => {
     });
 
     it('should not be hidden if the condition is truthy', () => {
-      assert(!container.find('div').hasClass('__dwayne-hidden__'));
+      strictEqual(container.find('div').hasClass('__dwayne-hidden__'), false);
     });
     it('should be hidden if the condition is falsy', () => {
       app.show = false;
 
-      assert(container.find('div').hasClass('__dwayne-hidden__'));
+      strictEqual(container.find('div').hasClass('__dwayne-hidden__'), true);
     });
     it('should not be hidden if the condition is truthy again', () => {
       app.show = true;
 
-      assert(!container.find('div').hasClass('__dwayne-hidden__'));
+      strictEqual(container.find('div').hasClass('__dwayne-hidden__'), false);
     });
 
     after(remove);

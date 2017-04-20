@@ -301,9 +301,7 @@ class Block {
    * @description Method for initializing app.
    */
   static init(container) {
-    const klass = this;
-
-    initApp(htmlScopeless`<d-block Constructor="{klass}"/>`, container);
+    initApp(htmlScopeless`<d-block Constructor="{this}"/>`, container);
   }
 
   /**

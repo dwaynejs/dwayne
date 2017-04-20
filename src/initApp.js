@@ -1,4 +1,4 @@
-import { isArray } from './utils';
+import { isArray, isString } from './utils';
 import { createBlock } from './helpers/Block';
 import { Block } from './Block';
 import { Elem } from './Elem';
@@ -12,6 +12,15 @@ export function initApp(html, container) {
 
   if (parentElem.prop('DwayneRootBlock')) {
     throw new Error('There already exists a Dwayne app inside the given element! (initApp)');
+  }
+
+  if (isString(html)) {
+    html = {
+      vars: [],
+      value: [{
+        name: html
+      }]
+    };
   }
 
   if (isArray(html)) {

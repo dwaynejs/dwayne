@@ -1,16 +1,16 @@
 import { Block } from './Block';
 import { Elem } from './Elem';
 
-export function removeApp(node) {
-  const elem = new Elem(node);
+export function removeApp(container) {
+  const elem = new Elem(container).elem(0);
 
   if (!elem.length) {
     throw new Error('No valid element to remove the app from was given! (removeApp)');
   }
 
-  node = elem[0];
+  container = elem[0];
 
-  const { DwayneRootBlock } = node;
+  const { DwayneRootBlock } = container;
 
   if (!(DwayneRootBlock instanceof Block)) {
     throw new Error('No app registered inside the given element! (removeApp)');
@@ -19,5 +19,5 @@ export function removeApp(node) {
   DwayneRootBlock.$$.remove();
   elem.removeAttr('dwayne-root');
 
-  delete node.DwayneRootBlock;
+  delete container.DwayneRootBlock;
 }

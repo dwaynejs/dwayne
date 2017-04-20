@@ -1,8 +1,5 @@
 import { Elem } from './Elem';
-
-const {
-  document = {}
-} = global;
+import { document } from './constants';
 
 /**
  * @function find

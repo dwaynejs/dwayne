@@ -2684,7 +2684,7 @@ function watchForAllArgs(block, watcher) {
   });
 }
 
-var Mixin$1 = function () {
+var Mixin = function () {
   createClass(Mixin, null, [{
     key: 'wrap',
 
@@ -2845,10 +2845,10 @@ var Mixin$1 = function () {
   return Mixin;
 }();
 
-Mixin$1.evaluate = true;
+Mixin.evaluate = true;
 
 
-setToStringTag(Mixin$1, 'Mixin');
+setToStringTag(Mixin, 'Mixin');
 
 function wrapBlock(block, wrapper) {
   var returnValue = wrapper(block);
@@ -2859,7 +2859,7 @@ function wrapBlock(block, wrapper) {
 function wrapMixin(mixin, wrapper) {
   var returnValue = wrapper(mixin);
 
-  return isInstanceOf(Mixin$1, returnValue) ? returnValue : mixin;
+  return isInstanceOf(Mixin, returnValue) ? returnValue : mixin;
 }
 
 function initApp(html, container) {
@@ -3203,9 +3203,22 @@ var Block$1 = function () {
     }
 
     /**
+     * @method Block.get
+     * @public
+     * @param {String} name - Block name.
+     * @returns {typeof Block|undefined} Returns registered Block with specified name.
+     */
+
+  }, {
+    key: 'get',
+    value: function get$$1(name) {
+      return (this._blocks || {})[name];
+    }
+
+    /**
      * @method Block.init
      * @public
-     * @param {Elem|Element} container - Container of the app.
+     * @param {Elem|Element} [container] - Container of the app.
      * @returns {void}
      * @description Method for initializing app.
      */
@@ -3213,15 +3226,13 @@ var Block$1 = function () {
   }, {
     key: 'init',
     value: function init(container) {
-      var _func;
-
-      var klass = this;
+      var _func, _this5;
 
       initApp([{
         "name": "d-block",
         "attrs": {
           "Constructor": function _(_$) {
-            return klass;
+            return _this5;
           }
         }
       }], container);
@@ -3239,7 +3250,7 @@ var Block$1 = function () {
   }, {
     key: 'mixin',
     value: function mixin(name, Subclass) {
-      var _this6 = this;
+      var _this7 = this;
 
       if (isFunction(Subclass) && !isInstanceOf(Mixin, Subclass)) {
         var _afterUpdate = Subclass;
@@ -3286,7 +3297,7 @@ var Block$1 = function () {
 
       try {
         Subclass = mixinHooks.reduce(function (returnValue, hook) {
-          var currentReturnValue = hook(returnValue, name, _this6);
+          var currentReturnValue = hook(returnValue, name, _this7);
 
           return isInstanceOf(Mixin, currentReturnValue) ? currentReturnValue : returnValue;
         }, Subclass);
@@ -3339,7 +3350,7 @@ var Block$1 = function () {
   }]);
 
   function Block(opts) {
-    var _this7 = this;
+    var _this8 = this;
 
     classCallCheck(this, Block);
     var name = opts.name,
@@ -3409,7 +3420,7 @@ var Block$1 = function () {
           forDElements = !!forDElements;
           forDItem = !!forDItem;
 
-          var scope = name === '#d-item' && !forDItem || forDEach ? (forDEach || _this7).$$.scope : _this7;
+          var scope = name === '#d-item' && !forDItem || forDEach ? (forDEach || _this8).$$.scope : _this8;
 
           var _ref = targetBlock ? targetBlock.$$ : {},
               watchersToRemove = _ref.watchersToRemove;
@@ -3429,7 +3440,7 @@ var Block$1 = function () {
             } catch (err) {
               err.expression = func.expression;
               err.original = func.original;
-              err.block = _this7;
+              err.block = _this8;
 
               if (isFunction(constructor.onEvalError)) {
                 try {
@@ -3483,7 +3494,7 @@ var Block$1 = function () {
           return evaluate();
         },
         remove: function remove$$1(isParentSignal) {
-          _this7.$$.isRemoved = true;
+          _this8.$$.isRemoved = true;
 
           removeWatchers(watchersToRemove);
 
@@ -3491,34 +3502,34 @@ var Block$1 = function () {
           iterateArray(mixins, removeWithParentSignal);
 
           try {
-            _this7.beforeRemove();
+            _this8.beforeRemove();
           } catch (err) {
             console.error('Uncaught error in ' + name + '#beforeRemove:', err);
           }
 
           if (!isParentSignal && isParentBlock) {
-            parent.$$.removeContent(_this7.$$.content);
+            parent.$$.removeContent(_this8.$$.content);
           }
 
           if (!isParentSignal && parentBlock) {
-            removeArrayElem(parentBlock.$$.children, _this7);
+            removeArrayElem(parentBlock.$$.children, _this8);
           }
 
-          _this7.$$.content.remove();
+          _this8.$$.content.remove();
         },
         changeContent: function changeContent(newContent) {
-          _this7.$$.content = newContent;
+          _this8.$$.content = newContent;
 
-          if (_this7.$$.isRendered) {
+          if (_this8.$$.isRendered) {
             try {
-              _this7.afterDOMChange();
+              _this8.afterDOMChange();
             } catch (err) {
               console.error('Uncaught error in ' + name + '#afterContentChange:', err);
             }
           }
         },
         addContent: function addContent(contentToAdd, notRecursive) {
-          var oldContent = _this7.$$.content;
+          var oldContent = _this8.$$.content;
           var index = oldContent.indexOf(contentToAdd[0].previousSibling) + 1;
           var newContent = void 0;
 
@@ -3528,14 +3539,14 @@ var Block$1 = function () {
             newContent = oldContent.slice(0, index).add(contentToAdd, oldContent.slice(index));
           }
 
-          _this7.$$.changeContent(newContent);
+          _this8.$$.changeContent(newContent);
 
           if (isParentBlock && !notRecursive) {
             parent.$$.addContent(contentToAdd, notRecursive);
           }
         },
         moveContent: function moveContent(contentToMove, after) {
-          var oldContent = _this7.$$.content;
+          var oldContent = _this8.$$.content;
           var index = oldContent.indexOf(contentToMove[0]);
           var indexToPut = oldContent.indexOf(after[0]) + 1;
           var newContent = void 0;
@@ -3548,14 +3559,14 @@ var Block$1 = function () {
             newContent = oldContent.slice(0, index).add(oldContent.slice(index + contentToMove.length, indexToPut), contentToMove, oldContent.slice(indexToPut));
           }
 
-          _this7.$$.changeContent(newContent);
+          _this8.$$.changeContent(newContent);
 
           if (isParentBlock && indexToPut) {
             parent.$$.moveContent(contentToMove, after);
           }
         },
         removeContent: function removeContent(contentToRemove) {
-          _this7.$$.changeContent(_this7.$$.content.filter(function (elem) {
+          _this8.$$.changeContent(_this8.$$.content.filter(function (elem) {
             return contentToRemove.indexOf(elem) === -1;
           }));
 
@@ -3564,7 +3575,7 @@ var Block$1 = function () {
           }
         },
         insertInStartOfIt: function insertInStartOfIt(contentToInsert, moveFlag) {
-          var prevBlock = _this7.$$.prevBlock;
+          var prevBlock = _this8.$$.prevBlock;
 
           var after = afterElem;
 
@@ -3610,21 +3621,21 @@ var Block$1 = function () {
           }
 
           if (moveFlag) {
-            _this7.$$.moveContent(contentToInsert, after);
+            _this8.$$.moveContent(contentToInsert, after);
           } else {
-            _this7.$$.addContent(contentToInsert, true);
+            _this8.$$.addContent(contentToInsert, true);
           }
 
           return after;
         },
         insertAfterIt: function insertAfterIt(contentToInsert, moveFlag) {
-          var prevBlock = _this7.$$.prevBlock;
+          var prevBlock = _this8.$$.prevBlock;
 
           var after = afterElem;
           var tryToAddOrMove = void 0;
 
-          if (_this7.$$.content.length) {
-            after = _this7.$$.content.elem(-1);
+          if (_this8.$$.content.length) {
+            after = _this8.$$.content.elem(-1);
             tryToAddOrMove = true;
             contentToInsert.insertAfter(after);
           } else if (prevBlock instanceof Block) {
@@ -3653,10 +3664,10 @@ var Block$1 = function () {
     });
 
     iterateObject(constructor.defaultLocals, function (value, variable) {
-      _this7[variable] = value;
+      _this8[variable] = value;
     });
     iterateArray(constructor._vars, function (variable) {
-      _this7[variable] = _this7[variable];
+      _this8[variable] = _this8[variable];
     });
 
     var argsObject = create(null);
@@ -3674,7 +3685,7 @@ var Block$1 = function () {
           iterateObject(localArgs, cleanProperty);
           assign(localArgs, transformRestArgs(value));
           calculateArgs(args, argsObject);
-        }, _this7);
+        }, _this8);
 
         wasDRest = true;
 
@@ -3690,7 +3701,7 @@ var Block$1 = function () {
         value = parentScope.$$.evaluate(value, function (value) {
           localArgs[arg] = value;
           calculateArgs(args, argsObject);
-        }, _this7, forDElements, isDElements && parentBlock.$$.name === '#d-item');
+        }, _this8, forDElements, isDElements && parentBlock.$$.name === '#d-item');
       }
 
       localArgs[arg] = value;
@@ -3920,7 +3931,7 @@ var Block$1 = function () {
   }, {
     key: 'watch',
     value: function watch() {
-      var _this8 = this;
+      var _this9 = this;
 
       for (var _len2 = arguments.length, vars = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
         vars[_key2] = arguments[_key2];
@@ -3956,25 +3967,25 @@ var Block$1 = function () {
         variable = '' + variable;
 
         if (variable === '$') {
-          return watchForAllLocals(_this8, watcher);
+          return watchForAllLocals(_this9, watcher);
         }
 
         if (variable === 'args') {
-          return watchForAllArgs(_this8, watcher);
+          return watchForAllArgs(_this9, watcher);
         }
 
         if (variable === 'globals') {
-          return watchForAllGlobals(_this8, watcher);
+          return watchForAllGlobals(_this9, watcher);
         }
 
         if (WATCHED_ARG_PREFIX_REGEX.test(variable)) {
           variable = variable.replace(WATCHED_ARG_PREFIX_REGEX, '');
 
-          if (!_this8.$$.args[variable]) {
+          if (!_this9.$$.args[variable]) {
             return;
           }
 
-          _this8.$$.args[variable].watchers.perm.push(watcher);
+          _this9.$$.args[variable].watchers.perm.push(watcher);
 
           return;
         }
@@ -3982,15 +3993,15 @@ var Block$1 = function () {
         if (WATCHED_GLOBAL_PREFIX_REGEX.test(variable)) {
           variable = variable.replace(WATCHED_GLOBAL_PREFIX_REGEX, '');
 
-          if (!_this8.$$.globals[variable]) {
+          if (!_this9.$$.globals[variable]) {
             return;
           }
 
-          var watchers = _this8.$$.globals[variable].watchers;
+          var watchers = _this9.$$.globals[variable].watchers;
 
 
           watchers.perm.push(watcher);
-          _this8.$$.watchersToRemove.push({
+          _this9.$$.watchersToRemove.push({
             watcher: watcher,
             watchers: watchers
           });
@@ -3998,11 +4009,11 @@ var Block$1 = function () {
           return;
         }
 
-        if (!_this8.$$.locals[variable]) {
+        if (!_this9.$$.locals[variable]) {
           return;
         }
 
-        _this8.$$.locals[variable].watchers.perm.push(watcher);
+        _this9.$$.locals[variable].watchers.perm.push(watcher);
       });
 
       oldWatcher();
@@ -4654,7 +4665,7 @@ rootMixins['d-attr'] = function (_Mixin) {
     }
   }]);
   return DAttr;
-}(Mixin$1);
+}(Mixin);
 
 rootMixins['d-bind'] = function (_Mixin) {
   inherits(DBind, _Mixin);
@@ -4693,7 +4704,7 @@ rootMixins['d-bind'] = function (_Mixin) {
     }
   }]);
   return DBind;
-}(Mixin$1);
+}(Mixin);
 
 var EMPTY_SPACE_REGEX = /\s+/;
 
@@ -4770,7 +4781,7 @@ rootMixins['d-class'] = function (_Mixin) {
     }
   }]);
   return DClass;
-}(Mixin$1);
+}(Mixin);
 
 var _class$4;
 var _temp$4;
@@ -4804,7 +4815,7 @@ rootMixins['d-elem'] = (_temp$4 = _class$4 = function (_Mixin) {
   }
 
   return DElem;
-}(Mixin$1), _class$4.evaluate = false, _temp$4);
+}(Mixin), _class$4.evaluate = false, _temp$4);
 
 rootMixins['d-hide'] = function (_Mixin) {
   inherits(DHide, _Mixin);
@@ -4833,7 +4844,7 @@ rootMixins['d-hide'] = function (_Mixin) {
     }
   }]);
   return DHide;
-}(Mixin$1);
+}(Mixin);
 
 var _class$5;
 var _temp$5;
@@ -4867,7 +4878,7 @@ rootMixins['d-node'] = (_temp$5 = _class$5 = function (_Mixin) {
   }
 
   return DNode;
-}(Mixin$1), _class$5.evaluate = false, _temp$5);
+}(Mixin), _class$5.evaluate = false, _temp$5);
 
 var _class$6;
 var _temp$6;
@@ -4902,7 +4913,7 @@ rootMixins['d-on'] = (_temp$6 = _class$6 = function (_Mixin) {
     }
   }]);
   return DOn;
-}(Mixin$1), _class$6.evaluate = false, _temp$6);
+}(Mixin), _class$6.evaluate = false, _temp$6);
 
 rootMixins['d-show'] = function (_Mixin) {
   inherits(DShow, _Mixin);
@@ -4931,7 +4942,7 @@ rootMixins['d-show'] = function (_Mixin) {
     }
   }]);
   return DShow;
-}(Mixin$1);
+}(Mixin);
 
 var CSS_STYLES_SEPARATOR_REGEX$1 = /; ?/;
 
@@ -4990,7 +5001,7 @@ rootMixins['d-style'] = function (_Mixin) {
     }
   }]);
   return DStyle;
-}(Mixin$1);
+}(Mixin);
 
 function addCSSProp$1(css, item) {
   var _item = slicedToArray(item, 2),
@@ -5129,7 +5140,7 @@ rootMixins['d-value'] = (_temp$7 = _class$7 = function (_Mixin) {
     }
   }]);
   return DValue;
-}(Mixin$1), _class$7.evaluate = false, _temp$7);
+}(Mixin), _class$7.evaluate = false, _temp$7);
 
 function getProp(name, type, elem) {
   switch (name) {
@@ -5361,7 +5372,7 @@ function removeApp(node) {
 
 exports.Block = Block$1;
 exports.Elem = Elem;
-exports.Mixin = Mixin$1;
+exports.Mixin = Mixin;
 exports.doc = doc;
 exports.html = html;
 exports.body = body;

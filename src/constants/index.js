@@ -10,3 +10,6 @@ export const Scope = {
   evalMode: false,
   gettingVars: []
 };
+export const {
+  document = {}
+} = global;

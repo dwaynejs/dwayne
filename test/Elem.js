@@ -1,9 +1,41 @@
 import { deepStrictEqual, strictEqual } from 'assert';
-import { Elem } from '../src/Elem';
-import { find } from '../src/find';
+import { Elem } from '../src';
 
 const { document } = global;
 const { body } = document;
+
+describe('Elem.', () => {
+  describe('addMethods()', () => {
+    it('should add methods to Elem', () => {
+      Elem.addMethods({
+        getOwnerDocument() {
+          if (!this.length) {
+            return new Elem();
+          }
+
+          return new Elem(this[0].ownerDocument);
+        }
+      });
+
+      const div = new Elem(document.createElement('div'));
+
+      strictEqual(div.getOwnerDocument()[0], document);
+    });
+    it('should support (string, function) syntax', () => {
+      Elem.addMethods('getOwnerDocument', function () {
+        if (!this.length) {
+          return new Elem();
+        }
+
+        return new Elem(this[0].ownerDocument);
+      });
+
+      const div = new Elem(document.createElement('div'));
+
+      strictEqual(div.getOwnerDocument()[0], document);
+    });
+  });
+});
 
 describe('Elem#', () => {
   describe('add()', () => {
@@ -85,7 +117,10 @@ describe('Elem#', () => {
     });
   });
   describe('attr()', () => {
-    it('should return wrap of an object of attributes with no arguments', (done) => {
+    it('should return empty object with no arguments and empty set', () => {
+      deepStrictEqual(new Elem().attr(), {});
+    });
+    it('should return an object of attributes with no arguments', (done) => {
       const elem = [
         document.createElement('div'),
         document.createElement('div'),
@@ -117,6 +152,9 @@ describe('Elem#', () => {
           done();
         }
       }
+    });
+    it('should return undefined with first string argument and empty set', () => {
+      strictEqual(new Elem().attr('foo'), undefined);
     });
     it('should return value of an attribute with first string argument', (done) => {
       const elem = [
@@ -187,7 +225,10 @@ describe('Elem#', () => {
 
       try {
         wrap
-          .attr({ attr: '123', contentEditable: '' })
+          .attr({
+            attr: '123',
+            contentEditable: ''
+          })
           .forEach((elem) => {
             strictEqual(elem.getAttribute('attr'), '123');
             strictEqual(elem.getAttribute('contentEditable'), '');
@@ -259,6 +300,12 @@ describe('Elem#', () => {
     });
   });
   describe('contains()', () => {
+    it('should return false, if element with empty set or empty parent', () => {
+      const elem = new Elem(document.createElement('div'));
+
+      strictEqual(elem.contains(new Elem()), false);
+      strictEqual(new Elem().contains(elem), false);
+    });
     it('should return true, if element contains another, and false if not', () => {
       const elem1 = document.createElement('div');
       const elem2 = document.createElement('div');
@@ -271,7 +318,7 @@ describe('Elem#', () => {
 
       elem1.appendChild(elem2);
       elem2.appendChild(elem3);
-      
+
       strictEqual(wrap1.contains(elem2), true);
       strictEqual(wrap2.contains(elem3), true);
       strictEqual(wrap1.contains(elem4), false);
@@ -285,7 +332,7 @@ describe('Elem#', () => {
       const childWrap = new Elem(parent);
   
       parent.appendChild(child);
-      
+
       strictEqual(parentWrap.contains(childWrap), true);
     });
   });
@@ -417,7 +464,10 @@ describe('Elem#', () => {
     });
   });
   describe('css()', () => {
-    it('should return wrap of an object of css properties with no arguments', () => {
+    it('should return empty object with no arguments and empty set', () => {
+      deepStrictEqual(new Elem().css(), {});
+    });
+    it('should return an object of css properties with no arguments', () => {
       const elem1 = document.createElement('div');
       const elem = [
         elem1,
@@ -437,6 +487,9 @@ describe('Elem#', () => {
         border: '1px solid black'
       });
       deepStrictEqual(wrap2.css(), {});
+    });
+    it('should return empty string with first string argument and empty set', () => {
+      strictEqual(new Elem().css('width'), '');
     });
     it('should return value of css property with first string argument', () => {
       const elem = document.createElement('div');
@@ -476,7 +529,10 @@ describe('Elem#', () => {
     });
   });
   describe('data()', () => {
-    it('should return wrap of an dataset object with no arguments', (done) => {
+    it('should return empty object with no arguments and empty set', () => {
+      deepStrictEqual(new Elem().data(), {});
+    });
+    it('should return a dataset object with no arguments', (done) => {
       const elem = [
         document.createElement('div'),
         document.createElement('div'),
@@ -509,7 +565,10 @@ describe('Elem#', () => {
         }
       }
     });
-    it('should return value of dataset parameter', (done) => {
+    it('should return undefined with first string argument and empty set', () => {
+      strictEqual(new Elem().data('foo'), undefined);
+    });
+    it('should return value of dataset parameter with first string parameter', (done) => {
       const elem = [
         document.createElement('div'),
         document.createElement('div'),
@@ -741,6 +800,9 @@ describe('Elem#', () => {
     // TODO: function filter
   });
   describe('hasAttr()', () => {
+    it('should return false with empty set', () => {
+      strictEqual(new Elem().hasAttr('foo'), false);
+    });
     it('should return true if the element has class', () => {
       const elem = document.createElement('div');
       const wrap = new Elem(elem);
@@ -763,6 +825,9 @@ describe('Elem#', () => {
     });
   });
   describe('hasClass()', () => {
+    it('should return false with empty set', () => {
+      strictEqual(new Elem().hasClass('foo'), false);
+    });
     it('should return true if the element has class', () => {
       const elem = document.createElement('div');
       const wrap = new Elem(elem);
@@ -792,6 +857,9 @@ describe('Elem#', () => {
     });
   });
   describe('html()', () => {
+    it('should return empty string with no arguments and empty set', () => {
+      strictEqual(new Elem().html(), '');
+    });
     it('should return innerHTML with no arguments', () => {
       const elem = document.createElement('div');
       const wrap = new Elem(elem);
@@ -810,7 +878,19 @@ describe('Elem#', () => {
     });
   });
   describe('insertAfter()', () => {
-    it('should support (element) syntax', () => {
+    it('should do nothing if the parameter has no parent', () => {
+      const parent = document.createElement('div');
+      const elem = document.createElement('div');
+      const wrap = new Elem(elem);
+
+      parent.appendChild(elem);
+
+      wrap.insertAfter(document.createElement('div'));
+
+      strictEqual(elem.parentNode, parent);
+    });
+    it('should be able to insert after some element in the set', () => {
+      const parent = document.createElement('div');
       const elem1 = document.createElement('div');
       const elem2 = document.createElement('div');
       const elem3 = document.createElement('div');
@@ -822,19 +902,49 @@ describe('Elem#', () => {
         elem3
       ];
       const wrap = new Elem(elem);
-      const wrap2 = new Elem(elem4);
+
+      parent.appendChild(elem4);
+      parent.appendChild(elem2);
+      parent.appendChild(elem5);
+
+      wrap.insertAfter(elem2);
+
+      const children = parent.childNodes;
+
+      strictEqual(children.length, 5);
+      strictEqual(children[0], elem4);
+      strictEqual(children[1], elem1);
+      strictEqual(children[2], elem2);
+      strictEqual(children[3], elem3);
+      strictEqual(children[4], elem5);
+    });
+    it('should support (element) syntax', () => {
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
+      const elem3 = document.createElement('div');
+      const elem4 = document.createElement('div');
+      const elem5 = document.createElement('div');
+      const elem6 = document.createElement('div');
+      const elem = [
+        elem1,
+        elem2,
+        elem3
+      ];
+      const wrap = new Elem(elem);
 
       elem4.appendChild(elem5);
+      elem4.appendChild(elem6);
 
       wrap.insertAfter(elem5);
 
-      const children = wrap2.children();
+      const children = elem4.childNodes;
 
-      strictEqual(children.length, 4);
+      strictEqual(children.length, 5);
       strictEqual(children[0], elem5);
       strictEqual(children[1], elem1);
       strictEqual(children[2], elem2);
       strictEqual(children[3], elem3);
+      strictEqual(children[4], elem6);
     });
     it('should support (Elem) syntax', () => {
       const elem1 = document.createElement('div');
@@ -865,6 +975,17 @@ describe('Elem#', () => {
     });
   });
   describe('insertBefore()', () => {
+    it('should do nothing if the parameter has no parent', () => {
+      const parent = document.createElement('div');
+      const elem = document.createElement('div');
+      const wrap = new Elem(elem);
+
+      parent.appendChild(elem);
+
+      wrap.insertBefore(document.createElement('div'));
+
+      strictEqual(elem.parentNode, parent);
+    });
     it('should support (element) syntax', () => {
       const elem1 = document.createElement('div');
       const elem2 = document.createElement('div');
@@ -998,6 +1119,9 @@ describe('Elem#', () => {
     });
   });
   describe('is()', () => {
+    it('should return false with empty set', () => {
+      strictEqual(new Elem().is('#foo'), false);
+    });
     it('should return if context matches selector', () => {
       const elem = document.createElement('div');
       const wrap = new Elem(elem);
@@ -1011,6 +1135,9 @@ describe('Elem#', () => {
     });
   });
   describe('name()', () => {
+    it('should return undefined for empty set', () => {
+      strictEqual(new Elem().name(), undefined);
+    });
     it('should return tagName.toLowerCase()', () => {
       const div = document.createElement('div');
       const input = document.createElement('input');
@@ -1130,12 +1257,24 @@ describe('Elem#', () => {
       const elem = document.createElement('div');
       const wrap = new Elem(elem);
       const removeListener = wrap.on('click, contextmenu', () => {
-        if (++times === 2) {
+        if (++times === 3) {
           wrap.remove();
 
           done();
 
           return removeListener('click');
+        }
+
+        if (times === 2) {
+          try {
+            removeListener('keydown');
+
+            return;
+          } catch (err) {
+            done(err);
+
+            return;
+          }
         }
 
         if (times < 2) {
@@ -1214,6 +1353,100 @@ describe('Elem#', () => {
       strictEqual(prev[1], elem3);
     });
   });
+  describe('prop()', () => {
+    it('should return undefined with first string argument and empty set', () => {
+      strictEqual(new Elem().prop('foo'), undefined);
+    });
+    it('should return value of a prop with first string argument', (done) => {
+      const elem = [
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
+      ];
+      const wrap = new Elem(elem);
+      let count = 0;
+
+      try {
+        wrap
+          .forEach((elem) => {
+            elem.foo = 123;
+            elem.bar = 456;
+          })
+          .forEach((elem) => {
+            strictEqual(new Elem(elem).prop('foo'), 123);
+            strictEqual(new Elem(elem).prop('bar'), 456);
+
+            doneAll();
+          });
+      } catch (err) {
+        done(err);
+      }
+
+      function doneAll() {
+        if (++count === elem.length) {
+          done();
+        }
+      }
+    });
+    it('should support (prop, value) syntax', (done) => {
+      const elem = [
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
+      ];
+      const wrap = new Elem(elem);
+      let count = 0;
+
+      try {
+        wrap
+          .prop('foo', 123)
+          .forEach((elem) => {
+            strictEqual(elem.foo, 123);
+
+            doneAll();
+          });
+      } catch (err) {
+        done(err);
+      }
+
+      function doneAll() {
+        if (++count === elem.length) {
+          done();
+        }
+      }
+    });
+    it('should support object property syntax', (done) => {
+      const elem = [
+        document.createElement('div'),
+        document.createElement('div'),
+        document.createElement('div')
+      ];
+      const wrap = new Elem(elem);
+      let count = 0;
+
+      try {
+        wrap
+          .prop({
+            foo: 123,
+            bar: 456
+          })
+          .forEach((elem) => {
+            strictEqual(elem.foo, 123);
+            strictEqual(elem.bar, 456);
+
+            doneAll();
+          });
+      } catch (err) {
+        done(err);
+      }
+
+      function doneAll() {
+        if (++count === elem.length) {
+          done();
+        }
+      }
+    });
+  });
   describe('remove()', () => {
     it('should remove the element', () => {
       const elem = document.createElement('div');
@@ -1274,6 +1507,17 @@ describe('Elem#', () => {
     });
   });
   describe('replace()', () => {
+    it('should do nothing if the element has no parent', () => {
+      const parent = document.createElement('div');
+      const elem = document.createElement('div');
+      const wrap = new Elem(document.createElement('div'));
+
+      parent.appendChild(elem);
+
+      wrap.replace(elem);
+
+      strictEqual(elem.parentNode, parent);
+    });
     it('should replace the element with a set of elements if it\'s not the only, first or last child', () => {
       const parent = document.createElement('div');
       const elem1 = document.createElement('div');
@@ -1523,33 +1767,6 @@ describe('Elem#', () => {
       strictEqual(elem2.classList.contains('foo'), true);
       strictEqual(elem3.classList.contains('baz'), false);
       strictEqual(elem4.classList.contains('baz'), true);
-    });
-  });
-});
-
-describe('it should test exported methods from Elem', () => {
-  describe('find()', () => {
-    it('should find a wrap of all elements in nested children, that matches selector', () => {
-      const elem = document.createElement('div');
-      const child1 = document.createElement('div');
-      const child2 = document.createElement('div');
-      const child3 = document.createElement('div');
-
-      body.appendChild(elem);
-      elem.appendChild(child1);
-      elem.appendChild(child2);
-      child2.appendChild(child3);
-
-      child1.className = 'dwayne-unique-class';
-      child3.className = 'dwayne-unique-class';
-
-      const found = find('.dwayne-unique-class');
-
-      strictEqual(found.length, 2);
-      strictEqual(found[0], child1);
-      strictEqual(found[1], child3);
-
-      new Elem(elem).remove();
     });
   });
 });
