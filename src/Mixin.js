@@ -129,9 +129,7 @@ class Mixin {
      */
     this.node = elem[0];
 
-    if (parentBlock) {
-      parentBlock.$$.mixins.push(this);
-    }
+    parentBlock.$$.mixins.push(this);
   }
 
   afterUpdate() {}

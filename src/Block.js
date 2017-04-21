@@ -78,10 +78,12 @@ import { Mixin } from './Mixin';
 const blockHooks = [];
 const mixinHooks = [];
 const TAG_NAME_REGEX = /^[a-z][a-z\d\-_.:!@#$%^&*()[\]{}='"\\]*$/i;
-const ATTR_NAME_REGEX = /^[\u0000-\u0020\s'">/=]+$/;
+const ATTR_NAME_REGEX = /^[^\u0000-\u0020\s'">/=]+$/;
 const WATCHED_ARG_PREFIX_REGEX = /^args\./;
 const WATCHED_GLOBAL_PREFIX_REGEX = /^globals\./;
 const afterElem = new Elem();
+const rootVars = [];
+const rootTemplate = [];
 
 /**
  * @class Block
@@ -121,6 +123,8 @@ const afterElem = new Elem();
 class Block {
   static _blocks = create(rootBlocks);
   static _mixins = create(rootMixins);
+  static _vars = rootVars;
+  static _html = rootTemplate;
 
   /**
    * @member {Object} [Block.defaultArgs = null]
@@ -194,15 +198,7 @@ class Block {
    */
   static block(name, Subclass) {
     if (isFunction(Subclass) && !isInstanceOf(Block, Subclass)) {
-      const constructor = Subclass;
-
-      Subclass = class extends Block {
-        constructor(opts) {
-          super(opts);
-
-          this::constructor(opts);
-        }
-      };
+      extendBlock(Subclass);
     }
 
     if (!isFunction(Subclass) && isArray(Subclass)) {
@@ -220,14 +216,10 @@ class Block {
       };
     }
 
-    if (!isFunction(Subclass)) {
-      console.warn(`Block must be a string (representing a block template), a function or a class that extends Block class (name: "${ name }") (Block.block)`);
+    if (!isInstanceOf(Block, Subclass)) {
+      console.warn(`Block must be a template (array or an object from an html loader), a function or a class that extends Block class (name: "${ name }") (Block.block)`);
 
       return;
-    }
-
-    if (!isInstanceOf(Block, Subclass)) {
-      extendBlock(Subclass);
     }
 
     if (rootBlocks[name]) {
@@ -266,6 +258,13 @@ class Block {
       console.error('Uncaught error in "beforeRegisterBlock" hook:', err);
     }
 
+    if (isArray(Subclass.template)) {
+      Subclass.template = {
+        vars: [],
+        value: Subclass.template
+      };
+    }
+
     const {
       vars,
       value
@@ -273,6 +272,12 @@ class Block {
 
     Subclass._html = value;
     Subclass._vars = vars;
+    Subclass._blocks = hasOwnProperty(Subclass, '_blocks')
+      ? Subclass._blocks
+      : create(this._blocks);
+    Subclass._mixins = hasOwnProperty(Subclass, '_mixins')
+      ? Subclass._mixins
+      : create(this._mixins);
 
     if (hasOwnProperty(Subclass, 'defaultArgs')) {
       setProto(Subclass.defaultArgs, null);
@@ -290,7 +295,17 @@ class Block {
    * @returns {typeof Block|undefined} Returns registered Block with specified name.
    */
   static get(name) {
-    return (this._blocks || {})[name];
+    return this._blocks[name];
+  }
+
+  /**
+   * @method Block.getMixin
+   * @public
+   * @param {String} name - Mixin name.
+   * @returns {typeof Mixin|undefined} Returns registered Mixin with specified name.
+   */
+  static getMixin(name) {
+    return this._mixins[name];
   }
 
   /**
@@ -324,7 +339,7 @@ class Block {
     }
 
     if (!isInstanceOf(Mixin, Subclass)) {
-      console.warn(`The "${ name }" class does not extend Mixin and will not be registered (Block.mixin)`);
+      console.warn(`The "${ name }" class does not extend Mixin or is not an afterUpdate function, so it will not be registered (Block.mixin)`);
 
       return;
     }
@@ -849,6 +864,16 @@ class Block {
    */
   getChildren() {
     return this.$$.htmlChildren;
+  }
+
+  /**
+   * @method Block#getConstructor
+   * @public
+   * @returns {typeof Block}
+   * @description Returns Block constructor.
+   */
+  getConstructor() {
+    return this.$$.ns;
   }
 
   /**

@@ -2,7 +2,7 @@ import { findInArray } from '../utils';
 import { Block } from '../Block';
 import { rootBlocks } from '../constants';
 
-rootBlocks['d-block'] = class DBlock extends Block {
+class DBlock extends Block {
   static template = html`
     <d-elements
       value="{elems}"
@@ -62,4 +62,8 @@ rootBlocks['d-block'] = class DBlock extends Block {
       this.elems = children;
     }
   }
-};
+}
+
+rootBlocks['d-block'] = DBlock;
+
+export { DBlock };

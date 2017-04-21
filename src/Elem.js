@@ -190,18 +190,21 @@ class Elem extends Array {
         return {};
       }
 
-      return collectFromObject(elem.attributes, addAttr);
+      return collectFromArray(elem.attributes, addAttr);
     }
 
     if (arguments.length <= 1 && isString(attr)) {
       if (!elem) {
-        return;
+        return null;
       }
 
-      const ns = getAttrNS(attr, elem);
+      const {
+        ns,
+        name
+      } = getAttrNS(attr, elem);
 
       return ns
-        ? elem.getAttributeNS(ns, attr)
+        ? elem.getAttributeNS(ns, name)
         : elem.getAttribute(attr);
     }
 
@@ -217,7 +220,7 @@ class Elem extends Array {
 
         value = value === true ? '' : value;
 
-        const ns = getAttrNS(key, elem);
+        const { ns } = getAttrNS(key, elem);
 
         if (ns) {
           elem.setAttributeNS(ns, key, value);
@@ -608,7 +611,7 @@ class Elem extends Array {
       return false;
     }
 
-    const ns = getAttrNS(attr, elem);
+    const { ns } = getAttrNS(attr, elem);
 
     return ns
       ? elem.hasAttributeNS(ns, attr)
@@ -1013,7 +1016,7 @@ class Elem extends Array {
   removeAttr() {
     return this.forEach((elem) => {
       iterateArray(arguments, (attr) => {
-        const ns = getAttrNS(attr, elem);
+        const { ns } = getAttrNS(attr, elem);
 
         if (ns) {
           elem.removeAttributeNS(ns, attr);

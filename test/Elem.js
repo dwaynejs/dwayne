@@ -153,8 +153,8 @@ describe('Elem#', () => {
         }
       }
     });
-    it('should return undefined with first string argument and empty set', () => {
-      strictEqual(new Elem().attr('foo'), undefined);
+    it('should return null with first string argument and empty set', () => {
+      strictEqual(new Elem().attr('foo'), null);
     });
     it('should return value of an attribute with first string argument', (done) => {
       const elem = [
@@ -170,10 +170,16 @@ describe('Elem#', () => {
           .forEach((elem) => {
             elem.setAttribute('attr', '123');
             elem.setAttribute('contentEditable', '');
+            elem.setAttribute('xmlns', '123');
+            elem.setAttribute('xmlns:xlink', '123');
+            elem.setAttribute('xlink:href', '123');
           })
           .forEach((elem) => {
             strictEqual(new Elem(elem).attr('attr'), '123');
             strictEqual(new Elem(elem).attr('contentEditable'), '');
+            strictEqual(new Elem(elem).attr('xmlns'), '123');
+            strictEqual(new Elem(elem).attr('xmlns:xlink'), '123');
+            strictEqual(new Elem(elem).attr('xlink:href'), '123');
 
             doneAll();
           });
@@ -244,6 +250,25 @@ describe('Elem#', () => {
           done();
         }
       }
+    });
+    it('should support namespaces', () => {
+      const elem = document.createElement('svg');
+      const wrap = new Elem(elem);
+      const image = wrap
+        .create('image')
+        .attr('xlink:image', '/test/loading.gif');
+
+      wrap.attr({
+        xmlns: 'http://www.w3.org/2000/svg',
+        'xmlns:xlink': 'http://www.w3.org/1999/xlink'
+      });
+
+      strictEqual(elem.getAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns'), 'http://www.w3.org/2000/svg');
+      strictEqual(elem.getAttributeNS('http://www.w3.org/2000/xmlns/', 'xlink'), 'http://www.w3.org/1999/xlink');
+      strictEqual(image[0].getAttributeNS('http://www.w3.org/1999/xlink', 'image'), '/test/loading.gif');
+      strictEqual(wrap.attr('xmlns'), 'http://www.w3.org/2000/svg');
+      strictEqual(wrap.attr('xmlns:xlink'), 'http://www.w3.org/1999/xlink');
+      strictEqual(image.attr('xlink:image'), '/test/loading.gif');
     });
   });
   describe('children()', () => {
@@ -395,6 +420,12 @@ describe('Elem#', () => {
           done();
         }
       }
+    });
+    it('should support namespaces', () => {
+      const elem = new Elem(document.createElement('div'));
+
+      strictEqual(elem.create('svg')[0].namespaceURI, 'http://www.w3.org/2000/svg');
+      strictEqual(elem.create('div')[0].namespaceURI, 'http://www.w3.org/1999/xhtml');
     });
   });
   describe('createComment()', () => {
@@ -823,6 +854,14 @@ describe('Elem#', () => {
 
       strictEqual(wrap.hasAttr('a'), false);
     });
+    it('should support namespaces', () => {
+      const wrap = new Elem(document.createElement('svg'));
+
+      wrap.attr('xmlns', 'http://www.w3.org/2000/xmlns/');
+
+      strictEqual(wrap.hasAttr('xmlns'), true);
+      strictEqual(wrap.hasAttr('xmlns:xlink'), false);
+    });
   });
   describe('hasClass()', () => {
     it('should return false with empty set', () => {
@@ -907,7 +946,7 @@ describe('Elem#', () => {
       parent.appendChild(elem2);
       parent.appendChild(elem5);
 
-      wrap.insertAfter(elem2);
+      wrap.insertAfter(elem4);
 
       const children = parent.childNodes;
 
@@ -1471,6 +1510,15 @@ describe('Elem#', () => {
       strictEqual(elem.hasAttribute('foo'), false);
       strictEqual(elem.hasAttribute('bar'), false);
       strictEqual(elem.hasAttribute('baz'), false);
+    });
+    it('should support namespaces', () => {
+      const elem = document.createElement('svg');
+      const wrap = new Elem(elem);
+
+      elem.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns', 'http://www.w3.org/2000/xmlns/');
+      wrap.removeAttr('xmlns');
+
+      strictEqual(elem.hasAttributeNS('http://www.w3.org/1999/xlink', 'xmlns'), false);
     });
   });
   describe('removeClass()', () => {

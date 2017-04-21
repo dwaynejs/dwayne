@@ -1,7 +1,7 @@
 import { Mixin } from '../Mixin';
 import { rootMixins } from '../constants';
 
-rootMixins['d-hide'] = class DHide extends Mixin {
+class DHide extends Mixin {
   afterUpdate(value) {
     const { elem } = this;
 
@@ -15,4 +15,8 @@ rootMixins['d-hide'] = class DHide extends Mixin {
   beforeRemove() {
     this.elem.show();
   }
-};
+}
+
+rootMixins['d-hide'] = DHide;
+
+export { DHide };
