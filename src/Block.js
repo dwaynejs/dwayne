@@ -10,9 +10,8 @@ import {
 import {
   constructMixinRegex, isInstanceOf,
   removeWatchers, removeWithParentSignal, cleanProperty,
-  transformRestArgs, calculateArgs,
-  watchForAllArgs, watchForAllGlobals, watchForAllLocals,
-  extendBlock, wrapBlock
+  transformRestArgs, calculateArgs, wrapBlock,
+  watchForAllArgs, watchForAllGlobals, watchForAllLocals
 } from './helpers/Block';
 import {
   D_REST_REGEX, Scope,
@@ -52,13 +51,13 @@ import { Mixin } from './Mixin';
  * @public
  * @param {*} newValue - New value.
  * @param {*} oldValue - Old value.
- * @param {*} mixin - Mixin instance.
+ * @param {Mixin} mixin - Mixin instance.
  */
 
 /**
  * @callback BlockRegisterHook
  * @public
- * @param {Block} Block - Registering block.
+ * @param {typeof Block} Block - Registering block.
  * @param {String} name - Block name.
  * @returns Return value is used for registering the block.
  * If Block subclass returned it's registered instead of the initial block, otherwise
@@ -68,11 +67,16 @@ import { Mixin } from './Mixin';
 /**
  * @callback MixinRegisterHook
  * @public
- * @param {Block} Mixin - Registering mixin.
+ * @param {typeof Mixin} Mixin - Registering mixin.
  * @param {String} name - Mixin name.
  * @returns Return value is used for registering the mixin.
  * If Mixin subclass returned it's registered instead of the initial mixin, otherwise
  * the initial mixin is used.
+ */
+
+/**
+ * @callback RemoveHook
+ * @public
  */
 
 const blockHooks = [];
@@ -121,9 +125,36 @@ const rootTemplate = [];
  * initApp(html`<App/>`, document.getElementById('root'));
  */
 class Block {
+  /**
+   * @member {Object.<String, typeof Block>} Block._blocks
+   * @type {Object.<String, typeof Block>}
+   * @protected
+   * @description Block namespace blocks.
+   */
   static _blocks = create(rootBlocks);
+
+  /**
+   * @member {Object.<String, typeof Mixin>} Block._mixins
+   * @type {Object.<String, typeof Mixin>}
+   * @protected
+   * @description Block namespace mixins.
+   */
   static _mixins = create(rootMixins);
+
+  /**
+   * @member {String[]} Block._vars
+   * @type {String[]}
+   * @protected
+   * @description Block used local vars.
+   */
   static _vars = rootVars;
+
+  /**
+   * @member {Object[]} Block._html
+   * @type {Object[]}
+   * @protected
+   * @description Block template.
+   */
   static _html = rootTemplate;
 
   /**
@@ -159,13 +190,14 @@ class Block {
    * @param {EvaluationError} err - The method is called when an evaluation error occurs.
    */
   static onEvalError(err) {
-    console.error(`Eval error (evaluating "${ err.expression }" in context of block "${ err.block.$$.name }"):`, err);
+    console.error(`Eval error (evaluating "${ err.original || err.expression }" in context of block "${ err.block.$$.name }"):`, err);
   }
 
   /**
    * @method Block.beforeRegisterBlock
    * @public
    * @param {BlockRegisterHook} hook - Block register hook.
+   * @returns {RemoveHook}
    */
   static beforeRegisterBlock(hook) {
     blockHooks.push(hook);
@@ -179,6 +211,7 @@ class Block {
    * @method Block.beforeRegisterMixin
    * @public
    * @param {MixinRegisterHook} hook - Mixin register hook.
+   * @returns {RemoveHook}
    */
   static beforeRegisterMixin(hook) {
     mixinHooks.push(hook);
@@ -198,7 +231,16 @@ class Block {
    */
   static block(name, Subclass) {
     if (isFunction(Subclass) && !isInstanceOf(Block, Subclass)) {
-      extendBlock(Subclass);
+      const constructor = Subclass;
+
+      Subclass = class extends Block {
+        static template = constructor.template;
+
+        constructor(opts) {
+          super(opts);
+          this::constructor(opts);
+        }
+      };
     }
 
     if (!isFunction(Subclass) && isArray(Subclass)) {
@@ -494,7 +536,7 @@ class Block {
             try {
               result = func(scope);
             } catch (err) {
-              err.expression = func.expression;
+              err.expression = func;
               err.original = func.original;
               err.block = this;
 
@@ -502,7 +544,7 @@ class Block {
                 try {
                   constructor.onEvalError(err);
                 } catch (e) {
-                  console.error('Uncaught error in onEvalError:', e);
+                  console.error('Uncaught error in Block.onEvalError:', e);
                 }
               }
             }
@@ -937,6 +979,10 @@ class Block {
    */
   evaluate(func, callback, target = this) {
     return this.$$.evaluate(func, callback, target);
+  }
+
+  toString() {
+    return this.$$.name;
   }
 
   /**

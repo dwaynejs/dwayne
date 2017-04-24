@@ -1,7 +1,8 @@
 import {
-  isArray, isFunction, isNil,
+  isFunction, isNil,
   collectFromArray
 } from '../utils';
+import { Block } from '../Block';
 import { Mixin } from '../Mixin';
 import { rootMixins } from '../constants';
 
@@ -14,8 +15,7 @@ rootMixins['d-value'] = class DValue extends Mixin {
     const {
       args,
       parentTemplate,
-      elem,
-      node
+      elem
     } = this;
     const name = elem.name();
     const type = elem.prop('type');
@@ -30,14 +30,14 @@ rootMixins['d-value'] = class DValue extends Mixin {
     this.scope = parentTemplate;
 
     if (args) {
-      this.name = args[0];
       this.scope = value instanceof Block
         ? value
         : parentTemplate;
+      this.value = args[0];
     }
 
-    if (!isFunction(value)) {
-      initialScopeValue = this.scope.$$.evaluate(getEvalFunction(value), (newValue) => {
+    if (!isFunction(this.value)) {
+      initialScopeValue = this.scope.$$.evaluate((scope) => scope[this.value], (newValue) => {
         if (this.currentValue !== newValue) {
           this.currentValue = newValue;
           this.setProp(newValue);
@@ -49,7 +49,7 @@ rootMixins['d-value'] = class DValue extends Mixin {
     const isInitialScopeValueNull = isNil(initialScopeValue);
     const isCheckbox = type === 'checkbox';
     const changeScope = () => {
-      this.currentValue = this.getProp(this.currentValue);
+      this.currentValue = this.getProp(this.currentValue, false);
       this.changeScope();
     };
 
@@ -65,11 +65,7 @@ rootMixins['d-value'] = class DValue extends Mixin {
       this.setProp(initialScopeValue);
     }
 
-    this.offElemListener = elem.on(getListenerName(name, type), (e) => {
-      if (e.target === node) {
-        changeScope();
-      }
-    });
+    this.offElemListener = elem.on(getListenerName(name, type), changeScope);
     this.offFormListener = elem.closest('form').on('reset', () => {
       setTimeout(changeScope, 0);
     });
@@ -194,22 +190,16 @@ function getValueForGetting(name, value, type, inputValue, values, options, init
           : null;
       }
 
+      values = values || [];
+
       if (!value && init) {
         return values;
       }
 
       if (value) {
-        if (values) {
-          return values.indexOf(inputValue) === -1
-            ? values.concat(inputValue)
-            : values;
-        }
-
-        return [inputValue];
-      }
-
-      if (!isArray(values)) {
-        return [];
+        return values.indexOf(inputValue) === -1
+          ? values.concat(inputValue)
+          : values;
       }
 
       const index = values.indexOf(inputValue);
@@ -251,10 +241,6 @@ function getListenerName(name, type) {
       return 'input';
     }
   }
-}
-
-function getEvalFunction(value) {
-  return (scope) => scope[value];
 }
 
 function addValue(values, { selected, value }) {

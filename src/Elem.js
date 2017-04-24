@@ -327,7 +327,11 @@ class Elem extends Array {
         el = document.createElementNS(ns, type);
       }
 
-      add(new Elem(el).into(elem));
+      if (!isHTMLDocument(elem)) {
+        new Elem(el).into(elem);
+      }
+
+      add(el);
     });
   }
 
@@ -767,10 +771,7 @@ class Elem extends Array {
   into(element, end = true) {
     element = toElem(element)[0];
 
-    if (
-      !element
-      || isHTMLDocument(element)
-    ) {
+    if (!element) {
       return this;
     }
 

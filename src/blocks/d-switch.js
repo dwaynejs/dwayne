@@ -1,4 +1,4 @@
-import { collectFromArray, findInArray, iterateArray } from '../utils';
+import { findInArray, iterateArray } from '../utils';
 import { Block } from '../Block';
 import { rootBlocks } from '../constants';
 
@@ -20,38 +20,23 @@ rootBlocks['d-switch'] = class DSwitch extends Block {
 
     const {
       $$: {
-        htmlChildren,
+        htmlChildren = [],
         parentScope
       },
       args,
       args: { value }
     } = this;
-    let wasDefault;
 
-    this.values = collectFromArray(htmlChildren, (values, child, i) => {
+    this.values = htmlChildren.map((child, i) => {
       const {
         name,
-        attrs,
+        attrs = {},
         children
       } = child;
-      let val = attrs.if;
+      let val = value;
 
-      if (wasDefault) {
-        return;
-      }
-
-      if (name !== 'd-case' && name !== 'd-default') {
-        return;
-      }
-
-      if (name === 'd-default') {
-        wasDefault = true;
-      }
-
-      if (name === 'd-default') {
-        val = value;
-      } else if (val) {
-        val = parentScope.$$.evaluate(val, (newValue) => {
+      if (name !== 'd-default') {
+        val = parentScope.$$.evaluate(attrs.if, (newValue) => {
           if (equals(this.values[i].value, newValue)) {
             return;
           }
@@ -81,8 +66,6 @@ rootBlocks['d-switch'] = class DSwitch extends Block {
             this.elems = null;
           }
         }, this);
-      } else {
-        val = undefined;
       }
 
       if (equals(val, value) && this.index === Infinity) {
@@ -90,12 +73,12 @@ rootBlocks['d-switch'] = class DSwitch extends Block {
         this.elems = children;
       }
 
-      values.push({
+      return {
         name,
         children,
         value: val
-      });
-    }, []);
+      };
+    });
   }
 
   afterConstruct() {

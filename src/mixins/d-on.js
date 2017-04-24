@@ -1,3 +1,4 @@
+import { noop } from '../utils';
 import { Mixin } from '../Mixin';
 import { rootMixins } from '../constants';
 
@@ -12,15 +13,13 @@ rootMixins['d-on'] = class DOn extends Mixin {
         this.evaluate();
       });
     } else {
+      this.off = noop;
+
       console.error('Provide "d-on" mixin with an event names (like "d-on(click)" or "d-on(keyup, keypress)")!');
     }
   }
 
   beforeRemove() {
-    const { off } = this;
-
-    if (off) {
-      off();
-    }
+    this.off();
   }
 };

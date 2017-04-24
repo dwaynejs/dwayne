@@ -2,6 +2,7 @@ const path = require('path');
 const builtins = require('rollup-plugin-node-builtins');
 const npm = require('rollup-plugin-node-resolve');
 const cjs = require('rollup-plugin-commonjs');
+const eslint = require('rollup-plugin-eslint');
 const babel = require('rollup-plugin-babel');
 const inject = require('rollup-plugin-inject');
 
@@ -31,6 +32,10 @@ module.exports = {
           'throws'
         ]
       }
+    }),
+    eslint({
+      include: './**/*.js',
+      exclude: 'node_modules/**'
     }),
     babel({
       include: './**/*.@(js|html)',

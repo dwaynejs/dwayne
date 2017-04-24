@@ -22,6 +22,37 @@ class DValueSimple extends Block {
     <input d-value="input"/>
     <input d-value="input"/>
     <input d-value="input2" value="456"/>
+    <DValueSimpleHelper/>
+    <input d-value="{(value) => input5 = value}" value="258"/>
+  `;
+
+  input = '123';
+  input2 = null;
+  input3 = null;
+
+  afterRender() {
+    app = this;
+  }
+}
+
+class DValueSimpleHelper extends Block {
+  static template = html`
+    <input d-value(input3)="{getParentTemplate()}" value="789"/>
+    <input d-value(input4) value="159"/>
+  `;
+
+  input4 = null;
+
+  afterRender() {
+    block = this;
+  }
+}
+
+class DValueTextArea extends Block {
+  static template = html`
+    <textarea d-value="input"/>
+    <textarea d-value="input"/>
+    <textarea d-value="input2">456</textarea>
   `;
 
   input = '123';
@@ -62,6 +93,22 @@ class DValueColor extends Block {
   }
 }
 
+class DValueFile extends Block {
+  static template = html`
+    <input type="file" d-value="file"/>
+    <input type="file" d-value="file"/>
+    <input type="file" d-value="file2" value="{defaultFiles}"/>
+  `;
+
+  file = doc.create('input').attr('type', 'file')[0].files;
+  file2 = null;
+  defaultFiles = doc.create('input').attr('type', 'file')[0].files;
+
+  afterRender() {
+    app = this;
+  }
+}
+
 class DValueRadio extends Block {
   static template = html`
     <input type="radio" d-value="choice" value="a"/>
@@ -94,10 +141,18 @@ class DValueCheckbox extends Block {
     <input type="checkbox" d-value="choice2" value="a" checked/>
     <input type="checkbox" d-value="choice2" value="b"/>
     <input type="checkbox" d-value="choice2" value="c" checked/>
+    <input type="checkbox" d-value="choice3" value="a"/>
+    <input type="checkbox" d-value="choice3" value="b"/>
+    <input type="checkbox" d-value="choice3" value="c" checked/>
+    <input type="checkbox" d-value="choice4" value="a" checked/>
+    <input type="checkbox" d-value="choice4" value="b" checked/>
+    <input type="checkbox" d-value="choice4" value="c"/>
   `;
 
   choice = ['a', 'b'];
   choice2 = null;
+  choice3 = null;
+  choice4 = null;
 
   afterRender() {
     app = this;
@@ -158,19 +213,101 @@ class DValueSelectMultiple extends Block {
   }
 }
 
+class DValueFormReset extends Block {
+  static template = html`
+    <form>
+      <input d-value="input"/>
+    </form>
+  `;
+
+  input = '123';
+
+  afterRender() {
+    app = this;
+  }
+}
+
 Block.block('DValueSimple', DValueSimple);
+Block.block('DValueSimpleHelper', DValueSimpleHelper);
+Block.block('DValueTextArea', DValueTextArea);
 Block.block('DValueContentEditable', DValueContentEditable);
 Block.block('DValueColor', DValueColor);
+Block.block('DValueFile', DValueFile);
 Block.block('DValueRadio', DValueRadio);
 Block.block('DValueCheckbox', DValueCheckbox);
 Block.block('DValueSelect', DValueSelect);
 Block.block('DValueSelectMultiple', DValueSelectMultiple);
+Block.block('DValueFormReset', DValueFormReset);
 
 export default () => {
   describe('d-value', () => {
     describe('simple test', () => {
       before(() => {
         initApp(htmlScopeless`<DValueSimple/>`, container);
+      });
+
+      it('should set default values', () => {
+        const children = container.children();
+
+        strictEqual(children.elem(0).prop('value'), '123');
+        strictEqual(children.elem(1).prop('value'), '123');
+        strictEqual(app.input2, '456');
+        strictEqual(app.input3, '789');
+        strictEqual(block.input4, '159');
+        strictEqual(app.input5, '258');
+      });
+      it('should react on variable change', () => {
+        app.input = '456';
+        app.input3 = '159';
+        block.input4 = '258';
+
+        const children = container.children();
+
+        strictEqual(children.elem(0).prop('value'), '456');
+        strictEqual(children.elem(1).prop('value'), '456');
+        strictEqual(children.elem(3).prop('value'), '159');
+        strictEqual(children.elem(4).prop('value'), '258');
+      });
+      it('should react on user interactions', (done) => {
+        const children = container.children();
+
+        children.elem(0)
+          .prop('value', '789')
+          .dispatch('input');
+
+        children.elem(3)
+          .prop('value', '258')
+          .dispatch('input');
+
+        children.elem(4)
+          .prop('value', '357')
+          .dispatch('input');
+
+        children.elem(5)
+          .prop('value', '456')
+          .dispatch('input');
+
+        setTimeout(() => {
+          try {
+            strictEqual(children.elem(0).prop('value'), '789');
+            strictEqual(children.elem(1).prop('value'), '789');
+            strictEqual(app.input, '789');
+            strictEqual(app.input3, '258');
+            strictEqual(block.input4, '357');
+            strictEqual(app.input5, '456');
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 25);
+      });
+
+      after(remove);
+    });
+    describe('textarea test', () => {
+      before(() => {
+        initApp(htmlScopeless`<DValueTextArea/>`, container);
       });
 
       it('should set default values', () => {
@@ -295,6 +432,49 @@ export default () => {
 
       after(remove);
     });
+    describe('file test', () => {
+      before(() => {
+        initApp(htmlScopeless`<DValueFile/>`, container);
+      });
+
+      it('should set default values', () => {
+        const children = container.children();
+
+        strictEqual(children.elem(0).prop('files'), app.file);
+        strictEqual(children.elem(1).prop('files'), app.file);
+        strictEqual(children.elem(2).prop('files'), app.file2);
+      });
+      it('should react on variable change', () => {
+        const file = app.file = doc.create('input').attr('type', 'file')[0].files;
+
+        const children = container.children();
+
+        strictEqual(children.elem(0).prop('files'), file);
+        strictEqual(children.elem(1).prop('files'), file);
+      });
+      it('should react on user interactions', (done) => {
+        const children = container.children();
+        const file = doc.create('input').attr('type', 'file')[0].files;
+
+        children.elem(0)
+          .prop('files', file)
+          .dispatch('change');
+
+        setTimeout(() => {
+          try {
+            strictEqual(children.elem(0).prop('files'), file);
+            strictEqual(children.elem(1).prop('files'), file);
+            strictEqual(app.file, file);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 25);
+      });
+
+      after(remove);
+    });
     describe('radio test', () => {
       before(() => {
         initApp(htmlScopeless`<DValueRadio/>`, container);
@@ -364,6 +544,8 @@ export default () => {
         strictEqual(children.elem(4).prop('checked'), true);
         strictEqual(children.elem(5).prop('checked'), false);
         deepStrictEqual(app.choice2, ['a', 'c']);
+        deepStrictEqual(app.choice3, ['c']);
+        deepStrictEqual(app.choice4, ['a', 'b']);
       });
       it('should react on variable change', () => {
         app.choice = ['a', 'c'];
@@ -380,7 +562,18 @@ export default () => {
       it('should react on user interactions', (done) => {
         const children = container.children();
 
+        app.choice3 = ['a', 'c'];
+        app.choice4 = ['b'];
+
         children.elem(0)
+          .prop('checked', false)
+          .dispatch('change');
+
+        children.elem(9)
+          .prop('checked', true)
+          .dispatch('change');
+
+        children.elem(12)
           .prop('checked', false)
           .dispatch('change');
 
@@ -392,7 +585,15 @@ export default () => {
             strictEqual(children.elem(3).prop('checked'), false);
             strictEqual(children.elem(4).prop('checked'), false);
             strictEqual(children.elem(5).prop('checked'), true);
+            strictEqual(children.elem(9).prop('checked'), true);
+            strictEqual(children.elem(10).prop('checked'), false);
+            strictEqual(children.elem(11).prop('checked'), true);
+            strictEqual(children.elem(12).prop('checked'), false);
+            strictEqual(children.elem(13).prop('checked'), true);
+            strictEqual(children.elem(14).prop('checked'), false);
             deepStrictEqual(app.choice, ['c']);
+            deepStrictEqual(app.choice3, ['a', 'c']);
+            deepStrictEqual(app.choice4, ['b']);
 
             done();
           } catch (err) {
@@ -479,6 +680,35 @@ export default () => {
             deepStrictEqual(children.elem(0).getValues(), ['c']);
             deepStrictEqual(children.elem(1).getValues(), ['c']);
             deepStrictEqual(app.choice, ['c']);
+
+            done();
+          } catch (err) {
+            done(err);
+          }
+        }, 25);
+      });
+
+      after(remove);
+    });
+    describe('form reset test', () => {
+      before(() => {
+        initApp(htmlScopeless`<DValueFormReset/>`, container);
+      });
+
+      it('should set default values', () => {
+        const children = container.children();
+
+        strictEqual(children.find('input').prop('value'), '123');
+      });
+      it('should react on resetting the form', (done) => {
+        const children = container.children();
+
+        children.find('input').prop('value', '');
+        children.elem(0).dispatch('reset');
+
+        setTimeout(() => {
+          try {
+            strictEqual(app.input, '');
 
             done();
           } catch (err) {

@@ -5,7 +5,8 @@ import {
 import { Mixin } from '../Mixin';
 import { rootMixins } from '../constants';
 
-const CSS_STYLES_SEPARATOR_REGEX = /; ?/;
+const CSS_STYLES_SEPARATOR_REGEX = /\s*;\s*/;
+const CSS_STYLE_SEPARATOR_REGEX = /\s*:\s*/;
 
 rootMixins['d-style'] = class DStyle extends Mixin {
   css = {};
@@ -27,7 +28,8 @@ rootMixins['d-style'] = class DStyle extends Mixin {
       newValue = collectFromArray(
         newValue
           .split(CSS_STYLES_SEPARATOR_REGEX)
-          .filter(Boolean),
+          .filter(Boolean)
+          .map(constructStyleFromString),
         addCSSProp
       );
     }
@@ -56,4 +58,13 @@ function addCSSProp(css, item) {
   const [prop, value] = item;
 
   css[prop] = value;
+}
+
+function constructStyleFromString(style) {
+  const split = style.split(CSS_STYLE_SEPARATOR_REGEX);
+
+  return [
+    split[0].trim(),
+    split[1].trim()
+  ];
 }

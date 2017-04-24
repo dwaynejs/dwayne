@@ -1,5 +1,5 @@
 import {
-  toObjectKeys, iterateArray,
+  toObjectKeys,
   assign, keys, create
 } from './utils';
 

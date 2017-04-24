@@ -57,9 +57,22 @@ class DStyleArgs extends Block {
   }
 }
 
+class DStyleString extends Block {
+  static template = html`
+    <div d-style="{styles}"/>
+  `;
+
+  styles = 'width: 1px;';
+
+  afterRender() {
+    app = this;
+  }
+}
+
 Block.block('DStyleSimple', DStyleSimple);
 Block.block('DStyleConflict', DStyleConflict);
 Block.block('DStyleArgs', DStyleArgs);
+Block.block('DStyleString', DStyleString);
 
 export default () => {
   describe('d-style', () => {
@@ -152,6 +165,38 @@ export default () => {
         deepStrictEqual(container.find('div').css(), {
           width: '2px',
           height: '2px'
+        });
+      });
+
+      after(remove);
+    });
+    describe('string test', () => {
+      before(() => {
+        initApp(htmlScopeless`<DStyleString/>`, container);
+      });
+
+      it('should set styles from the mixin', () => {
+        deepStrictEqual(container.find('div').css(), {
+          width: '1px'
+        });
+      });
+      it('should change styles on value change', () => {
+        app.styles = 'height: 2px;';
+
+        deepStrictEqual(container.find('div').css(), {
+          height: '2px'
+        });
+      });
+      it('should ignore (delete previous) null and undefined values', () => {
+        app.styles = {
+          width: null,
+          height: undefined,
+          zIndex: '1'
+        };
+        app.styles = 'z-index: 1;';
+
+        deepStrictEqual(container.find('div').css(), {
+          zIndex: '1'
         });
       });
 

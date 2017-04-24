@@ -126,10 +126,6 @@ export function createBlock({ node, Constructor, parent, parentElem, parentBlock
       wasDRest = false;
 
       if (match) {
-        if (value === true) {
-          value = 'true';
-        }
-
         localAttrs[attr] = {
           type: 'mixin',
           dynamic: false,
@@ -179,10 +175,20 @@ export function createBlock({ node, Constructor, parent, parentElem, parentBlock
     }
 
     if (children) {
-      const parentElem = name === 'template'
-        ? new Elem(element[0].content)
-        : element;
       let prevBlock;
+      let parentElem = element;
+
+      if (name === 'template') {
+        parentElem = new Elem(element[0].content);
+      } else if (name === 'iframe') {
+        if (!('src' in attrs)) {
+          const document = element[0].contentDocument;
+
+          new Elem(document.documentElement).remove();
+
+          parentElem = new Elem(document);
+        }
+      }
 
       iterateArray(children, (child) => {
         prevBlock = createBlock({

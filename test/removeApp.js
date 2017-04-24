@@ -1,19 +1,19 @@
 import { strictEqual, throws } from 'assert';
 import { Block, Elem, initApp, doc, removeApp } from '../src';
 
-class MyBlock extends Block {
+class RemoveAppBlock extends Block {
   static template = html`
     <span>Hello, world!</span>
   `;
 }
 
-Block.block('MyBlock', MyBlock);
+Block.block('RemoveAppBlock', RemoveAppBlock);
 
 describe('removeApp()', () => {
   it('should remove existing app from the element', () => {
     const container = doc.create('div');
 
-    initApp(htmlScopeless`<MyBlock/>`, container);
+    initApp(htmlScopeless`<RemoveAppBlock/>`, container);
 
     strictEqual(container.html(), '<span>Hello, world!</span>');
 

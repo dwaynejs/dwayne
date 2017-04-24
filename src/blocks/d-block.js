@@ -41,10 +41,10 @@ class DBlock extends Block {
 
         /* eslint no-empty: 0 */
         while (
-        (parent = parent.$$.parentScope)
-        && !(found = findInArray(parent.$$.dBlocks, ({ $$: { dBlockName: DBlockName } }) => DBlockName === dBlockName))
-        && parent.$$.parentScope.$$.name === '#d-item'
-          ) {}
+          (parent = parent.$$.parentScope)
+          && !(found = findInArray(parent.$$.dBlocks, ({ $$: { dBlockName: DBlockName } }) => DBlockName === dBlockName))
+          && parent.$$.parentScope.$$.name === '#d-item'
+        ) {}
 
         if (found) {
           this.ParentScope = parent;

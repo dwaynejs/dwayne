@@ -14,7 +14,9 @@ const remove = () => {
 class DIfSimple extends Block {
   static template = html`
     <d-if if="{condition}">
-      {caption}
+      <span>
+        {caption}
+      </span>
     </d-if>
   `;
 
@@ -75,6 +77,8 @@ Block.block('DIfElseIfElse', DIfElseIfElse);
 export default () => {
   describe('d-if', () => {
     describe('simple test', () => {
+      let span;
+
       before(() => {
         initApp(htmlScopeless`<DIfSimple/>`, container);
       });
@@ -85,8 +89,15 @@ export default () => {
       it('should re-render caption after the condition has been changed', () => {
         app.condition = true;
         app.caption = 'Hello, world!';
+        span = container.find('span')[0];
 
-        strictEqual(container.html(), 'Hello, world!');
+        strictEqual(container.html(), '<span>Hello, world!</span>');
+      });
+      it('should not re-render caption after the condition has been changed to same in terms of boolean', () => {
+        app.condition = 1;
+
+        strictEqual(container.html(), '<span>Hello, world!</span>');
+        strictEqual(container.find('span')[0], span);
       });
       it('should re-render caption again after the condition has been changed', () => {
         app.condition = false;

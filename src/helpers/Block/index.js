@@ -2,7 +2,6 @@ export * from './calculateArgs';
 export * from './cleanProperty';
 export * from './constructMixinRegex';
 export * from './createBlock';
-export * from './extendBlock';
 export * from './isInstanceOf';
 export * from './remove';
 export * from './removeWatcher';

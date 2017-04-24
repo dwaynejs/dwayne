@@ -15,6 +15,8 @@ class DElem extends Block {
   static template = html`
     <span d-elem="span"/>
     <input d-elem="{setInput}"/>
+    <i d-elem/>
+    <DElemHelper/>
   `;
 
   afterRender() {
@@ -26,7 +28,19 @@ class DElem extends Block {
   };
 }
 
+class DElemHelper extends Block {
+  static template = html`
+    <div d-elem(div)="{getParentTemplate()}"/>
+    <b d-elem(b)/>
+  `;
+
+  afterRender() {
+    block = this;
+  }
+}
+
 Block.block('DElem', DElem);
+Block.block('DElemHelper', DElemHelper);
 
 export default () => {
   describe('d-elem', () => {
@@ -34,11 +48,17 @@ export default () => {
       initApp(htmlScopeless`<DElem/>`, container);
     });
 
-    it('should support string argument and set the block property to the Elem', () => {
+    it('should support string value and set the block property to the Elem', () => {
       strictEqual(container.find('span')[0], app.span[0]);
     });
-    it('should support function argument and call the function with the Elem argument', () => {
+    it('should support function value and call the function with the Elem argument', () => {
       strictEqual(container.find('input')[0], app.input[0]);
+    });
+    it('should support string argument with block value', () => {
+      strictEqual(container.find('div')[0], app.div[0]);
+    });
+    it('should support string argument with no value', () => {
+      strictEqual(container.find('b')[0], block.b[0]);
     });
 
     after(remove);

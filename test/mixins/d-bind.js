@@ -14,6 +14,7 @@ const remove = () => {
 class DBind extends Block {
   static template = html`
     <div d-bind(click)="{onClick}"/>
+    <div d-bind(keydown)="{onKeydown}"/>
   `;
 
   afterRender() {
@@ -21,12 +22,24 @@ class DBind extends Block {
   }
 }
 
+class DBindNoArgs extends Block {
+  static template = html`
+    <div d-bind="{() => {}}"/>
+  `;
+}
+
 Block.block('DBind', DBind);
+Block.block('DBindNoArgs', DBindNoArgs);
 
 export default () => {
   describe('d-bind', () => {
+    const oldConsoleError = console.error;
+
     before(() => {
       initApp(htmlScopeless`<DBind/>`, container);
+    });
+    after(() => {
+      console.error = oldConsoleError;
     });
 
     it('should bind event listeners', (done) => {
@@ -43,6 +56,19 @@ export default () => {
       container
         .find('div')
         .dispatch('click');
+    });
+    it('should log an error with no args', (done) => {
+      console.error = (message) => {
+        try {
+          strictEqual(message, 'Provide "d-bind" mixin with an event names (like "d-bind(click)" or "d-bind(keyup, keypress)")!');
+
+          done();
+        } catch (err) {
+          done(err);
+        }
+      };
+
+      initApp(htmlScopeless`<DBindNoArgs/>`, doc.create('div'));
     });
 
     after(remove);
