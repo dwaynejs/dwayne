@@ -506,7 +506,7 @@ class Block {
         parentTemplate,
         content: new Elem(),
         ns: constructor,
-        htmlChildren: children,
+        htmlChildren: children || [],
         children: childrenBlocks,
         mixins,
         prevBlock,

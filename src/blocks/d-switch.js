@@ -1,8 +1,11 @@
-import { findInArray, iterateArray } from '../utils';
+import { findInArray } from '../utils';
 import { Block } from '../Block';
 import { rootBlocks } from '../constants';
 
-const watchArgs = js`args.value`;
+const watchArgs = js`[
+  args.value,
+  args.compareFn
+]`;
 
 rootBlocks['d-switch'] = class DSwitch extends Block {
   static template = html`
@@ -12,6 +15,14 @@ rootBlocks['d-switch'] = class DSwitch extends Block {
       parentTemplate="{$$.parentTemplate}"
     />
   `;
+  static defaultArgs = {
+    compareFn(switchValue, caseValue) {
+      return (
+        switchValue === caseValue
+        || (switchValue !== switchValue && caseValue !== caseValue)
+      );
+    }
+  };
 
   index = Infinity;
 
@@ -20,7 +31,7 @@ rootBlocks['d-switch'] = class DSwitch extends Block {
 
     const {
       $$: {
-        htmlChildren = [],
+        htmlChildren,
         parentScope
       },
       args,
@@ -33,42 +44,34 @@ rootBlocks['d-switch'] = class DSwitch extends Block {
         attrs = {},
         children
       } = child;
-      let val = value;
+      let val;
 
       if (name !== 'd-default') {
         val = parentScope.$$.evaluate(attrs.if, (newValue) => {
-          if (equals(this.values[i].value, newValue)) {
-            return;
-          }
-
           this.values[i].value = newValue;
 
           if (i > this.index) {
             return;
           }
 
-          if (i < this.index) {
-            this.index = i;
-            this.elems = children;
-
-            return;
-          }
-
-          const found = findInArray(this.values, ({ value }) => (
-            equals(value, args.value)
+          const found = findInArray(this.values, ({ name, value }) => (
+            name === 'd-default'
+            || this.args.compareFn(args.value, value)
           ));
 
-          if (found) {
-            this.index = found.key;
-            this.elems = found.value.children;
-          } else {
-            this.index = Infinity;
-            this.elems = null;
-          }
+          this.index = found
+            ? found.key
+            : Infinity;
+          this.elems = found
+            ? found.value.children
+            : null;
         }, this);
       }
 
-      if (equals(val, value) && this.index === Infinity) {
+      if (this.index === Infinity && (
+        name === 'd-default'
+        || this.args.compareFn(value, val)
+      )) {
         this.index = i;
         this.elems = children;
       }
@@ -84,19 +87,21 @@ rootBlocks['d-switch'] = class DSwitch extends Block {
   afterConstruct() {
     this.evaluate(watchArgs, () => {
       const {
-        value: newValue
+        value: newValue,
+        compareFn
       } = this.args;
 
       this.index = Infinity;
 
-      iterateArray(this.values, ({ name, value, children }, i) => {
-        const val = name === 'd-default'
-          ? newValue
-          : value;
-
-        if (equals(val, newValue) && this.index === Infinity) {
+      this.values.some(({ name, value, children }, i) => {
+        if (
+          name === 'd-default'
+          || compareFn(newValue, value)
+        ) {
           this.index = i;
           this.elems = children;
+
+          return true;
         }
       });
 
@@ -106,7 +111,3 @@ rootBlocks['d-switch'] = class DSwitch extends Block {
     });
   }
 };
-
-function equals(value1, value2) {
-  return value1 === value2;
-}

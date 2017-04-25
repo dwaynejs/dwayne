@@ -21,6 +21,16 @@ class DEachSimple extends Block {
   `;
 }
 
+class DEachObject extends Block {
+  static template = html`
+    <d-each set="{{ a: 1, b: 2, c: 3 }}">
+      <b id="{'item-' + $index}">
+        {$index + $item}
+      </b>
+    </d-each>
+  `;
+}
+
 class DEachScope extends Block {
   static template = html`
     <d-each set="{numbers}">
@@ -202,6 +212,7 @@ class DEachDoubleNested extends Block {
 }
 
 Block.block('DEachSimple', DEachSimple);
+Block.block('DEachObject', DEachObject);
 Block.block('DEachScope', DEachScope);
 Block.block('DEachChangingSet', DEachChangingSet);
 Block.block('DEachUID', DEachUID);
@@ -218,6 +229,17 @@ export default () => {
 
       it('should render caption using variables from the d-each scope', () => {
         strictEqual(container.html(), '<b id="item-0">02</b><b id="item-1">11</b><b id="item-2">20</b>');
+      });
+
+      after(remove);
+    });
+    describe('object test', () => {
+      before(() => {
+        initApp(htmlScopeless`<DEachObject/>`, container);
+      });
+
+      it('should render caption using variables from the d-each scope', () => {
+        strictEqual(container.html(), '<b id="item-a">a1</b><b id="item-b">b2</b><b id="item-c">c3</b>');
       });
 
       after(remove);
@@ -288,12 +310,47 @@ export default () => {
       after(remove);
     });
     describe('args test', () => {
+      let michael;
+      let john;
+      let mary;
+
       before(() => {
         initApp(htmlScopeless`<DEachArgs/>`, container);
       });
 
       it('should render captions using redefined variables from the d-each scope', () => {
+        const children = container.children();
+
+        michael = children[0];
+        john = children[1];
+        mary = children[2];
+
         strictEqual(container.html(), '<b>0: Michael</b><b>1: John</b><b>2: Mary</b>');
+        strictEqual(michael.outerHTML, '<b>0: Michael</b>');
+        strictEqual(john.outerHTML, '<b>1: John</b>');
+        strictEqual(mary.outerHTML, '<b>2: Mary</b>');
+      });
+      it('should move captions using redefined variables from the d-each scope', () => {
+        const maryIndex = 3;
+
+        app.people = [
+          ...app.people.slice(0, maryIndex),
+          {
+            ...app.people[maryIndex],
+            age: 29.5
+          },
+          ...app.people.slice(maryIndex + 1)
+        ];
+
+        const children = container.children();
+
+        strictEqual(container.html(), '<b>0: Mary</b><b>1: Michael</b><b>2: John</b>');
+        strictEqual(children[0], mary);
+        strictEqual(children[1], michael);
+        strictEqual(children[2], john);
+        strictEqual(michael.outerHTML, '<b>1: Michael</b>');
+        strictEqual(john.outerHTML, '<b>2: John</b>');
+        strictEqual(mary.outerHTML, '<b>0: Mary</b>');
       });
 
       after(remove);

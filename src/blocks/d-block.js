@@ -22,32 +22,27 @@ class DBlock extends Block {
       },
       htmlChildren: ownChildren,
       parentTemplate,
-      dBlockName
+      dBlockName: DBlockName
     } = this.$$;
     let found;
 
     if (ownChildren.length) {
+      parentTemplate.$$.dBlocks.push(this);
+
       return;
     }
 
     this.ParentScope = parentParentScope;
     this.ParentTemplate = parentParentTemplate;
 
-    if (dBlockName) {
-      found = findInArray(children, ({ name: nodeName }) => nodeName === `d-block:${ dBlockName }`);
+    if (DBlockName) {
+      found = findInArray(children, ({ name: nodeName }) => nodeName === `d-block:${ DBlockName }`);
 
       if (!found) {
-        let parent = this;
-
-        /* eslint no-empty: 0 */
-        while (
-          (parent = parent.$$.parentScope)
-          && !(found = findInArray(parent.$$.dBlocks, ({ $$: { dBlockName: DBlockName } }) => DBlockName === dBlockName))
-          && parent.$$.parentScope.$$.name === '#d-item'
-        ) {}
+        found = findInArray(parentTemplate.$$.dBlocks, ({ $$: { dBlockName } }) => dBlockName === DBlockName);
 
         if (found) {
-          this.ParentScope = parent;
+          this.ParentScope = parentTemplate;
           this.ParentTemplate = parentTemplate;
           found.value = {
             children: found.value.$$.htmlChildren
@@ -55,7 +50,7 @@ class DBlock extends Block {
         }
       }
 
-      this.elems = found && found.value.children.length
+      this.elems = found
         ? found.value.children
         : null;
     } else {

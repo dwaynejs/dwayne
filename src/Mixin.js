@@ -73,7 +73,7 @@ class Mixin {
             console.error(`Uncaught error in ${ name }#beforeRemove:`, err);
           }
 
-          if (!isParentSignal && parentBlock) {
+          if (!isParentSignal) {
             removeArrayElem(parentBlock.$$.mixins, this);
           }
         }

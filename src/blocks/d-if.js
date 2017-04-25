@@ -39,7 +39,7 @@ rootBlocks['d-if'] = class DIf extends Block {
             return;
           }
 
-          if (i < index) {
+          if (i < index && newValue) {
             index = i;
             this.elems = children;
 

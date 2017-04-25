@@ -67,6 +67,39 @@ class DBlockNamed extends Block {
   `;
 }
 
+class DBlockTemplateApp extends Block {
+  static template = html`
+    <DBlockTemplate>
+      <d-block:a>
+        Hello, world!
+      </d-block:a>
+    </DBlockTemplate>
+  `;
+
+  afterRender() {
+    app = this;
+  }
+}
+
+class DBlockTemplate extends Block {
+  static template = html`
+    <d-block:a>
+      Hello!
+    </d-block:a>
+    <d-block:b>
+      Goodbye!
+    </d-block:b>
+
+    <i><d-block:a/></i>
+    <b><d-block:b/></b>
+    <a><d-block:c/></a>
+  `;
+
+  afterRender() {
+    block = this;
+  }
+}
+
 class DBlockNestedApp extends Block {
   static template = html`
     <DBlockNested>
@@ -115,6 +148,8 @@ Block.block('DBlockSimpleApp', DBlockSimpleApp);
 Block.block('DBlockSimple', DBlockSimple);
 Block.block('DBlockNamedApp', DBlockNamedApp);
 Block.block('DBlockNamed', DBlockNamed);
+Block.block('DBlockTemplateApp', DBlockTemplateApp);
+Block.block('DBlockTemplate', DBlockTemplate);
 Block.block('DBlockNestedApp', DBlockNestedApp);
 Block.block('DBlockNested', DBlockNested);
 Block.block('DBlockNestedTestHelper', DBlockNestedTestHelper);
@@ -150,6 +185,17 @@ export default () => {
         app.captionB = 'Hello!';
 
         strictEqual(container.html(), '<a id="a1">Goodbye!</a><b id="b">Hello!</b><i id="a2">Goodbye!</i>');
+      });
+
+      after(remove);
+    });
+    describe('template test', () => {
+      before(() => {
+        initApp(htmlScopeless`<DBlockTemplateApp/>`, container);
+      });
+
+      it('should render block from the children and templates ignoring non-existing blocks', () => {
+        strictEqual(container.html(), '<i>Hello, world!</i><b>Goodbye!</b><a></a>');
       });
 
       after(remove);

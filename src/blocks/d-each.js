@@ -114,7 +114,7 @@ rootBlocks['d-each'] = class DEach extends Block {
         block.$$.scope[indexName] = index;
         block.$$.scope[itemName] = item;
 
-        if (block.$$.prevBlock !== prevBlock && prevBlock) {
+        if (prevBlock) {
           prevBlock.$$.insertAfterIt(block.$$.content, true);
         }
       } else {

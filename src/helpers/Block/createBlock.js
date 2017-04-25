@@ -24,8 +24,8 @@ export function createBlock({ node, Constructor, parent, parentElem, parentBlock
     : doc;
   const localBlocks = parentTemplate ? parentTemplate.$$.ns._blocks : Block._blocks;
   const localMixins = parentTemplate ? parentTemplate.$$.ns._mixins : Block._mixins;
-  let children = node.children = node.children || [];
-  let args = node.attrs = node.attrs || {};
+  let { children } = node;
+  let args = node.attrs || {};
   let name = node.name || 'UnknownBlock';
   let constructor = Constructor || (node.name && localBlocks[node.name]);
   let dBlockMatch;

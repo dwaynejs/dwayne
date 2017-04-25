@@ -9,12 +9,12 @@ module.exports = (config) => {
     },
     reporters: [
       'progress',
-      'coverage'
+      'coverage-istanbul'
     ],
     plugins: [
       'karma-chrome-launcher',
       'karma-rollup-plugin',
-      'karma-coverage',
+      'karma-coverage-istanbul-reporter',
       'karma-mocha'
     ],
     frameworks: [
@@ -28,6 +28,9 @@ module.exports = (config) => {
     ],
 
     rollupPreprocessor: rollupConfig,
+    coverageIstanbulReporter: {
+      reports: ['html']
+    },
     coverageReporter: {
       type: 'html',
       dir: 'coverage/'
