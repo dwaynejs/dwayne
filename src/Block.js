@@ -14,7 +14,7 @@ import {
   watchForAllArgs, watchForAllGlobals, watchForAllLocals
 } from './helpers/Block';
 import {
-  D_REST_REGEX, Scope,
+  D_REST_REGEX,
   rootBlocks, rootMixins
 } from './constants';
 import { initApp } from './initApp';
@@ -88,6 +88,8 @@ const WATCHED_GLOBAL_PREFIX_REGEX = /^globals\./;
 const afterElem = new Elem();
 const rootVars = [];
 const rootTemplate = [];
+let evalMode = false;
+let gettingVars = [];
 
 /**
  * @class Block
@@ -529,8 +531,8 @@ class Block {
             let result;
 
             if (onChangeFlag) {
-              Scope.evalMode = true;
-              Scope.gettingVars = [];
+              evalMode = true;
+              gettingVars = [];
             }
 
             try {
@@ -552,7 +554,7 @@ class Block {
             if (onChangeFlag) {
               const localWatchers = [];
 
-              iterateArray(Scope.gettingVars, (watchers) => {
+              iterateArray(gettingVars, (watchers) => {
                 const watcher = () => {
                   const newResult = evaluate();
 
@@ -583,8 +585,8 @@ class Block {
                 watchers.push(watcher);
               });
 
-              Scope.evalMode = false;
-              Scope.gettingVars = [];
+              evalMode = false;
+              gettingVars = [];
             }
 
             return result;
@@ -1104,4 +1106,4 @@ class Block {
 setToStringTag(Block, 'Block');
 setProto(Block.prototype, null);
 
-export { Block };
+export { Block, gettingVars, evalMode };

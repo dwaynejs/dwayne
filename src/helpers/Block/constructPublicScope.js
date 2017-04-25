@@ -1,5 +1,5 @@
 import { defineProperties, mapObject, iterateArray } from '../../utils';
-import { Scope } from '../../constants';
+import { gettingVars, evalMode } from '../../Block';
 import { removeTempWatcher } from './removeWatcher';
 
 let changed;
@@ -13,9 +13,9 @@ export function constructPublicScope(scope, scopeValues, privateScope) {
       configurable: false,
       enumerable: true,
       get() {
-        if (Scope.evalMode) {
-          if (Scope.gettingVars.indexOf(watchers.temp) === -1) {
-            Scope.gettingVars.push(watchers.temp);
+        if (evalMode) {
+          if (gettingVars.indexOf(watchers.temp) === -1) {
+            gettingVars.push(watchers.temp);
           }
         }
 

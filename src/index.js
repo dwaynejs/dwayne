@@ -1,4 +1,4 @@
-export * from './Block';
+export { Block } from './Block';
 export * from './Elem';
 export * from './Mixin';
 

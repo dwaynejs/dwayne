@@ -6,10 +6,6 @@ export const D_REST_REGEX = /^d-rest(?:#|$)/;
 
 export const rootBlocks = create(null);
 export const rootMixins = create(null);
-export const Scope = {
-  evalMode: false,
-  gettingVars: []
-};
 export const {
   document = {}
 } = global;
