@@ -63,12 +63,13 @@ class Mixin {
           return currentValue;
         },
         remove: (isParentSignal) => {
+          isParentSignal = !!isParentSignal;
           this.$$.isRemoved = true;
 
           removeWatchers(watchersToRemove);
 
           try {
-            this.beforeRemove();
+            this.beforeRemove(isParentSignal);
           } catch (err) {
             console.error(`Uncaught error in ${ name }#beforeRemove:`, err);
           }
@@ -134,7 +135,13 @@ class Mixin {
 
   afterUpdate() {}
 
-  beforeRemove() {}
+  /**
+   * @method Mixin#beforeRemove
+   * @public
+   * @param {Boolean} isElementRemoved - If element removed as well.
+   * @description Is called before the mixin removal.
+   */
+  beforeRemove(isElementRemoved) {}
 
   /**
    * @method Block#evaluate

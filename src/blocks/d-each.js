@@ -114,8 +114,18 @@ rootBlocks['d-each'] = class DEach extends Block {
         block.$$.scope[indexName] = index;
         block.$$.scope[itemName] = item;
 
-        if (prevBlock) {
-          prevBlock.$$.insertAfterIt(block.$$.content, true);
+        const {
+          prevBlock: prevPrevBlock
+        } = block.$$;
+
+        if (prevPrevBlock && prevPrevBlock !== prevBlock) {
+          const { content } = block.$$;
+
+          if (prevBlock) {
+            prevBlock.$$.insertAfterIt(content, true);
+          } else {
+            this.$$.insertInStartOfIt(content, true);
+          }
         }
       } else {
         block = createBlock({

@@ -7,7 +7,7 @@ import {
   setToStringTag, setProto
 } from './utils';
 import {
-  isHTMLDocument, isValidNode,
+  isDocument, isValidNode,
   addAttr, addCSSProp, addDataAttr,
   addNext, addParent, addPrev,
   toElem, isElementsCollection,
@@ -311,7 +311,7 @@ class Elem extends Array {
     return this.collect((add, elem) => {
       let el = null;
       const isText = type === '#text';
-      const document = isHTMLDocument(elem)
+      const document = isDocument(elem)
         ? elem
         : elem.ownerDocument;
 
@@ -327,7 +327,7 @@ class Elem extends Array {
         el = document.createElementNS(ns, type);
       }
 
-      if (!isHTMLDocument(elem)) {
+      if (!isDocument(elem)) {
         new Elem(el).into(elem);
       }
 
@@ -513,7 +513,7 @@ class Elem extends Array {
 
     return this.forEach((elem) => {
       if (!EVENT_REGEX.test(toStringTag(finalEvent))) {
-        const document = isHTMLDocument(elem)
+        const document = isDocument(elem)
           ? elem
           : elem.ownerDocument;
 

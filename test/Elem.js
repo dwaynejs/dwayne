@@ -423,9 +423,11 @@ describe('Elem#', () => {
     });
     it('should support namespaces', () => {
       const elem = new Elem(document.createElement('div'));
+      const doc = new Elem(document.implementation.createDocument(null, 'html', null));
 
       strictEqual(elem.create('svg')[0].namespaceURI, 'http://www.w3.org/2000/svg');
       strictEqual(elem.create('div')[0].namespaceURI, 'http://www.w3.org/1999/xhtml');
+      strictEqual(doc.create('div')[0].namespaceURI, 'http://www.w3.org/1999/xhtml');
     });
   });
   describe('createComment()', () => {

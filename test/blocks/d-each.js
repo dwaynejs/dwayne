@@ -331,25 +331,25 @@ export default () => {
         strictEqual(mary.outerHTML, '<b>2: Mary</b>');
       });
       it('should move captions using redefined variables from the d-each scope', () => {
-        const maryIndex = 3;
+        app.people[3] = {
+          ...app.people[3],
+          age: 29.5
+        };
+        app.people[1] = {
+          ...app.people[1],
+          age: 29.25
+        };
 
-        app.people = [
-          ...app.people.slice(0, maryIndex),
-          {
-            ...app.people[maryIndex],
-            age: 29.5
-          },
-          ...app.people.slice(maryIndex + 1)
-        ];
+        app.people = app.people.slice();
 
         const children = container.children();
 
-        strictEqual(container.html(), '<b>0: Mary</b><b>1: Michael</b><b>2: John</b>');
+        strictEqual(container.html(), '<b>0: Mary</b><b>1: John</b><b>2: Michael</b>');
         strictEqual(children[0], mary);
-        strictEqual(children[1], michael);
-        strictEqual(children[2], john);
-        strictEqual(michael.outerHTML, '<b>1: Michael</b>');
-        strictEqual(john.outerHTML, '<b>2: John</b>');
+        strictEqual(children[1], john);
+        strictEqual(children[2], michael);
+        strictEqual(michael.outerHTML, '<b>2: Michael</b>');
+        strictEqual(john.outerHTML, '<b>1: John</b>');
         strictEqual(mary.outerHTML, '<b>0: Mary</b>');
       });
 

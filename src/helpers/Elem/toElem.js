@@ -1,4 +1,4 @@
-import { isElem } from './isElem';
+import { isElem } from './is';
 import { Elem } from '../../Elem';
 
 export function toElem(elem) {
