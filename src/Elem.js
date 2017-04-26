@@ -548,16 +548,24 @@ class Elem extends Array {
   /**
    * @method Elem#filter
    * @public
-   * @param {IterationCallback} [filterFn = Boolean] - Filter function
+   * @param {IterationCallback|String} filter - Filter function or a selector.
    * @returns {Elem} New instance of Elem.
    * @description Method for filtering elements.
    *
    * @example
    * elem.filter((elem) => new Elem(elem).closest('.parent'));
    */
-  filter(filterFn = Boolean) {
+  filter(filter) {
+    if (isString(filter)) {
+      const selector = filter;
+
+      filter = (elem) => (
+        new Elem(elem).is(selector)
+      );
+    }
+
     return this.collect((add, elem, index) => {
-      if (filterFn(elem, index, this)) {
+      if (filter(elem, index, this)) {
         add(elem);
       }
     });

@@ -830,7 +830,34 @@ describe('Elem#', () => {
     });
   });
   describe('filter()', () => {
-    // TODO: function filter
+    it('should filter the set', () => {
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
+      const wrap = new Elem([
+        elem1,
+        document.createElement('span'),
+        elem2
+      ]);
+      const filtered = wrap.filter((elem) => new Elem().is('div'));
+
+      strictEqual(filtered.length, 2);
+      strictEqual(filtered[0], elem1);
+      strictEqual(filtered[1], elem2);
+    });
+    it('should support string argument', () => {
+      const elem1 = document.createElement('div');
+      const elem2 = document.createElement('div');
+      const wrap = new Elem([
+        elem1,
+        document.createElement('span'),
+        elem2
+      ]);
+      const filtered = wrap.filter('div');
+
+      strictEqual(filtered.length, 2);
+      strictEqual(filtered[0], elem1);
+      strictEqual(filtered[1], elem2);
+    });
   });
   describe('hasAttr()', () => {
     it('should return false with empty set', () => {
@@ -1157,6 +1184,17 @@ describe('Elem#', () => {
       strictEqual(children[0], elem[0]);
       strictEqual(children[1], elem[1]);
       strictEqual(children[2], elem[2]);
+    });
+    it('should do nothing if the element parameter is empty', () => {
+      const parent = document.createElement('div');
+      const elem = document.createElement('div');
+      const wrap = new Elem(elem);
+
+      parent.appendChild(elem);
+
+      wrap.into(new Elem());
+
+      strictEqual(elem.parentNode, parent);
     });
   });
   describe('is()', () => {
