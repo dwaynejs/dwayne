@@ -1,6 +1,9 @@
-import { findInArray } from '../utils';
+import { findInArray, isFunction } from '../utils';
 import { Block } from '../Block';
 import { rootBlocks } from '../constants';
+
+const watchNameArgs = js`args.name`;
+const watchConstructorArgs = js`args.Constructor`;
 
 class DBlock extends Block {
   static template = html`
@@ -11,7 +14,7 @@ class DBlock extends Block {
     />
   `;
 
-  afterConstruct() {
+  afterConstruct(opts) {
     const {
       parentScope: {
         $$: {
@@ -21,10 +24,34 @@ class DBlock extends Block {
         }
       },
       htmlChildren: ownChildren,
+      parentScope,
       parentTemplate,
       dBlockName: DBlockName
     } = this.$$;
+    const {
+      name,
+      Constructor
+    } = this.args;
     let found;
+
+    this.ParentScope = parentScope;
+    this.ParentTemplate = parentTemplate;
+
+    if (name) {
+      this.constructDynamicNameBlock(
+        this.evaluate(watchNameArgs, this.constructDynamicNameBlock)
+      );
+
+      return;
+    }
+
+    if (Constructor) {
+      this.constructDynamicConstructorBlock(
+        this.evaluate(watchConstructorArgs, this.constructDynamicConstructorBlock)
+      );
+
+      return;
+    }
 
     if (ownChildren.length) {
       parentTemplate.$$.dBlocks.push(this);
@@ -57,6 +84,38 @@ class DBlock extends Block {
       this.elems = children;
     }
   }
+
+  constructDynamicNameBlock = (name) => {
+    const {
+      htmlChildren,
+      dBlockArgs
+    } = this.$$;
+
+    this.elems = [{
+      name,
+      attrs: dBlockArgs,
+      children: htmlChildren
+    }];
+  };
+
+  constructDynamicConstructorBlock = (Constructor) => {
+    if (!isFunction(Constructor)) {
+      this.elems = null;
+
+      return;
+    }
+
+    const {
+      htmlChildren,
+      dBlockArgs
+    } = this.$$;
+
+    this.elems = [{
+      Constructor,
+      attrs: dBlockArgs,
+      children: htmlChildren
+    }];
+  };
 }
 
 rootBlocks['d-block'] = DBlock;

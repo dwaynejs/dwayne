@@ -233,8 +233,9 @@ export default () => {
       class MyMixin1 extends Mixin {}
       class MyMixin2 extends Mixin {}
 
-      Block.mixin('my-mixin1', MyMixin1);
       MyBlock.mixin('my-mixin2', MyMixin2);
+      Block.mixin('my-mixin1', MyMixin1);
+      Block.block('MyBlock', MyBlock);
 
       strictEqual(Block.getMixin('d-hide'), DHide);
       strictEqual(Block.getMixin('d-hide2'), undefined);
@@ -248,6 +249,151 @@ export default () => {
       strictEqual(MyBlock.getMixin('d-hide2'), undefined);
       strictEqual(MyBlock.getMixin('my-mixin1'), MyMixin1);
       strictEqual(MyBlock.getMixin('my-mixin2'), MyMixin2);
+    });
+  });
+  describe('mixin()', () => {
+    const oldConsoleWarn = console.warn;
+    const oldConsoleError = console.error;
+    let removeHook;
+
+    before(() => {
+      removeHook = Block.beforeRegisterMixin((Mixin) => {
+        if (Mixin.forHooks) {
+          const { afterUpdate } = Mixin.prototype;
+
+          Mixin.prototype.afterUpdate = function (newValue, oldValue) {
+            this::afterUpdate(+newValue, +oldValue);
+          };
+        }
+
+        if (Mixin.noReturn) {
+          return;
+        }
+
+        if (Mixin.forErrorHooks) {
+          throw error;
+        }
+
+        return Mixin;
+      });
+    });
+    after(() => {
+      console.warn = oldConsoleWarn;
+      console.error = oldConsoleError;
+      removeHook();
+    });
+
+    it('should register mixin with afterUpdate function', () => {
+      Block.mixin('mixin', (newValue, oldValue, mixin) => {
+        mixin.elem.text(newValue);
+      });
+
+      const container = doc.create('div');
+
+      initApp(html`<div mixin="text"/>`, container);
+
+      strictEqual(container.html(), '<div>text</div>');
+    });
+    it('should not register mixin with any other value', (done) => {
+      console.warn = (message) => {
+        try {
+          strictEqual(message, 'The "mixin" class does not extend Mixin or is not an afterUpdate function, so it will not be registered (Block.mixin)');
+
+          done();
+        } catch (err) {
+          done(err);
+        }
+      };
+
+      Block.mixin('mixin', {});
+    });
+    it('should not register mixin with a built-in name', (done) => {
+      console.warn = (message) => {
+        try {
+          strictEqual(message, 'The "d-bind" mixin is a built-in mixin so the mixin will not be registered (Block.mixin)');
+
+          done();
+        } catch (err) {
+          done(err);
+        }
+      };
+
+      Block.mixin('d-bind', () => {});
+    });
+    it('should not register mixin with invalid name', (done) => {
+      console.warn = (message) => {
+        try {
+          strictEqual(message, 'Name "=mixin" is not allowed for mixins so the mixin will not be registered (Block.mixin)');
+
+          done();
+        } catch (err) {
+          done(err);
+        }
+      };
+
+      Block.mixin('=mixin', () => {});
+    });
+    it('should test hooks', () => {
+      class MyMixin extends Mixin {
+        static forHooks = true;
+
+        afterUpdate(newValue) {
+          this.elem.text(1 + newValue);
+        }
+      }
+
+      Block.mixin('mixin', MyMixin);
+
+      const container = doc.create('div');
+
+      initApp(html`<div mixin="1"/>`, container);
+
+      strictEqual(container.html(), '<div>2</div>');
+    });
+    it('should test hooks which return undefined', () => {
+      class MyMixin extends Mixin {
+        static noReturn = true;
+
+        afterUpdate(newValue) {
+          this.elem.text(newValue);
+        }
+      }
+
+      Block.mixin('mixin', MyMixin);
+
+      const container = doc.create('div');
+
+      initApp(html`<div mixin="1"/>`, container);
+
+      strictEqual(container.html(), '<div>1</div>');
+    });
+    it('should test hooks with errors', (done) => {
+      console.error = (message, e) => {
+        try {
+          strictEqual(message, 'Uncaught error in "beforeRegisterMixin" hook:');
+          strictEqual(e, error);
+
+          done();
+        } catch (err) {
+          done(err);
+        }
+      };
+
+      class MyMixin extends Mixin {
+        static forErrorHooks = true;
+
+        afterUpdate(newValue) {
+          this.elem.text(newValue);
+        }
+      }
+
+      Block.mixin('mixin', MyMixin);
+
+      const container = doc.create('div');
+
+      initApp(html`<div mixin="1"/>`, container);
+
+      strictEqual(container.html(), '<div>1</div>');
     });
   });
 };

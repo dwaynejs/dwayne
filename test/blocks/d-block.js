@@ -122,18 +122,18 @@ class DBlockNestedApp extends Block {
 
 class DBlockNested extends Block {
   static template = html`
-    <DBlockNestedTestHelper>
+    <DBlockNestedHelper>
       <d-block:a>
         <d-block:b/>
       </d-block:a>
       <d-block:b>
         <d-block:a/>
       </d-block:b>
-    </DBlockNestedTestHelper>
+    </DBlockNestedHelper>
   `;
 }
 
-class DBlockNestedTestHelper extends Block {
+class DBlockNestedHelper extends Block {
   static template = html`
     <a id="a">
       <d-block:a/>
@@ -141,6 +141,55 @@ class DBlockNestedTestHelper extends Block {
     <b id="b">
       <d-block:b/>
     </b>
+  `;
+}
+
+class DBlockArgsNameApp extends Block {
+  static template = html`
+    <d-block name="{name}" contentEditable="true" caption="{caption}"/>
+  `;
+
+  name = 'div';
+  caption = 'caption';
+
+  afterRender() {
+    app = this;
+  }
+}
+
+class DBlockArgsName extends Block {
+  static template = html`
+    <span>{args.caption}</span>
+  `;
+
+  afterRender() {
+    block = this;
+  }
+}
+
+class DBlockArgsConstructorApp extends Block {
+  static template = html`
+    <d-block Constructor="{Constructor}" who="{who}"/>
+    <d-block Constructor="Constructor" who="{who}"/>
+  `;
+
+  Constructor = DBlockArgsConstructorHelper1;
+  who = 'world';
+
+  afterRender() {
+    app = this;
+  }
+}
+
+class DBlockArgsConstructorHelper1 extends Block {
+  static template = html`
+    <span>Hello, {args.who}!</span>
+  `;
+}
+
+class DBlockArgsConstructorHelper2 extends Block {
+  static template = html`
+    <span>Goodbye, {args.who}!</span>
   `;
 }
 
@@ -152,7 +201,10 @@ Block.block('DBlockTemplateApp', DBlockTemplateApp);
 Block.block('DBlockTemplate', DBlockTemplate);
 Block.block('DBlockNestedApp', DBlockNestedApp);
 Block.block('DBlockNested', DBlockNested);
-Block.block('DBlockNestedTestHelper', DBlockNestedTestHelper);
+Block.block('DBlockNestedHelper', DBlockNestedHelper);
+Block.block('DBlockArgsNameApp', DBlockArgsNameApp);
+Block.block('DBlockArgsName', DBlockArgsName);
+Block.block('DBlockArgsConstructorApp', DBlockArgsConstructorApp);
 
 export default () => {
   describe('d-block', () => {
@@ -213,6 +265,41 @@ export default () => {
         app.captionB = 'Hello!';
 
         strictEqual(container.html(), '<a id="a">Hello!</a><b id="b">Goodbye!</b>');
+      });
+
+      after(remove);
+    });
+    describe('args name test', () => {
+      before(() => {
+        initApp(htmlScopeless`<DBlockArgsNameApp/>`, container);
+      });
+
+      it('should render the block using the name arg', () => {
+        strictEqual(container.html(), '<div contenteditable="true" caption="caption"></div>');
+      });
+      it('should re-render the block after the name have been changed', () => {
+        app.name = 'DBlockArgsName';
+        app.caption = 'Hello, world!';
+
+        strictEqual(block.args.contentEditable, 'true');
+        strictEqual(container.html(), '<span>Hello, world!</span>');
+      });
+
+      after(remove);
+    });
+    describe('args constructor test', () => {
+      before(() => {
+        initApp(htmlScopeless`<DBlockArgsConstructorApp/>`, container);
+      });
+
+      it('should render the block using the Constructor arg', () => {
+        strictEqual(container.html(), '<span>Hello, world!</span>');
+      });
+      it('should re-render the block after the Constructor have been changed', () => {
+        app.Constructor = DBlockArgsConstructorHelper2;
+        app.who = 'human';
+
+        strictEqual(container.html(), '<span>Goodbye, human!</span>');
       });
 
       after(remove);

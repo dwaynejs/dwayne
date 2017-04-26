@@ -10,12 +10,11 @@ rootBlocks['d-elements'] = class DElements extends Block {
   afterConstruct() {
     const { parentElem } = this.$$;
     const {
-      Constructor,
       parentScope,
       parentTemplate
     } = this.args;
 
-    this.$$.evaluate(watchArgs, () => {
+    this.$$.evaluate(watchArgs, (value) => {
       const {
         children,
         mixins,
@@ -23,7 +22,6 @@ rootBlocks['d-elements'] = class DElements extends Block {
         watchersToRemove,
         content
       } = this.$$;
-      const { value } = this.args;
 
       iterateArray(children, removeWithParentSignal);
       iterateArray(mixins, removeWithParentSignal);
@@ -49,7 +47,6 @@ rootBlocks['d-elements'] = class DElements extends Block {
       iterateArray(value || [], (child) => {
         prevBlock = createBlock({
           node: child,
-          Constructor,
           parent: this,
           parentElem,
           parentBlock: this,

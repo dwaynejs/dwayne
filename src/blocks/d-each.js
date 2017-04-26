@@ -32,7 +32,7 @@ rootBlocks['d-each'] = class DEach extends Block {
     });
   }
 
-  afterRender() {
+  afterConstruct() {
     this.evaluate(watchArgs, this.renderSet);
     this.renderSet();
   }
@@ -135,9 +135,9 @@ rootBlocks['d-each'] = class DEach extends Block {
             item,
             index,
             name: '#d-item',
+            Constructor: DItem,
             children: htmlChildren
           },
-          Constructor: DItem,
           parent: this,
           parentElem,
           parentBlock: this,

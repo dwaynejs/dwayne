@@ -17,40 +17,25 @@ import { Block } from '../../Block';
 
 const NAMED_D_BLOCK_REGEX = /^d-block:([\s\S]+)$/;
 
-export function createBlock({ node, Constructor, parent, parentElem, parentBlock, parentScope, parentTemplate, prevBlock }) {
+export function createBlock({ node, parent, parentElem, parentBlock, parentScope, parentTemplate, prevBlock }) {
   const doc = new Elem(parentElem[0].ownerDocument);
   const elem = parentElem[0].namespaceURI === SVG_NS
     ? doc.create('svg')
     : doc;
   const localBlocks = parentTemplate ? parentTemplate.$$.ns._blocks : Block._blocks;
   const localMixins = parentTemplate ? parentTemplate.$$.ns._mixins : Block._mixins;
-  let { children } = node;
-  let args = node.attrs || {};
-  let name = node.name || 'UnknownBlock';
-  let constructor = Constructor || (node.name && localBlocks[node.name]);
+  const { children } = node;
+  const args = node.attrs || {};
+  const name = node.name || 'UnknownBlock';
+  let constructor = node.Constructor || (node.name && localBlocks[node.name]);
   let dBlockMatch;
   let dBlockName;
   let dBlockArgs;
-  let dBlockChildren;
-  let dElementsName;
-  let dElementsConstructor;
 
   if (name === 'd-block' && args.name) {
-    name = 'd-elements';
-    constructor = localBlocks[name];
-    dElementsName = args.name;
     dBlockArgs = except(args, 'name');
-    dBlockChildren = children;
-    children = [];
-    args = {};
   } else if (name === 'd-block' && args.Constructor) {
-    name = 'UnknownBlock';
-    constructor = localBlocks[name];
-    dElementsConstructor = args.Constructor;
     dBlockArgs = except(args, 'Constructor');
-    dBlockChildren = children;
-    children = [];
-    args = {};
   } else if ((dBlockMatch = name.match(NAMED_D_BLOCK_REGEX)) || name === 'd-block') {
     constructor = Block._blocks['d-block'];
     dBlockName = dBlockMatch ? dBlockMatch[1] : null;
@@ -64,6 +49,7 @@ export function createBlock({ node, Constructor, parent, parentElem, parentBlock
         name,
         args,
         dBlockName,
+        dBlockArgs,
         children,
         parent,
         parentElem,
@@ -231,41 +217,9 @@ export function createBlock({ node, Constructor, parent, parentElem, parentBlock
     ...locals
   } = blockInstance;
 
-  if (dElementsName) {
-    node = {
-      attrs: dBlockArgs,
-      children: dBlockChildren
-    };
-    node.name = parentScope.$$.evaluate(dElementsName, (newName) => {
-      node.name = newName;
-
-      Args.value = [node];
-    }, blockInstance, true);
-
-    Args.value = [node];
-    Args.parentScope = parentScope;
-    Args.parentTemplate = parentTemplate;
-  }
-
-  if (dElementsConstructor) {
-    node = {
-      name,
-      attrs: dBlockArgs,
-      children: dBlockChildren
-    };
-
-    Args.Constructor = parentScope.$$.evaluate(dElementsConstructor, (newConstructor) => {
-      Args.Constructor = newConstructor;
-      Args.value = [node];
-    }, blockInstance, true);
-    Args.value = [node];
-    Args.parentScope = parentScope;
-    Args.parentTemplate = parentTemplate;
-  }
-
   const html = name === 'd-elements'
     ? Args.value || []
-    : constructor._html;
+    : constructor.template.value;
 
   $$.args = constructPrivateScope(Args);
   $$.locals = constructPrivateScope(locals);

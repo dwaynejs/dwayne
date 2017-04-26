@@ -318,11 +318,9 @@ class Elem extends Array {
           ? document.createTextNode('')
           : document.createComment('');
       } else {
-        const ns = type === 'svg'
-          ? SVG_NS
-          : elem.namespaceURI || document.documentElement.namespaceURI || XHTML_NS;
-
-        el = document.createElementNS(ns, type);
+        el = type === 'svg'
+          ? document.createElementNS(SVG_NS, type)
+          : document.createElement(type);
       }
 
       if (!isDocument(elem)) {
@@ -331,40 +329,6 @@ class Elem extends Array {
 
       add(el);
     });
-  }
-
-  /**
-   * @method Elem#createComment
-   * @public
-   * @param {String} text - Text of the comment.
-   * @returns {Elem} New instance of Elem - wrap of the created comments.
-   * @description Method for creating comments inside this element.
-   * If this element is not an Element the comment is just created.
-   *
-   * @example
-   * elem.createComment('comment');
-   */
-  createComment(text) {
-    return this
-      .create('#comment')
-      .text(text);
-  }
-
-  /**
-   * @method Elem#createText
-   * @public
-   * @param {String} text - Text.
-   * @returns {Elem} New instance of Elem - wrap of the created text nodes.
-   * @description Method for creating text nodes inside this element.
-   * If this element is not an Element the text node is just created.
-   *
-   * @example
-   * elem.createText('text');
-   */
-  createText(text) {
-    return this
-      .create('#text')
-      .text(text);
   }
 
   /**

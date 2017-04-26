@@ -1,6 +1,18 @@
 import { Block } from './Block';
 import { Elem } from './Elem';
 
+/**
+ * @function removeApp
+ * @public
+ * @param {Elem|Element} container - Container of the app.
+ * @returns {void}
+ * @description Method for removing app.
+ *
+ * @example
+ * import { removeApp, find } from 'dwayne';
+ *
+ * removeApp(find('.root'));
+ */
 export function removeApp(container) {
   const elem = new Elem(container).elem(0);
 

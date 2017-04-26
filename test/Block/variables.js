@@ -129,6 +129,11 @@ export default () => {
 
         strictEqual(container.html(), '<span>Hello, dwayne!</span>');
       });
+      it('should re-render caption again after it\'s been changed', () => {
+        app.caption = null;
+
+        strictEqual(container.html(), '<span>Hello, !</span>');
+      });
 
       after(remove);
     });

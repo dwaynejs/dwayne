@@ -21,9 +21,22 @@ import { initApp } from './initApp';
 import { Mixin } from './Mixin';
 
 /**
+ * @typedef {Object} Template
+ * @public
+ * @property {String[]} vars - Template used vars.
+ * @property {Object[]} value - Template itself.
+ */
+
+/**
+ * @typedef {Object[]} ScopelessTemplate
+ * @public
+ */
+
+/**
  * @typedef {Error} EvaluationError
  * @public
- * @property {String} expression - Expression which has been evaluated with the error.
+ * @property {Function} expression - Function which caused eval error.
+ * @property {String} original - Evaluated expression original js.
  * @property {Block} block - Block in context of which the expression has been evaluated with the error.
  */
 
@@ -86,8 +99,6 @@ const ATTR_NAME_REGEX = /^[^\u0000-\u0020\s'">/=]+$/;
 const WATCHED_ARG_PREFIX_REGEX = /^args\./;
 const WATCHED_GLOBAL_PREFIX_REGEX = /^globals\./;
 const afterElem = new Elem();
-const rootVars = [];
-const rootTemplate = [];
 let evalMode = false;
 let gettingVars = [];
 
@@ -95,36 +106,39 @@ let gettingVars = [];
  * @class Block
  * @extends null
  * @public
- * @param {Object} opts - Element options.
+ * @param {Object} opts - Block options.
  * @returns {Block} Instance of Block.
- * @description Class for dynamic templating.
  *
  * @example
- * import { D, Block, initApp } from 'dwayne';
+ * import { Block, initApp } from 'dwayne';
  *
  * class App extends Block {
- *   static template = '<Hello text="{text}"/>';
+ *   static template = '<Hello text="{text}"/> ({ this.times })';
  *
  *   constructor(opts) {
  *     super(opts);
  *
- *     this.text = 'world (0)';
+ *     this.text = 'world';
  *     this.times = 0;
  *
  *     this.setInterval();
  *   }
  *
  *   setInterval() {
- *     D(1000).interval(() => {
- *       this.text = `world (${ ++this.times })`;
+ *     this.interval = setInterval(() => {
+ *       this.times++;
  *     });
+ *   }
+ *
+ *   beforeRemove() {
+ *     clearInterval(this.interval);
  *   }
  * }
  *
  * Block.block('App', App);
- * Block.block('Hello', 'Hello, {args.text}!');
+ * Block.block('Hello', html`Hello, {args.text}!`);
  *
- * initApp(html`<App/>`, document.getElementById('root'));
+ * initApp('App', document.getElementById('root'));
  */
 class Block {
   /**
@@ -142,22 +156,6 @@ class Block {
    * @description Block namespace mixins.
    */
   static _mixins = create(rootMixins);
-
-  /**
-   * @member {String[]} Block._vars
-   * @type {String[]}
-   * @protected
-   * @description Block used local vars.
-   */
-  static _vars = rootVars;
-
-  /**
-   * @member {Object[]} Block._html
-   * @type {Object[]}
-   * @protected
-   * @description Block template.
-   */
-  static _html = rootTemplate;
 
   /**
    * @member {Object} [Block.defaultArgs = null]
@@ -227,7 +225,7 @@ class Block {
    * @method Block.block
    * @public
    * @param {String} name - Block or mixin name.
-   * @param {Template|typeof Block} Subclass - Subclass of Block or template string of it.
+   * @param {Template|ScopelessTemplate|typeof Block} Subclass - Subclass of Block or template string of it.
    * @returns {typeof Block|undefined} Returns registered Block or undefined if the block hasn't been registered.
    * @description Register block in the namespace of this.
    */
@@ -314,8 +312,6 @@ class Block {
       value
     } = Subclass.template;
 
-    Subclass._html = value;
-    Subclass._vars = vars;
     Subclass._blocks = hasOwnProperty(Subclass, '_blocks')
       ? Subclass._blocks
       : create(this._blocks);
@@ -353,17 +349,6 @@ class Block {
   }
 
   /**
-   * @method Block.init
-   * @public
-   * @param {Elem|Element} [container] - Container of the app.
-   * @returns {void}
-   * @description Method for initializing app.
-   */
-  static init(container) {
-    initApp(htmlScopeless`<d-block Constructor="{this}"/>`, container);
-  }
-
-  /**
    * @method Block.mixin
    * @public
    * @param {String} name - Block or mixin name.
@@ -388,7 +373,7 @@ class Block {
       return;
     }
 
-    if (rootMixins[name]) {
+    if (rootMixins[name] || name === 'd-rest') {
       console.warn(`The "${ name }" mixin is a built-in mixin so the mixin will not be registered (Block.mixin)`);
 
       return;
@@ -457,6 +442,7 @@ class Block {
       name,
       args: originalArgs,
       dBlockName,
+      dBlockArgs,
       children,
       parent,
       parentElem,
@@ -473,31 +459,35 @@ class Block {
 
     defineFrozenProperties(this, {
       /**
-       * @member {Block} Block#$
-       * @type {Block}
-       * @public
-       * @description This.
-       */
-      $: this,
-
-      /**
        * @member {Object} Block#$$
        * @type {Object}
        * @protected
-       * @property {Object} args - Private args scope.
-       * @property {Object[]} htmlChildren - Block html children.
-       * @property {Block[]} children - Child blocks.
-       * @property {Mixin[]} mixins - Child mixins.
+       * @property {Object} Block#$$.args - Private args scope.
+       * @property {Block[]} Block#$$.children - Child blocks.
+       * @property {Elem} Block#$$.content - Content elements.
+       * @property {String|void} Block#$$.dBlockName - d-block name.
+       * @property {Object|void} Block#$$.dBlockName - d-block args.
+       * @property {Block[]} Block#$$.dBlocks - d-block's within the block.
+       * @property {Function} Block#$$.evaluate - Evaluate function.
+       * @property {Object} Block#$$.globals - Private globals scope.
+       * @property {Object[]} Block#$$.htmlChildren - Block html children.
+       * @property {Boolean} Block#$$.isRemoved - If the block is removed.
+       * @property {Boolean} Block#$$.isRendered - If the block is rendered.
+       * @property {Object} Block#$$.locals - Private locals scope.
+       * @property {Mixin[]} Block#$$.mixins - Child mixins.
+       * @property {typeof Block} Block#$$.ns - Block constructor.
+       * @property {Block|Elem|void} Block#$$.parent - Parent block or elem.
+       * @property {Block|void} Block#$$.parentBlock - Parent block.
        * @property {Elem} parentElem - Parent element.
-       * @property {Elem} content - Content elements.
-       * @property {Function} evaluate - Evaluate function.
-       * @property {Object} globals - Private globals scope.
-       * @property {Object} locals - Private locals scope.
-       * @property {Object[]} watchersToRemove - Watchers to remove before removing element.
+       * @property {Block|void} Block#$$.parentScope - Parent scope.
+       * @property {Block|void} Block#$$.parentTemplate - Parent template.
+       * @property {Block|Elem|void} Block#$$.prevBlock - Parent template.
+       * @property {Object[]} Block#$$.watchersToRemove - Watchers to remove before removing element.
        */
       $$: {
         name,
         dBlockName,
+        dBlockArgs,
         dBlocks: [],
         parent,
         parentElem,
@@ -621,11 +611,11 @@ class Block {
         changeContent: (newContent) => {
           this.$$.content = newContent;
 
-          if (this.$$.isRendered) {
+          if (this.$$.isRendered && !this.$$.isRemoved) {
             try {
               this.afterDOMChange();
             } catch (err) {
-              console.error(`Uncaught error in ${ name }#afterContentChange:`, err);
+              console.error(`Uncaught error in ${ name }#afterDOMChange:`, err);
             }
           }
         },
@@ -781,7 +771,7 @@ class Block {
     iterateObject(constructor.defaultLocals, (value, variable) => {
       this[variable] = value;
     });
-    iterateArray(constructor._vars, (variable) => {
+    iterateArray(constructor.template.vars, (variable) => {
       this[variable] = this[variable];
     });
 
@@ -862,7 +852,9 @@ class Block {
   /**
    * @method Block#afterDOMChange
    * @public
-   * @description Is called after block DOM structure has changed.
+   * @description Is called after block DOM structure has changed. Note that
+   * it's important not to modify the DOM structure within the block. You can only insert
+   * elements to empty elements (which Dwayne considers empty) and remove ones from them.
    */
   afterDOMChange() {}
 

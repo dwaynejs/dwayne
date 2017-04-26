@@ -4,7 +4,19 @@ import {
 } from './utils';
 import { wrapMixin, removeWatchers } from './helpers/Block';
 
+/**
+ * @class Mixin
+ * @public
+ * @param {Object} opts - Mixin options.
+ * @returns {Mixin} Instance of Mixin.
+ */
 class Mixin {
+  /**
+   * @member {Boolean} [Mixin.evaluate = true]
+   * @type {Boolean}
+   * @public
+   * @description If the mixin value should be evaluated and watched or not.
+   */
   static evaluate = true;
 
   /**

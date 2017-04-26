@@ -423,77 +423,9 @@ describe('Elem#', () => {
     });
     it('should support namespaces', () => {
       const elem = new Elem(document.createElement('div'));
-      const doc = new Elem(document.implementation.createDocument(null, 'html', null));
 
       strictEqual(elem.create('svg')[0].namespaceURI, 'http://www.w3.org/2000/svg');
       strictEqual(elem.create('div')[0].namespaceURI, 'http://www.w3.org/1999/xhtml');
-      strictEqual(doc.create('div')[0].namespaceURI, 'http://www.w3.org/1999/xhtml');
-    });
-  });
-  describe('createComment()', () => {
-    it('should create comment node inside elements', (done) => {
-      const elem = [
-        document.createElement('div'),
-        document.createElement('div'),
-        document.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .forEach((elem) => {
-            elem.innerHTML = '123';
-          })
-          .createComment('comment')
-          .parent()
-          .forEach((elem) => {
-            strictEqual(elem.innerHTML, '123<!--comment-->');
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
-    });
-  });
-  describe('createText()', () => {
-    it('should create comment node inside elements', (done) => {
-      const elem = [
-        document.createElement('div'),
-        document.createElement('div'),
-        document.createElement('div')
-      ];
-      const wrap = new Elem(elem);
-      let count = 0;
-
-      try {
-        wrap
-          .forEach((elem) => {
-            elem.innerHTML = '123';
-          })
-          .createText('<div>123</div>')
-          .parent()
-          .forEach((elem) => {
-            strictEqual(elem.innerHTML, '123&lt;div&gt;123&lt;/div&gt;');
-
-            doneAll();
-          });
-      } catch (err) {
-        done(err);
-      }
-
-      function doneAll() {
-        if (++count === elem.length) {
-          done();
-        }
-      }
     });
   });
   describe('css()', () => {
