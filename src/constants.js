@@ -7,5 +7,6 @@ export const D_REST_REGEX = /^d-rest(?:#|$)/;
 export const rootBlocks = create(null);
 export const rootMixins = create(null);
 export const {
-  document = {}
+  document = {},
+  Symbol = {}
 } = global;

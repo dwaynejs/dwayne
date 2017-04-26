@@ -1,17 +1,17 @@
 import {
-  isNil, isString, assign,
-  definePrototypeProperties, defineProperties,
+  isNil, isString,
+  definePrototypeProperties,
   collectFromArray, collectFromObject,
   iterateArray, iterateObject,
-  toHyphenCase, toStringTag,
+  toHyphenCase, setSymbolSpecies,
   setToStringTag, setProto
 } from './utils';
 import {
-  isDocument, isValidNode,
+  isDocument, isValidNode, getMatchesFunction,
   addAttr, addCSSProp, addDataAttr,
   addNext, addParent, addPrev,
   toElem, isElementsCollection,
-  getAttrNS, hide, show, remove
+  getAttrNS, getEvent, hide, show, remove
 } from './helpers/Elem';
 import { SVG_NS } from './constants';
 import { find } from './find';
@@ -51,11 +51,9 @@ import { find } from './find';
  * @this Elem
  */
 
-const { Symbol } = global;
 const EVENT_SEPARATOR_REGEX = /(?:,| ) */;
 const CSS_STYLES_SEPARATOR_REGEX = /; ?/;
 const CSS_IMPORTANT_REGEX = / ?!important$/;
-const EVENT_REGEX = /Event$/;
 const XHTML_NS = 'http://www.w3.org/1999/xhtml';
 const emptyCollection = [];
 
@@ -502,28 +500,15 @@ class Elem extends Array {
       cancelable = true,
       ...realDetails
     } = details;
-    let finalEvent = event;
-
-    if (!EVENT_REGEX.test(toStringTag(finalEvent))) {
-      try {
-        finalEvent = new Event(finalEvent, { bubbles, cancelable });
-        assign(finalEvent, realDetails);
-      } catch (err) {}
-    }
 
     return this.forEach((elem) => {
-      if (!EVENT_REGEX.test(toStringTag(finalEvent))) {
-        const document = isDocument(elem)
-          ? elem
-          : elem.ownerDocument;
-
-        finalEvent = document.createEvent('Event');
-        finalEvent.initEvent(event, bubbles, cancelable);
-
-        assign(finalEvent, realDetails);
-      }
-
-      elem.dispatchEvent(finalEvent);
+      elem.dispatchEvent(getEvent(
+        event,
+        bubbles,
+        cancelable,
+        realDetails,
+        elem
+      ));
     });
   }
 
@@ -817,14 +802,7 @@ class Elem extends Array {
     }
 
     const elem = this[0];
-    const matches = (
-      elem.matches
-      || elem.matchesSelector
-      || elem.webkitMatchesSelector
-      || elem.mozMatchesSelector
-      || elem.msMatchesSelector
-      || elem.oMatchesSelector
-    );
+    const matches = getMatchesFunction(elem);
 
     return elem::matches(selector);
   }
@@ -1204,15 +1182,6 @@ class Elem extends Array {
 }
 
 setToStringTag(Elem, 'Elem');
-
-if (Symbol && Symbol.species) {
-  defineProperties(Elem, {
-    [Symbol.species]: {
-      get() {
-        return Array;
-      }
-    }
-  });
-}
+setSymbolSpecies(Elem, Array);
 
 export { Elem };

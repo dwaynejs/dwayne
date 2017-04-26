@@ -45,7 +45,19 @@ module.exports = {
         [
           'istanbul',
           {
-            exclude: ['test/**']
+            exclude: [
+              'test/**',
+
+              'src/constants.js',
+              'src/global.js',
+
+              'src/utils/objectStatics.js',
+              'src/utils/setSymbolSpecies.js',
+              'src/utils/toStringTag.js',
+
+              'src/helpers/Elem/matches.js',
+              'src/helpers/Elem/getEvent.js'
+            ]
           }
         ]
       ]

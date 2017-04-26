@@ -838,7 +838,7 @@ describe('Elem#', () => {
         document.createElement('span'),
         elem2
       ]);
-      const filtered = wrap.filter((elem) => new Elem().is('div'));
+      const filtered = wrap.filter((elem) => new Elem(elem).is('div'));
 
       strictEqual(filtered.length, 2);
       strictEqual(filtered[0], elem1);

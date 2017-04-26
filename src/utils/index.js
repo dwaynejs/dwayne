@@ -5,5 +5,6 @@ export * from './escapeRegex';
 export * from './noop';
 export * from './object';
 export * from './objectStatics';
+export * from './setSymbolSpecies';
 export * from './toCase';
 export * from './toStringTag';
