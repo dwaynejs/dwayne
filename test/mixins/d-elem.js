@@ -30,7 +30,7 @@ class DElem extends Block {
 
 class DElemHelper extends Block {
   static template = html`
-    <div d-elem(div)="{getParentTemplate()}"/>
+    <div d-elem(div)="{getTopBlock()}"/>
     <b d-elem(b)/>
   `;
 

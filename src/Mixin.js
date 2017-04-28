@@ -165,6 +165,10 @@ class Mixin {
   evaluate(callback) {
     return this.$$.evaluate(callback);
   }
+
+  toString() {
+    return '[object Mixin]';
+  }
 }
 
 setToStringTag(Mixin, 'Mixin');

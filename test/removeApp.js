@@ -1,4 +1,4 @@
-import { strictEqual, throws } from 'assert';
+import { strictEqual } from 'assert';
 import { Block, Elem, initApp, doc, removeApp } from '../src';
 
 class RemoveAppBlock extends Block {
@@ -21,19 +21,31 @@ describe('removeApp()', () => {
 
     strictEqual(container.html(), '');
   });
-  it('should throw an error if the container is empty', () => {
-    const container = new Elem();
+  it('should throw an error if the container is empty', (done) => {
+    console.error = (message) => {
+      try {
+        strictEqual(message, 'No valid element to remove the app from was given! (removeApp)');
 
-    throws(() => {
-      removeApp(container);
-    }, 'No valid element to remove the app from was given! (removeApp)');
+        done();
+      } catch (err) {
+        done(err);
+      }
+    };
+
+    removeApp(new Elem());
   });
-  it('should throw an error if the container doesn\'t contain a Dwayne app', () => {
-    const container = doc.create('div');
+  it('should throw an error if the container doesn\'t contain a Dwayne app', (done) => {
+    console.error = (message) => {
+      try {
+        strictEqual(message, 'No app registered inside the given element! (removeApp)');
 
-    throws(() => {
-      removeApp(container);
-    }, 'No valid element to remove the app from was given! (removeApp)');
+        done();
+      } catch (err) {
+        done(err);
+      }
+    };
+
+    removeApp(doc.create('div'));
   });
 });
 

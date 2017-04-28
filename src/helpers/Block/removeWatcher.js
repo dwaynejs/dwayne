@@ -1,7 +1,6 @@
 import { removeArrayElem, iterateArray } from '../../utils';
 
 export function removeTempWatcher(watcher) {
-  watcher.onRemove();
   watcher();
 }
 

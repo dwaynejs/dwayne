@@ -28,8 +28,7 @@ module.exports = {
           'deepStrictEqual',
           'notDeepEqual',
           'notEqual',
-          'strictEqual',
-          'throws'
+          'strictEqual'
         ]
       }
     }),

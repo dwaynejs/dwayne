@@ -85,11 +85,9 @@ rootBlocks['d-switch'] = class DSwitch extends Block {
   }
 
   afterConstruct() {
-    this.evaluate(watchArgs, () => {
-      const {
-        value: newValue,
-        compareFn
-      } = this.args;
+    this.evaluate(watchArgs, (args) => {
+      const newValue = args[0];
+      const compareFn = args[1];
 
       this.index = Infinity;
 

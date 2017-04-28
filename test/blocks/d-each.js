@@ -352,6 +352,24 @@ export default () => {
         strictEqual(john.outerHTML, '<b>1: John</b>');
         strictEqual(mary.outerHTML, '<b>0: Mary</b>');
       });
+      it('should move captions again using redefined variables from the d-each scope', () => {
+        app.people[3] = {
+          ...app.people[3],
+          age: 21
+        };
+
+        app.people = app.people.slice();
+
+        const children = container.children();
+
+        strictEqual(container.html(), '<b>0: John</b><b>1: Michael</b><b>2: Mary</b>');
+        strictEqual(children[0], john);
+        strictEqual(children[1], michael);
+        strictEqual(children[2], mary);
+        strictEqual(michael.outerHTML, '<b>1: Michael</b>');
+        strictEqual(john.outerHTML, '<b>0: John</b>');
+        strictEqual(mary.outerHTML, '<b>2: Mary</b>');
+      });
 
       after(remove);
     });

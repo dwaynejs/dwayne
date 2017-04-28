@@ -14,10 +14,7 @@ export function constructPrivateScope(object, type, parentScope) {
   return collectFromObject(object, (scope, value, key) => {
     scope[key] = {
       value,
-      watchers: {
-        temp: [],
-        perm: []
-      }
+      watchers: []
     };
   }, scope);
 }

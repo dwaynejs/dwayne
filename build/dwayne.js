@@ -1,10 +1,6 @@
 (function (exports) {
 'use strict';
 
-/* eslint no-nested-ternary: 0 */
-/* eslint no-negated-condition: 0 */
-var global$1 = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
 function collectFromArray(array, callback) {
   var initialValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
@@ -148,6 +144,31 @@ function defineFrozenProperties(target, properties) {
     });
   });
 }
+
+/* eslint no-nested-ternary: 0 */
+/* eslint no-negated-condition: 0 */
+var global$1 = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+var create = Object.create;
+var keys = Object.keys;
+var getProto = Object.getPrototypeOf;
+var setProto = Object.setPrototypeOf || function (target, proto) {
+  /* eslint no-proto: 0 */
+  target.__proto__ = proto;
+};
+
+var HIDE_CLASS = '__dwayne-hidden__';
+var SVG_NS = 'http://www.w3.org/2000/svg';
+var D_REST_REGEX = /^d-rest(?:#|$)/;
+
+var rootBlocks = create(null);
+var rootMixins = create(null);
+var _global = global$1;
+var _global$document = _global.document;
+var document = _global$document === undefined ? {} : _global$document;
+var _global$Symbol = _global.Symbol;
+
+var _Symbol = _global$Symbol === undefined ? {} : _global$Symbol;
 
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -339,8 +360,6 @@ var toConsumableArray = function (arr) {
   }
 };
 
-var _global$1 = global$1;
-var _Symbol$1 = _global$1.Symbol;
 var _ref = {};
 var toString = _ref.toString;
 
@@ -351,13 +370,13 @@ var toString = _ref.toString;
  * @description Cut "Type" string from "[object Type]" string that gotten from {}.toString,call(object).
  */
 
-function toStringTag(object) {
+function toStringTag$1(object) {
   return toString.call(object).slice(8, -1);
 }
 
-function setToStringTag(object, tag) {
-  if (_Symbol$1 && _Symbol$1.toStringTag) {
-    definePrototypeProperties(object.prototype, defineProperty({}, _Symbol$1.toStringTag, tag));
+function setToStringTag(klass, tag) {
+  if (_Symbol.toStringTag) {
+    definePrototypeProperties(klass.prototype, defineProperty({}, _Symbol.toStringTag, tag));
   }
 }
 
@@ -382,7 +401,7 @@ function setToStringTag(object, tag) {
 var isArray = Array.isArray;
 
 function isFunction(value) {
-  return toStringTag(value) === 'Function' || typeof value === 'function';
+  return toStringTag$1(value) === 'Function' || typeof value === 'function';
 }
 
 /**
@@ -412,7 +431,7 @@ function isNil(value) {
  * isString(new String('0')); // true
  */
 function isString(value) {
-  return toStringTag(value) === 'String';
+  return toStringTag$1(value) === 'String';
 }
 
 var regexpSpecialCharacters = ['.', '+', '*', '?', '(', ')', '[', ']', '{', '}', '<', '>', '^', '$', '!', '=', ':', '-', '|', ',', '\\'];
@@ -426,13 +445,15 @@ function escapeRegex(string) {
 
 function noop() {}
 
-var create = Object.create;
-var keys = Object.keys;
-var getProto = Object.getPrototypeOf;
-var setProto = Object.setPrototypeOf || function (target, proto) {
-  /* eslint no-proto: 0 */
-  target.__proto__ = proto;
-};
+function setSymbolSpecies(klass, species) {
+  if (_Symbol.species) {
+    defineProperties(klass, defineProperty({}, _Symbol.species, {
+      get: function get$$1() {
+        return species;
+      }
+    }));
+  }
+}
 
 var DASHED_SYMBOL_REGEX = /-[a-z]/g;
 var UPPERCASED_SYMBOL_REGEX = /[A-Z]/g;
@@ -483,20 +504,6 @@ function addPrev(add, elem) {
   add(elem.previousSibling);
 }
 
-var HIDE_CLASS = '__dwayne-hidden__';
-var SVG_NS = 'http://www.w3.org/2000/svg';
-var D_REST_REGEX = /^d-rest(?:#|$)/;
-
-var rootBlocks = create(null);
-var rootMixins = create(null);
-var Scope = {
-  evalMode: false,
-  gettingVars: []
-};
-var _global$2 = global$1;
-var _global$document = _global$2.document;
-var document = _global$document === undefined ? {} : _global$document;
-
 function createHideStyleNode(head) {
   var style = head.find('style#' + HIDE_CLASS);
 
@@ -543,31 +550,68 @@ function getAttrNS(attr, elem) {
   return Null;
 }
 
-function hide(elem) {
-  createHideStyleNode(new Elem(elem.ownerDocument.head));
-  new Elem(elem).addClass(HIDE_CLASS);
+var HTML_COLLECTION_REGEX = /^(HTMLCollection|NodeList)$/;
+var DOCUMENT_REGEX = /Document$/;
+var ELEMENT_REGEX = /Element$/;
+
+function isDocument(value) {
+  return DOCUMENT_REGEX.test(toStringTag$1(value));
 }
 
 function isElem(value) {
   return value instanceof Elem;
 }
 
-var HTML_COLLECTION_REGEX = /^(HTMLCollection|NodeList)$/;
-
 function isElementsCollection(value) {
-  return HTML_COLLECTION_REGEX.test(toStringTag(value)) || isElem(value) || isArray(value);
+  return HTML_COLLECTION_REGEX.test(toStringTag$1(value)) || isElem(value) || isArray(value);
 }
-
-function isHTMLDocument(value) {
-  return toStringTag(value) === 'HTMLDocument';
-}
-
-var ELEMENT_REGEX = /Element$/;
 
 function isValidNode(value) {
-  var tag = toStringTag(value);
+  var tag = toStringTag$1(value);
 
-  return ELEMENT_REGEX.test(tag) || tag === 'HTMLDocument' || tag === 'Text' || tag === 'DocumentFragment' || tag === 'Comment';
+  return ELEMENT_REGEX.test(tag) || DOCUMENT_REGEX.test(tag) || tag === 'Text' || tag === 'DocumentFragment' || tag === 'Comment';
+}
+
+var EVENT_REGEX = /Event$/;
+
+function getEvent(event, bubbles, cancelable, realDetails, elem) {
+  var finalEvent = event;
+
+  if (!EVENT_REGEX.test(toStringTag$1(finalEvent))) {
+    try {
+      finalEvent = new Event(finalEvent, { bubbles: bubbles, cancelable: cancelable });
+      assign(finalEvent, realDetails);
+    } catch (err) {
+      var document = isDocument(elem) ? elem : elem.ownerDocument;
+
+      finalEvent = document.createEvent('Event');
+      finalEvent.initEvent(event, bubbles, cancelable);
+
+      assign(finalEvent, realDetails);
+    }
+  }
+
+  return finalEvent;
+}
+
+function hide(elem) {
+  createHideStyleNode(new Elem(elem.ownerDocument.head));
+  new Elem(elem).addClass(HIDE_CLASS);
+}
+
+var indexOf = [].indexOf;
+
+
+function getMatchesFunction(elem) {
+  return elem.matches || elem.matchesSelector || elem.webkitMatchesSelector || elem.mozMatchesSelector || elem.msMatchesSelector || elem.oMatchesSelector || matches;
+}
+
+function matches(selector) {
+  var _context;
+
+  var document = isDocument(this) ? this : this.ownerDocument;
+
+  return (_context = document.querySelectorAll(selector), indexOf).call(_context, this) !== -1;
 }
 
 function remove(elem) {
@@ -636,14 +680,9 @@ function find(selector) {
  * @this Elem
  */
 
-var _global = global$1;
-var _Symbol = _global.Symbol;
-
 var EVENT_SEPARATOR_REGEX = /(?:,| ) */;
 var CSS_STYLES_SEPARATOR_REGEX = /; ?/;
 var CSS_IMPORTANT_REGEX = / ?!important$/;
-var EVENT_REGEX = /Event$/;
-var XHTML_NS = 'http://www.w3.org/1999/xhtml';
 var emptyCollection = [];
 
 /**
@@ -933,54 +972,20 @@ var Elem = function (_Array) {
       return this.collect(function (add, elem) {
         var el = null;
         var isText = type === '#text';
-        var document$$1 = isHTMLDocument(elem) ? elem : elem.ownerDocument;
+        var document$$1 = isDocument(elem) ? elem : elem.ownerDocument;
 
         if (isText || type === '#comment') {
           el = isText ? document$$1.createTextNode('') : document$$1.createComment('');
         } else {
-          var ns = type === 'svg' ? SVG_NS : elem.namespaceURI || document$$1.documentElement.namespaceURI || XHTML_NS;
-
-          el = document$$1.createElementNS(ns, type);
+          el = type === 'svg' ? document$$1.createElementNS(SVG_NS, type) : document$$1.createElement(type);
         }
 
-        add(new Elem(el).into(elem));
+        if (!isDocument(elem)) {
+          new Elem(el).into(elem);
+        }
+
+        add(el);
       });
-    }
-
-    /**
-     * @method Elem#createComment
-     * @public
-     * @param {String} text - Text of the comment.
-     * @returns {Elem} New instance of Elem - wrap of the created comments.
-     * @description Method for creating comments inside this element.
-     * If this element is not an Element the comment is just created.
-     *
-     * @example
-     * elem.createComment('comment');
-     */
-
-  }, {
-    key: 'createComment',
-    value: function createComment(text) {
-      return this.create('#comment').text(text);
-    }
-
-    /**
-     * @method Elem#createText
-     * @public
-     * @param {String} text - Text.
-     * @returns {Elem} New instance of Elem - wrap of the created text nodes.
-     * @description Method for creating text nodes inside this element.
-     * If this element is not an Element the text node is just created.
-     *
-     * @example
-     * elem.createText('text');
-     */
-
-  }, {
-    key: 'createText',
-    value: function createText(text) {
-      return this.create('#text').text(text);
     }
 
     /**
@@ -1125,26 +1130,9 @@ var Elem = function (_Array) {
           cancelable = _details$cancelable === undefined ? true : _details$cancelable,
           realDetails = objectWithoutProperties(details, ['bubbles', 'cancelable']);
 
-      var finalEvent = event;
-
-      if (!EVENT_REGEX.test(toStringTag(finalEvent))) {
-        try {
-          finalEvent = new Event(finalEvent, { bubbles: bubbles, cancelable: cancelable });
-          assign(finalEvent, realDetails);
-        } catch (err) {}
-      }
 
       return this.forEach(function (elem) {
-        if (!EVENT_REGEX.test(toStringTag(finalEvent))) {
-          var document$$1 = isHTMLDocument(elem) ? elem : elem.ownerDocument;
-
-          finalEvent = document$$1.createEvent('Event');
-          finalEvent.initEvent(event, bubbles, cancelable);
-
-          assign(finalEvent, realDetails);
-        }
-
-        elem.dispatchEvent(finalEvent);
+        elem.dispatchEvent(getEvent(event, bubbles, cancelable, realDetails, elem));
       });
     }
 
@@ -1174,7 +1162,7 @@ var Elem = function (_Array) {
     /**
      * @method Elem#filter
      * @public
-     * @param {IterationCallback} [filterFn = Boolean] - Filter function
+     * @param {IterationCallback|String} filter - Filter function or a selector.
      * @returns {Elem} New instance of Elem.
      * @description Method for filtering elements.
      *
@@ -1184,13 +1172,19 @@ var Elem = function (_Array) {
 
   }, {
     key: 'filter',
-    value: function filter() {
+    value: function filter(_filter) {
       var _this3 = this;
 
-      var filterFn = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Boolean;
+      if (isString(_filter)) {
+        var selector = _filter;
+
+        _filter = function _filter(elem) {
+          return new Elem(elem).is(selector);
+        };
+      }
 
       return this.collect(function (add, elem, index) {
-        if (filterFn(elem, index, _this3)) {
+        if (_filter(elem, index, _this3)) {
           add(elem);
         }
       });
@@ -1431,7 +1425,7 @@ var Elem = function (_Array) {
 
       element = toElem(element)[0];
 
-      if (!element || isHTMLDocument(element)) {
+      if (!element) {
         return this;
       }
 
@@ -1472,7 +1466,7 @@ var Elem = function (_Array) {
       }
 
       var elem = this[0];
-      var matches = elem.matches || elem.matchesSelector || elem.webkitMatchesSelector || elem.mozMatchesSelector || elem.msMatchesSelector || elem.oMatchesSelector;
+      var matches = getMatchesFunction(elem);
 
       return matches.call(elem, selector);
     }
@@ -1916,14 +1910,7 @@ var Elem = function (_Array) {
 }(Array);
 
 setToStringTag(Elem, 'Elem');
-
-if (_Symbol && _Symbol.species) {
-  defineProperties(Elem, defineProperty({}, _Symbol.species, {
-    get: function get$$1() {
-      return Array;
-    }
-  }));
-}
+setSymbolSpecies(Elem, Array);
 
 function calculateArgs(args, argsObject) {
   iterateArray(keys(argsObject), function (arg) {
@@ -2238,16 +2225,12 @@ function constructPrivateScope(object, type, parentScope) {
   return collectFromObject(object, function (scope, value, key) {
     scope[key] = {
       value: value,
-      watchers: {
-        temp: [],
-        perm: []
-      }
+      watchers: []
     };
   }, scope);
 }
 
 function removeTempWatcher(watcher) {
-  watcher.onRemove();
   watcher();
 }
 
@@ -2262,21 +2245,17 @@ function removeWatcher(_ref) {
   removeArrayElem(watchers, watcher);
 }
 
-var changed = void 0;
-
 function constructPublicScope(scope, scopeValues, privateScope) {
   defineProperties(scope, mapObject(scopeValues, function (value, key) {
     var scope = privateScope[key];
-    var watchers = scope.watchers;
-
 
     return {
       configurable: false,
       enumerable: true,
       get: function get() {
-        if (Scope.evalMode) {
-          if (Scope.gettingVars.indexOf(watchers.temp) === -1) {
-            Scope.gettingVars.push(watchers.temp);
+        if (evalMode) {
+          if (gettingVars.indexOf(scope.watchers) === -1) {
+            gettingVars.push(scope.watchers);
           }
         }
 
@@ -2287,70 +2266,12 @@ function constructPublicScope(scope, scopeValues, privateScope) {
           return;
         }
 
-        if (!changed) {
-          changed = [];
-        }
+        var oldTempWatchers = scope.watchers.slice();
 
-        var oldTempWatchers = watchers.temp.slice();
-        var oldValue = scope.value;
-
-        watchers.temp = [];
+        scope.watchers = [];
         scope.value = value;
 
         iterateArray(oldTempWatchers, removeTempWatcher);
-        changed.push({
-          scope: scope,
-          oldValue: oldValue,
-          value: value
-        });
-
-        setTimeout(function () {
-          if (!changed) {
-            return;
-          }
-
-          var was = [];
-          var values = [];
-
-          var _loop = function _loop(i) {
-            var _changed$i = changed[i],
-                scope = _changed$i.scope,
-                value = _changed$i.value,
-                oldValue = _changed$i.oldValue;
-
-
-            iterateArray(scope.watchers.perm, function (watcher) {
-              var index = was.indexOf(watcher);
-
-              if (index === -1) {
-                was.push(watcher);
-                values.push({
-                  value: value,
-                  oldValue: oldValue
-                });
-              } else {
-                values[index].oldValue = oldValue;
-              }
-            });
-
-            changed.splice(i, 1);
-          };
-
-          for (var i = changed.length - 1; i >= 0; i--) {
-            _loop(i);
-          }
-
-          changed = null;
-
-          iterateArray(was, function (watcher, i) {
-            var _values$i = values[i],
-                value = _values$i.value,
-                oldValue = _values$i.oldValue;
-
-
-            watcher(value, oldValue);
-          });
-        }, 0);
       }
     };
   }));
@@ -2360,7 +2281,6 @@ var NAMED_D_BLOCK_REGEX = /^d-block:([\s\S]+)$/;
 
 function createBlock(_ref) {
   var node = _ref.node,
-      Constructor = _ref.Constructor,
       parent = _ref.parent,
       parentElem = _ref.parentElem,
       parentBlock = _ref.parentBlock,
@@ -2372,33 +2292,19 @@ function createBlock(_ref) {
   var elem = parentElem[0].namespaceURI === SVG_NS ? doc.create('svg') : doc;
   var localBlocks = parentTemplate ? parentTemplate.$$.ns._blocks : Block._blocks;
   var localMixins = parentTemplate ? parentTemplate.$$.ns._mixins : Block._mixins;
-  var children = node.children = node.children || [];
-  var args = node.attrs = node.attrs || {};
+  var children = node.children;
+
+  var args = node.attrs || {};
   var name = node.name || 'UnknownBlock';
-  var constructor = Constructor || node.name && localBlocks[node.name];
+  var constructor = node.Constructor || node.name && localBlocks[node.name];
   var dBlockMatch = void 0;
   var dBlockName = void 0;
   var dBlockArgs = void 0;
-  var dBlockChildren = void 0;
-  var dElementsName = void 0;
-  var dElementsConstructor = void 0;
 
   if (name === 'd-block' && args.name) {
-    name = 'd-elements';
-    constructor = localBlocks[name];
-    dElementsName = args.name;
     dBlockArgs = except(args, 'name');
-    dBlockChildren = children;
-    children = [];
-    args = {};
   } else if (name === 'd-block' && args.Constructor) {
-    name = 'UnknownBlock';
-    constructor = localBlocks[name];
-    dElementsConstructor = args.Constructor;
     dBlockArgs = except(args, 'Constructor');
-    dBlockChildren = children;
-    children = [];
-    args = {};
   } else if ((dBlockMatch = name.match(NAMED_D_BLOCK_REGEX)) || name === 'd-block') {
     constructor = Block._blocks['d-block'];
     dBlockName = dBlockMatch ? dBlockMatch[1] : null;
@@ -2412,6 +2318,7 @@ function createBlock(_ref) {
         name: name,
         args: args,
         dBlockName: dBlockName,
+        dBlockArgs: dBlockArgs,
         children: children,
         parent: parent,
         parentElem: parentElem,
@@ -2427,9 +2334,8 @@ function createBlock(_ref) {
   }
 
   if (!constructor) {
-    var _node = node,
-        value = _node.value,
-        _children = _node.children;
+    var value = node.value,
+        _children = node.children;
 
 
     var element = elem.create(name);
@@ -2515,8 +2421,20 @@ function createBlock(_ref) {
     }
 
     if (_children) {
-      var _parentElem = name === 'template' ? new Elem(element[0].content) : element;
       var _prevBlock = void 0;
+      var _parentElem = element;
+
+      if (name === 'template') {
+        _parentElem = new Elem(element[0].content);
+      } else if (name === 'iframe') {
+        if (!('src' in attrs)) {
+          var document$$1 = element[0].contentDocument;
+
+          new Elem(document$$1.documentElement).remove();
+
+          _parentElem = new Elem(document$$1);
+        }
+      }
 
       iterateArray(_children, function (child) {
         _prevBlock = createBlock({
@@ -2559,39 +2477,7 @@ function createBlock(_ref) {
       locals = objectWithoutProperties(_blockInstance, ['$$', 'args', 'globals']);
 
 
-  if (dElementsName) {
-    node = {
-      attrs: dBlockArgs,
-      children: dBlockChildren
-    };
-    node.name = parentScope.$$.evaluate(dElementsName, function (newName) {
-      node.name = newName;
-
-      Args.value = [node];
-    }, blockInstance, true);
-
-    Args.value = [node];
-    Args.parentScope = parentScope;
-    Args.parentTemplate = parentTemplate;
-  }
-
-  if (dElementsConstructor) {
-    node = {
-      name: name,
-      attrs: dBlockArgs,
-      children: dBlockChildren
-    };
-
-    Args.Constructor = parentScope.$$.evaluate(dElementsConstructor, function (newConstructor) {
-      Args.Constructor = newConstructor;
-      Args.value = [node];
-    }, blockInstance, true);
-    Args.value = [node];
-    Args.parentScope = parentScope;
-    Args.parentTemplate = parentTemplate;
-  }
-
-  var html = name === 'd-elements' ? Args.value || [] : constructor._html;
+  var html = name === 'd-elements' ? Args.value || [] : constructor.template.value;
 
   $$.args = constructPrivateScope(Args);
   $$.locals = constructPrivateScope(locals);
@@ -2675,39 +2561,12 @@ function remove$1(child) {
   child.$$.remove();
 }
 
-function watchForAllLocals(block, watcher) {
-  iterateObject(block.$$.locals, function (_ref) {
-    var watchers = _ref.watchers;
-
-    watchers.perm.push(watcher);
-  });
-}
-
-function watchForAllGlobals(block, watcher) {
-  var _block$$$ = block.$$,
-      globals = _block$$$.globals,
-      watchersToRemove = _block$$$.watchersToRemove;
-
-
-  for (var glob in globals) {
-    /* eslint guard-for-in: 0 */
-    var watchers = globals[glob].watchers.perm;
-
-    watchers.push(watcher);
-    watchersToRemove.push({
-      watcher: watcher,
-      watchers: watchers
-    });
-  }
-}
-
-function watchForAllArgs(block, watcher) {
-  iterateObject(block.$$.args, function (_ref2) {
-    var watchers = _ref2.watchers;
-
-    watchers.perm.push(watcher);
-  });
-}
+/**
+ * @class Mixin
+ * @public
+ * @param {Object} opts - Mixin options.
+ * @returns {Mixin} Instance of Mixin.
+ */
 
 var Mixin = function () {
   createClass(Mixin, null, [{
@@ -2729,6 +2588,13 @@ var Mixin = function () {
 
       return wrappers.reduce(wrapMixin, this);
     }
+    /**
+     * @member {Boolean} [Mixin.evaluate = true]
+     * @type {Boolean}
+     * @public
+     * @description If the mixin value should be evaluated and watched or not.
+     */
+
   }]);
 
   function Mixin(opts) {
@@ -2775,17 +2641,18 @@ var Mixin = function () {
           return currentValue;
         },
         remove: function remove$$1(isParentSignal) {
+          isParentSignal = !!isParentSignal;
           _this.$$.isRemoved = true;
 
           removeWatchers(watchersToRemove);
 
           try {
-            _this.beforeRemove();
+            _this.beforeRemove(isParentSignal);
           } catch (err) {
             console.error('Uncaught error in ' + name + '#beforeRemove:', err);
           }
 
-          if (!isParentSignal && parentBlock) {
+          if (!isParentSignal) {
             removeArrayElem(parentBlock.$$.mixins, _this);
           }
         }
@@ -2847,9 +2714,17 @@ var Mixin = function () {
   createClass(Mixin, [{
     key: 'afterUpdate',
     value: function afterUpdate() {}
+
+    /**
+     * @method Mixin#beforeRemove
+     * @public
+     * @param {Boolean} isElementRemoved - If element removed as well.
+     * @description Is called before the mixin removal.
+     */
+
   }, {
     key: 'beforeRemove',
-    value: function beforeRemove() {}
+    value: function beforeRemove(isElementRemoved) {}
 
     /**
      * @method Block#evaluate
@@ -2863,6 +2738,11 @@ var Mixin = function () {
     key: 'evaluate',
     value: function evaluate(callback) {
       return this.$$.evaluate(callback);
+    }
+  }, {
+    key: 'toString',
+    value: function toString() {
+      return '[object Mixin]';
     }
   }]);
   return Mixin;
@@ -2885,64 +2765,23 @@ function wrapMixin(mixin, wrapper) {
   return isInstanceOf(Mixin, returnValue) ? returnValue : mixin;
 }
 
-function initApp(html, container) {
-  var parentElem = new Elem(container).elem(0);
+/**
+ * @typedef {Object} Template
+ * @public
+ * @property {String[]} vars - Template used vars.
+ * @property {Object[]} value - Template itself.
+ */
 
-  if (!parentElem.length) {
-    throw new Error('No valid element to insert the app into was given! (initApp)');
-  }
-
-  if (parentElem.prop('DwayneRootBlock')) {
-    throw new Error('There already exists a Dwayne app inside the given element! (initApp)');
-  }
-
-  if (isString(html)) {
-    html = {
-      vars: [],
-      value: [{
-        name: html
-      }]
-    };
-  }
-
-  if (isArray(html)) {
-    html = {
-      vars: [],
-      value: html
-    };
-  }
-
-  var RootBlock = function (_Block) {
-    inherits(RootBlock, _Block);
-
-    function RootBlock() {
-      classCallCheck(this, RootBlock);
-      return possibleConstructorReturn(this, (RootBlock.__proto__ || Object.getPrototypeOf(RootBlock)).apply(this, arguments));
-    }
-
-    return RootBlock;
-  }(Block);
-
-  RootBlock._vars = html.vars;
-  RootBlock._html = html.value;
-
-
-  var block = createBlock({
-    node: {
-      name: '#RootBlock'
-    },
-    Constructor: RootBlock,
-    parent: parentElem,
-    parentElem: parentElem
-  });
-
-  parentElem.prop('DwayneRootBlock', block).attr('dwayne-root', '');
-}
+/**
+ * @typedef {Object[]} ScopelessTemplate
+ * @public
+ */
 
 /**
  * @typedef {Error} EvaluationError
  * @public
- * @property {String} expression - Expression which has been evaluated with the error.
+ * @property {Function} func - Function which caused eval error.
+ * @property {String} original - Evaluated expression original js.
  * @property {Block} block - Block in context of which the expression has been evaluated with the error.
  */
 
@@ -2951,11 +2790,6 @@ function initApp(html, container) {
  * @public
  * @param {*} newValue - New value.
  * @param {*} oldValue - Old value.
- */
-
-/**
- * @callback VarsWatcher
- * @public
  */
 
 /**
@@ -3002,46 +2836,49 @@ var blockHooks = [];
 var mixinHooks = [];
 var TAG_NAME_REGEX = /^[a-z][a-z\d\-_.:!@#$%^&*()[\]{}='"\\]*$/i;
 var ATTR_NAME_REGEX = /^[^\u0000-\u0020\s'">/=]+$/;
-var WATCHED_ARG_PREFIX_REGEX = /^args\./;
-var WATCHED_GLOBAL_PREFIX_REGEX = /^globals\./;
+var toStringTag$$1 = '[object Block]';
 var afterElem = new Elem();
-var rootVars = [];
-var rootTemplate = [];
+var emptyObject = {};
+var evalMode = false;
+var gettingVars = [];
 
 /**
  * @class Block
  * @extends null
  * @public
- * @param {Object} opts - Element options.
+ * @param {Object} opts - Block options.
  * @returns {Block} Instance of Block.
- * @description Class for dynamic templating.
  *
  * @example
- * import { D, Block, initApp } from 'dwayne';
+ * import { Block, initApp } from 'dwayne';
  *
  * class App extends Block {
- *   static template = '<Hello text="{text}"/>';
+ *   static template = '<Hello text="{text}"/> ({ this.times })';
  *
  *   constructor(opts) {
  *     super(opts);
  *
- *     this.text = 'world (0)';
+ *     this.text = 'world';
  *     this.times = 0;
  *
  *     this.setInterval();
  *   }
  *
  *   setInterval() {
- *     D(1000).interval(() => {
- *       this.text = `world (${ ++this.times })`;
+ *     this.interval = setInterval(() => {
+ *       this.times++;
  *     });
+ *   }
+ *
+ *   beforeRemove() {
+ *     clearInterval(this.interval);
  *   }
  * }
  *
  * Block.block('App', App);
- * Block.block('Hello', 'Hello, {args.text}!');
+ * Block.block('Hello', html`Hello, {args.text}!`);
  *
- * initApp(html`<App/>`, document.getElementById('root'));
+ * initApp('App', document.getElementById('root'));
  */
 
 var Block = function () {
@@ -3065,21 +2902,13 @@ var Block = function () {
 
 
     /**
-     * @member {Object[]} Block._html
-     * @type {Object[]}
-     * @protected
-     * @description Block template.
-     */
-
-
-    /**
      * @member {Object.<String, typeof Mixin>} Block._mixins
      * @type {Object.<String, typeof Mixin>}
      * @protected
      * @description Block namespace mixins.
      */
     value: function onEvalError(err) {
-      console.error('Eval error (evaluating "' + (err.original || err.expression) + '" in context of block "' + err.block.$$.name + '"):', err);
+      console.error('Eval error (evaluating "' + (err.original || err.func) + '" in context of ' + err.block.$$.name + '):', err);
     }
 
     /**
@@ -3105,14 +2934,6 @@ var Block = function () {
      * @description Block default args.
      */
 
-
-    /**
-     * @member {String[]} Block._vars
-     * @type {String[]}
-     * @protected
-     * @description Block used local vars.
-     */
-
     /**
      * @member {Object.<String, typeof Block>} Block._blocks
      * @type {Object.<String, typeof Block>}
@@ -3134,6 +2955,7 @@ var Block = function () {
      * @method Block.beforeRegisterMixin
      * @public
      * @param {MixinRegisterHook} hook - Mixin register hook.
+     * @returns {RemoveHook}
      */
 
   }, {
@@ -3150,7 +2972,7 @@ var Block = function () {
      * @method Block.block
      * @public
      * @param {String} name - Block or mixin name.
-     * @param {Template|typeof Block} Subclass - Subclass of Block or template string of it.
+     * @param {Template|ScopelessTemplate|typeof Block} Subclass - Subclass of Block or template string of it.
      * @returns {typeof Block|undefined} Returns registered Block or undefined if the block hasn't been registered.
      * @description Register block in the namespace of this.
      */
@@ -3266,8 +3088,6 @@ var Block = function () {
           value = _Subclass2$template.value;
 
 
-      _Subclass2._html = value;
-      _Subclass2._vars = vars;
       _Subclass2._blocks = hasOwnProperty(_Subclass2, '_blocks') ? _Subclass2._blocks : create(this._blocks);
       _Subclass2._mixins = hasOwnProperty(_Subclass2, '_mixins') ? _Subclass2._mixins : create(this._mixins);
 
@@ -3307,29 +3127,6 @@ var Block = function () {
     }
 
     /**
-     * @method Block.init
-     * @public
-     * @param {Elem|Element} [container] - Container of the app.
-     * @returns {void}
-     * @description Method for initializing app.
-     */
-
-  }, {
-    key: 'init',
-    value: function init(container) {
-      var _this5;
-
-      initApp((_this5 = this, [{
-        "name": "d-block",
-        "attrs": {
-          "Constructor": function _(_$) {
-            return _this5;
-          }
-        }
-      }]), container);
-    }
-
-    /**
      * @method Block.mixin
      * @public
      * @param {String} name - Block or mixin name.
@@ -3341,7 +3138,7 @@ var Block = function () {
   }, {
     key: 'mixin',
     value: function mixin(name, Subclass) {
-      var _this7 = this;
+      var _this6 = this;
 
       if (isFunction(Subclass) && !isInstanceOf(Mixin, Subclass)) {
         var _afterUpdate = Subclass;
@@ -3370,7 +3167,7 @@ var Block = function () {
         return;
       }
 
-      if (rootMixins[name]) {
+      if (rootMixins[name] || name === 'd-rest') {
         console.warn('The "' + name + '" mixin is a built-in mixin so the mixin will not be registered (Block.mixin)');
 
         return;
@@ -3388,7 +3185,7 @@ var Block = function () {
 
       try {
         Subclass = mixinHooks.reduce(function (returnValue, hook) {
-          var currentReturnValue = hook(returnValue, name, _this7);
+          var currentReturnValue = hook(returnValue, name, _this6);
 
           return isInstanceOf(Mixin, currentReturnValue) ? currentReturnValue : returnValue;
         }, Subclass);
@@ -3441,12 +3238,13 @@ var Block = function () {
   }]);
 
   function Block(opts) {
-    var _this8 = this;
+    var _this7 = this;
 
     classCallCheck(this, Block);
     var name = opts.name,
         originalArgs = opts.args,
         dBlockName = opts.dBlockName,
+        dBlockArgs = opts.dBlockArgs,
         children = opts.children,
         parent = opts.parent,
         parentElem = opts.parentElem,
@@ -3463,31 +3261,37 @@ var Block = function () {
 
     defineFrozenProperties(this, {
       /**
-       * @member {Block} Block#$
-       * @type {Block}
-       * @public
-       * @description This.
-       */
-      $: this,
-
-      /**
        * @member {Object} Block#$$
        * @type {Object}
        * @protected
-       * @property {Object} args - Private args scope.
-       * @property {Object[]} htmlChildren - Block html children.
-       * @property {Block[]} children - Child blocks.
-       * @property {Mixin[]} mixins - Child mixins.
+       * @property {Object} Block#$$.args - Private args scope.
+       * @property {Block[]} Block#$$.children - Child blocks.
+       * @property {Elem} Block#$$.content - Content elements.
+       * @property {String|void} Block#$$.dBlockName - d-block name.
+       * @property {Object|void} Block#$$.dBlockName - d-block args.
+       * @property {Block[]} Block#$$.dBlocks - d-block's within the block.
+       * @property {Function} Block#$$.evaluate - Evaluate function.
+       * @property {Object} Block#$$.globals - Private globals scope.
+       * @property {Object[]} Block#$$.htmlChildren - Block html children.
+       * @property {Boolean} Block#$$.isRemoved - If the block is removed.
+       * @property {Boolean} Block#$$.isRendered - If the block is rendered.
+       * @property {Object} Block#$$.locals - Private locals scope.
+       * @property {Mixin[]} Block#$$.mixins - Child mixins.
+       * @property {String} Block#$$.name - Block name.
+       * @property {typeof Block} Block#$$.ns - Block constructor.
+       * @property {Block|Elem|void} Block#$$.parent - Parent block or elem.
+       * @property {Block|void} Block#$$.parentBlock - Parent block.
        * @property {Elem} parentElem - Parent element.
-       * @property {Elem} content - Content elements.
-       * @property {Function} evaluate - Evaluate function.
-       * @property {Object} globals - Private globals scope.
-       * @property {Object} locals - Private locals scope.
-       * @property {Object[]} watchersToRemove - Watchers to remove before removing element.
+       * @property {Block|void} Block#$$.parentScope - Parent scope.
+       * @property {Block|void} Block#$$.parentTemplate - Parent template.
+       * @property {Block|Elem|void} Block#$$.prevBlock - Parent template.
+       * @property {Watcher[]} Block#$$.watchers - Temporary vars watchers.
+       * @property {Object[]} Block#$$.watchersToRemove - Watchers to remove before removing element.
        */
       $$: {
         name: name,
         dBlockName: dBlockName,
+        dBlockArgs: dBlockArgs,
         dBlocks: [],
         parent: parent,
         parentElem: parentElem,
@@ -3496,7 +3300,7 @@ var Block = function () {
         parentTemplate: parentTemplate,
         content: new Elem(),
         ns: constructor,
-        htmlChildren: children,
+        htmlChildren: children || [],
         children: childrenBlocks,
         mixins: mixins,
         prevBlock: prevBlock,
@@ -3511,9 +3315,9 @@ var Block = function () {
           forDElements = !!forDElements;
           forDItem = !!forDItem;
 
-          var scope = name === '#d-item' && !forDItem || forDEach ? (forDEach || _this8).$$.scope : _this8;
+          var scope = name === '#d-item' && !forDItem || forDEach ? (forDEach || _this7).$$.scope : _this7;
 
-          var _ref = targetBlock ? targetBlock.$$ : {},
+          var _ref = targetBlock ? targetBlock.$$ : emptyObject,
               watchersToRemove = _ref.watchersToRemove;
 
           var onChangeFlag = !!onChange;
@@ -3522,22 +3326,22 @@ var Block = function () {
             var result = void 0;
 
             if (onChangeFlag) {
-              Scope.evalMode = true;
-              Scope.gettingVars = [];
+              evalMode = true;
+              gettingVars = [];
             }
 
             try {
               result = func(scope);
             } catch (err) {
-              err.expression = func;
+              err.func = func;
               err.original = func.original;
-              err.block = _this8;
+              err.block = _this7;
 
               if (isFunction(constructor.onEvalError)) {
                 try {
                   constructor.onEvalError(err);
                 } catch (e) {
-                  console.error('Uncaught error in Block.onEvalError:', e);
+                  console.error('Uncaught error in ' + name + '.onEvalError:', e);
                 }
               }
             }
@@ -3545,11 +3349,20 @@ var Block = function () {
             if (onChangeFlag) {
               var localWatchers = [];
 
-              iterateArray(Scope.gettingVars, function (watchers) {
+              iterateArray(gettingVars, function (watchers) {
                 var watcher = function watcher() {
+                  iterateArray(localWatchers, function (watcherBlock) {
+                    var watcher = watcherBlock.watcher,
+                        watchers = watcherBlock.watchers;
+
+
+                    removeArrayElem(watchersToRemove, watcherBlock);
+                    removeArrayElem(watchers, watcher);
+                  });
+
                   var newResult = evaluate();
 
-                  if (newResult !== result && !targetBlock.$$.isRemoved) {
+                  if (newResult !== result && !targetBlock.$$.isRemoved && !_this7.$$.isRemoved) {
                     onChange(newResult, result);
                   }
                 };
@@ -3559,24 +3372,13 @@ var Block = function () {
                   watchers: watchers
                 };
 
-                watcher.onRemove = function () {
-                  iterateArray(localWatchers, function (watcherBlock) {
-                    var watcher = watcherBlock.watcher,
-                        watchers = watcherBlock.watchers;
-
-
-                    removeArrayElem(watchersToRemove, watcherBlock);
-                    removeArrayElem(watchers, watcher);
-                  });
-                };
-
                 localWatchers.push(watcherBlock);
                 watchersToRemove.push(watcherBlock);
                 watchers.push(watcher);
               });
 
-              Scope.evalMode = false;
-              Scope.gettingVars = [];
+              evalMode = false;
+              gettingVars = [];
             }
 
             return result;
@@ -3585,7 +3387,7 @@ var Block = function () {
           return evaluate();
         },
         remove: function remove$$1(isParentSignal) {
-          _this8.$$.isRemoved = true;
+          _this7.$$.isRemoved = true;
 
           removeWatchers(watchersToRemove);
 
@@ -3593,34 +3395,34 @@ var Block = function () {
           iterateArray(mixins, removeWithParentSignal);
 
           try {
-            _this8.beforeRemove();
+            _this7.beforeRemove();
           } catch (err) {
             console.error('Uncaught error in ' + name + '#beforeRemove:', err);
           }
 
           if (!isParentSignal && isParentBlock) {
-            parent.$$.removeContent(_this8.$$.content);
+            parent.$$.removeContent(_this7.$$.content);
           }
 
           if (!isParentSignal && parentBlock) {
-            removeArrayElem(parentBlock.$$.children, _this8);
+            removeArrayElem(parentBlock.$$.children, _this7);
           }
 
-          _this8.$$.content.remove();
+          _this7.$$.content.remove();
         },
         changeContent: function changeContent(newContent) {
-          _this8.$$.content = newContent;
+          _this7.$$.content = newContent;
 
-          if (_this8.$$.isRendered) {
+          if (_this7.$$.isRendered && !_this7.$$.isRemoved) {
             try {
-              _this8.afterDOMChange();
+              _this7.afterDOMChange();
             } catch (err) {
-              console.error('Uncaught error in ' + name + '#afterContentChange:', err);
+              console.error('Uncaught error in ' + name + '#afterDOMChange:', err);
             }
           }
         },
         addContent: function addContent(contentToAdd, notRecursive) {
-          var oldContent = _this8.$$.content;
+          var oldContent = _this7.$$.content;
           var index = oldContent.indexOf(contentToAdd[0].previousSibling) + 1;
           var newContent = void 0;
 
@@ -3630,14 +3432,14 @@ var Block = function () {
             newContent = oldContent.slice(0, index).add(contentToAdd, oldContent.slice(index));
           }
 
-          _this8.$$.changeContent(newContent);
+          _this7.$$.changeContent(newContent);
 
           if (isParentBlock && !notRecursive) {
             parent.$$.addContent(contentToAdd, notRecursive);
           }
         },
         moveContent: function moveContent(contentToMove, after) {
-          var oldContent = _this8.$$.content;
+          var oldContent = _this7.$$.content;
           var index = oldContent.indexOf(contentToMove[0]);
           var indexToPut = oldContent.indexOf(after[0]) + 1;
           var newContent = void 0;
@@ -3650,14 +3452,14 @@ var Block = function () {
             newContent = oldContent.slice(0, index).add(oldContent.slice(index + contentToMove.length, indexToPut), contentToMove, oldContent.slice(indexToPut));
           }
 
-          _this8.$$.changeContent(newContent);
+          _this7.$$.changeContent(newContent);
 
           if (isParentBlock && indexToPut) {
             parent.$$.moveContent(contentToMove, after);
           }
         },
         removeContent: function removeContent(contentToRemove) {
-          _this8.$$.changeContent(_this8.$$.content.filter(function (elem) {
+          _this7.$$.changeContent(_this7.$$.content.filter(function (elem) {
             return contentToRemove.indexOf(elem) === -1;
           }));
 
@@ -3666,7 +3468,7 @@ var Block = function () {
           }
         },
         insertInStartOfIt: function insertInStartOfIt(contentToInsert, moveFlag) {
-          var prevBlock = _this8.$$.prevBlock;
+          var prevBlock = _this7.$$.prevBlock;
 
           var after = afterElem;
 
@@ -3712,21 +3514,21 @@ var Block = function () {
           }
 
           if (moveFlag) {
-            _this8.$$.moveContent(contentToInsert, after);
+            _this7.$$.moveContent(contentToInsert, after);
           } else {
-            _this8.$$.addContent(contentToInsert, true);
+            _this7.$$.addContent(contentToInsert, true);
           }
 
           return after;
         },
         insertAfterIt: function insertAfterIt(contentToInsert, moveFlag) {
-          var prevBlock = _this8.$$.prevBlock;
+          var prevBlock = _this7.$$.prevBlock;
 
           var after = afterElem;
           var tryToAddOrMove = void 0;
 
-          if (_this8.$$.content.length) {
-            after = _this8.$$.content.elem(-1);
+          if (_this7.$$.content.length) {
+            after = _this7.$$.content.elem(-1);
             tryToAddOrMove = true;
             contentToInsert.insertAfter(after);
           } else if (prevBlock instanceof Block) {
@@ -3755,10 +3557,10 @@ var Block = function () {
     });
 
     iterateObject(constructor.defaultLocals, function (value, variable) {
-      _this8[variable] = value;
+      _this7[variable] = value;
     });
-    iterateArray(constructor._vars, function (variable) {
-      _this8[variable] = _this8[variable];
+    iterateArray(constructor.template.vars, function (variable) {
+      _this7[variable] = _this7[variable];
     });
 
     var argsObject = create(null);
@@ -3776,7 +3578,7 @@ var Block = function () {
           iterateObject(localArgs, cleanProperty);
           assign(localArgs, transformRestArgs(value));
           calculateArgs(args, argsObject);
-        }, _this8);
+        }, _this7);
 
         wasDRest = true;
 
@@ -3792,7 +3594,7 @@ var Block = function () {
         value = parentScope.$$.evaluate(value, function (value) {
           localArgs[arg] = value;
           calculateArgs(args, argsObject);
-        }, _this8, forDElements, isDElements && parentBlock.$$.name === '#d-item');
+        }, _this7, forDElements, isDElements && parentBlock.$$.name === '#d-item');
       }
 
       localArgs[arg] = value;
@@ -3836,7 +3638,9 @@ var Block = function () {
     /**
      * @method Block#afterDOMChange
      * @public
-     * @description Is called after block DOM structure has changed.
+     * @description Is called after block DOM structure has changed. Note that
+     * it's important not to modify the DOM structure within the block. You can only insert
+     * elements to empty elements (which Dwayne considers empty) and remove ones from them.
      */
 
   }, {
@@ -3864,58 +3668,6 @@ var Block = function () {
     value: function beforeRemove() {}
 
     /**
-     * @method Block#getChildBlocks
-     * @public
-     * @returns {Block[]}
-     * @description Returns child blocks.
-     */
-
-  }, {
-    key: 'getChildBlocks',
-    value: function getChildBlocks() {
-      return this.$$.blocks.slice();
-    }
-
-    /**
-     * @method Block#getChildBlocks
-     * @public
-     * @returns {Mixin[]}
-     * @description Returns child mixins.
-     */
-
-  }, {
-    key: 'getChildMixins',
-    value: function getChildMixins() {
-      return this.$$.mixins.slice();
-    }
-
-    /**
-     * @method Block#getChildren
-     * @public
-     * @returns {Object[]}
-     * @description Returns Block HTML children.
-     */
-
-  }, {
-    key: 'getChildren',
-    value: function getChildren() {
-      return this.$$.htmlChildren;
-    }
-
-    /**
-     * @method Block#getConstructor
-     * @public
-     * @returns {typeof Block}
-     * @description Returns Block constructor.
-     */
-
-  }, {
-    key: 'getConstructor',
-    value: function getConstructor() {
-      return this.$$.ns;
-    }
-
-    /**
      * @method Block#getDOM
      * @public
      * @returns {Elem}
@@ -3929,16 +3681,16 @@ var Block = function () {
     }
 
     /**
-     * @method Block#getParentBlock
+     * @method Block#getName
      * @public
-     * @returns {Block|void}
-     * @description Returns parent block.
+     * @returns {String}
+     * @description Returns Block name.
      */
 
   }, {
-    key: 'getParentBlock',
-    value: function getParentBlock() {
-      return this.$$.parentBlock;
+    key: 'getName',
+    value: function getName() {
+      return this.$$.name;
     }
 
     /**
@@ -3955,28 +3707,15 @@ var Block = function () {
     }
 
     /**
-     * @method Block#getParentScope
+     * @method Block#getTopBlock
      * @public
      * @returns {Block|void}
-     * @description Returns parent scope.
+     * @description Returns block in which template the block is located in.
      */
 
   }, {
-    key: 'getParentScope',
-    value: function getParentScope() {
-      return this.$$.parentScope;
-    }
-
-    /**
-     * @method Block#getParentTemplate
-     * @public
-     * @returns {Block|void}
-     * @description Returns parent template.
-     */
-
-  }, {
-    key: 'getParentTemplate',
-    value: function getParentTemplate() {
+    key: 'getTopBlock',
+    value: function getTopBlock() {
       return this.$$.parentTemplate;
     }
 
@@ -4000,132 +3739,7 @@ var Block = function () {
   }, {
     key: 'toString',
     value: function toString() {
-      return this.$$.name;
-    }
-
-    /**
-     * @method Block#watch
-     * @public
-     * @param {...('args'|'globals'|String)} [vars] - Vars to watch (args, globals or locals).
-     * If no specified all locals, args and globals are to be watched.
-     * If the 'args' string all args are to be watched.
-     * If the 'globals' string all globals are to be watched.
-     * @param {VarsWatcher} watcher - Called when watched vars are changed.
-     * @description Method for watching for vars. If no vars passed in arguments
-     * all vars are to be watched. If the 'args' string is in the arguments all args are to be watched.
-     * If the 'globals' string is in the arguments all globals are to be watched.
-     * Otherwise specified vars will be watched.
-     * Watchers should not be put inside the constructor. It is considered best
-     * practice to do it inside the {@link Block#afterConstruct} method.
-     * Note that these expressions (vars, i.e. "args.arg") are not to be
-     * evaluated so you cannot put there things like "a[b]" or any js code,
-     * only expressions like "a", "b", "args.a", "args.b" and "globals.a", "globals.b".
-     * Also note that if there are more than one var that are changed at once (synchronously)
-     * the watcher is called only once.
-     * Note that the watcher is executed right away because in most cases
-     * this behaviour is very convenient.
-     *
-     * @example
-     * class MyBlock extends Block {
-     *   static template = '<div />';
-     *
-     *   afterConstruct() {
-     *     this.watch('a', () => {});
-     *     this.watch('args.a', 'globals.r', () => {});
-     *     this.watch(() => {});
-     *   }
-     * }
-     */
-
-  }, {
-    key: 'watch',
-    value: function watch() {
-      var _this9 = this;
-
-      for (var _len2 = arguments.length, vars = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        vars[_key2] = arguments[_key2];
-      }
-
-      var oldWatcher = arguments[arguments.length - 1];
-
-      if (!isFunction(oldWatcher)) {
-        console.warn('The last argument (watcher) wasn\'t specified (' + this.$$.name + '#watch)');
-
-        return;
-      }
-
-      var watcher = function watcher() {
-        oldWatcher();
-      };
-
-      if (arguments.length === 1) {
-        watchForAllLocals(this, watcher);
-        watchForAllArgs(this, watcher);
-        watchForAllGlobals(this, watcher);
-
-        oldWatcher();
-
-        return;
-      }
-
-      iterateArray(arguments, function (variable) {
-        if (variable === oldWatcher) {
-          return;
-        }
-
-        variable = '' + variable;
-
-        if (variable === '$') {
-          return watchForAllLocals(_this9, watcher);
-        }
-
-        if (variable === 'args') {
-          return watchForAllArgs(_this9, watcher);
-        }
-
-        if (variable === 'globals') {
-          return watchForAllGlobals(_this9, watcher);
-        }
-
-        if (WATCHED_ARG_PREFIX_REGEX.test(variable)) {
-          variable = variable.replace(WATCHED_ARG_PREFIX_REGEX, '');
-
-          if (!_this9.$$.args[variable]) {
-            return;
-          }
-
-          _this9.$$.args[variable].watchers.perm.push(watcher);
-
-          return;
-        }
-
-        if (WATCHED_GLOBAL_PREFIX_REGEX.test(variable)) {
-          variable = variable.replace(WATCHED_GLOBAL_PREFIX_REGEX, '');
-
-          if (!_this9.$$.globals[variable]) {
-            return;
-          }
-
-          var watchers = _this9.$$.globals[variable].watchers;
-
-
-          watchers.perm.push(watcher);
-          _this9.$$.watchersToRemove.push({
-            watcher: watcher,
-            watchers: watchers
-          });
-
-          return;
-        }
-
-        if (!_this9.$$.locals[variable]) {
-          return;
-        }
-
-        _this9.$$.locals[variable].watchers.perm.push(watcher);
-      });
-
-      oldWatcher();
+      return toStringTag$$1;
     }
   }]);
   return Block;
@@ -4133,8 +3747,6 @@ var Block = function () {
 
 Block._blocks = create(rootBlocks);
 Block._mixins = create(rootMixins);
-Block._vars = rootVars;
-Block._html = rootTemplate;
 Block.defaultArgs = null;
 Block.defaultLocals = null;
 Block.template = {
@@ -4146,52 +3758,114 @@ Block.template = {
 setToStringTag(Block, 'Block');
 setProto(Block.prototype, null);
 
+var watchNameArgs = function _(_$) {
+  return _$.args.name;
+};
+var watchConstructorArgs = function _(_$) {
+  return _$.args.Constructor;
+};
+
 var DBlock = function (_Block) {
   inherits(DBlock, _Block);
 
   function DBlock() {
+    var _ref;
+
+    var _temp, _this, _ret;
+
     classCallCheck(this, DBlock);
-    return possibleConstructorReturn(this, (DBlock.__proto__ || Object.getPrototypeOf(DBlock)).apply(this, arguments));
+
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = DBlock.__proto__ || Object.getPrototypeOf(DBlock)).call.apply(_ref, [this].concat(args))), _this), _this.constructDynamicNameBlock = function (name) {
+      var _this$$$ = _this.$$,
+          htmlChildren = _this$$$.htmlChildren,
+          dBlockArgs = _this$$$.dBlockArgs;
+
+
+      _this.elems = [{
+        name: name,
+        attrs: dBlockArgs,
+        children: htmlChildren
+      }];
+    }, _this.constructDynamicConstructorBlock = function (Constructor) {
+      if (!isFunction(Constructor)) {
+        _this.elems = null;
+
+        return;
+      }
+
+      var _this$$$2 = _this.$$,
+          htmlChildren = _this$$$2.htmlChildren,
+          dBlockArgs = _this$$$2.dBlockArgs;
+
+
+      _this.elems = [{
+        Constructor: Constructor,
+        attrs: dBlockArgs,
+        children: htmlChildren
+      }];
+    }, _temp), possibleConstructorReturn(_this, _ret);
   }
 
   createClass(DBlock, [{
     key: 'afterConstruct',
-    value: function afterConstruct() {
+    value: function afterConstruct(opts) {
       var _$$ = this.$$,
           _$$$parentScope$$$ = _$$.parentScope.$$,
           parentParentScope = _$$$parentScope$$$.parentScope,
           parentParentTemplate = _$$$parentScope$$$.parentTemplate,
           children = _$$$parentScope$$$.htmlChildren,
           ownChildren = _$$.htmlChildren,
+          parentScope = _$$.parentScope,
           parentTemplate = _$$.parentTemplate,
-          dBlockName = _$$.dBlockName;
+          DBlockName = _$$.dBlockName;
+      var _args = this.args,
+          name = _args.name,
+          Constructor = _args.Constructor;
 
       var found = void 0;
 
+      this.ParentScope = parentScope;
+      this.ParentTemplate = parentTemplate;
+
+      if (name) {
+        this.constructDynamicNameBlock(this.evaluate(watchNameArgs, this.constructDynamicNameBlock));
+
+        return;
+      }
+
+      if (Constructor) {
+        this.constructDynamicConstructorBlock(this.evaluate(watchConstructorArgs, this.constructDynamicConstructorBlock));
+
+        return;
+      }
+
       if (ownChildren.length) {
+        parentTemplate.$$.dBlocks.push(this);
+
         return;
       }
 
       this.ParentScope = parentParentScope;
       this.ParentTemplate = parentParentTemplate;
 
-      if (dBlockName) {
-        found = findInArray(children, function (_ref) {
-          var nodeName = _ref.name;
-          return nodeName === 'd-block:' + dBlockName;
+      if (DBlockName) {
+        found = findInArray(children, function (_ref2) {
+          var nodeName = _ref2.name;
+          return nodeName === 'd-block:' + DBlockName;
         });
 
         if (!found) {
-          var parent = this;
-
-          /* eslint no-empty: 0 */
-          while ((parent = parent.$$.parentScope) && !(found = findInArray(parent.$$.dBlocks, function (_ref2) {
-            var DBlockName = _ref2.$$.dBlockName;
-            return DBlockName === dBlockName;
-          })) && parent.$$.parentScope.$$.name === '#d-item') {}
+          found = findInArray(parentTemplate.$$.dBlocks, function (_ref3) {
+            var dBlockName = _ref3.$$.dBlockName;
+            return dBlockName === DBlockName;
+          });
 
           if (found) {
-            this.ParentScope = parent;
+            this.ParentScope = parentTemplate;
             this.ParentTemplate = parentTemplate;
             found.value = {
               children: found.value.$$.htmlChildren
@@ -4199,7 +3873,7 @@ var DBlock = function (_Block) {
           }
         }
 
-        this.elems = found && found.value.children.length ? found.value.children : null;
+        this.elems = found ? found.value.children : null;
       } else {
         this.elems = children;
       }
@@ -4259,8 +3933,6 @@ var DItem = function (_Block) {
 }(Block);
 
 DItem.template = template;
-DItem._vars = template.vars;
-DItem._html = template.value;
 
 var _class;
 var _temp;
@@ -4297,8 +3969,8 @@ rootBlocks['d-each'] = (_temp = _class = function (_Block) {
   }
 
   createClass(DEach, [{
-    key: 'afterRender',
-    value: function afterRender() {
+    key: 'afterConstruct',
+    value: function afterConstruct() {
       this.evaluate(watchArgs, this.renderSet);
       this.renderSet();
     }
@@ -4378,8 +4050,18 @@ rootBlocks['d-each'] = (_temp = _class = function (_Block) {
         block.$$.scope[indexName] = index;
         block.$$.scope[itemName] = item;
 
-        if (block.$$.prevBlock !== prevBlock && prevBlock) {
-          prevBlock.$$.insertAfterIt(block.$$.content, true);
+        var prevPrevBlock = block.$$.prevBlock;
+
+
+        if (prevPrevBlock && prevPrevBlock !== prevBlock) {
+          var content = block.$$.content;
+
+
+          if (prevBlock) {
+            prevBlock.$$.insertAfterIt(content, true);
+          } else {
+            _this2.$$.insertInStartOfIt(content, true);
+          }
         }
       } else {
         block = createBlock({
@@ -4389,9 +4071,9 @@ rootBlocks['d-each'] = (_temp = _class = function (_Block) {
             item: item,
             index: index,
             name: '#d-item',
+            Constructor: DItem,
             children: htmlChildren
           },
-          Constructor: DItem,
           parent: _this2,
           parentElem: parentElem,
           parentBlock: _this2,
@@ -4429,19 +4111,17 @@ rootBlocks['d-elements'] = function (_Block) {
 
       var parentElem = this.$$.parentElem;
       var _args = this.args,
-          Constructor = _args.Constructor,
           parentScope = _args.parentScope,
           parentTemplate = _args.parentTemplate;
 
 
-      this.$$.evaluate(watchArgs$1, function () {
+      this.$$.evaluate(watchArgs$1, function (value) {
         var _$$ = _this2.$$,
             children = _$$.children,
             mixins = _$$.mixins,
             parent = _$$.parent,
             watchersToRemove = _$$.watchersToRemove,
             content = _$$.content;
-        var value = _this2.args.value;
 
 
         iterateArray(children, removeWithParentSignal);
@@ -4472,7 +4152,6 @@ rootBlocks['d-elements'] = function (_Block) {
         iterateArray(value || [], function (child) {
           prevBlock = createBlock({
             node: child,
-            Constructor: Constructor,
             parent: _this2,
             parentElem: parentElem,
             parentBlock: _this2,
@@ -4523,7 +4202,7 @@ rootBlocks['d-if'] = (_temp$1 = _class$1 = function (_Block) {
             return;
           }
 
-          if (i < index) {
+          if (i < index && newValue) {
             index = i;
             _this.elems = children;
 
@@ -4577,7 +4256,7 @@ var _class$2;
 var _temp$2;
 
 var watchArgs$2 = function _(_$) {
-  return _$.args.value;
+  return [_$.args.value, _$.args.compareFn];
 };
 
 rootBlocks['d-switch'] = (_temp$2 = _class$2 = function (_Block) {
@@ -4590,8 +4269,7 @@ rootBlocks['d-switch'] = (_temp$2 = _class$2 = function (_Block) {
 
     _this.index = Infinity;
     var _this$$$ = _this.$$,
-        _this$$$$htmlChildren = _this$$$.htmlChildren,
-        htmlChildren = _this$$$$htmlChildren === undefined ? [] : _this$$$$htmlChildren,
+        htmlChildren = _this$$$.htmlChildren,
         parentScope = _this$$$.parentScope,
         args = _this.args,
         value = _this.args.value;
@@ -4600,48 +4278,31 @@ rootBlocks['d-switch'] = (_temp$2 = _class$2 = function (_Block) {
     _this.values = htmlChildren.map(function (child, i) {
       var name = child.name,
           _child$attrs = child.attrs,
-          attrs = _child$attrs === undefined ? [] : _child$attrs,
+          attrs = _child$attrs === undefined ? {} : _child$attrs,
           children = child.children;
 
-      var val = attrs.if || noop;
+      var val = void 0;
 
-      if (name === 'd-default') {
-        val = value;
-      } else {
-        val = parentScope.$$.evaluate(val, function (newValue) {
-          if (equals(_this.values[i].value, newValue)) {
-            return;
-          }
-
+      if (name !== 'd-default') {
+        val = parentScope.$$.evaluate(attrs.if, function (newValue) {
           _this.values[i].value = newValue;
 
           if (i > _this.index) {
             return;
           }
 
-          if (i < _this.index) {
-            _this.index = i;
-            _this.elems = children;
-
-            return;
-          }
-
           var found = findInArray(_this.values, function (_ref) {
-            var value = _ref.value;
-            return equals(value, args.value);
+            var name = _ref.name,
+                value = _ref.value;
+            return name === 'd-default' || _this.args.compareFn(args.value, value);
           });
 
-          if (found) {
-            _this.index = found.key;
-            _this.elems = found.value.children;
-          } else {
-            _this.index = Infinity;
-            _this.elems = null;
-          }
+          _this.index = found ? found.key : Infinity;
+          _this.elems = found ? found.value.children : null;
         }, _this);
       }
 
-      if (equals(val, value) && _this.index === Infinity) {
+      if (_this.index === Infinity && (name === 'd-default' || _this.args.compareFn(value, val))) {
         _this.index = i;
         _this.elems = children;
       }
@@ -4661,21 +4322,23 @@ rootBlocks['d-switch'] = (_temp$2 = _class$2 = function (_Block) {
       var _this2 = this;
 
       this.evaluate(watchArgs$2, function () {
-        var newValue = _this2.args.value;
+        var _args = _this2.args,
+            newValue = _args.value,
+            compareFn = _args.compareFn;
 
 
         _this2.index = Infinity;
 
-        iterateArray(_this2.values, function (_ref2, i) {
+        _this2.values.some(function (_ref2, i) {
           var name = _ref2.name,
               value = _ref2.value,
               children = _ref2.children;
 
-          var val = name === 'd-default' ? newValue : value;
-
-          if (equals(val, newValue) && _this2.index === Infinity) {
+          if (name === 'd-default' || compareFn(newValue, value)) {
             _this2.index = i;
             _this2.elems = children;
+
+            return true;
           }
         });
 
@@ -4702,11 +4365,11 @@ rootBlocks['d-switch'] = (_temp$2 = _class$2 = function (_Block) {
       }
     }
   }]
+}, _class$2.defaultArgs = {
+  compareFn: function compareFn(switchValue, caseValue) {
+    return switchValue === caseValue || switchValue !== switchValue && caseValue !== caseValue;
+  }
 }, _temp$2);
-
-function equals(value1, value2) {
-  return value1 === value2;
-}
 
 rootMixins['d-attr'] = function (_Mixin) {
   inherits(DAttr, _Mixin);
@@ -5355,11 +5018,6 @@ function addValue(values, _ref) {
   }
 }
 
-iterateObject(rootBlocks, function (Block) {
-  Block._vars = Block.template.vars;
-  Block._html = Block.template.value;
-});
-
 iterateObject(rootMixins, function (Mixin, name) {
   Mixin._match = constructMixinRegex(name);
 });
@@ -5441,6 +5099,93 @@ function insertTemplates(template, templates) {
   return template;
 }
 
+/**
+ * @function initApp
+ * @public
+ * @param {Template|ScopelessTemplate|String|typeof Block} block - Root template (may be scopeless),
+ * string defining a name of the root block or a block subclass.
+ * @param {Elem|Element} container - Container of the app.
+ * @returns {void}
+ * @description Method for initializing app.
+ *
+ * @example
+ * import { initApp, doc } from 'dwayne';
+ *
+ * initApp(html`<App/>`, doc.create('div'));
+ * initApp(htmlScopeless`<App/>`, doc.create('div'));
+ * initApp('App', doc.create('div'));
+ * initApp(App, doc.create('div'));
+ */
+function initApp(block, container) {
+  var parentElem = new Elem(container).elem(0);
+
+  if (!parentElem.length) {
+    throw new Error('No valid element to insert the app into was given! (initApp)');
+  }
+
+  if (parentElem.prop('DwayneRootBlock')) {
+    throw new Error('There already exists a Dwayne app inside the given element! (initApp)');
+  }
+
+  if (isString(block)) {
+    block = {
+      vars: [],
+      value: [{
+        name: block
+      }]
+    };
+  }
+
+  if (isArray(block)) {
+    block = {
+      vars: [],
+      value: block
+    };
+  }
+
+  var Constructor = void 0;
+
+  if (isInstanceOf(Block, block)) {
+    Constructor = block;
+  } else {
+    var _class, _temp;
+
+    Constructor = (_temp = _class = function (_Block) {
+      inherits(RootBlock, _Block);
+
+      function RootBlock() {
+        classCallCheck(this, RootBlock);
+        return possibleConstructorReturn(this, (RootBlock.__proto__ || Object.getPrototypeOf(RootBlock)).apply(this, arguments));
+      }
+
+      return RootBlock;
+    }(Block), _class.template = block, _temp);
+  }
+
+  var rootBlock = createBlock({
+    node: {
+      name: '#RootBlock',
+      Constructor: Constructor
+    },
+    parent: parentElem,
+    parentElem: parentElem
+  });
+
+  parentElem.prop('DwayneRootBlock', rootBlock).attr('dwayne-root', '');
+}
+
+/**
+ * @function removeApp
+ * @public
+ * @param {Elem|Element} container - Container of the app.
+ * @returns {void}
+ * @description Method for removing app.
+ *
+ * @example
+ * import { removeApp, find } from 'dwayne';
+ *
+ * removeApp(find('.root'));
+ */
 function removeApp(container) {
   var elem = new Elem(container).elem(0);
 

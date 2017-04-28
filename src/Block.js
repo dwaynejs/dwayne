@@ -10,14 +10,12 @@ import {
 import {
   constructMixinRegex, isInstanceOf,
   removeWatchers, removeWithParentSignal, cleanProperty,
-  transformRestArgs, calculateArgs, wrapBlock,
-  watchForAllArgs, watchForAllGlobals, watchForAllLocals
+  transformRestArgs, calculateArgs, wrapBlock
 } from './helpers/Block';
 import {
   D_REST_REGEX,
   rootBlocks, rootMixins
 } from './constants';
-import { initApp } from './initApp';
 import { Mixin } from './Mixin';
 
 /**
@@ -35,7 +33,7 @@ import { Mixin } from './Mixin';
 /**
  * @typedef {Error} EvaluationError
  * @public
- * @property {Function} expression - Function which caused eval error.
+ * @property {Function} func - Function which caused eval error.
  * @property {String} original - Evaluated expression original js.
  * @property {Block} block - Block in context of which the expression has been evaluated with the error.
  */
@@ -45,11 +43,6 @@ import { Mixin } from './Mixin';
  * @public
  * @param {*} newValue - New value.
  * @param {*} oldValue - Old value.
- */
-
-/**
- * @callback VarsWatcher
- * @public
  */
 
 /**
@@ -96,9 +89,9 @@ const blockHooks = [];
 const mixinHooks = [];
 const TAG_NAME_REGEX = /^[a-z][a-z\d\-_.:!@#$%^&*()[\]{}='"\\]*$/i;
 const ATTR_NAME_REGEX = /^[^\u0000-\u0020\s'">/=]+$/;
-const WATCHED_ARG_PREFIX_REGEX = /^args\./;
-const WATCHED_GLOBAL_PREFIX_REGEX = /^globals\./;
+const toStringTag = '[object Block]';
 const afterElem = new Elem();
+const emptyObject = {};
 let evalMode = false;
 let gettingVars = [];
 
@@ -190,7 +183,7 @@ class Block {
    * @param {EvaluationError} err - The method is called when an evaluation error occurs.
    */
   static onEvalError(err) {
-    console.error(`Eval error (evaluating "${ err.original || err.expression }" in context of block "${ err.block.$$.name }"):`, err);
+    console.error(`Eval error (evaluating "${ err.original || err.func }" in context of ${ err.block.$$.name }):`, err);
   }
 
   /**
@@ -475,6 +468,7 @@ class Block {
        * @property {Boolean} Block#$$.isRendered - If the block is rendered.
        * @property {Object} Block#$$.locals - Private locals scope.
        * @property {Mixin[]} Block#$$.mixins - Child mixins.
+       * @property {String} Block#$$.name - Block name.
        * @property {typeof Block} Block#$$.ns - Block constructor.
        * @property {Block|Elem|void} Block#$$.parent - Parent block or elem.
        * @property {Block|void} Block#$$.parentBlock - Parent block.
@@ -482,6 +476,7 @@ class Block {
        * @property {Block|void} Block#$$.parentScope - Parent scope.
        * @property {Block|void} Block#$$.parentTemplate - Parent template.
        * @property {Block|Elem|void} Block#$$.prevBlock - Parent template.
+       * @property {Watcher[]} Block#$$.watchers - Temporary vars watchers.
        * @property {Object[]} Block#$$.watchersToRemove - Watchers to remove before removing element.
        */
       $$: {
@@ -514,7 +509,7 @@ class Block {
           const scope = (name === '#d-item' && !forDItem) || forDEach
             ? (forDEach || this).$$.scope
             : this;
-          const { watchersToRemove } = targetBlock ? targetBlock.$$ : {};
+          const { watchersToRemove } = targetBlock ? targetBlock.$$ : emptyObject;
           const onChangeFlag = !!onChange;
 
           const evaluate = () => {
@@ -528,7 +523,7 @@ class Block {
             try {
               result = func(scope);
             } catch (err) {
-              err.expression = func;
+              err.func = func;
               err.original = func.original;
               err.block = this;
 
@@ -536,7 +531,7 @@ class Block {
                 try {
                   constructor.onEvalError(err);
                 } catch (e) {
-                  console.error('Uncaught error in Block.onEvalError:', e);
+                  console.error(`Uncaught error in ${ name }.onEvalError:`, e);
                 }
               }
             }
@@ -546,19 +541,6 @@ class Block {
 
               iterateArray(gettingVars, (watchers) => {
                 const watcher = () => {
-                  const newResult = evaluate();
-
-                  if (newResult !== result && !targetBlock.$$.isRemoved) {
-                    onChange(newResult, result);
-                  }
-                };
-                const watcherBlock = {
-                  forDElements,
-                  watcher,
-                  watchers
-                };
-
-                watcher.onRemove = () => {
                   iterateArray(localWatchers, (watcherBlock) => {
                     const {
                       watcher,
@@ -568,6 +550,17 @@ class Block {
                     removeArrayElem(watchersToRemove, watcherBlock);
                     removeArrayElem(watchers, watcher);
                   });
+
+                  const newResult = evaluate();
+
+                  if (newResult !== result && !targetBlock.$$.isRemoved && !this.$$.isRemoved) {
+                    onChange(newResult, result);
+                  }
+                };
+                const watcherBlock = {
+                  forDElements,
+                  watcher,
+                  watchers
                 };
 
                 localWatchers.push(watcherBlock);
@@ -873,46 +866,6 @@ class Block {
   beforeRemove() {}
 
   /**
-   * @method Block#getChildBlocks
-   * @public
-   * @returns {Block[]}
-   * @description Returns child blocks.
-   */
-  getChildBlocks() {
-    return this.$$.blocks.slice();
-  }
-
-  /**
-   * @method Block#getChildBlocks
-   * @public
-   * @returns {Mixin[]}
-   * @description Returns child mixins.
-   */
-  getChildMixins() {
-    return this.$$.mixins.slice();
-  }
-
-  /**
-   * @method Block#getChildren
-   * @public
-   * @returns {Object[]}
-   * @description Returns Block HTML children.
-   */
-  getChildren() {
-    return this.$$.htmlChildren;
-  }
-
-  /**
-   * @method Block#getConstructor
-   * @public
-   * @returns {typeof Block}
-   * @description Returns Block constructor.
-   */
-  getConstructor() {
-    return this.$$.ns;
-  }
-
-  /**
    * @method Block#getDOM
    * @public
    * @returns {Elem}
@@ -923,13 +876,13 @@ class Block {
   }
 
   /**
-   * @method Block#getParentBlock
+   * @method Block#getName
    * @public
-   * @returns {Block|void}
-   * @description Returns parent block.
+   * @returns {String}
+   * @description Returns Block name.
    */
-  getParentBlock() {
-    return this.$$.parentBlock;
+  getName() {
+    return this.$$.name;
   }
 
   /**
@@ -943,22 +896,12 @@ class Block {
   }
 
   /**
-   * @method Block#getParentScope
+   * @method Block#getTopBlock
    * @public
    * @returns {Block|void}
-   * @description Returns parent scope.
+   * @description Returns block in which template the block is located in.
    */
-  getParentScope() {
-    return this.$$.parentScope;
-  }
-
-  /**
-   * @method Block#getParentTemplate
-   * @public
-   * @returns {Block|void}
-   * @description Returns parent template.
-   */
-  getParentTemplate() {
+  getTopBlock() {
     return this.$$.parentTemplate;
   }
 
@@ -976,122 +919,7 @@ class Block {
   }
 
   toString() {
-    return this.$$.name;
-  }
-
-  /**
-   * @method Block#watch
-   * @public
-   * @param {...('args'|'globals'|String)} [vars] - Vars to watch (args, globals or locals).
-   * If no specified all locals, args and globals are to be watched.
-   * If the 'args' string all args are to be watched.
-   * If the 'globals' string all globals are to be watched.
-   * @param {VarsWatcher} watcher - Called when watched vars are changed.
-   * @description Method for watching for vars. If no vars passed in arguments
-   * all vars are to be watched. If the 'args' string is in the arguments all args are to be watched.
-   * If the 'globals' string is in the arguments all globals are to be watched.
-   * Otherwise specified vars will be watched.
-   * Watchers should not be put inside the constructor. It is considered best
-   * practice to do it inside the {@link Block#afterConstruct} method.
-   * Note that these expressions (vars, i.e. "args.arg") are not to be
-   * evaluated so you cannot put there things like "a[b]" or any js code,
-   * only expressions like "a", "b", "args.a", "args.b" and "globals.a", "globals.b".
-   * Also note that if there are more than one var that are changed at once (synchronously)
-   * the watcher is called only once.
-   * Note that the watcher is executed right away because in most cases
-   * this behaviour is very convenient.
-   *
-   * @example
-   * class MyBlock extends Block {
-   *   static template = '<div />';
-   *
-   *   afterConstruct() {
-   *     this.watch('a', () => {});
-   *     this.watch('args.a', 'globals.r', () => {});
-   *     this.watch(() => {});
-   *   }
-   * }
-   */
-  watch(...vars) {
-    const oldWatcher = arguments[arguments.length - 1];
-
-    if (!isFunction(oldWatcher)) {
-      console.warn(`The last argument (watcher) wasn't specified (${ this.$$.name }#watch)`);
-
-      return;
-    }
-
-    const watcher = () => {
-      oldWatcher();
-    };
-
-    if (arguments.length === 1) {
-      watchForAllLocals(this, watcher);
-      watchForAllArgs(this, watcher);
-      watchForAllGlobals(this, watcher);
-
-      oldWatcher();
-
-      return;
-    }
-
-    iterateArray(arguments, (variable) => {
-      if (variable === oldWatcher) {
-        return;
-      }
-
-      variable = `${ variable }`;
-
-      if (variable === '$') {
-        return watchForAllLocals(this, watcher);
-      }
-
-      if (variable === 'args') {
-        return watchForAllArgs(this, watcher);
-      }
-
-      if (variable === 'globals') {
-        return watchForAllGlobals(this, watcher);
-      }
-
-      if (WATCHED_ARG_PREFIX_REGEX.test(variable)) {
-        variable = variable.replace(WATCHED_ARG_PREFIX_REGEX, '');
-
-        if (!this.$$.args[variable]) {
-          return;
-        }
-
-        this.$$.args[variable].watchers.perm.push(watcher);
-
-        return;
-      }
-
-      if (WATCHED_GLOBAL_PREFIX_REGEX.test(variable)) {
-        variable = variable.replace(WATCHED_GLOBAL_PREFIX_REGEX, '');
-
-        if (!this.$$.globals[variable]) {
-          return;
-        }
-
-        const { watchers } = this.$$.globals[variable];
-
-        watchers.perm.push(watcher);
-        this.$$.watchersToRemove.push({
-          watcher,
-          watchers
-        });
-
-        return;
-      }
-
-      if (!this.$$.locals[variable]) {
-        return;
-      }
-
-      this.$$.locals[variable].watchers.perm.push(watcher);
-    });
-
-    oldWatcher();
+    return toStringTag;
   }
 }
 

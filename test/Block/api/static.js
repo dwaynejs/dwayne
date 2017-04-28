@@ -9,6 +9,47 @@ const template = html`
   </div>
 `;
 const error = new Error();
+const errorFunc = () => null.a;
+
+errorFunc.toString = () => '() => null.a';
+
+class ErrorBlock extends Block {
+  static template = {
+    vars: [],
+    value: [{
+      name: '#text',
+      value: errorFunc
+    }]
+  };
+}
+
+class OwnOnEvalErrorBlock extends Block {
+  static template = {
+    vars: [],
+    value: [{
+      name: '#text',
+      value: errorFunc
+    }]
+  };
+}
+
+class MuteEvalErrorBlock extends Block {
+  static template = html`{null.a}`;
+  static onEvalError = null;
+}
+
+class ErrorEvalErrorBlock extends Block {
+  static template = {
+    vars: [],
+    value: [{
+      name: '#text',
+      value: errorFunc
+    }]
+  };
+}
+
+Block.block('OwnOnEvalErrorBlock', OwnOnEvalErrorBlock);
+Block.block('MuteEvalErrorBlock', MuteEvalErrorBlock);
 
 export default () => {
   describe('block()', () => {
@@ -40,11 +81,6 @@ export default () => {
 
         return Block;
       });
-    });
-    after(() => {
-      console.warn = oldConsoleWarn;
-      console.error = oldConsoleError;
-      removeHook();
     });
 
     it('should register block which does not extend Block', () => {
@@ -204,6 +240,33 @@ export default () => {
 
       strictEqual(container.html(), '<div>Hello, world!</div>');
     });
+
+    after(() => {
+      console.warn = oldConsoleWarn;
+      console.error = oldConsoleError;
+      removeHook();
+    });
+  });
+  describe('defaultLocals', () => {
+    it('should use static defaultLocals property', () => {
+      let app;
+
+      class DefaultLocals extends Block {
+        static defaultLocals = {
+          a: 1,
+          b: 2
+        };
+
+        afterRender() {
+          app = this;
+        }
+      }
+
+      initApp(DefaultLocals, doc.create('div'));
+
+      strictEqual(app.a, 1);
+      strictEqual(app.b, 2);
+    });
   });
   describe('get()', () => {
     it('should return registered block in the namespace', () => {
@@ -276,11 +339,6 @@ export default () => {
 
         return Mixin;
       });
-    });
-    after(() => {
-      console.warn = oldConsoleWarn;
-      console.error = oldConsoleError;
-      removeHook();
     });
 
     it('should register mixin with afterUpdate function', () => {
@@ -394,6 +452,95 @@ export default () => {
       initApp(html`<div mixin="1"/>`, container);
 
       strictEqual(container.html(), '<div>1</div>');
+    });
+
+    after(() => {
+      console.warn = oldConsoleWarn;
+      console.error = oldConsoleError;
+      removeHook();
+    });
+  });
+  describe('onEvalError()', () => {
+    const oldConsoleError = console.error;
+
+    it('should use default handler and original code', (done) => {
+      const func = () => null.a;
+
+      console.error = (message, error) => {
+        try {
+          strictEqual(message, 'Eval error (evaluating "null.a" in context of #RootBlock):');
+          strictEqual(error.original, 'null.a');
+          strictEqual(error.func, func);
+          strictEqual(error.block.getName(), '#RootBlock');
+
+          done();
+        } catch (err) {
+          done(err);
+        }
+      };
+
+      func.original = 'null.a';
+
+      initApp([{
+        name: '#text',
+        value: func
+      }], doc.create('div'));
+    });
+    it('should use default handler and compiled code', (done) => {
+      console.error = (message, error) => {
+        try {
+          strictEqual(message, 'Eval error (evaluating "() => null.a" in context of #RootBlock):');
+          strictEqual(error.original, undefined);
+          strictEqual(error.func, errorFunc);
+          strictEqual(error.block instanceof ErrorBlock, true);
+
+          done();
+        } catch (err) {
+          done(err);
+        }
+      };
+
+      initApp(ErrorBlock, doc.create('div'));
+    });
+    it('should use own handler', (done) => {
+      OwnOnEvalErrorBlock.onEvalError = (error) => {
+        try {
+          strictEqual(error.original, undefined);
+          strictEqual(error.func, errorFunc);
+          strictEqual(error.block instanceof OwnOnEvalErrorBlock, true);
+
+          done();
+        } catch (err) {
+          done(err);
+        }
+      };
+
+      initApp(html`
+        <OwnOnEvalErrorBlock/>
+        <MuteEvalErrorBlock/>
+      `, doc.create('div'));
+    });
+    it('should handle error onEvalError handlers', (done) => {
+      ErrorEvalErrorBlock.onEvalError = () => {
+        throw error;
+      };
+
+      console.error = (message, e) => {
+        try {
+          strictEqual(message, 'Uncaught error in #RootBlock.onEvalError:');
+          strictEqual(e, error);
+
+          done();
+        } catch (err) {
+          done(err);
+        }
+      };
+
+      initApp(ErrorEvalErrorBlock, doc.create('div'));
+    });
+
+    after(() => {
+      console.error = oldConsoleError;
     });
   });
 };

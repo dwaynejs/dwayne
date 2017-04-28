@@ -24,11 +24,15 @@ export function initApp(block, container) {
   const parentElem = new Elem(container).elem(0);
 
   if (!parentElem.length) {
-    throw new Error('No valid element to insert the app into was given! (initApp)');
+    console.error('No valid element to insert the app into was given! (initApp)');
+
+    return;
   }
 
   if (parentElem.prop('DwayneRootBlock')) {
-    throw new Error('There already exists a Dwayne app inside the given element! (initApp)');
+    console.error('There already exists a Dwayne app inside the given element! (initApp)');
+
+    return;
   }
 
   if (isString(block)) {

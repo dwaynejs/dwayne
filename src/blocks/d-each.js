@@ -114,11 +114,7 @@ rootBlocks['d-each'] = class DEach extends Block {
         block.$$.scope[indexName] = index;
         block.$$.scope[itemName] = item;
 
-        const {
-          prevBlock: prevPrevBlock
-        } = block.$$;
-
-        if (prevPrevBlock && prevPrevBlock !== prevBlock) {
+        if (block.$$.prevBlock !== prevBlock) {
           const { content } = block.$$;
 
           if (prevBlock) {

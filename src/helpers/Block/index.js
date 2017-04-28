@@ -6,5 +6,4 @@ export * from './isInstanceOf';
 export * from './remove';
 export * from './removeWatcher';
 export * from './transformRestAttrs';
-export * from './watchForAll';
 export * from './wrap';
