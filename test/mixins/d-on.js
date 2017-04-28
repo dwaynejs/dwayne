@@ -37,7 +37,7 @@ export default () => {
     before(() => {
       initApp(htmlScopeless`<DOn/>`, container);
     });
-    after(() => {
+    afterEach(() => {
       console.error = oldConsoleError;
     });
 

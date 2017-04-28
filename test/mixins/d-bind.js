@@ -38,7 +38,7 @@ export default () => {
     before(() => {
       initApp(htmlScopeless`<DBind/>`, container);
     });
-    after(() => {
+    afterEach(() => {
       console.error = oldConsoleError;
     });
 

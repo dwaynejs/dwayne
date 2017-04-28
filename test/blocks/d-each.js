@@ -23,11 +23,13 @@ class DEachSimple extends Block {
 
 class DEachObject extends Block {
   static template = html`
-    <d-each set="{{ a: 1, b: 2, c: 3 }}">
-      <b id="{'item-' + $index}">
-        {$index + $item}
-      </b>
-    </d-each>
+    <div>
+      <d-each set="{{ a: 1, b: 2, c: 3 }}">
+        <b id="{'item-' + $index}">
+          {$index + $item}
+        </b>
+      </d-each>
+    </div>
   `;
 }
 
@@ -239,7 +241,7 @@ export default () => {
       });
 
       it('should render caption using variables from the d-each scope', () => {
-        strictEqual(container.html(), '<b id="item-a">a1</b><b id="item-b">b2</b><b id="item-c">c3</b>');
+        strictEqual(container.html(), '<div><b id="item-a">a1</b><b id="item-b">b2</b><b id="item-c">c3</b></div>');
       });
 
       after(remove);

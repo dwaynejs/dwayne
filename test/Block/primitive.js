@@ -1,5 +1,5 @@
 import { strictEqual } from 'assert';
-import { Block, doc, initApp, removeApp } from '../../src';
+import { Block, doc, body, initApp, removeApp, Elem } from '../../src';
 
 let app;
 let block;
@@ -15,24 +15,128 @@ class Primitive extends Block {
   static template = html`
     <span>Hello, world!</span>
   `;
-
-  afterRender() {
-    app = this;
-  }
 }
 
-Block.block('Primitive', Primitive);
+class Blocks extends Block {
+  static template = html`
+    <span>Hello, world!</span>
+    <BlocksHelper/>
+    <span>Goodbye, world!</span>
+  `;
+}
+
+class BlocksHelper extends Block {
+  static template = html`
+    <span>Hello, world, again!</span>
+  `;
+}
+
+class EmptyBlocks extends Block {
+  static template = html`
+    <div>
+      <EmptyBlock/>
+      <span>Hello, world!</span>
+      <EmptyBlock/>
+      <span>Goodbye, world!</span>
+    </div>
+  `;
+}
+
+class EmptyBlock extends Block {}
+
+class Elements extends Block {
+  static template = html`
+    <svg>
+      <circle r="10" cx="10" cy="10"/>
+    </svg>
+    <template>
+      <div>123</div>
+    </template>
+    <!-- comment -->
+    <iframe src="/index.html">
+      <div/>
+    </iframe>
+    <iframe>
+      <html>
+        <head></head>
+        <body>
+          <span>456</span>
+        </body>
+      </html>
+    </iframe>
+  `;
+}
+
+Block.block('BlocksHelper', BlocksHelper);
+Block.block('EmptyBlock', EmptyBlock);
 
 export default () => {
   describe('primitive', () => {
     before(() => {
-      initApp(htmlScopeless`<Primitive/>`, container);
+      initApp(Primitive, container);
     });
 
     it('should render simple caption', () => {
       strictEqual(container.html(), '<span>Hello, world!</span>');
     });
 
+    after(remove);
+  });
+  describe('blocks', () => {
+    before(() => {
+      initApp(Blocks, container);
+    });
+
+    it('should render blocks and elements', () => {
+      strictEqual(container.html(), '<span>Hello, world!</span><span>Hello, world, again!</span><span>Goodbye, world!</span>');
+    });
+
+    after(remove);
+  });
+  describe('empty blocks', () => {
+    before(() => {
+      initApp(EmptyBlocks, container);
+    });
+
+    it('should render empty blocks and elements', () => {
+      strictEqual(container.html(), '<div><span>Hello, world!</span><span>Goodbye, world!</span></div>');
+    });
+
+    after(remove);
+  });
+  describe('support svg, template, iframe and comments', () => {
+    before(() => {
+      container.into(body);
+    });
+    before(() => {
+      initApp(Elements, container);
+    });
+
+    it('should render empty blocks and elements', () => {
+      strictEqual(container.html(), ''
+        + '<svg>'
+          + '<circle r="10" cx="10" cy="10"></circle>'
+        + '</svg>'
+        + '<template>'
+          + '<div>123</div>'
+        + '</template>'
+        + '<!-- comment -->'
+        + '<iframe src="/index.html"></iframe>'
+        + '<iframe></iframe>'
+      );
+      strictEqual(new Elem(container.children()[4].contentDocument.documentElement).prop('outerHTML'), ''
+        + '<html>'
+          + '<head></head>'
+          + '<body>'
+            + '<span>456</span>'
+          + '</body>'
+        + '</html>'
+      );
+    });
+
+    after(() => {
+      container.remove();
+    });
     after(remove);
   });
 };

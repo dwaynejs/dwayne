@@ -24,7 +24,7 @@ describe('initApp()', () => {
     noApp = false;
   });
   afterEach(remove);
-  after(() => {
+  afterEach(() => {
     console.error = oldConsoleError;
   });
 

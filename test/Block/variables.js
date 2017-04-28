@@ -21,7 +21,7 @@ class Variables extends Block {
 
 class ChangingVariables extends Block {
   static template = html`
-    <span>Hello, {caption}!</span>
+    <span caption="{caption}">Hello, {caption}!</span>
   `;
 
   caption = null;
@@ -122,12 +122,12 @@ export default () => {
       it('should re-render caption after it\'s been changed', () => {
         app.caption = 'world';
 
-        strictEqual(container.html(), '<span>Hello, world!</span>');
+        strictEqual(container.html(), '<span caption="world">Hello, world!</span>');
       });
       it('should re-render caption again after it\'s been changed', () => {
         app.caption = 'dwayne';
 
-        strictEqual(container.html(), '<span>Hello, dwayne!</span>');
+        strictEqual(container.html(), '<span caption="dwayne">Hello, dwayne!</span>');
       });
       it('should re-render caption again after it\'s been changed', () => {
         app.caption = null;

@@ -3,6 +3,7 @@ import {
   iterateObject, iterateArray,
   isNil
 } from '../../utils';
+import { isDocument } from '../Elem';
 import { Elem } from '../../Elem';
 import {
   SVG_NS, D_REST_REGEX
@@ -16,17 +17,20 @@ import { constructPublicScope } from './constructPublicScope';
 import { Block } from '../../Block';
 
 const NAMED_D_BLOCK_REGEX = /^d-block:([\s\S]+)$/;
+const emptyArray = [];
 
 export function createBlock({ node, parent, parentElem, parentBlock, parentScope, parentTemplate, prevBlock }) {
-  const doc = new Elem(parentElem[0].ownerDocument);
+  const doc = isDocument(parentElem[0])
+    ? parentElem
+    : new Elem(parentElem[0].ownerDocument);
   const elem = parentElem[0].namespaceURI === SVG_NS
     ? doc.create('svg')
     : doc;
   const localBlocks = parentTemplate ? parentTemplate.$$.ns._blocks : Block._blocks;
   const localMixins = parentTemplate ? parentTemplate.$$.ns._mixins : Block._mixins;
-  const { children } = node;
   const args = node.attrs || {};
   const name = node.name || 'UnknownBlock';
+  let { children } = node;
   let constructor = node.Constructor || (node.name && localBlocks[node.name]);
   let dBlockMatch;
   let dBlockName;
@@ -65,10 +69,7 @@ export function createBlock({ node, parent, parentElem, parentBlock, parentScope
   }
 
   if (!constructor) {
-    const {
-      value,
-      children
-    } = node;
+    const { value } = node;
 
     const element = elem.create(name);
     const currentAttrs = create(null);
@@ -91,13 +92,13 @@ export function createBlock({ node, parent, parentElem, parentBlock, parentScope
 
       if (isDRest) {
         const restAttrs = parentScope.$$.evaluate(value, (value) => {
-          setTimeout(() => {
-            iterateObject(localAttrs, cleanProperty);
-            assign(localAttrs, transformRestAttrs(
-              value, localMixins, mixinDefaultOpts
-            ));
-            calculateAttrs(attrs, currentAttrs, element, false);
-          }, 0);
+          iterateObject(localAttrs, cleanProperty);
+          assign(localAttrs, transformRestAttrs(
+            value,
+            localMixins,
+            mixinDefaultOpts
+          ));
+          calculateAttrs(attrs, currentAttrs, element, false);
         }, parentBlock);
 
         wasDRest = true;
@@ -160,6 +161,22 @@ export function createBlock({ node, parent, parentElem, parentBlock, parentScope
       element.text(`${ text }`);
     }
 
+    const isParentBlock = parent instanceof Block;
+
+    if (prevBlock instanceof Block) {
+      prevBlock.$$.insertAfterIt(element, false);
+    } else if (prevBlock) {
+      element.insertAfter(prevBlock);
+
+      if (isParentBlock) {
+        parent.$$.addContent(element);
+      }
+    } else if (isParentBlock) {
+      parent.$$.insertInStartOfIt(element, false);
+    } else {
+      element.into(parentElem, false);
+    }
+
     if (children) {
       let prevBlock;
       let parentElem = element;
@@ -167,7 +184,9 @@ export function createBlock({ node, parent, parentElem, parentBlock, parentScope
       if (name === 'template') {
         parentElem = new Elem(element[0].content);
       } else if (name === 'iframe') {
-        if (!('src' in attrs)) {
+        if ('src' in attrs) {
+          children = emptyArray;
+        } else {
           const document = element[0].contentDocument;
 
           new Elem(document.documentElement).remove();
@@ -187,22 +206,6 @@ export function createBlock({ node, parent, parentElem, parentBlock, parentScope
           prevBlock
         });
       });
-    }
-
-    const isParentBlock = parent instanceof Block;
-
-    if (prevBlock instanceof Block) {
-      prevBlock.$$.insertAfterIt(element, false);
-    } else if (prevBlock) {
-      element.insertAfter(prevBlock);
-
-      if (isParentBlock) {
-        parent.$$.addContent(element);
-      }
-    } else if (isParentBlock) {
-      parent.$$.insertInStartOfIt(element, false);
-    } else {
-      element.into(parentElem, false);
     }
 
     createMixins();

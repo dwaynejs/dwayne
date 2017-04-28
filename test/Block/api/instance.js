@@ -12,6 +12,14 @@ const remove = () => {
   block = null;
 };
 
+class ErrorConstructor extends Block {
+  constructor(opts) {
+    super(opts);
+
+    throw error;
+  }
+}
+
 class DOMChange extends Block {
   static template = html`
     <d-if if="{value}">
@@ -65,16 +73,43 @@ class NameApp extends Block {
   }
 }
 
+Block.block('ErrorConstructor', ErrorConstructor);
 Block.block('GetTopBlock', GetTopBlock);
 Block.block('NameApp', NameApp);
 
 export default () => {
   const oldConsoleError = console.error;
 
-  after(() => {
+  afterEach(() => {
     console.error = oldConsoleError;
   });
 
+  describe('constructor()', () => {
+    it('should log error in the constructor', (done) => {
+      const container = doc.create('div');
+
+      console.error = (message, e) => {
+        try {
+          strictEqual(message, 'Uncaught error in new ErrorConstructor:');
+          strictEqual(e, error);
+
+          setTimeout(() => {
+            try {
+              strictEqual(container.html(), '<errorconstructor></errorconstructor>');
+
+              done();
+            } catch (err) {
+              done(err);
+            }
+          }, 0);
+        } catch (err) {
+          done(err);
+        }
+      };
+
+      initApp(html`<ErrorConstructor/>`, container);
+    });
+  });
   describe('afterDOMChange()', () => {
     before(() => {
       initApp(DOMChange, container);
