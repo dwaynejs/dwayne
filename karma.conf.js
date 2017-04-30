@@ -12,6 +12,10 @@ module.exports = (config) => {
       'coverage-istanbul'
     ],
     plugins: [
+      'karma-ie-launcher',
+      // 'karma-firefox-launcher',
+      'karma-opera-launcher',
+      'karma-safari-launcher',
       'karma-chrome-launcher',
       'karma-rollup-plugin',
       'karma-coverage-istanbul-reporter',
@@ -21,19 +25,20 @@ module.exports = (config) => {
       'mocha'
     ],
     browsers: [
-      'Chrome'
+      // 'Chrome',
+      // 'Safari',
+      'IE',
+      // 'Firefox',
+      // 'Opera'
     ],
     files: [
       'test/all.js'
     ],
 
+    concurrency: 1,
     rollupPreprocessor: rollupConfig,
     coverageIstanbulReporter: {
       reports: ['html']
-    },
-    coverageReporter: {
-      type: 'html',
-      dir: 'coverage/'
     }
   });
 };

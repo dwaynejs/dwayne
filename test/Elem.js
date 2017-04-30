@@ -444,12 +444,12 @@ describe('Elem#', () => {
 
       elem1.style.display = 'inline';
       elem1.style.textAlign = 'center';
-      elem1.style.border = '1px solid black';
+      elem1.style.position = 'absolute';
 
       deepStrictEqual(wrap1.css(), {
         display: 'inline',
         textAlign: 'center',
-        border: '1px solid black'
+        position: 'absolute'
       });
       deepStrictEqual(wrap2.css(), {});
     });

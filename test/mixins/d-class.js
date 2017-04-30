@@ -50,7 +50,7 @@ class DClassConflict extends Block {
 
 class DClassArgs extends Block {
   static template = html`
-    <div d-class(a,b)="{bool}" d-class()="{bool}"/>
+    <div d-class(a,b)="{bool}" d-class()="{bool}" class="c"/>
   `;
 
   bool = true;
@@ -156,12 +156,12 @@ export default () => {
       });
 
       it('should set classes from the args if the value is truthy', () => {
-        strictEqual(container.html(), '<div class="a b"></div>');
+        strictEqual(container.html(), '<div class="c a b"></div>');
       });
       it('should remove classes from the args if the value is falsy', () => {
         app.bool = false;
 
-        strictEqual(container.html(), '<div class=""></div>');
+        strictEqual(container.html(), '<div class="c"></div>');
       });
 
       after(remove);

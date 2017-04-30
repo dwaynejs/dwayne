@@ -26,7 +26,7 @@ rootMixins['d-value'] = class DValue extends Mixin {
     this.name = name;
     this.type = type;
     this.value = value;
-    this.options = elem.find('option');
+    this.options = elem.children().filter('option');
     this.scope = parentTemplate;
 
     if (args) {

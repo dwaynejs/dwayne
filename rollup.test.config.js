@@ -9,6 +9,7 @@ const inject = require('rollup-plugin-inject');
 module.exports = {
   format: 'iife',
   moduleName: 'Dwayne',
+  sourceMap: 'inline',
   plugins: [
     builtins(),
     npm({

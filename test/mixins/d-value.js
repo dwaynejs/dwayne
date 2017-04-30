@@ -13,7 +13,9 @@ const remove = () => {
 
 Elem.addMethods({
   getValues() {
-    return new Elem(this.prop('selectedOptions')).map(({ value }) => value);
+    return new Elem(this.find('option'))
+      .filter((option) => option.selected)
+      .map(({ value }) => value);
   }
 });
 
@@ -102,13 +104,9 @@ class DValueColor extends Block {
 class DValueFile extends Block {
   static template = html`
     <input type="file" d-value="file"/>
-    <input type="file" d-value="file"/>
-    <input type="file" d-value="file2" value="{defaultFiles}"/>
   `;
 
-  file = doc.create('input').attr('type', 'file')[0].files;
-  file2 = null;
-  defaultFiles = doc.create('input').attr('type', 'file')[0].files;
+  file = null;
 
   afterRender() {
     app = this;
@@ -459,36 +457,6 @@ export default () => {
         const children = container.children();
 
         strictEqual(children.elem(0).prop('files'), app.file);
-        strictEqual(children.elem(1).prop('files'), app.file);
-        strictEqual(children.elem(2).prop('files'), app.file2);
-      });
-      it('should react on variable change', () => {
-        const file = app.file = doc.create('input').attr('type', 'file')[0].files;
-
-        const children = container.children();
-
-        strictEqual(children.elem(0).prop('files'), file);
-        strictEqual(children.elem(1).prop('files'), file);
-      });
-      it('should react on user interactions', (done) => {
-        const children = container.children();
-        const file = doc.create('input').attr('type', 'file')[0].files;
-
-        children.elem(0)
-          .prop('files', file)
-          .dispatch('change');
-
-        setTimeout(() => {
-          try {
-            strictEqual(children.elem(0).prop('files'), file);
-            strictEqual(children.elem(1).prop('files'), file);
-            strictEqual(app.file, file);
-
-            done();
-          } catch (err) {
-            done(err);
-          }
-        }, 25);
       });
 
       after(remove);

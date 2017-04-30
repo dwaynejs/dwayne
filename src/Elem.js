@@ -1176,7 +1176,13 @@ class Elem extends Array {
     return this.forEach((elem) => {
       const { classList } = elem;
 
-      classList.toggle(cls, arguments.length < 2 ? !classList.contains(cls) : condition);
+      elem = new Elem(elem);
+
+      if (arguments.length < 2 ? !classList.contains(cls) : condition) {
+        elem.addClass(cls);
+      } else {
+        elem.removeClass(cls);
+      }
     });
   }
 }

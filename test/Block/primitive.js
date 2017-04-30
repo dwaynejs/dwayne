@@ -1,4 +1,4 @@
-import { strictEqual } from 'assert';
+import { strictEqual, deepStrictEqual } from 'assert';
 import { Block, doc, body, initApp, removeApp, Elem } from '../../src';
 
 let app;
@@ -60,9 +60,6 @@ class Elements extends Block {
     <svg>
       <circle r="10" cx="10" cy="10"/>
     </svg>
-    <template>
-      <div>123</div>
-    </template>
     <!-- comment -->
     <iframe src="/index.html">
       <div/>
@@ -134,18 +131,21 @@ export default () => {
     });
 
     it('should render empty blocks and elements', () => {
-      strictEqual(container.html(), ''
-        + '<svg>'
-          + '<circle r="10" cx="10" cy="10"></circle>'
-        + '</svg>'
-        + '<template>'
-          + '<div>123</div>'
-        + '</template>'
-        + '<!-- comment -->'
-        + '<iframe src="/index.html"></iframe>'
-        + '<iframe></iframe>'
-      );
-      strictEqual(new Elem(container.children()[4].contentDocument.documentElement).prop('outerHTML'), ''
+      const children = container.children();
+      const svgChildren = children.elem(0).children();
+
+      strictEqual(children.elem(0).name(), 'svg');
+      strictEqual(svgChildren.length, 1);
+      deepStrictEqual(svgChildren.elem(0).attr(), {
+        r: '10',
+        cx: '10',
+        cy: '10'
+      });
+      strictEqual(children.elem(1).name(), '#comment');
+      strictEqual(children.elem(1).text(), ' comment ');
+      strictEqual(children.elem(2).prop('outerHTML'), '<iframe src="/index.html"></iframe>');
+      strictEqual(children.elem(3).prop('outerHTML'), '<iframe></iframe>');
+      strictEqual(new Elem(container.children()[3].contentDocument.documentElement).prop('outerHTML'), ''
         + '<html>'
           + '<head></head>'
           + '<body>'
