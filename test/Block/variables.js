@@ -1,4 +1,4 @@
-import { strictEqual } from 'assert';
+import { strictEqual, deepStrictEqual } from 'assert';
 import { Block, doc, initApp, removeApp } from '../../src';
 
 let app;
@@ -89,6 +89,35 @@ class ChangingMultipleVariables extends Block {
   }
 }
 
+class BlockDRestApp extends Block {
+  static template = html`
+    <BlockDRest
+      arg="{arg}"
+      d-rest="{rest}"
+    />
+  `;
+
+  arg = null;
+  rest = {
+    c: 3
+  };
+
+  afterRender() {
+    app = this;
+  }
+}
+
+class BlockDRest extends Block {
+  static defaultArgs = {
+    a: 1,
+    b: 2
+  };
+
+  afterRender() {
+    block = this;
+  }
+}
+
 Block.block('Variables', Variables);
 Block.block('ChangingVariables', ChangingVariables);
 Block.block('ChangingArgsApp', ChangingArgsApp);
@@ -97,6 +126,7 @@ Block.block('ChangingGlobalsApp', ChangingGlobalsApp);
 Block.block('ChangingGlobals', ChangingGlobals);
 Block.block('ChangingMultipleVariablesApp', ChangingMultipleVariablesApp);
 Block.block('ChangingMultipleVariables', ChangingMultipleVariables);
+Block.block('BlockDRest', BlockDRest);
 
 export default () => {
   describe('variables', () => {
@@ -198,6 +228,49 @@ export default () => {
         block.caption = 'not to be?';
 
         strictEqual(container.html(), '<span>To be or not to be?</span>');
+      });
+
+      after(remove);
+    });
+    describe('d-rest test', () => {
+      before(() => {
+        initApp(BlockDRestApp, container);
+      });
+
+      it('should pass args using Block.defaultArgs', () => {
+        deepStrictEqual({ ...block.args }, {
+          arg: null,
+          a: 1,
+          b: 2,
+          c: 3
+        });
+      });
+      it('should change the args rewriting default args', () => {
+        app.arg = 'a';
+        app.rest = {
+          a: 7
+        };
+
+        deepStrictEqual({ ...block.args }, {
+          arg: 'a',
+          a: 7,
+          b: 2,
+          c: undefined
+        });
+      });
+      it('should handle nested d-rest', () => {
+        app.rest = {
+          'd-rest': {
+            b: 8
+          }
+        };
+
+        deepStrictEqual({ ...block.args }, {
+          arg: 'a',
+          a: 1,
+          b: 8,
+          c: undefined
+        });
       });
 
       after(remove);

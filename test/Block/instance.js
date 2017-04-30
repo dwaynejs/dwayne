@@ -1,5 +1,5 @@
 import { strictEqual } from 'assert';
-import { Block, initApp, removeApp, doc } from '../../../src';
+import { Block, initApp, removeApp, doc } from '../../src';
 
 let app;
 let block;
@@ -31,6 +31,10 @@ class DOMChange extends Block {
     app = this;
   }
 }
+
+class AfterConstruct extends Block {}
+
+class AfterRender extends Block {}
 
 class BeforeRemove extends Block {}
 
@@ -108,6 +112,68 @@ export default () => {
       };
 
       initApp(html`<ErrorConstructor/>`, container);
+    });
+  });
+  describe('afterConstruct()', () => {
+    it('should call afterConstruct after constructing', (done) => {
+      const container = doc.create('div');
+
+      AfterConstruct.prototype.afterConstruct = () => {
+        done();
+      };
+
+      initApp(AfterConstruct, container);
+    });
+    it('should log errors in afterConstruct function', (done) => {
+      const container = doc.create('div');
+
+      AfterConstruct.prototype.afterConstruct = () => {
+        throw error;
+      };
+      console.error = (message, e) => {
+        try {
+          strictEqual(message, 'Uncaught error in #RootBlock#afterConstruct:');
+          strictEqual(e, error);
+
+          done();
+        } catch (err) {
+          done(err);
+        }
+      };
+
+      initApp(AfterConstruct, container);
+      removeApp(container);
+    });
+  });
+  describe('afterRender()', () => {
+    it('should call afterRender after rendering', (done) => {
+      const container = doc.create('div');
+
+      AfterRender.prototype.afterRender = () => {
+        done();
+      };
+
+      initApp(AfterRender, container);
+    });
+    it('should log errors in afterRender function', (done) => {
+      const container = doc.create('div');
+
+      AfterRender.prototype.afterRender = () => {
+        throw error;
+      };
+      console.error = (message, e) => {
+        try {
+          strictEqual(message, 'Uncaught error in #RootBlock#afterRender:');
+          strictEqual(e, error);
+
+          done();
+        } catch (err) {
+          done(err);
+        }
+      };
+
+      initApp(AfterRender, container);
+      removeApp(container);
     });
   });
   describe('afterDOMChange()', () => {

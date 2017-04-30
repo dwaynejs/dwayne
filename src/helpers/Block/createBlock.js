@@ -11,6 +11,7 @@ import {
 import { cleanProperty } from './cleanProperty';
 import { transformRestAttrs } from './transformRestAttrs';
 import { calculateAttrs } from './calculateAttrs';
+import { normalizeArgs } from './normalizeArgs';
 import { mixinMatch } from './mixinMatch';
 import { constructPrivateScope } from './constructPrivateScope';
 import { constructPublicScope } from './constructPublicScope';
@@ -75,6 +76,7 @@ export function createBlock({ node, parent, parentElem, parentBlock, parentScope
     const currentAttrs = create(null);
     let attrs = create(null);
     let wasDRest;
+    const attrsChain = [attrs];
     const mixinDefaultOpts = {
       elem: element,
       parentBlock,
@@ -88,6 +90,10 @@ export function createBlock({ node, parent, parentElem, parentBlock, parentScope
         ? create(attrs)
         : attrs;
 
+      if (attrs !== localAttrs) {
+        attrsChain.push(localAttrs);
+      }
+
       attrs = localAttrs;
 
       if (isDRest) {
@@ -98,7 +104,7 @@ export function createBlock({ node, parent, parentElem, parentBlock, parentScope
             localMixins,
             mixinDefaultOpts
           ));
-          calculateAttrs(attrs, currentAttrs, element, false);
+          calculateAttrs(normalizeArgs(attrsChain), attrs, currentAttrs, element, false);
         }, parentBlock);
 
         wasDRest = true;
@@ -134,12 +140,12 @@ export function createBlock({ node, parent, parentElem, parentBlock, parentScope
             type: 'attr',
             value
           };
-          calculateAttrs(attrs, currentAttrs, element, false);
+          calculateAttrs(normalizeArgs(attrsChain), attrs, currentAttrs, element, false);
         }, parentBlock)
       };
     });
 
-    const createMixins = calculateAttrs(attrs, currentAttrs, element, true);
+    parentBlock.$$.mixinsToBuild.push(calculateAttrs(normalizeArgs(attrsChain), attrs, currentAttrs, element, true));
 
     if (name === '#comment') {
       element.text(value);
@@ -207,8 +213,6 @@ export function createBlock({ node, parent, parentElem, parentBlock, parentScope
         });
       });
     }
-
-    createMixins();
 
     return element;
   }
@@ -286,6 +290,11 @@ export function createBlock({ node, parent, parentElem, parentBlock, parentScope
   });
 
   blockInstance.$$.isRendered = true;
+
+  iterateArray(blockInstance.$$.mixinsToBuild, (executeBuilders) => {
+    executeBuilders();
+  });
+  blockInstance.$$.mixinsToBuild = [];
 
   try {
     blockInstance.afterRender();

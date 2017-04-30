@@ -19,7 +19,9 @@ rootMixins['d-on'] = class DOn extends Mixin {
     }
   }
 
-  beforeRemove() {
-    this.off();
+  beforeRemove(isElementRemoved) {
+    if (!isElementRemoved) {
+      this.off();
+    }
   }
 };

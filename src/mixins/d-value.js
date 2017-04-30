@@ -121,8 +121,11 @@ rootMixins['d-value'] = class DValue extends Mixin {
       : getValueForGetting(name, elem.prop(prop), type, node.value, values, options, init, prop === 'multiple-select');
   }
 
-  beforeRemove() {
-    this.offElemListener();
+  beforeRemove(isElementRemoved) {
+    if (!isElementRemoved) {
+      this.offElemListener();
+    }
+
     this.offFormListener();
   }
 };

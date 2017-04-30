@@ -84,9 +84,11 @@ class DSwitchDefault extends Block {
       <d-case if="{2}">
         {captionB}
       </d-case>
+      <div>not rendered</div>
       <d-default>
         {captionC}
       </d-default>
+      <d-default>not rendered</d-default>
     </d-switch>
   `;
 

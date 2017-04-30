@@ -13,10 +13,14 @@ const remove = () => {
 
 class DHide extends Block {
   static template = html`
-    <div d-hide="{hide}"/>
+    <div d-hide="{hide}" class="hidden"/>
+    <div d-rest="{rest}" class="rest"/>
   `;
 
   hide = false;
+  rest = {
+    'd-hide': true
+  };
 
   afterRender() {
     app = this;
@@ -32,17 +36,23 @@ export default () => {
     });
 
     it('should not be hidden if the condition is falsy', () => {
-      strictEqual(container.find('div').hasClass('__dwayne-hidden__'), false);
+      strictEqual(container.find('div.hidden').hasClass('__dwayne-hidden__'), false);
     });
     it('should be hidden if the condition is truthy', () => {
       app.hide = true;
 
-      strictEqual(container.find('div').hasClass('__dwayne-hidden__'), true);
+      strictEqual(container.find('div.hidden').hasClass('__dwayne-hidden__'), true);
+      strictEqual(container.find('div.rest').hasClass('__dwayne-hidden__'), true);
     });
     it('should not be hidden if the condition is falsy again', () => {
       app.hide = false;
 
-      strictEqual(container.find('div').hasClass('__dwayne-hidden__'), false);
+      strictEqual(container.find('div.hidden').hasClass('__dwayne-hidden__'), false);
+    });
+    it('should do the cleaning', () => {
+      app.rest = {};
+
+      strictEqual(container.find('div.rest').hasClass('__dwayne-hidden__'), false);
     });
 
     after(remove);

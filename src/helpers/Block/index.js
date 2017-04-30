@@ -3,6 +3,7 @@ export * from './cleanProperty';
 export * from './constructMixinRegex';
 export * from './createBlock';
 export * from './isInstanceOf';
+export * from './normalizeArgs';
 export * from './remove';
 export * from './removeWatcher';
 export * from './transformRestAttrs';

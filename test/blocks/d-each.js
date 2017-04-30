@@ -90,11 +90,10 @@ class DEachChangingSet extends Block {
   }
 }
 
-class DEachUID extends Block {
+class DEachUIDApp extends Block {
   static template = html`
-    <d-each set="{people}" uid="{$item.id}">
-      <b>{$item.name}</b>
-    </d-each>
+    <i>People</i>
+    <DEachUID people="{people}"/>
   `;
 
   people = [
@@ -117,8 +116,21 @@ class DEachUID extends Block {
   }
 }
 
+class DEachUID extends Block {
+  static template = html`
+    <d-each set="{args.people}" uid="{$item.id}">
+      <b>{$item.name}</b>
+    </d-each>
+  `;
+
+  afterRender() {
+    block = this;
+  }
+}
+
 class DEachArgs extends Block {
   static template = html`
+    <i>People</i>
     <d-each
       set="{people}"
       item="person"
@@ -217,6 +229,7 @@ Block.block('DEachSimple', DEachSimple);
 Block.block('DEachObject', DEachObject);
 Block.block('DEachScope', DEachScope);
 Block.block('DEachChangingSet', DEachChangingSet);
+Block.block('DEachUIDApp', DEachUIDApp);
 Block.block('DEachUID', DEachUID);
 Block.block('DEachArgs', DEachArgs);
 Block.block('DEachNested', DEachNested);
@@ -289,24 +302,27 @@ export default () => {
     });
     describe('uid test', () => {
       before(() => {
-        initApp(htmlScopeless`<DEachUID/>`, container);
+        initApp(htmlScopeless`<DEachUIDApp/>`, container);
       });
 
       let john;
       let michael;
 
       it('should render captions using variables from the d-each scope', () => {
-        john = container.children()[1];
-        michael = container.children()[2];
+        john = container.children()[2];
+        michael = container.children()[3];
 
-        strictEqual(container.html(), '<b>Bill</b><b>John</b><b>Michael</b>');
+        strictEqual(container.html(), '<i>People</i><b>Bill</b><b>John</b><b>Michael</b>');
       });
       it('should not re-render captions which don\'t change when the set changes', () => {
-        app.people = app.people.slice(1);
+        app.people = [
+          app.people[2],
+          app.people[1]
+        ];
 
-        strictEqual(container.html(), '<b>John</b><b>Michael</b>');
-        strictEqual(container.children()[0], john);
+        strictEqual(container.html(), '<i>People</i><b>Michael</b><b>John</b>');
         strictEqual(container.children()[1], michael);
+        strictEqual(container.children()[2], john);
       });
 
       after(remove);
@@ -321,13 +337,13 @@ export default () => {
       });
 
       it('should render captions using redefined variables from the d-each scope', () => {
-        const children = container.children();
+        const children = container.children().slice(1);
 
         michael = children[0];
         john = children[1];
         mary = children[2];
 
-        strictEqual(container.html(), '<b>0: Michael</b><b>1: John</b><b>2: Mary</b>');
+        strictEqual(container.html(), '<i>People</i><b>0: Michael</b><b>1: John</b><b>2: Mary</b>');
         strictEqual(michael.outerHTML, '<b>0: Michael</b>');
         strictEqual(john.outerHTML, '<b>1: John</b>');
         strictEqual(mary.outerHTML, '<b>2: Mary</b>');
@@ -344,9 +360,9 @@ export default () => {
 
         app.people = app.people.slice();
 
-        const children = container.children();
+        const children = container.children().slice(1);
 
-        strictEqual(container.html(), '<b>0: Mary</b><b>1: John</b><b>2: Michael</b>');
+        strictEqual(container.html(), '<i>People</i><b>0: Mary</b><b>1: John</b><b>2: Michael</b>');
         strictEqual(children[0], mary);
         strictEqual(children[1], john);
         strictEqual(children[2], michael);
@@ -362,9 +378,9 @@ export default () => {
 
         app.people = app.people.slice();
 
-        const children = container.children();
+        const children = container.children().slice(1);
 
-        strictEqual(container.html(), '<b>0: John</b><b>1: Michael</b><b>2: Mary</b>');
+        strictEqual(container.html(), '<i>People</i><b>0: John</b><b>1: Michael</b><b>2: Mary</b>');
         strictEqual(children[0], john);
         strictEqual(children[1], michael);
         strictEqual(children[2], mary);

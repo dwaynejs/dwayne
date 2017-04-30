@@ -24,15 +24,21 @@ class DValueSimple extends Block {
     <input d-value="input2" value="456"/>
     <DValueSimpleHelper/>
     <input d-value="{(value) => input5 = value}" value="258"/>
+    <input d-rest="{rest}" class="rest"/>
   `;
 
   input = '123';
   input2 = null;
   input3 = null;
+  rest = {
+    'd-value': js`(value) => onChange(value)`
+  };
 
   afterRender() {
     app = this;
   }
+
+  onChange() {}
 }
 
 class DValueSimpleHelper extends Block {
@@ -301,6 +307,18 @@ export default () => {
             done(err);
           }
         }, 25);
+      });
+      it('should do the cleaning', (done) => {
+        app.onChange = () => {
+          done(new Error('Shouldn\'t have been called'));
+        };
+        app.rest = {};
+
+        container
+          .find('input.d-rest')
+          .dispatch('input');
+
+        setTimeout(done, 25);
       });
 
       after(remove);

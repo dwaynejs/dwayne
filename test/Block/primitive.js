@@ -22,12 +22,23 @@ class Blocks extends Block {
     <span>Hello, world!</span>
     <BlocksHelper/>
     <span>Goodbye, world!</span>
+    <div>
+      <i>123</i>
+      <BlocksHelper/>
+    </div>
+    <BlocksHelper2/>
   `;
 }
 
 class BlocksHelper extends Block {
   static template = html`
     <span>Hello, world, again!</span>
+  `;
+}
+
+class BlocksHelper2 extends Block {
+  static template = html`
+    <BlocksHelper/>
   `;
 }
 
@@ -68,6 +79,7 @@ class Elements extends Block {
 }
 
 Block.block('BlocksHelper', BlocksHelper);
+Block.block('BlocksHelper2', BlocksHelper2);
 Block.block('EmptyBlock', EmptyBlock);
 
 export default () => {
@@ -88,7 +100,16 @@ export default () => {
     });
 
     it('should render blocks and elements', () => {
-      strictEqual(container.html(), '<span>Hello, world!</span><span>Hello, world, again!</span><span>Goodbye, world!</span>');
+      strictEqual(container.html(), ''
+        + '<span>Hello, world!</span>'
+        + '<span>Hello, world, again!</span>'
+        + '<span>Goodbye, world!</span>'
+        + '<div>'
+          + '<i>123</i>'
+          + '<span>Hello, world, again!</span>'
+        + '</div>'
+        + '<span>Hello, world, again!</span>'
+      );
     });
 
     after(remove);

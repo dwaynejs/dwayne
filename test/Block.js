@@ -1,5 +1,5 @@
-import runStaticTests from './Block/api/static';
-import runInstanceTests from './Block/api/instance';
+import runStaticTests from './Block/static';
+import runInstanceTests from './Block/instance';
 
 import runPrimitiveTests from './Block/primitive';
 import runVariablesTests from './Block/variables';

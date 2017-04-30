@@ -44,13 +44,15 @@ rootMixins['d-style'] = class DStyle extends Mixin {
     this.css = newValue;
   }
 
-  beforeRemove() {
-    const {
-      elem,
-      css
-    } = this;
+  beforeRemove(isElementRemoved) {
+    if (!isElementRemoved) {
+      const {
+        elem,
+        css
+      } = this;
 
-    elem.removeCSS.apply(elem, keys(css));
+      elem.removeCSS.apply(elem, keys(css));
+    }
   }
 };
 

@@ -12,7 +12,9 @@ rootMixins['d-show'] = class DShow extends Mixin {
     }
   }
 
-  beforeRemove() {
-    this.elem.show();
+  beforeRemove(isElementRemoved) {
+    if (!isElementRemoved) {
+      this.elem.show();
+    }
   }
 };

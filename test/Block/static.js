@@ -1,7 +1,7 @@
 import { strictEqual } from 'assert';
-import { Block, Mixin, initApp, doc, insertTemplates } from '../../../src';
-import { DBlock } from '../../../src/blocks/d-block';
-import { DHide } from '../../../src/mixins/d-hide';
+import { Block, Mixin, initApp, doc, insertTemplates } from '../../src';
+import { DBlock } from '../../src/blocks/d-block';
+import { DHide } from '../../src/mixins/d-hide';
 
 const template = html`
   <div>

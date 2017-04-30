@@ -46,15 +46,29 @@ import { find } from './find';
  */
 
 /**
+ * @callback CollectCallback
+ * @public
+ * @param {AddCallback} add - Add element to the eventual set function.
+ * @param {Element|Node} node - Iteration element.
+ * @param {Number} index - Iteration index.
+ * @param {Elem} elem - Initial set.
+ */
+
+/**
+ * @callback AddCallback
+ * @public
+ * @param {...(Element|Node|elem)} elem - Element to add.
+ */
+
+/**
  * @callback ElemMethod
  * @public
  * @this Elem
  */
 
-const EVENT_SEPARATOR_REGEX = /(?:,| ) */;
+const EVENT_SEPARATOR_REGEX = /[,| ] */;
 const CSS_STYLES_SEPARATOR_REGEX = /; ?/;
 const CSS_IMPORTANT_REGEX = / ?!important$/;
-const XHTML_NS = 'http://www.w3.org/1999/xhtml';
 const emptyCollection = [];
 
 /**
@@ -123,10 +137,10 @@ class Elem extends Array {
    *   .add(elem2.find('.cls2'))
    *   .hide();
    */
-  add() {
+  add(...elements) {
     const elems = this.slice();
 
-    iterateArray(arguments, (elem) => {
+    iterateArray(elements, (elem) => {
       if (!isElementsCollection(elem)) {
         elem = [elem];
       }
@@ -151,11 +165,11 @@ class Elem extends Array {
    * @example
    * elem.addClass('red', 'round');
    */
-  addClass() {
+  addClass(...classes) {
     return this.forEach((elem) => {
       const list = elem.classList;
 
-      iterateArray(arguments, (cls) => list.add(cls));
+      iterateArray(classes, (cls) => list.add(cls));
     });
   }
 
@@ -262,6 +276,18 @@ class Elem extends Array {
     });
   }
 
+  /**
+   * @method Elem#collect
+   * @public
+   * @param {CollectCallback} callback - Called on each iteration.
+   * @returns {Elem} Returns eventual set.
+   * @description Method for collecting elements into a new set.
+   *
+   * @example
+   * const parents = elem.collect((add, elem) => {
+   *   add(elem.parentNode);
+   * });
+   */
   collect(callback) {
     const elements = [];
     const cb = ::elements.push;
@@ -637,6 +663,13 @@ class Elem extends Array {
     });
   }
 
+  /**
+   * @method Elem#includes
+   * @public
+   * @param {Element|node} elem - Element to search.
+   * @return {Boolean} If the element is in the set.
+   * @description The same as Array#includes.
+   */
   includes(elem) {
     return this.indexOf(elem) !== -1;
   }
@@ -814,20 +847,16 @@ class Elem extends Array {
    * @example
    * elem.on(
    *   'change, input',
-   *   'input, select, textarea, datalist, keygen, output',
    *   (e, elem, index) => console.log(elem.value)
    * );
    * elem.on(
    *   'change, input',
    *   (e, elem, index) => console.log(elem.value)
    * );
-   * elem.on(
-   *   {
-   *     'change, input': (e, elem, index) => console.log(elem.value),
-   *     'blur': () => console.log('blur')
-   *   },
-   *   'input, select, textarea, datalist, keygen, output'
-   * );
+   * elem.on({
+   *   'change, input': (e, elem, index) => console.log(elem.value),
+   *   'blur': () => console.log('blur')
+   * });
    *
    * const removeListeners = elem.on({
    *   'change, input': (e, elem, index) => console.log(elem.value),
@@ -964,9 +993,9 @@ class Elem extends Array {
    * @example
    * elem.removeAttr('foo', 'bar', 'baz');
    */
-  removeAttr() {
+  removeAttr(...attributes) {
     return this.forEach((elem) => {
-      iterateArray(arguments, (attr) => {
+      iterateArray(attributes, (attr) => {
         const { ns } = getAttrNS(attr, elem);
 
         if (ns) {
@@ -988,11 +1017,11 @@ class Elem extends Array {
    * @example
    * elem.removeClass('foo', 'bar', 'baz');
    */
-  removeClass() {
+  removeClass(...classes) {
     return this.forEach((elem) => {
       const list = elem.classList;
 
-      iterateArray(arguments, (cls) => list.remove(cls));
+      iterateArray(classes, (cls) => list.remove(cls));
     });
   }
 
@@ -1006,9 +1035,9 @@ class Elem extends Array {
    * @example
    * elem.removeCSS('display', 'position', 'margin');
    */
-  removeCSS() {
+  removeCSS(...props) {
     return this.forEach((elem) => {
-      iterateArray(arguments, (css) => {
+      iterateArray(props, (css) => {
         elem.style.removeProperty(toHyphenCase(css));
       });
     });
@@ -1070,6 +1099,13 @@ class Elem extends Array {
     return this.forEach(show);
   }
 
+  /**
+   * @method Elem#slice
+   * @public
+   * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/slice
+   * @returns {Elem}
+   * @description The same as Array#slice but for Elem.
+   */
   slice() {
     return new Elem(super.slice.apply(this, arguments));
   }

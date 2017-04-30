@@ -29,6 +29,7 @@ class DClassConflict extends Block {
       d-class#string="{stringClasses}"
       d-class#array="{arrayClasses}"
       d-class#object="{objectClasses}"
+      d-rest="{rest}"
     />`;
 
   stringClasses = 'a b';
@@ -37,6 +38,9 @@ class DClassConflict extends Block {
     e: true,
     f: true,
     g: false
+  };
+  rest = {
+    'd-class#rest': 'rest'
   };
 
   afterRender() {
@@ -107,15 +111,17 @@ export default () => {
     describe('conflict test', () => {
       before(() => {
         initApp(htmlScopeless`<DClassConflict/>`, container);
+
+        console.log(app.$$.mixins.map((m) => m.comment));
       });
 
       it('should set classes from mixins', () => {
-        strictEqual(container.html(), '<div class="a b c d e f"></div>');
+        strictEqual(container.html(), '<div class="a b c d e f rest"></div>');
       });
       it('should set classes right if they don\'t conflict', () => {
         app.stringClasses = 'a h i';
 
-        strictEqual(container.html(), '<div class="a c d e f h i"></div>');
+        strictEqual(container.html(), '<div class="a c d e f rest h i"></div>');
       });
       it('should set classes right again if they don\'t conflict', () => {
         app.arrayClasses = [
@@ -125,7 +131,7 @@ export default () => {
           'k'
         ];
 
-        strictEqual(container.html(), '<div class="a d e f h i j k"></div>');
+        strictEqual(container.html(), '<div class="a d e f rest h i j k"></div>');
       });
       it('should set classes right again if they don\'t conflict', () => {
         app.objectClasses = {
@@ -133,6 +139,11 @@ export default () => {
           g: true,
           l: true
         };
+
+        strictEqual(container.html(), '<div class="a d e rest h i j k g l"></div>');
+      });
+      it('should do the cleaning', () => {
+        app.rest = {};
 
         strictEqual(container.html(), '<div class="a d e h i j k g l"></div>');
       });

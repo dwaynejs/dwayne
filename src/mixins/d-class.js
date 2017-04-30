@@ -57,12 +57,14 @@ rootMixins['d-class'] = class DClass extends Mixin {
     this.classes = newClasses;
   }
 
-  beforeRemove() {
-    const {
-      elem,
-      classes
-    } = this;
+  beforeRemove(isElementRemoved) {
+    if (!isElementRemoved) {
+      const {
+        elem,
+        classes
+      } = this;
 
-    elem.removeClass.apply(elem, classes);
+      elem.removeClass.apply(elem, classes);
+    }
   }
 };

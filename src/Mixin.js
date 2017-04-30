@@ -1,8 +1,10 @@
 import {
-  defineFrozenProperties,
+  defineFrozenProperties, getProto,
   removeArrayElem, setToStringTag
 } from './utils';
 import { wrapMixin, removeWatchers } from './helpers/Block';
+
+const toStringTag = '[object Mixin]';
 
 /**
  * @class Mixin
@@ -45,8 +47,32 @@ class Mixin {
     } = opts;
     const watchersToRemove = [];
     const watchers = [];
+    const { constructor } = getProto(this);
+    const afterUpdate = (newValue, oldValue) => {
+      this.$$.value = newValue;
+
+      try {
+        this.afterUpdate(newValue, oldValue);
+      } catch (err) {
+        console.error(`Uncaught error in ${ name }#afterUpdate:`, err);
+      }
+    };
 
     defineFrozenProperties(this, {
+      /**
+       * @member {Object} Mixin#$$
+       * @type {Object}
+       * @protected
+       * @property {Function} Mixin#$$.evaluate - Evaluate function.
+       * @property {Boolean} Mixin#$$.isDynamic - If the mixin is dynamic.
+       * @property {Boolean} Mixin#$$.isRemoved - If the block is removed.
+       * @property {String} Mixin#$$.name - Mixin name.
+       * @property {Block|void} Mixin#$$.parentBlock - Parent block.
+       * @property {Block|void} Mixin#$$.parentScope - Parent scope.
+       * @property {Block|void} Mixin#$$.parentTemplate - Parent template.
+       * @property {Watcher[]} Block#$$.watchers - Temporary vars watchers.
+       * @property {Object[]} Block#$$.watchersToRemove - Watchers to remove before removing mixin.
+       */
       $$: {
         name,
         _value: value,
@@ -88,6 +114,11 @@ class Mixin {
 
           if (!isParentSignal) {
             removeArrayElem(parentBlock.$$.mixins, this);
+          }
+        },
+        setAfterUpdate: () => {
+          if (constructor.evaluate) {
+            afterUpdate(this.$$.evaluate(afterUpdate));
           }
         }
       }
@@ -167,7 +198,7 @@ class Mixin {
   }
 
   toString() {
-    return '[object Mixin]';
+    return toStringTag;
   }
 }
 

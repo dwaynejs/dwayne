@@ -37,51 +37,68 @@ rootBlocks['d-switch'] = class DSwitch extends Block {
       args,
       args: { value }
     } = this;
+    let wasDefault = false;
 
-    this.values = htmlChildren.map((child, i) => {
-      const {
-        name,
-        attrs = {},
-        children
-      } = child;
-      let val;
+    this.values = htmlChildren
+      .filter(({ name }) => {
+        if (name !== 'd-case' && name !== 'd-default') {
+          return;
+        }
 
-      if (name !== 'd-default') {
-        val = parentScope.$$.evaluate(attrs.if, (newValue) => {
-          this.values[i].value = newValue;
+        if (wasDefault) {
+          return;
+        }
 
-          if (i > this.index) {
-            return;
-          }
+        if (name === 'd-default') {
+          wasDefault = true;
+        }
 
-          const found = findInArray(this.values, ({ name, value }) => (
-            name === 'd-default'
-            || this.args.compareFn(args.value, value)
-          ));
+        return true;
+      })
+      .map((child, i) => {
+        const {
+          name,
+          attrs = {},
+          children
+        } = child;
+        let val;
 
-          this.index = found
-            ? found.key
-            : Infinity;
-          this.elems = found
-            ? found.value.children
-            : null;
-        }, this);
-      }
+        if (name !== 'd-default') {
+          val = parentScope.$$.evaluate(attrs.if, (newValue) => {
+            this.values[i].value = newValue;
 
-      if (this.index === Infinity && (
-        name === 'd-default'
-        || this.args.compareFn(value, val)
-      )) {
-        this.index = i;
-        this.elems = children;
-      }
+            if (i > this.index) {
+              return;
+            }
 
-      return {
-        name,
-        children,
-        value: val
-      };
-    });
+            const found = findInArray(this.values, ({ name, value }) => (
+              name === 'd-default'
+              || this.args.compareFn(args.value, value)
+            ));
+
+            this.index = found
+              ? found.key
+              : Infinity;
+            this.elems = found
+              ? found.value.children
+              : null;
+          }, this);
+        }
+
+        if (this.index === Infinity && (
+          name === 'd-default'
+          || this.args.compareFn(value, val)
+        )) {
+          this.index = i;
+          this.elems = children;
+        }
+
+        return {
+          name,
+          children,
+          value: val
+        };
+      });
   }
 
   afterConstruct() {

@@ -30,6 +30,7 @@ class DStyleConflict extends Block {
     <div
       d-style#a="{stylesA}"
       d-style#b="{stylesB}"
+      d-rest="{rest}"
     />
   `;
 
@@ -38,6 +39,11 @@ class DStyleConflict extends Block {
   };
   stylesB = {
     height: '1px'
+  };
+  rest = {
+    'd-style#rest': {
+      position: 'absolute'
+    }
   };
 
   afterRender() {
@@ -117,7 +123,8 @@ export default () => {
       it('should set styles from variables', () => {
         deepStrictEqual(container.find('div').css(), {
           width: '1px',
-          height: '1px'
+          height: '1px',
+          position: 'absolute'
         });
       });
       it('should set styles right if they don\'t conflict', () => {
@@ -129,7 +136,8 @@ export default () => {
         deepStrictEqual(container.find('div').css(), {
           width: '2px',
           height: '1px',
-          zIndex: '3'
+          zIndex: '3',
+          position: 'absolute'
         });
       });
       it('should set styles right again if they don\'t conflict', () => {
@@ -137,6 +145,17 @@ export default () => {
           height: '2px',
           lineHeight: '3px'
         };
+
+        deepStrictEqual(container.find('div').css(), {
+          width: '2px',
+          height: '2px',
+          zIndex: '3',
+          lineHeight: '3px',
+          position: 'absolute'
+        });
+      });
+      it('should do the cleaning', () => {
+        app.rest = {};
 
         deepStrictEqual(container.find('div').css(), {
           width: '2px',

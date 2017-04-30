@@ -14,7 +14,12 @@ const remove = () => {
 class DOn extends Block {
   static template = html`
     <div d-on(click)="{onClick()}"/>
+    <div d-rest="{rest}" class="d-rest"/>
   `;
+
+  rest = {
+    'd-on(contextmenu)': js`onRightClick()`
+  };
 
   afterRender() {
     app = this;
@@ -62,6 +67,18 @@ export default () => {
       };
 
       initApp(htmlScopeless`<DOnNoArgs/>`, doc.create('div'));
+    });
+    it('should do the cleaning', (done) => {
+      app.onRightClick = () => {
+        done(new Error('Shouldn\'t have been called'));
+      };
+      app.rest = {};
+
+      container
+        .find('div.d-rest')
+        .dispatch('contextmenu');
+
+      setTimeout(done, 25);
     });
 
     after(remove);

@@ -1,4 +1,4 @@
-import { iterateArray, keys } from '../../utils';
+import { iterateArray, iterateObject, keys } from '../../utils';
 
 export function calculateArgs(args, argsObject) {
   iterateArray(keys(argsObject), (arg) => {
@@ -7,8 +7,7 @@ export function calculateArgs(args, argsObject) {
     }
   });
 
-  /* eslint guard-for-in: 0 */
-  for (const arg in args) {
-    argsObject[arg] = args[arg];
-  }
+  iterateObject(args, (value, arg) => {
+    argsObject[arg] = value;
+  });
 }

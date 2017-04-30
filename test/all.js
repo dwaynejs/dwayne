@@ -1,5 +1,6 @@
 import './Block';
 import './Elem';
+import './Mixin';
 
 import './blocks';
 import './mixins';

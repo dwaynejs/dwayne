@@ -15,7 +15,12 @@ class DBind extends Block {
   static template = html`
     <div d-bind(click)="{onClick}"/>
     <div d-bind(keydown)="{onKeydown}"/>
+    <div d-rest="{rest}" class="d-rest"/>
   `;
+
+  rest = {
+    'd-bind(contextmenu)': js`(e) => onRightClick(e)`
+  };
 
   afterRender() {
     app = this;
@@ -69,6 +74,18 @@ export default () => {
       };
 
       initApp(htmlScopeless`<DBindNoArgs/>`, doc.create('div'));
+    });
+    it('should do the cleaning', (done) => {
+      app.onRightClick = () => {
+        done(new Error('Shouldn\'t have been called'));
+      };
+      app.rest = {};
+
+      container
+        .find('div.d-rest')
+        .dispatch('contextmenu');
+
+      setTimeout(done, 25);
     });
 
     after(remove);

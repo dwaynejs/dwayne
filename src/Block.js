@@ -8,7 +8,7 @@ import {
   getProto, setProto
 } from './utils';
 import {
-  constructMixinRegex, isInstanceOf,
+  constructMixinRegex, isInstanceOf, normalizeArgs,
   removeWatchers, removeWithParentSignal, cleanProperty,
   transformRestArgs, calculateArgs, wrapBlock
 } from './helpers/Block';
@@ -300,11 +300,6 @@ class Block {
       };
     }
 
-    const {
-      vars,
-      value
-    } = Subclass.template;
-
     Subclass._blocks = hasOwnProperty(Subclass, '_blocks')
       ? Subclass._blocks
       : create(this._blocks);
@@ -445,7 +440,7 @@ class Block {
       prevBlock
     } = opts;
     const watchersToRemove = [];
-    const constructor = getProto(this).constructor;
+    const { constructor } = getProto(this);
     const childrenBlocks = [];
     const mixins = [];
     const isParentBlock = parent instanceof Block;
@@ -458,8 +453,8 @@ class Block {
        * @property {Object} Block#$$.args - Private args scope.
        * @property {Block[]} Block#$$.children - Child blocks.
        * @property {Elem} Block#$$.content - Content elements.
+       * @property {Object|void} Block#$$.dBlockArgs - d-block args.
        * @property {String|void} Block#$$.dBlockName - d-block name.
-       * @property {Object|void} Block#$$.dBlockName - d-block args.
        * @property {Block[]} Block#$$.dBlocks - d-block's within the block.
        * @property {Function} Block#$$.evaluate - Evaluate function.
        * @property {Object} Block#$$.globals - Private globals scope.
@@ -468,6 +463,7 @@ class Block {
        * @property {Boolean} Block#$$.isRendered - If the block is rendered.
        * @property {Object} Block#$$.locals - Private locals scope.
        * @property {Mixin[]} Block#$$.mixins - Child mixins.
+       * @property {Function[]} Block#$$.mixinsToBuild - Pending mixins builders.
        * @property {String} Block#$$.name - Block name.
        * @property {typeof Block} Block#$$.ns - Block constructor.
        * @property {Block|Elem|void} Block#$$.parent - Parent block or elem.
@@ -477,7 +473,7 @@ class Block {
        * @property {Block|void} Block#$$.parentTemplate - Parent template.
        * @property {Block|Elem|void} Block#$$.prevBlock - Parent template.
        * @property {Watcher[]} Block#$$.watchers - Temporary vars watchers.
-       * @property {Object[]} Block#$$.watchersToRemove - Watchers to remove before removing element.
+       * @property {Object[]} Block#$$.watchersToRemove - Watchers to remove before removing the block.
        */
       $$: {
         name,
@@ -494,6 +490,7 @@ class Block {
         htmlChildren: children || [],
         children: childrenBlocks,
         mixins,
+        mixinsToBuild: [],
         prevBlock,
         watchersToRemove,
         isRemoved: false,
@@ -769,8 +766,16 @@ class Block {
     });
 
     const argsObject = create(null);
-    let args = create(constructor.defaultArgs || null);
+    const { defaultArgs } = constructor;
+    let args = create(defaultArgs || null);
     let wasDRest;
+    const argsChain = [];
+
+    if (defaultArgs) {
+      argsChain.push(defaultArgs);
+    }
+
+    argsChain.push(args);
 
     iterateObject(originalArgs, (value, arg) => {
       const isDRest = D_REST_REGEX.test(arg);
@@ -778,13 +783,17 @@ class Block {
         ? create(args)
         : args;
 
+      if (args !== localArgs) {
+        argsChain.push(localArgs);
+      }
+
       args = localArgs;
 
       if (isDRest) {
         const restArgs = parentScope.$$.evaluate(value, (value) => {
           iterateObject(localArgs, cleanProperty);
           assign(localArgs, transformRestArgs(value));
-          calculateArgs(args, argsObject);
+          calculateArgs(normalizeArgs(argsChain), argsObject);
         }, this);
 
         wasDRest = true;
@@ -800,7 +809,7 @@ class Block {
       if (name !== 'd-each' || arg !== 'uid') {
         value = parentScope.$$.evaluate(value, (value) => {
           localArgs[arg] = value;
-          calculateArgs(args, argsObject);
+          calculateArgs(normalizeArgs(argsChain), argsObject);
         }, this, forDElements, isDElements && parentBlock.$$.name === '#d-item');
       }
 
@@ -827,7 +836,7 @@ class Block {
       )
     });
 
-    calculateArgs(args, argsObject);
+    calculateArgs(normalizeArgs(argsChain), argsObject);
 
     if (parentBlock) {
       parentBlock.$$.children.push(this);

@@ -12,8 +12,10 @@ class DHide extends Mixin {
     }
   }
 
-  beforeRemove() {
-    this.elem.show();
+  beforeRemove(isElementRemoved) {
+    if (!isElementRemoved) {
+      this.elem.show();
+    }
   }
 }
 

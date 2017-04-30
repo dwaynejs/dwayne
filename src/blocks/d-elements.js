@@ -55,6 +55,10 @@ rootBlocks['d-elements'] = class DElements extends Block {
           prevBlock
         });
       });
+      iterateArray(this.$$.mixinsToBuild, (executeBuilders) => {
+        executeBuilders();
+      });
+      this.$$.mixinsToBuild = [];
     }, this, true);
   }
 };

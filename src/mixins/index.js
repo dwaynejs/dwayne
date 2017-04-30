@@ -1,4 +1,3 @@
-import './d-attr';
 import './d-bind';
 import './d-class';
 import './d-elem';

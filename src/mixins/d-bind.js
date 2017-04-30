@@ -21,7 +21,9 @@ rootMixins['d-bind'] = class DBind extends Mixin {
     }
   }
 
-  beforeRemove() {
-    this.off();
+  beforeRemove(isElementRemoved) {
+    if (!isElementRemoved) {
+      this.off();
+    }
   }
 };
