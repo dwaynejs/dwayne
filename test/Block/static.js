@@ -71,10 +71,6 @@ export default () => {
           return;
         }
 
-        if (Block.returnArray) {
-          Block.template = Block.template.value;
-        }
-
         if (Block.forErrorHooks) {
           throw error;
         }
@@ -212,22 +208,6 @@ export default () => {
       class MyBlock extends Block {
         static template = template;
         static forErrorHooks = true;
-
-        who = 'world';
-      }
-
-      Block.block('MyBlock', MyBlock);
-
-      const container = doc.create('div');
-
-      initApp('MyBlock', container);
-
-      strictEqual(container.html(), '<div>Hello, world!</div>');
-    });
-    it('should test hooks which set template to an array', () => {
-      class MyBlock extends Block {
-        static template = template;
-        static returnArray = true;
 
         who = 'world';
       }

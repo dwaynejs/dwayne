@@ -226,7 +226,7 @@ export function createBlock({ node, parent, parentElem, parentBlock, parentScope
 
   const html = name === 'd-elements'
     ? Args.value || []
-    : constructor.template.value;
+    : constructor.template.value || constructor.template;
 
   $$.args = constructPrivateScope(Args);
   $$.locals = constructPrivateScope(locals);

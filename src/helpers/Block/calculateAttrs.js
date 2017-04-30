@@ -3,7 +3,7 @@ import { executeMixinWatchers } from './executeMixinWatchers';
 
 export function calculateAttrs(normalizedAttrs, attrs, attrsObject, elem, firstTime) {
   iterateObject(attrsObject, ({ type, value }, attr) => {
-    if (!attrs[attr]) {
+    if (!(attr in attrs)) {
       if (type === 'attr') {
         elem.removeAttr(attr);
       } else {

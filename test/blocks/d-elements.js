@@ -44,7 +44,6 @@ export default () => {
     let span;
 
     before(() => {
-      console.dir(DElements);
       initApp(DElements, container);
     });
 

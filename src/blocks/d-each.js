@@ -1,5 +1,5 @@
 import {
-  assign, iterateArray, iterateObject,
+  iterateArray, iterateObject,
   isArray, isFunction
 } from '../utils';
 import { remove, createBlock } from '../helpers/Block';
@@ -25,46 +25,42 @@ rootBlocks['d-each'] = class DEach extends Block {
 
     const {
       args: {
-        item: itemName = '$item',
-        index: indexName = '$index'
+        item = '$item',
+        index = '$index'
       }
     } = this;
 
-    assign(this.$$, {
-      itemsByUIDs: {},
-      itemName,
-      indexName
-    });
+    this.itemName = item;
+    this.indexName = index;
+    this.itemsByUIDs = {};
   }
 
   afterConstruct() {
-    this.evaluate(watchArgs, this.renderSet);
-    this.renderSet();
+    this.renderSet(this.evaluate(watchArgs, this.renderSet));
   }
 
-  renderSet = () => {
+  renderSet = (args) => {
+    let set = args[0];
+    let filterBy = args[1];
+    const sortBy = args[2];
+
     const {
       htmlChildren,
-      itemsByUIDs,
       parentScope,
       parentElem,
-      parentTemplate,
-      itemName,
-      indexName
+      parentTemplate
     } = this.$$;
     const {
       args: {
-        sortBy,
         uid: UID
-      }
+      },
+      itemsByUIDs,
+      itemName,
+      indexName
     } = this;
     const newItemsByUIDs = {};
-    const newUIDsCounter = {};
+    const newUIDsByIndexes = {};
     const newUIDs = {};
-    let {
-      set,
-      filterBy
-    } = this.args;
     const isArr = isArray(set);
     const iterate = isArr
       ? iterateArray
@@ -89,18 +85,18 @@ rootBlocks['d-each'] = class DEach extends Block {
     iterate(set, (item, index) => {
       const uid = UID(item, index, set, parentScope);
 
-      newUIDsCounter[uid] = (newUIDsCounter[uid] || 0) + 1;
+      if (uid in newUIDsByIndexes) {
+        console.error(`UIDs can't be same for multiple items! In UID function: "${ UID.original || UID }"`);
+      }
+
+      newUIDsByIndexes[uid] = index;
       newUIDs[index] = uid;
     });
 
-    iterateObject(itemsByUIDs, (items, uid) => {
-      if (!newUIDsCounter[uid]) {
-        iterateArray(items, remove);
-
-        return;
+    iterateObject(itemsByUIDs, (block, uid) => {
+      if (!(uid in newUIDsByIndexes)) {
+        remove(block);
       }
-
-      iterateArray(items.splice(newUIDsCounter[uid]), remove);
     });
 
     let prevBlock;
@@ -109,8 +105,14 @@ rootBlocks['d-each'] = class DEach extends Block {
       const uid = newUIDs[index];
       let block;
 
-      if (itemsByUIDs[uid] && itemsByUIDs[uid].length) {
-        block = itemsByUIDs[uid].shift();
+      if (newUIDsByIndexes[uid] !== index) {
+        return;
+      }
+
+      const prevUIDBlock = itemsByUIDs[uid];
+
+      if (prevUIDBlock) {
+        block = prevUIDBlock;
         block.$$.scope[indexName] = index;
         block.$$.scope[itemName] = item;
 
@@ -143,11 +145,11 @@ rootBlocks['d-each'] = class DEach extends Block {
         });
       }
 
-      (newItemsByUIDs[uid] = newItemsByUIDs[uid] || []).push(block);
+      newItemsByUIDs[uid] = block;
       block.$$.prevBlock = prevBlock;
       prevBlock = block;
     });
 
-    this.$$.itemsByUIDs = newItemsByUIDs;
+    this.itemsByUIDs = newItemsByUIDs;
   };
 };

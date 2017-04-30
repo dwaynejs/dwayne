@@ -8,6 +8,7 @@ describe('insertTemplates()', () => {
         123
         <!-- templateA -->
         <!-- templateC -->
+        <!-- templateD -->
       </div>
       <svg>
         <rect width="10" height="10"/>
@@ -38,6 +39,7 @@ describe('insertTemplates()', () => {
         <span>Hello, world!</span>
         <i>123</i>
         <b>important</b>
+        <!-- templateD -->
       </div>
       <svg>
         <rect width="10" height="10"/>

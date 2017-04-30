@@ -293,13 +293,6 @@ class Block {
       console.error('Uncaught error in "beforeRegisterBlock" hook:', err);
     }
 
-    if (isArray(Subclass.template)) {
-      Subclass.template = {
-        vars: [],
-        value: Subclass.template
-      };
-    }
-
     Subclass._blocks = hasOwnProperty(Subclass, '_blocks')
       ? Subclass._blocks
       : create(this._blocks);
@@ -761,7 +754,7 @@ class Block {
     iterateObject(constructor.defaultLocals, (value, variable) => {
       this[variable] = value;
     });
-    iterateArray(constructor.template.vars, (variable) => {
+    iterateArray(constructor.template.vars || [], (variable) => {
       this[variable] = this[variable];
     });
 
@@ -793,7 +786,7 @@ class Block {
         const restArgs = parentScope.$$.evaluate(value, (value) => {
           iterateObject(localArgs, cleanProperty);
           assign(localArgs, transformRestArgs(value));
-          calculateArgs(normalizeArgs(argsChain), argsObject);
+          calculateArgs(normalizeArgs(argsChain), args, argsObject);
         }, this);
 
         wasDRest = true;
@@ -808,7 +801,7 @@ class Block {
 
       localArgs[arg] = parentScope.$$.evaluate(value, (value) => {
         localArgs[arg] = value;
-        calculateArgs(normalizeArgs(argsChain), argsObject);
+        calculateArgs(normalizeArgs(argsChain), args, argsObject);
       }, this, forDElements, isDElements && parentBlock.$$.name === '#d-item');
     });
 
@@ -832,7 +825,7 @@ class Block {
       )
     });
 
-    calculateArgs(normalizeArgs(argsChain), argsObject);
+    calculateArgs(normalizeArgs(argsChain), args, argsObject);
 
     if (parentBlock) {
       parentBlock.$$.children.push(this);

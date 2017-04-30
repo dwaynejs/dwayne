@@ -10,6 +10,9 @@ const remove = () => {
   app = null;
   block = null;
 };
+const sameUID = (item) => item;
+
+sameUID.toString = () => '(item) => item';
 
 class DEachSimple extends Block {
   static template = html`
@@ -126,6 +129,23 @@ class DEachUID extends Block {
   afterRender() {
     block = this;
   }
+}
+
+class DEachSameUID extends Block {
+  static template = [{
+    name: 'd-each',
+    attrs: {
+      set: [2, 2, 3],
+      uid: () => sameUID
+    },
+    children: [{
+      name: 'b',
+      children: [{
+        name: '#text',
+        value: ($) => $.$item
+      }]
+    }]
+  }];
 }
 
 class DEachArgs extends Block {
@@ -326,6 +346,37 @@ export default () => {
       });
 
       after(remove);
+    });
+    describe('same uid test', () => {
+      const oldConsoleError = console.error;
+
+      it('should log an error when UIDs are same', (done) => {
+        const container = doc.create('div');
+
+        console.error = (message) => {
+          try {
+            strictEqual(message, `UIDs can't be same for multiple items! In UID function: "${ sameUID.toString() }"`);
+
+            setTimeout(() => {
+              try {
+                strictEqual(container.html(), '<b>2</b><b>3</b>');
+
+                done();
+              } catch (err) {
+                done(err);
+              }
+            }, 0);
+          } catch (err) {
+            done(err);
+          }
+        };
+
+        initApp(DEachSameUID, container);
+      });
+
+      after(() => {
+        console.error = oldConsoleError;
+      });
     });
     describe('args test', () => {
       let michael;
