@@ -246,19 +246,6 @@ export function createBlock({ node, parent, parentElem, parentBlock, parentScope
     constructPublicScope($$.scope = create(scope), scopeValues, $$.privateScope);
   }
 
-  if (name === 'd-each') {
-    $$.scope = create(parentScope.$$.name === '#d-item' ? parentScope.$$.scope : parentScope, {
-      [Args.item || '$item']: {
-        value: null,
-        writable: true
-      },
-      [Args.index || '$index']: {
-        value: null,
-        writable: true
-      }
-    });
-  }
-
   constructPublicScope(Args, Args, $$.args);
   constructPublicScope(globals, globals, $$.globals);
   constructPublicScope(blockInstance, locals, $$.locals);

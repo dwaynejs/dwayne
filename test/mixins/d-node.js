@@ -30,7 +30,7 @@ class DNode extends Block {
 
 class DNodeHelper extends Block {
   static template = html`
-    <div d-node(div)="{getTopBlock()}"/>
+    <div d-node(div)="{getParentTemplate()}"/>
     <b d-node(b)/>
   `;
 

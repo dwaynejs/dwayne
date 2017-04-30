@@ -139,13 +139,6 @@ class Mixin {
     this.comment = comment;
 
     /**
-     * @member {Block} [Mixin#parentBlock]
-     * @type {Block}
-     * @public
-     */
-    this.parentBlock = parentBlock;
-
-    /**
      * @member {Block} [Mixin#parentScope]
      * @type {Block}
      * @public

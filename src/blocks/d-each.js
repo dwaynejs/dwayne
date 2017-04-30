@@ -14,6 +14,12 @@ const watchArgs = js`[
 ]`;
 
 rootBlocks['d-each'] = class DEach extends Block {
+  static defaultArgs = {
+    uid(item, index) {
+      return index;
+    }
+  };
+
   constructor(opts) {
     super(opts);
 
@@ -26,7 +32,6 @@ rootBlocks['d-each'] = class DEach extends Block {
 
     assign(this.$$, {
       itemsByUIDs: {},
-      UID: this.args.uid || undefined,
       itemName,
       indexName
     });
@@ -44,13 +49,14 @@ rootBlocks['d-each'] = class DEach extends Block {
       parentScope,
       parentElem,
       parentTemplate,
-      scope,
       itemName,
-      indexName,
-      UID
+      indexName
     } = this.$$;
     const {
-      args: { sortBy }
+      args: {
+        sortBy,
+        uid: UID
+      }
     } = this;
     const newItemsByUIDs = {};
     const newUIDsCounter = {};
@@ -81,17 +87,11 @@ rootBlocks['d-each'] = class DEach extends Block {
     }
 
     iterate(set, (item, index) => {
-      scope[itemName] = item;
-      scope[indexName] = index;
-
-      const uid = parentScope.$$.evaluate(UID, null, null, false, false, this);
+      const uid = UID(item, index, set, parentScope);
 
       newUIDsCounter[uid] = (newUIDsCounter[uid] || 0) + 1;
       newUIDs[index] = uid;
     });
-
-    scope[itemName] = null;
-    scope[indexName] = null;
 
     iterateObject(itemsByUIDs, (items, uid) => {
       if (!newUIDsCounter[uid]) {

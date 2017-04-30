@@ -495,7 +495,7 @@ class Block {
         watchersToRemove,
         isRemoved: false,
         isRendered: false,
-        evaluate: (func, onChange, targetBlock, forDElements, forDItem, forDEach) => {
+        evaluate: (func, onChange, targetBlock, forDElements, forDItem) => {
           if (!isFunction(func)) {
             return func;
           }
@@ -503,8 +503,8 @@ class Block {
           forDElements = !!forDElements;
           forDItem = !!forDItem;
 
-          const scope = (name === '#d-item' && !forDItem) || forDEach
-            ? (forDEach || this).$$.scope
+          const scope = name === '#d-item' && !forDItem
+            ? this.$$.scope
             : this;
           const { watchersToRemove } = targetBlock ? targetBlock.$$ : emptyObject;
           const onChangeFlag = !!onChange;
@@ -806,14 +806,10 @@ class Block {
 
       wasDRest = false;
 
-      if (name !== 'd-each' || arg !== 'uid') {
-        value = parentScope.$$.evaluate(value, (value) => {
-          localArgs[arg] = value;
-          calculateArgs(normalizeArgs(argsChain), argsObject);
-        }, this, forDElements, isDElements && parentBlock.$$.name === '#d-item');
-      }
-
-      localArgs[arg] = value;
+      localArgs[arg] = parentScope.$$.evaluate(value, (value) => {
+        localArgs[arg] = value;
+        calculateArgs(normalizeArgs(argsChain), argsObject);
+      }, this, forDElements, isDElements && parentBlock.$$.name === '#d-item');
     });
 
     defineFrozenProperties(this, {
@@ -905,12 +901,22 @@ class Block {
   }
 
   /**
-   * @method Block#getTopBlock
+   * @method Block#getParentScope
    * @public
    * @returns {Block|void}
    * @description Returns block in which template the block is located in.
    */
-  getTopBlock() {
+  getParentScope() {
+    return this.$$.parentScope;
+  }
+
+  /**
+   * @method Block#getParentTemplate
+   * @public
+   * @returns {Block|void}
+   * @description Returns block in which template the block is located in.
+   */
+  getParentTemplate() {
     return this.$$.parentTemplate;
   }
 

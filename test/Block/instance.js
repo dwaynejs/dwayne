@@ -55,9 +55,9 @@ class GetParentElemApp extends Block {
   }
 }
 
-class GetTopBlockApp extends Block {
+class GetParentTemplateApp extends Block {
   static template = html`
-    <GetTopBlock/>
+    <GetParentTemplate/>
   `;
 
   afterRender() {
@@ -65,7 +65,7 @@ class GetTopBlockApp extends Block {
   }
 }
 
-class GetTopBlock extends Block {
+class GetParentTemplate extends Block {
   afterRender() {
     block = this;
   }
@@ -78,7 +78,7 @@ class NameApp extends Block {
 }
 
 Block.block('ErrorConstructor', ErrorConstructor);
-Block.block('GetTopBlock', GetTopBlock);
+Block.block('GetParentTemplate', GetParentTemplate);
 Block.block('NameApp', NameApp);
 
 export default () => {
@@ -281,15 +281,28 @@ export default () => {
 
     after(remove);
   });
-  describe('getTopBlock()', () => {
+  describe('getParentScope()', () => {
     before(() => {
-      initApp(GetTopBlockApp, container);
+      initApp(GetParentTemplateApp, container);
     });
 
     it('should return block top block', () => {
-      const topBlock = block.getTopBlock();
+      const parentScope = block.getParentScope();
 
-      strictEqual(topBlock, app);
+      strictEqual(parentScope, app);
+    });
+
+    after(remove);
+  });
+  describe('getParentTemplate()', () => {
+    before(() => {
+      initApp(GetParentTemplateApp, container);
+    });
+
+    it('should return block top block', () => {
+      const parentTemplate = block.getParentTemplate();
+
+      strictEqual(parentTemplate, app);
     });
 
     after(remove);

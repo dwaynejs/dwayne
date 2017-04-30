@@ -43,7 +43,7 @@ class DValueSimple extends Block {
 
 class DValueSimpleHelper extends Block {
   static template = html`
-    <input d-value(input3)="{getTopBlock()}" value="789"/>
+    <input d-value(input3)="{getParentTemplate()}" value="789"/>
     <input d-value(input4) value="159"/>
   `;
 

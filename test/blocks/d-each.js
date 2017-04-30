@@ -118,7 +118,7 @@ class DEachUIDApp extends Block {
 
 class DEachUID extends Block {
   static template = html`
-    <d-each set="{args.people}" uid="{$item.id}">
+    <d-each set="{args.people}" uid="{(item) => item.id}">
       <b>{$item.name}</b>
     </d-each>
   `;
@@ -135,7 +135,7 @@ class DEachArgs extends Block {
       set="{people}"
       item="person"
       index="index"
-      uid="{person.id}"
+      uid="{(person) => person.id}"
       filterBy="{({ age }) => age < 30}"
       sortBy="{({ age: age1 }, { age: age2 }) => age1 > age2 ? -1 : age1 < age2 ? 1 : 0}"
     >

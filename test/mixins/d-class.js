@@ -50,7 +50,7 @@ class DClassConflict extends Block {
 
 class DClassArgs extends Block {
   static template = html`
-    <div d-class(a,b)="{bool}"/>
+    <div d-class(a,b)="{bool}" d-class()="{bool}"/>
   `;
 
   bool = true;
