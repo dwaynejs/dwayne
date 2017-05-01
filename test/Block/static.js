@@ -1,4 +1,4 @@
-import { strictEqual } from 'assert';
+import { strictEqual, deepStrictEqual } from 'assert';
 import { Block, Mixin, initApp, doc, insertTemplates } from '../../src';
 import { DBlock } from '../../src/blocks/d-block';
 import { DHide } from '../../src/mixins/d-hide';
@@ -47,6 +47,27 @@ class ErrorEvalErrorBlock extends Block {
     }]
   };
 }
+
+class Test extends Block {
+  static template = html`
+    <div>Hello, world!</div>
+  `;
+}
+
+const wrapper = (Block) => {
+  if (Block.wrapped) {
+    return;
+  }
+
+  return class extends Block {
+    static template = insertTemplates(html`
+      <span><!-- block --></span>
+    `, {
+      block: Block.template
+    });
+    static wrapped = true;
+  };
+};
 
 Block.block('OwnOnEvalErrorBlock', OwnOnEvalErrorBlock);
 Block.block('MuteEvalErrorBlock', MuteEvalErrorBlock);
@@ -138,7 +159,7 @@ export default () => {
     it('should not register block with a built-in name', (done) => {
       console.warn = (message) => {
         try {
-          strictEqual(message, 'The "d-block" block is a built-in block so the block will not be registered (Block.block)');
+          strictEqual(message, 'The "d-elements" block is a built-in block so the block will not be registered (Block.block)');
 
           done();
         } catch (err) {
@@ -146,7 +167,7 @@ export default () => {
         }
       };
 
-      Block.block('d-block', template);
+      Block.block('d-elements', template);
     });
     it('should not register block with invalid name', (done) => {
       console.warn = (message) => {
@@ -348,7 +369,7 @@ export default () => {
     it('should not register mixin with a built-in name', (done) => {
       console.warn = (message) => {
         try {
-          strictEqual(message, 'The "d-bind" mixin is a built-in mixin so the mixin will not be registered (Block.mixin)');
+          strictEqual(message, 'The "d-rest" mixin is a built-in mixin so the mixin will not be registered (Block.mixin)');
 
           done();
         } catch (err) {
@@ -356,7 +377,7 @@ export default () => {
         }
       };
 
-      Block.mixin('d-bind', () => {});
+      Block.mixin('d-rest', () => {});
     });
     it('should not register mixin with invalid name', (done) => {
       console.warn = (message) => {
@@ -521,6 +542,26 @@ export default () => {
 
     after(() => {
       console.error = oldConsoleError;
+    });
+  });
+  describe('wrap()', () => {
+    it('should return new block', () => {
+      const wrapped = Test.wrap(wrapper);
+
+      deepStrictEqual(wrapped.template, html`
+        <span>
+          <div>Hello, world!</div>
+        </span>
+      `);
+    });
+    it('should return initial block if return value is not a block', () => {
+      const wrapped = Test.wrap(wrapper, wrapper);
+
+      deepStrictEqual(wrapped.template, html`
+        <span>
+          <div>Hello, world!</div>
+        </span>
+      `);
     });
   });
 };

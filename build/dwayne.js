@@ -46,8 +46,23 @@ function addKey(vars, variable) {
   vars[variable] = true;
 }
 
-var _ref$1 = {};
-var has = _ref$1.hasOwnProperty;
+var isArray = Array.isArray;
+function isFunction(value) {
+  return typeof value === 'function';
+}
+
+function isNil(value) {
+  /* eslint-disable eqeqeq */
+  return value == null;
+  /* eslint-enable eqeqeq */
+}
+
+function isString(value) {
+  return typeof value === 'string';
+}
+
+var _ref = {};
+var has = _ref.hasOwnProperty;
 var slice = [].slice;
 
 
@@ -145,17 +160,31 @@ function defineFrozenProperties(target, properties) {
   });
 }
 
-/* eslint no-nested-ternary: 0 */
-/* eslint no-negated-condition: 0 */
-var global$1 = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+var regexpSpecialCharacters = ['.', '+', '*', '?', '(', ')', '[', ']', '{', '}', '<', '>', '^', '$', '!', '=', ':', '-', '|', ',', '\\'];
+var regexpSpecialsRegexp = new RegExp(regexpSpecialCharacters.map(function (s) {
+  return '\\' + s;
+}).join('|'), 'g');
+
+function escapeRegex(string) {
+  return string.replace(regexpSpecialsRegexp, '\\$&');
+}
+
+function noop() {}
 
 var create = Object.create;
 var keys = Object.keys;
 var getProto = Object.getPrototypeOf;
 var setProto = Object.setPrototypeOf || function (target, proto) {
-  /* eslint no-proto: 0 */
+  /* eslint-disable no-proto */
   target.__proto__ = proto;
+  /* eslint-enable no-proto */
 };
+
+/* eslint-disable no-nested-ternary */
+/* eslint-disable no-negated-condition */
+var global$1 = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+/* eslint-enable no-nested-ternary */
+/* eslint-enable no-negated-condition */
 
 var HIDE_CLASS = '__dwayne-hidden__';
 var SVG_NS = 'http://www.w3.org/2000/svg';
@@ -360,91 +389,6 @@ var toConsumableArray = function (arr) {
   }
 };
 
-var _ref = {};
-var toString = _ref.toString;
-
-/**
- * @function toStringTag
- * @param {*} object - Object to get toStringTag of.
- * @returns {String} Cut string.
- * @description Cut "Type" string from "[object Type]" string that gotten from {}.toString,call(object).
- */
-
-function toStringTag$1(object) {
-  return toString.call(object).slice(8, -1);
-}
-
-function setToStringTag(klass, tag) {
-  if (_Symbol.toStringTag) {
-    definePrototypeProperties(klass.prototype, defineProperty({}, _Symbol.toStringTag, tag));
-  }
-}
-
-/**
- * @module helpers/checkTypes
- * @private
- * @mixin
- * @description Exports is<Type> methods.
- */
-
-/**
- * @function isArray
- * @public
- * @param {*} value - Value to check if it is an array.
- * @returns {Boolean} If the argument is an array or not.
- * 
- * @example
- * isArray([]);                             // true
- * isArray(0);                              // true
- * isArray(document.querySelectorAll('*')); // false
- */
-var isArray = Array.isArray;
-
-function isFunction(value) {
-  return toStringTag$1(value) === 'Function' || typeof value === 'function';
-}
-
-/**
- * @function isNil
- * @public
- * @param {*} value - Value to check if it is null or undefined.
- * @returns {Boolean} If the argument is null or undefined or not.
- *
- * @example
- * isNil(null);      // true
- * isNil(undefined); // true
- * isNil(false);     // false
- */
-function isNil(value) {
-  /* eslint eqeqeq: 0 */
-  return value == null;
-}
-
-/**
- * @function isString
- * @public
- * @param {*} value - Value to check if it is a string.
- * @returns {Boolean} If the argument is a string or not.
- *
- * @example
- * isString('0');             // true
- * isString(new String('0')); // true
- */
-function isString(value) {
-  return toStringTag$1(value) === 'String';
-}
-
-var regexpSpecialCharacters = ['.', '+', '*', '?', '(', ')', '[', ']', '{', '}', '<', '>', '^', '$', '!', '=', ':', '-', '|', ',', '\\'];
-var regexpSpecialsRegexp = new RegExp(regexpSpecialCharacters.map(function (s) {
-  return '\\' + s;
-}).join('|'), 'g');
-
-function escapeRegex(string) {
-  return string.replace(regexpSpecialsRegexp, '\\$&');
-}
-
-function noop() {}
-
 function setSymbolSpecies(klass, species) {
   if (_Symbol.species) {
     defineProperties(klass, defineProperty({}, _Symbol.species, {
@@ -472,6 +416,26 @@ function capitalize(match) {
 
 function hyphenize(match) {
   return "-" + match[0].toLowerCase();
+}
+
+var _ref$1 = {};
+var toString = _ref$1.toString;
+
+/**
+ * @function toStringTag
+ * @param {*} object - Object to get toStringTag of.
+ * @returns {String} Cut string.
+ * @description Cut "Type" string from "[object Type]" string that gotten from {}.toString,call(object).
+ */
+
+function toStringTag$1(object) {
+  return toString.call(object).slice(8, -1);
+}
+
+function setToStringTag(klass, tag) {
+  if (_Symbol.toStringTag) {
+    definePrototypeProperties(klass.prototype, defineProperty({}, _Symbol.toStringTag, tag));
+  }
 }
 
 function addAttr(attrs, attr) {
@@ -1954,10 +1918,17 @@ var Elem = function (_Array) {
       var _arguments2 = arguments;
 
       return this.forEach(function (elem) {
-        var classList = elem.classList;
+        var _elem = elem,
+            classList = _elem.classList;
 
 
-        classList.toggle(cls, _arguments2.length < 2 ? !classList.contains(cls) : condition);
+        elem = new Elem(elem);
+
+        if (_arguments2.length < 2 ? !classList.contains(cls) : condition) {
+          elem.addClass(cls);
+        } else {
+          elem.removeClass(cls);
+        }
       });
     }
   }]);
@@ -1967,14 +1938,14 @@ var Elem = function (_Array) {
 setToStringTag(Elem, 'Elem');
 setSymbolSpecies(Elem, Array);
 
-function calculateArgs(args, argsObject) {
+function calculateArgs(normalizedArgs, args, argsObject) {
   iterateArray(keys(argsObject), function (arg) {
     if (!(arg in args)) {
       argsObject[arg] = undefined;
     }
   });
 
-  iterateObject(args, function (value, arg) {
+  iterateObject(normalizedArgs, function (value, arg) {
     argsObject[arg] = value;
   });
 }
@@ -1992,7 +1963,7 @@ var COMMA_REGEX = /,/;
 function mixinMatch(mixins, attr) {
   var match = void 0;
 
-  /* eslint guard-for-in: 0 */
+  /* eslint-disable guard-for-in */
   for (var name in mixins) {
     var Mixin = mixins[name];
     var localMatch = attr.match(Mixin._match);
@@ -2017,6 +1988,7 @@ function mixinMatch(mixins, attr) {
       break;
     }
   }
+  /* eslint-enable guard-for-in */
 
   return match;
 }
@@ -2076,7 +2048,7 @@ function calculateAttrs(normalizedAttrs, attrs, attrsObject, elem, firstTime) {
     var type = _ref.type,
         value = _ref.value;
 
-    if (!attrs[attr]) {
+    if (!(attr in attrs)) {
       if (type === 'attr') {
         elem.removeAttr(attr);
       } else {
@@ -2469,8 +2441,9 @@ function createBlock(_ref) {
       var _prevBlock = void 0;
       var _parentElem = element;
 
+      /* istanbul ignore if */
       if (name === 'template') {
-        _parentElem = new Elem(element[0].content);
+        _parentElem = new Elem(element[0].content = element[0].content || doc[0].createDocumentFragment());
       } else if (name === 'iframe') {
         if ('src' in attrs) {
           children = emptyArray;
@@ -2506,7 +2479,7 @@ function createBlock(_ref) {
       locals = objectWithoutProperties(_blockInstance, ['$$', 'args', 'globals']);
 
 
-  var html = name === 'd-elements' ? Args.value || [] : constructor.template.value;
+  var html = name === 'd-elements' ? Args.value || [] : constructor.template.value || constructor.template;
 
   $$.args = constructPrivateScope(Args);
   $$.locals = constructPrivateScope(locals);
@@ -3091,8 +3064,8 @@ var Block = function () {
         return;
       }
 
-      if (rootBlocks[name]) {
-        console.warn('The "' + name + '" block is a built-in block so the block will not be registered (Block.block)');
+      if (name === 'd-elements') {
+        console.warn('The "d-elements" block is a built-in block so the block will not be registered (Block.block)');
 
         return;
       }
@@ -3123,13 +3096,6 @@ var Block = function () {
         }, _Subclass2);
       } catch (err) {
         console.error('Uncaught error in "beforeRegisterBlock" hook:', err);
-      }
-
-      if (isArray(_Subclass2.template)) {
-        _Subclass2.template = {
-          vars: [],
-          value: _Subclass2.template
-        };
       }
 
       _Subclass2._blocks = hasOwnProperty(_Subclass2, '_blocks') ? _Subclass2._blocks : create(this._blocks);
@@ -3211,8 +3177,8 @@ var Block = function () {
         return;
       }
 
-      if (rootMixins[name] || name === 'd-rest') {
-        console.warn('The "' + name + '" mixin is a built-in mixin so the mixin will not be registered (Block.mixin)');
+      if (name === 'd-rest') {
+        console.warn('The "d-rest" mixin is a built-in mixin so the mixin will not be registered (Block.mixin)');
 
         return;
       }
@@ -3608,7 +3574,7 @@ var Block = function () {
     iterateObject(constructor.defaultLocals, function (value, variable) {
       _this7[variable] = value;
     });
-    iterateArray(constructor.template.vars, function (variable) {
+    iterateArray(constructor.template.vars || [], function (variable) {
       _this7[variable] = _this7[variable];
     });
 
@@ -3639,7 +3605,7 @@ var Block = function () {
         var restArgs = parentScope.$$.evaluate(value, function (value) {
           iterateObject(localArgs, cleanProperty);
           assign(localArgs, transformRestArgs(value));
-          calculateArgs(normalizeArgs(argsChain), argsObject);
+          calculateArgs(normalizeArgs(argsChain), args, argsObject);
         }, _this7);
 
         wasDRest = true;
@@ -3654,7 +3620,7 @@ var Block = function () {
 
       localArgs[arg] = parentScope.$$.evaluate(value, function (value) {
         localArgs[arg] = value;
-        calculateArgs(normalizeArgs(argsChain), argsObject);
+        calculateArgs(normalizeArgs(argsChain), args, argsObject);
       }, _this7, forDElements, isDElements && parentBlock.$$.name === '#d-item');
     });
 
@@ -3674,7 +3640,7 @@ var Block = function () {
       globals: create(parentScope ? parentScope.globals : null)
     });
 
-    calculateArgs(normalizeArgs(argsChain), argsObject);
+    calculateArgs(normalizeArgs(argsChain), args, argsObject);
 
     if (parentBlock) {
       parentBlock.$$.children.push(this);
@@ -4025,24 +3991,21 @@ rootBlocks['d-each'] = (_temp = _class = function (_Block) {
 
     var _this$args = _this.args,
         _this$args$item = _this$args.item,
-        itemName = _this$args$item === undefined ? '$item' : _this$args$item,
+        item = _this$args$item === undefined ? '$item' : _this$args$item,
         _this$args$index = _this$args.index,
-        indexName = _this$args$index === undefined ? '$index' : _this$args$index;
+        index = _this$args$index === undefined ? '$index' : _this$args$index;
 
 
-    assign(_this.$$, {
-      itemsByUIDs: {},
-      itemName: itemName,
-      indexName: indexName
-    });
+    _this.itemName = item;
+    _this.indexName = index;
+    _this.itemsByUIDs = create(null);
     return _this;
   }
 
   createClass(DEach, [{
     key: 'afterConstruct',
     value: function afterConstruct() {
-      this.evaluate(watchArgs, this.renderSet);
-      this.renderSet();
+      this.renderSet(this.evaluate(watchArgs, this.renderSet));
     }
   }]);
   return DEach;
@@ -4053,26 +4016,24 @@ rootBlocks['d-each'] = (_temp = _class = function (_Block) {
 }, _initialiseProps = function _initialiseProps() {
   var _this2 = this;
 
-  this.renderSet = function () {
+  this.renderSet = function (args) {
+    var set$$1 = args[0];
+    var filterBy = args[1];
+    var sortBy = args[2];
+
     var _$$ = _this2.$$,
         htmlChildren = _$$.htmlChildren,
-        itemsByUIDs = _$$.itemsByUIDs,
         parentScope = _$$.parentScope,
         parentElem = _$$.parentElem,
-        parentTemplate = _$$.parentTemplate,
-        itemName = _$$.itemName,
-        indexName = _$$.indexName;
-    var _args = _this2.args,
-        sortBy = _args.sortBy,
-        UID = _args.uid;
+        parentTemplate = _$$.parentTemplate;
+    var UID = _this2.args.uid,
+        itemsByUIDs = _this2.itemsByUIDs,
+        itemName = _this2.itemName,
+        indexName = _this2.indexName;
 
-    var newItemsByUIDs = {};
-    var newUIDsCounter = {};
-    var newUIDs = {};
-    var _args2 = _this2.args,
-        set$$1 = _args2.set,
-        filterBy = _args2.filterBy;
-
+    var newItemsByUIDs = create(null);
+    var newUIDsByIndexes = create(null);
+    var newUIDs = create(null);
     var isArr = isArray(set$$1);
     var iterate = isArr ? iterateArray : iterateObject;
 
@@ -4093,18 +4054,18 @@ rootBlocks['d-each'] = (_temp = _class = function (_Block) {
     iterate(set$$1, function (item, index) {
       var uid = UID(item, index, set$$1, parentScope);
 
-      newUIDsCounter[uid] = (newUIDsCounter[uid] || 0) + 1;
+      if (uid in newUIDsByIndexes) {
+        console.error('UIDs can\'t be same for multiple items! In UID function: "' + (UID.original || UID) + '"');
+      }
+
+      newUIDsByIndexes[uid] = index;
       newUIDs[index] = uid;
     });
 
-    iterateObject(itemsByUIDs, function (items, uid) {
-      if (!newUIDsCounter[uid]) {
-        iterateArray(items, remove$1);
-
-        return;
+    iterateObject(itemsByUIDs, function (block, uid) {
+      if (!(uid in newUIDsByIndexes)) {
+        remove$1(block);
       }
-
-      iterateArray(items.splice(newUIDsCounter[uid]), remove$1);
     });
 
     var prevBlock = void 0;
@@ -4113,8 +4074,14 @@ rootBlocks['d-each'] = (_temp = _class = function (_Block) {
       var uid = newUIDs[index];
       var block = void 0;
 
-      if (itemsByUIDs[uid] && itemsByUIDs[uid].length) {
-        block = itemsByUIDs[uid].shift();
+      if (newUIDsByIndexes[uid] !== index) {
+        return;
+      }
+
+      var prevUIDBlock = itemsByUIDs[uid];
+
+      if (prevUIDBlock) {
+        block = prevUIDBlock;
         block.$$.scope[indexName] = index;
         block.$$.scope[itemName] = item;
 
@@ -4148,12 +4115,12 @@ rootBlocks['d-each'] = (_temp = _class = function (_Block) {
         });
       }
 
-      (newItemsByUIDs[uid] = newItemsByUIDs[uid] || []).push(block);
+      newItemsByUIDs[uid] = block;
       block.$$.prevBlock = prevBlock;
       prevBlock = block;
     });
 
-    _this2.$$.itemsByUIDs = newItemsByUIDs;
+    _this2.itemsByUIDs = newItemsByUIDs;
   };
 }, _temp);
 
@@ -4816,7 +4783,7 @@ rootMixins['d-value'] = (_temp$5 = _class$6 = function (_Mixin) {
     _this.name = name;
     _this.type = type;
     _this.value = value;
-    _this.options = elem.find('option');
+    _this.options = elem.children().filter('option');
     _this.scope = parentTemplate;
 
     if (args) {

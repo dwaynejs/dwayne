@@ -5,6 +5,7 @@ export const {
 } = Object;
 
 export const setProto = Object.setPrototypeOf || ((target, proto) => {
-  /* eslint no-proto: 0 */
+  /* eslint-disable no-proto */
   target.__proto__ = proto;
+  /* eslint-enable no-proto */
 });

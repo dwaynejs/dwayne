@@ -257,8 +257,8 @@ class Block {
       return;
     }
 
-    if (rootBlocks[name]) {
-      console.warn(`The "${ name }" block is a built-in block so the block will not be registered (Block.block)`);
+    if (name === 'd-elements') {
+      console.warn('The "d-elements" block is a built-in block so the block will not be registered (Block.block)');
 
       return;
     }
@@ -354,8 +354,8 @@ class Block {
       return;
     }
 
-    if (rootMixins[name] || name === 'd-rest') {
-      console.warn(`The "${ name }" mixin is a built-in mixin so the mixin will not be registered (Block.mixin)`);
+    if (name === 'd-rest') {
+      console.warn('The "d-rest" mixin is a built-in mixin so the mixin will not be registered (Block.mixin)');
 
       return;
     }

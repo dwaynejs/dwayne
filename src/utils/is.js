@@ -5,8 +5,9 @@ export function isFunction(value) {
 }
 
 export function isNil(value) {
-  /* eslint eqeqeq: 0 */
+  /* eslint-disable eqeqeq */
   return value == null;
+  /* eslint-enable eqeqeq */
 }
 
 export function isString(value) {

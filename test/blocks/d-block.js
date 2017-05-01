@@ -1,4 +1,4 @@
-import { strictEqual } from 'assert';
+import { strictEqual, deepStrictEqual } from 'assert';
 import { Block, doc, initApp, removeApp } from '../../src';
 
 let app;
@@ -275,7 +275,14 @@ export default () => {
       });
 
       it('should render the block using the name arg', () => {
-        strictEqual(container.html(), '<div contenteditable="true" caption="caption"></div>');
+        const children = container.children();
+
+        strictEqual(children.length, 1);
+        strictEqual(children.elem(0).name(), 'div');
+        deepStrictEqual(children.elem(0).attr(), {
+          contenteditable: 'true',
+          caption: 'caption'
+        });
       });
       it('should re-render the block after the name have been changed', () => {
         app.name = 'DBlockArgsName';

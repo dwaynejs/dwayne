@@ -189,7 +189,7 @@ export function createBlock({ node, parent, parentElem, parentBlock, parentScope
 
       /* istanbul ignore if */
       if (name === 'template') {
-        parentElem = new Elem(element[0].content);
+        parentElem = new Elem(element[0].content = element[0].content || doc[0].createDocumentFragment());
       } else if (name === 'iframe') {
         if ('src' in attrs) {
           children = emptyArray;

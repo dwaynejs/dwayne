@@ -3,7 +3,7 @@ const COMMA_REGEX = /,/;
 export function mixinMatch(mixins, attr) {
   let match;
 
-  /* eslint guard-for-in: 0 */
+  /* eslint-disable guard-for-in */
   for (const name in mixins) {
     const Mixin = mixins[name];
     const localMatch = attr.match(Mixin._match);
@@ -28,6 +28,7 @@ export function mixinMatch(mixins, attr) {
       break;
     }
   }
+  /* eslint-enable guard-for-in */
 
   return match;
 }

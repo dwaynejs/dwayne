@@ -13,7 +13,7 @@ module.exports = (config) => {
     ],
     plugins: [
       'karma-ie-launcher',
-      // 'karma-firefox-launcher',
+      'karma-firefox-launcher',
       'karma-opera-launcher',
       'karma-safari-launcher',
       'karma-chrome-launcher',
@@ -25,11 +25,11 @@ module.exports = (config) => {
       'mocha'
     ],
     browsers: [
-      // 'Chrome',
-      // 'Safari',
-      'IE',
-      // 'Firefox',
-      // 'Opera'
+      'Chrome',
+      'Safari',
+      // 'IE',
+      'Firefox',
+      'Opera'
     ],
     files: [
       'test/all.js'

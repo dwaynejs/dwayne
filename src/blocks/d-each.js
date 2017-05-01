@@ -1,6 +1,6 @@
 import {
   iterateArray, iterateObject,
-  isArray, isFunction
+  isArray, isFunction, create
 } from '../utils';
 import { remove, createBlock } from '../helpers/Block';
 import { Block } from '../Block';
@@ -32,7 +32,7 @@ rootBlocks['d-each'] = class DEach extends Block {
 
     this.itemName = item;
     this.indexName = index;
-    this.itemsByUIDs = {};
+    this.itemsByUIDs = create(null);
   }
 
   afterConstruct() {
@@ -58,9 +58,9 @@ rootBlocks['d-each'] = class DEach extends Block {
       itemName,
       indexName
     } = this;
-    const newItemsByUIDs = {};
-    const newUIDsByIndexes = {};
-    const newUIDs = {};
+    const newItemsByUIDs = create(null);
+    const newUIDsByIndexes = create(null);
+    const newUIDs = create(null);
     const isArr = isArray(set);
     const iterate = isArr
       ? iterateArray
