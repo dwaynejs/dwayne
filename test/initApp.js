@@ -43,7 +43,7 @@ describe('initApp()', () => {
 
     strictEqual(container.html(), '<span>Hello, world!</span>');
   });
-  it('should throw an error if a container is empty', (done) => {
+  it('should log an error if a container is empty', (done) => {
     noApp = true;
 
     console.error = (message) => {
@@ -58,7 +58,24 @@ describe('initApp()', () => {
 
     initApp('InitAppBlock', new Elem());
   });
-  it('should throw an error if there is already a Dwayne app in the container', (done) => {
+  it('should log an error if no proper block was given', (done) => {
+    noApp = true;
+
+    console.error = (message) => {
+      try {
+        strictEqual(message, 'No valid root block to insert the app into was given! (initApp)');
+
+        done();
+      } catch (err) {
+        done(err);
+      }
+    };
+
+    initApp(null, doc.create('div'));
+  });
+  it('should log an error if there is already a Dwayne app in the container', (done) => {
+    noApp = true;
+
     console.error = (message) => {
       try {
         strictEqual(message, 'There already exists a Dwayne app inside the given element! (initApp)');

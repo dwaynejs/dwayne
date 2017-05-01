@@ -22,6 +22,7 @@ import { Elem } from './Elem';
  */
 export function initApp(block, container) {
   const parentElem = new Elem(container).elem(0);
+  let Constructor = block;
 
   if (!parentElem.length) {
     console.error('No valid element to insert the app into was given! (initApp)');
@@ -36,29 +37,35 @@ export function initApp(block, container) {
   }
 
   if (isString(block)) {
-    block = {
-      vars: [],
-      value: [{
-        name: block
-      }]
+    Constructor = class RootBlock extends Block {
+      static template = {
+        vars: [],
+        value: [{
+          name: block
+        }]
+      };
     };
   }
 
   if (isArray(block)) {
-    block = {
-      vars: [],
-      value: block
+    Constructor = class RootBlock extends Block {
+      static template = {
+        vars: [],
+        value: block
+      };
     };
   }
 
-  let Constructor;
-
-  if (isInstanceOf(Block, block)) {
-    Constructor = block;
-  } else {
+  if (block && !isInstanceOf(Block, block) && isArray(block.vars) && isArray(block.value)) {
     Constructor = class RootBlock extends Block {
       static template = block;
     };
+  }
+
+  if (!isInstanceOf(Block, Constructor)) {
+    console.error('No valid root block to insert the app into was given! (initApp)');
+
+    return;
   }
 
   const rootBlock = createBlock({

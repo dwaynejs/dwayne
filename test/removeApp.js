@@ -21,7 +21,7 @@ describe('removeApp()', () => {
 
     strictEqual(container.html(), '');
   });
-  it('should throw an error if the container is empty', (done) => {
+  it('should log an error if the container is empty', (done) => {
     console.error = (message) => {
       try {
         strictEqual(message, 'No valid element to remove the app from was given! (removeApp)');
@@ -34,7 +34,7 @@ describe('removeApp()', () => {
 
     removeApp(new Elem());
   });
-  it('should throw an error if the container doesn\'t contain a Dwayne app', (done) => {
+  it('should log an error if the container doesn\'t contain a Dwayne app', (done) => {
     console.error = (message) => {
       try {
         strictEqual(message, 'No app registered inside the given element! (removeApp)');

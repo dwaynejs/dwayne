@@ -1,6 +1,6 @@
 {
   "name": "dwayne",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "browser": "lib/index.js",
   "jsnext:main": "lib/es6.js",
   "module": "lib/es6.js",

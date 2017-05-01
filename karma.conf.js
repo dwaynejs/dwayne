@@ -31,6 +31,7 @@ module.exports = (config) => {
       'Firefox',
       'Opera'
     ],
+    // browsers: ['Chrome'],
     files: [
       'test/all.js'
     ],

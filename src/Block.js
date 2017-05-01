@@ -245,7 +245,7 @@ class Block {
       };
     }
 
-    if (!isFunction(Subclass) && Subclass.vars && Subclass.value) {
+    if (!isFunction(Subclass) && isArray(Subclass.vars) && isArray(Subclass.value)) {
       Subclass = class extends Block {
         static template = Subclass;
       };
