@@ -18,6 +18,7 @@ bundle.js.map
 index.html
 
 gulpfile.js
+karma.conf.js
 rollup.build.config.js
 rollup.dev.config.js
 rollup.test.config.js
