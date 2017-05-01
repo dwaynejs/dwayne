@@ -9,7 +9,7 @@ import { Elem } from './Elem';
  * @param {Template|ScopelessTemplate|String|typeof Block} block - Root template (may be scopeless),
  * string defining a name of the root block or a block subclass.
  * @param {Elem|Element} container - Container of the app.
- * @returns {void}
+ * @returns {Block|void} Root block if the app has benn registered and undefined if not.
  * @description Method for initializing app.
  *
  * @example
@@ -73,4 +73,6 @@ export function initApp(block, container) {
   parentElem
     .prop('DwayneRootBlock', rootBlock)
     .attr('dwayne-root', '');
+
+  return rootBlock;
 }
