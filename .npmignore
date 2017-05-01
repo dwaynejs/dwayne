@@ -14,15 +14,10 @@ coverage/
 entry.js
 bundle.js
 bundle.js.map
-test.js
-test.js.map
 
 index.html
-test.html
 
 gulpfile.js
-livereload.js
 rollup.build.config.js
 rollup.dev.config.js
 rollup.test.config.js
-server.js
