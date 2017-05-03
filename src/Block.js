@@ -178,7 +178,7 @@ class Block {
   };
 
   /**
-   * @method Block.onEvalError
+   * @function Block.onEvalError
    * @public
    * @param {EvaluationError} err - The method is called when an evaluation error occurs.
    */
@@ -187,7 +187,7 @@ class Block {
   }
 
   /**
-   * @method Block.beforeRegisterBlock
+   * @function Block.beforeRegisterBlock
    * @public
    * @param {BlockRegisterHook} hook - Block register hook.
    * @returns {RemoveHook}
@@ -201,7 +201,7 @@ class Block {
   }
 
   /**
-   * @method Block.beforeRegisterMixin
+   * @function Block.beforeRegisterMixin
    * @public
    * @param {MixinRegisterHook} hook - Mixin register hook.
    * @returns {RemoveHook}
@@ -215,7 +215,7 @@ class Block {
   }
 
   /**
-   * @method Block.block
+   * @function Block.block
    * @public
    * @param {String} name - Block or mixin name.
    * @param {Template|ScopelessTemplate|typeof Block} Subclass - Subclass of Block or template string of it.
@@ -310,7 +310,7 @@ class Block {
   }
 
   /**
-   * @method Block.get
+   * @function Block.get
    * @public
    * @param {String} name - Block name.
    * @returns {typeof Block|undefined} Returns registered Block with specified name.
@@ -320,7 +320,7 @@ class Block {
   }
 
   /**
-   * @method Block.getMixin
+   * @function Block.getMixin
    * @public
    * @param {String} name - Mixin name.
    * @returns {typeof Mixin|undefined} Returns registered Mixin with specified name.
@@ -330,7 +330,7 @@ class Block {
   }
 
   /**
-   * @method Block.mixin
+   * @function Block.mixin
    * @public
    * @param {String} name - Block or mixin name.
    * @param {typeof Mixin|AfterUpdate} Subclass - Subclass of Mixin or AfterUpdate callback.
@@ -390,7 +390,7 @@ class Block {
   }
 
   /**
-   * @method Block.wrap
+   * @function Block.wrap
    * @public
    * @param {...Wrapper} wrappers - Functions that return wrapped block.
    * @returns {typeof Block} New block.
@@ -833,7 +833,7 @@ class Block {
   }
 
   /**
-   * @method Block#afterConstruct
+   * @function Block#afterConstruct
    * @public
    * @description Is called after block construction (including all scopes)
    * but before rendering the block and its children.
@@ -841,7 +841,7 @@ class Block {
   afterConstruct() {}
 
   /**
-   * @method Block#afterDOMChange
+   * @function Block#afterDOMChange
    * @public
    * @description Is called after block DOM structure has changed. Note that
    * it's important not to modify the DOM structure within the block. You can only insert
@@ -850,21 +850,21 @@ class Block {
   afterDOMChange() {}
 
   /**
-   * @method Block#afterRender
+   * @function Block#afterRender
    * @public
    * @description Is called after block has been rendered.
    */
   afterRender() {}
 
   /**
-   * @method Block#beforeRemove
+   * @function Block#beforeRemove
    * @public
    * @description Is called before the block removal.
    */
   beforeRemove() {}
 
   /**
-   * @method Block#getDOM
+   * @function Block#getDOM
    * @public
    * @returns {Elem}
    * @description Returns DOM contents of the block.
@@ -874,7 +874,7 @@ class Block {
   }
 
   /**
-   * @method Block#getName
+   * @function Block#getName
    * @public
    * @returns {String}
    * @description Returns Block name.
@@ -884,7 +884,7 @@ class Block {
   }
 
   /**
-   * @method Block#getParentElem
+   * @function Block#getParentElem
    * @public
    * @returns {Elem|void}
    * @description Returns parent Elem.
@@ -894,7 +894,7 @@ class Block {
   }
 
   /**
-   * @method Block#getParentScope
+   * @function Block#getParentScope
    * @public
    * @returns {Block|void}
    * @description Returns block in which template the block is located in.
@@ -904,7 +904,7 @@ class Block {
   }
 
   /**
-   * @method Block#getParentTemplate
+   * @function Block#getParentTemplate
    * @public
    * @returns {Block|void}
    * @description Returns block in which template the block is located in.
@@ -914,7 +914,7 @@ class Block {
   }
 
   /**
-   * @method Block#evaluate
+   * @function Block#evaluate
    * @public
    * @param {Function} func - Function to evaluate.
    * @param {Watcher} [callback] - If present, callback which is called when the expression value is changed.

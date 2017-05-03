@@ -123,13 +123,6 @@ function mapObject(object, callback) {
   return newObject;
 }
 
-/**
- * @function defineProperties
- * @param {Object} target - Target to define properties for.
- * @param {Object} properties - Object with properties needed to be assign to the target.
- * @returns {void}
- * @description Function for defining properties of an object.
- */
 var defineProperties = Object.defineProperties;
 function definePrototypeProperties(target, properties) {
   iterateObject(properties, function (value, name) {
@@ -142,13 +135,6 @@ function definePrototypeProperties(target, properties) {
   });
 }
 
-/**
- * @function defineFrozenProperties
- * @param {Object} target - Target to define properties for.
- * @param {Object} properties - Object with properties needed to be assign to the target.
- * @returns {void}
- * @description Function for defining frozen properties of an object.
- */
 function defineFrozenProperties(target, properties) {
   iterateObject(properties, function (value, name) {
     Object.defineProperty(target, name, {
@@ -684,7 +670,7 @@ var Elem = function (_Array) {
     key: 'addMethods',
 
     /**
-     * @method Elem.addMethods
+     * @function Elem.addMethods
      * @public
      * @param {String|Object.<String, ElemMethod>} methodName - Name of the method or object of
      * method names and methods.
@@ -729,7 +715,7 @@ var Elem = function (_Array) {
   }
 
   /**
-   * @method Elem#add
+   * @function Elem#add
    * @public
    * @param {...(Elem|Element|Element[])} elements - Each argument is a Elem, or Element, or array of Elements.
    * @returns {Elem} Returns this.
@@ -767,7 +753,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#addClass
+     * @function Elem#addClass
      * @public
      * @param {...String} classes - Classes to add.
      * @returns {Elem} Returns this.
@@ -794,7 +780,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#attr
+     * @function Elem#attr
      * @public
      * @param {String|Object.<String, String>} [attr] - Name of the attribute to get or
      * an object of the format { [attrName]: value, ... } to set attributes.
@@ -865,7 +851,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#children
+     * @function Elem#children
      * @public
      * @returns {Elem} D-Wrap of the children of the first element in the set.
      * @description Method for getting element's children.
@@ -881,7 +867,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#closest
+     * @function Elem#closest
      * @public
      * @param {String} selector - See the link.
      * @returns {Elem} Set of the closest elements.
@@ -904,7 +890,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#collect
+     * @function Elem#collect
      * @public
      * @param {CollectCallback} callback - Called on each iteration.
      * @returns {Elem} Returns eventual set.
@@ -932,7 +918,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#contains
+     * @function Elem#contains
      * @public
      * @param {Elem|Element} element - Element to find out if it's within the first element in the set.
      * @returns {Boolean} Returns if the argument within this element.
@@ -953,7 +939,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#create
+     * @function Elem#create
      * @public
      * @param {String} type - Type of created element. If type is "#text" a text node is created.
      * If type is "#comment" a comment node is created.
@@ -988,7 +974,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#css
+     * @function Elem#css
      * @public
      * @param {String|Object.<String, String>} [property] - Name of the property to get or
      * an object of the format { [property]: value, ... } to set styles.
@@ -1050,7 +1036,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#data
+     * @function Elem#data
      * @public
      * @param {String|Object.<String, String>} [key] - Name of the data attribute (without data- prefix)
      * to get or an object of the format { [attrName]: value, ... } to set attributes.
@@ -1104,7 +1090,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#dispatch
+     * @function Elem#dispatch
      * @public
      * @param {String|Event} event - Event or a string (new Event(event) is created).
      * @param {Object} [details = {}] - Object that is assigned to the event.
@@ -1136,7 +1122,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#elem
+     * @function Elem#elem
      * @public
      * @param {Number} [index = 0] - Index of the element of the set to get. Negative index means elem.length + index.
      * @returns {Elem} New instance of Elem.
@@ -1159,7 +1145,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#filter
+     * @function Elem#filter
      * @public
      * @param {IterationCallback|String} filter - Filter function or a selector.
      * @returns {Elem} New instance of Elem.
@@ -1190,7 +1176,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#find
+     * @function Elem#find
      * @public
      * @param {String} selector - Selector to find.
      * @returns {Elem} New instance of Elem.
@@ -1207,7 +1193,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#forEach
+     * @function Elem#forEach
      * @public
      * @param {IterationCallback} callback - Called on each iteration.
      * @returns {Elem} Returns this.
@@ -1232,7 +1218,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#hasAttr
+     * @function Elem#hasAttr
      * @public
      * @param {String} attr - Name of the attribute.
      * @returns {Boolean} If the first element in the set has the attribute.
@@ -1259,7 +1245,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#hasClass
+     * @function Elem#hasClass
      * @public
      * @param {String} cls - Name of the class.
      * @returns {Boolean} If the first element in the set has the class.
@@ -1279,7 +1265,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#hide
+     * @function Elem#hide
      * @public
      * @returns {Elem} Returns this.
      * @description Hides all elements in the set.
@@ -1295,7 +1281,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#html
+     * @function Elem#html
      * @public
      * @param {String|*} [html] - HTML to write instead of current HTML.
      * @returns {Elem|String} If no arguments passed HTML of the first element in the set returned.
@@ -1322,7 +1308,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#includes
+     * @function Elem#includes
      * @public
      * @param {Element|node} elem - Element to search.
      * @return {Boolean} If the element is in the set.
@@ -1336,7 +1322,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#insertAfter
+     * @function Elem#insertAfter
      * @public
      * @param {Elem|Element} element - Element to insert this element after.
      * @returns {Elem} Returns this.
@@ -1379,7 +1365,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#insertBefore
+     * @function Elem#insertBefore
      * @public
      * @param {Elem|Element} element - Element to insert this element before.
      * @returns {Elem} Returns this.
@@ -1412,7 +1398,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#into
+     * @function Elem#into
      * @public
      * @param {Elem|Element} element - Element to put this elements into.
      * @param {Boolean} end - If the elements should be inserted to the end. If false they are inserted to the start.
@@ -1451,7 +1437,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#is
+     * @function Elem#is
      * @public
      * @param {String} selector
      * @returns {Boolean} If the first element in the set matches the selector.
@@ -1480,7 +1466,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#name
+     * @function Elem#name
      * @public
      * @returns {String|void} nodeName (lowercased) of the first element in the set.
      * @description Method for getting name of the first element in the set.
@@ -1498,7 +1484,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#next
+     * @function Elem#next
      * @public
      * @returns {Elem} New instance of Elem.
      * @description Method for finding next element to each element in the set.
@@ -1514,7 +1500,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#on
+     * @function Elem#on
      * @public
      * @param {ElemEventString|Object.<ElemEventString|ElemListener>} event - Either a {@link ElemEventString} string
      * or an object with event keys (a key is also ElemEventString) and listeners values.
@@ -1603,7 +1589,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#parent
+     * @function Elem#parent
      * @public
      * @returns {Elem} New instance of Elem.
      * @description Method returns wrap of the set of the parent elements of each element in the set.
@@ -1616,7 +1602,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#prev
+     * @function Elem#prev
      * @public
      * @returns {Elem} New instance of Elem.
      * @description Method for finding previous element to each element in the set.
@@ -1632,7 +1618,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#prop
+     * @function Elem#prop
      * @public
      * @param {String|Object.<String, *>} property - Either a string of a property or an assigned object.
      * @param {*} [value] - If a property parameter is a string
@@ -1665,7 +1651,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#remove
+     * @function Elem#remove
      * @public
      * @returns {Elem} Returns this.
      * @description Removes all the elements from the set from the document.
@@ -1682,7 +1668,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#removeAttr
+     * @function Elem#removeAttr
      * @public
      * @param {...String} attributes - Attributes to remove.
      * @returns {Elem} Returns this.
@@ -1714,7 +1700,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#removeClass
+     * @function Elem#removeClass
      * @public
      * @param {...String} classes - Classes to remove.
      * @returns {Elem} Returns this.
@@ -1741,7 +1727,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#removeCSS
+     * @function Elem#removeCSS
      * @public
      * @param {...String} props - CSS properties to remove.
      * @returns {Elem} Returns this.
@@ -1766,7 +1752,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#replace
+     * @function Elem#replace
      * @public
      * @param {Elem|Element} element - Element to replace the first element in the set
      * with a set of elements specified by the argument (Element or Elem).
@@ -1811,7 +1797,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#show
+     * @function Elem#show
      * @public
      * @returns {Elem} Returns this.
      * @description Shows all elements in the set.
@@ -1828,7 +1814,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#slice
+     * @function Elem#slice
      * @public
      * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/slice
      * @returns {Elem}
@@ -1842,7 +1828,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#text
+     * @function Elem#text
      * @public
      * @param {String|*} [text] - Text to write instead of current text.
      * @returns {Elem|String} If no arguments passed text of the first element in the set returned.
@@ -1867,7 +1853,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#toggleAttr
+     * @function Elem#toggleAttr
      * @public
      * @param {String} attr - Attribute to toggle.
      * @param {Boolean|*} [condition] - If present and the condition is truthy method adds the attribute
@@ -1898,7 +1884,7 @@ var Elem = function (_Array) {
     }
 
     /**
-     * @method Elem#toggleClass
+     * @function Elem#toggleClass
      * @public
      * @param {String} cls - Class to toggle.
      * @param {Boolean|*} [condition] - If present and the condition is truthy method adds the class
@@ -2422,6 +2408,34 @@ function createBlock(_ref) {
     }
 
     var isParentBlock = parent instanceof Block;
+    var childBlocks = [];
+
+    /* istanbul ignore if */
+    if (name === 'iframe' && !('src' in attrs)) {
+      element.on('load', function () {
+        var document$$1 = element[0].contentDocument;
+        var doc = new Elem(document$$1);
+
+        new Elem(document$$1.documentElement).remove();
+        iterateChildren(childBlocks, true);
+
+        function iterateChildren(children, isRoot) {
+          iterateArray(children, function (child) {
+            if (child instanceof Block) {
+              if (isRoot) {
+                child.$$.parentElem = doc;
+                child.$$.parent = doc;
+                child.$$.content.into(doc);
+              }
+
+              iterateChildren(child.$$.children, false);
+            } else {
+              child.into(doc);
+            }
+          });
+        }
+      });
+    }
 
     if (prevBlock instanceof Block) {
       prevBlock.$$.insertAfterIt(element, false);
@@ -2466,6 +2480,7 @@ function createBlock(_ref) {
           parentTemplate: parentTemplate,
           prevBlock: _prevBlock
         });
+        childBlocks.push(_prevBlock);
       });
     }
 
@@ -2571,7 +2586,7 @@ var Mixin = function () {
 
 
     /**
-     * @method Mixin.wrap
+     * @function Mixin.wrap
      * @public
      * @param {...Wrapper} wrappers - Functions that return wrapped mixin.
      * @returns {typeof Mixin} New mixin.
@@ -2738,7 +2753,7 @@ var Mixin = function () {
     value: function afterUpdate() {}
 
     /**
-     * @method Mixin#beforeRemove
+     * @function Mixin#beforeRemove
      * @public
      * @param {Boolean} isElementRemoved - If element removed as well.
      * @description Is called before the mixin removal.
@@ -2749,7 +2764,7 @@ var Mixin = function () {
     value: function beforeRemove(isElementRemoved) {}
 
     /**
-     * @method Block#evaluate
+     * @function Block#evaluate
      * @public
      * @param {Watcher} [callback] - If present, callback which is called when the mixin value is changed.
      * @returns {*} Evaluation result.
@@ -2909,7 +2924,7 @@ var Block = function () {
 
 
     /**
-     * @method Block.onEvalError
+     * @function Block.onEvalError
      * @public
      * @param {EvaluationError} err - The method is called when an evaluation error occurs.
      */
@@ -2934,7 +2949,7 @@ var Block = function () {
     }
 
     /**
-     * @method Block.beforeRegisterBlock
+     * @function Block.beforeRegisterBlock
      * @public
      * @param {BlockRegisterHook} hook - Block register hook.
      * @returns {RemoveHook}
@@ -2974,7 +2989,7 @@ var Block = function () {
     }
 
     /**
-     * @method Block.beforeRegisterMixin
+     * @function Block.beforeRegisterMixin
      * @public
      * @param {MixinRegisterHook} hook - Mixin register hook.
      * @returns {RemoveHook}
@@ -2991,7 +3006,7 @@ var Block = function () {
     }
 
     /**
-     * @method Block.block
+     * @function Block.block
      * @public
      * @param {String} name - Block or mixin name.
      * @param {Template|ScopelessTemplate|typeof Block} Subclass - Subclass of Block or template string of it.
@@ -3043,7 +3058,7 @@ var Block = function () {
         }, _temp2);
       }
 
-      if (!isFunction(_Subclass2) && _Subclass2.vars && _Subclass2.value) {
+      if (!isFunction(_Subclass2) && isArray(_Subclass2.vars) && isArray(_Subclass2.value)) {
         var _class3, _temp3;
 
         _Subclass2 = (_temp3 = _class3 = function (_Block3) {
@@ -3111,7 +3126,7 @@ var Block = function () {
     }
 
     /**
-     * @method Block.get
+     * @function Block.get
      * @public
      * @param {String} name - Block name.
      * @returns {typeof Block|undefined} Returns registered Block with specified name.
@@ -3124,7 +3139,7 @@ var Block = function () {
     }
 
     /**
-     * @method Block.getMixin
+     * @function Block.getMixin
      * @public
      * @param {String} name - Mixin name.
      * @returns {typeof Mixin|undefined} Returns registered Mixin with specified name.
@@ -3137,7 +3152,7 @@ var Block = function () {
     }
 
     /**
-     * @method Block.mixin
+     * @function Block.mixin
      * @public
      * @param {String} name - Block or mixin name.
      * @param {typeof Mixin|AfterUpdate} Subclass - Subclass of Mixin or AfterUpdate callback.
@@ -3211,7 +3226,7 @@ var Block = function () {
     }
 
     /**
-     * @method Block.wrap
+     * @function Block.wrap
      * @public
      * @param {...Wrapper} wrappers - Functions that return wrapped block.
      * @returns {typeof Block} New block.
@@ -3648,7 +3663,7 @@ var Block = function () {
   }
 
   /**
-   * @method Block#afterConstruct
+   * @function Block#afterConstruct
    * @public
    * @description Is called after block construction (including all scopes)
    * but before rendering the block and its children.
@@ -3660,7 +3675,7 @@ var Block = function () {
     value: function afterConstruct() {}
 
     /**
-     * @method Block#afterDOMChange
+     * @function Block#afterDOMChange
      * @public
      * @description Is called after block DOM structure has changed. Note that
      * it's important not to modify the DOM structure within the block. You can only insert
@@ -3672,7 +3687,7 @@ var Block = function () {
     value: function afterDOMChange() {}
 
     /**
-     * @method Block#afterRender
+     * @function Block#afterRender
      * @public
      * @description Is called after block has been rendered.
      */
@@ -3682,7 +3697,7 @@ var Block = function () {
     value: function afterRender() {}
 
     /**
-     * @method Block#beforeRemove
+     * @function Block#beforeRemove
      * @public
      * @description Is called before the block removal.
      */
@@ -3692,7 +3707,7 @@ var Block = function () {
     value: function beforeRemove() {}
 
     /**
-     * @method Block#getDOM
+     * @function Block#getDOM
      * @public
      * @returns {Elem}
      * @description Returns DOM contents of the block.
@@ -3705,7 +3720,7 @@ var Block = function () {
     }
 
     /**
-     * @method Block#getName
+     * @function Block#getName
      * @public
      * @returns {String}
      * @description Returns Block name.
@@ -3718,7 +3733,7 @@ var Block = function () {
     }
 
     /**
-     * @method Block#getParentElem
+     * @function Block#getParentElem
      * @public
      * @returns {Elem|void}
      * @description Returns parent Elem.
@@ -3731,7 +3746,7 @@ var Block = function () {
     }
 
     /**
-     * @method Block#getParentScope
+     * @function Block#getParentScope
      * @public
      * @returns {Block|void}
      * @description Returns block in which template the block is located in.
@@ -3744,7 +3759,7 @@ var Block = function () {
     }
 
     /**
-     * @method Block#getParentTemplate
+     * @function Block#getParentTemplate
      * @public
      * @returns {Block|void}
      * @description Returns block in which template the block is located in.
@@ -3757,7 +3772,7 @@ var Block = function () {
     }
 
     /**
-     * @method Block#evaluate
+     * @function Block#evaluate
      * @public
      * @param {Function} func - Function to evaluate.
      * @param {Watcher} [callback] - If present, callback which is called when the expression value is changed.
@@ -5102,6 +5117,7 @@ function insertTemplates(template, templates) {
  */
 function initApp(block, container) {
   var parentElem = new Elem(container).elem(0);
+  var Constructor = block;
 
   if (!parentElem.length) {
     console.error('No valid element to insert the app into was given! (initApp)');
@@ -5116,26 +5132,6 @@ function initApp(block, container) {
   }
 
   if (isString(block)) {
-    block = {
-      vars: [],
-      value: [{
-        name: block
-      }]
-    };
-  }
-
-  if (isArray(block)) {
-    block = {
-      vars: [],
-      value: block
-    };
-  }
-
-  var Constructor = void 0;
-
-  if (isInstanceOf(Block, block)) {
-    Constructor = block;
-  } else {
     var _class, _temp;
 
     Constructor = (_temp = _class = function (_Block) {
@@ -5147,7 +5143,51 @@ function initApp(block, container) {
       }
 
       return RootBlock;
-    }(Block), _class.template = block, _temp);
+    }(Block), _class.template = {
+      vars: [],
+      value: [{
+        name: block
+      }]
+    }, _temp);
+  }
+
+  if (isArray(block)) {
+    var _class2, _temp2;
+
+    Constructor = (_temp2 = _class2 = function (_Block2) {
+      inherits(RootBlock, _Block2);
+
+      function RootBlock() {
+        classCallCheck(this, RootBlock);
+        return possibleConstructorReturn(this, (RootBlock.__proto__ || Object.getPrototypeOf(RootBlock)).apply(this, arguments));
+      }
+
+      return RootBlock;
+    }(Block), _class2.template = {
+      vars: [],
+      value: block
+    }, _temp2);
+  }
+
+  if (block && !isInstanceOf(Block, block) && isArray(block.vars) && isArray(block.value)) {
+    var _class3, _temp3;
+
+    Constructor = (_temp3 = _class3 = function (_Block3) {
+      inherits(RootBlock, _Block3);
+
+      function RootBlock() {
+        classCallCheck(this, RootBlock);
+        return possibleConstructorReturn(this, (RootBlock.__proto__ || Object.getPrototypeOf(RootBlock)).apply(this, arguments));
+      }
+
+      return RootBlock;
+    }(Block), _class3.template = block, _temp3);
+  }
+
+  if (!isInstanceOf(Block, Constructor)) {
+    console.error('No valid root block to insert the app into was given! (initApp)');
+
+    return;
   }
 
   var rootBlock = createBlock({

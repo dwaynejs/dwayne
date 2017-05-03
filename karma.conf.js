@@ -39,7 +39,21 @@ module.exports = (config) => {
     concurrency: 1,
     rollupPreprocessor: rollupConfig,
     coverageIstanbulReporter: {
-      reports: ['html']
+      reports: ['html'],
+      thresholds: {
+        global: {
+          statements: 100,
+          lines: 100,
+          branches: 100,
+          functions: 100
+        },
+        each: {
+          statements: 100,
+          lines: 100,
+          branches: 100,
+          functions: 100
+        }
+      }
     }
   });
 };

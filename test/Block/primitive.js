@@ -72,6 +72,9 @@ class Elements extends Block {
         </body>
       </html>
     </iframe>
+    <iframe>
+      <BlocksHelper/>
+    </iframe>
   `;
 }
 
@@ -134,6 +137,7 @@ export default () => {
       const children = container.children();
       const svgChildren = children.elem(0).children();
 
+      strictEqual(children.length, 5);
       strictEqual(children.elem(0).name(), 'svg');
       strictEqual(svgChildren.length, 1);
       deepStrictEqual(svgChildren.elem(0).attr(), {
@@ -145,13 +149,17 @@ export default () => {
       strictEqual(children.elem(1).text(), ' comment ');
       strictEqual(children.elem(2).prop('outerHTML'), '<iframe src="/index.html"></iframe>');
       strictEqual(children.elem(3).prop('outerHTML'), '<iframe></iframe>');
-      strictEqual(new Elem(container.children()[3].contentDocument.documentElement).prop('outerHTML'), ''
+      strictEqual(new Elem(children[3].contentDocument.documentElement).prop('outerHTML'), ''
         + '<html>'
           + '<head></head>'
           + '<body>'
             + '<span>456</span>'
           + '</body>'
         + '</html>'
+      );
+      strictEqual(
+        new Elem(children[4].contentDocument.documentElement).prop('outerHTML'),
+        '<span>Hello, world, again!</span>'
       );
     });
 

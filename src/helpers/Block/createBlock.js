@@ -168,6 +168,34 @@ export function createBlock({ node, parent, parentElem, parentBlock, parentScope
     }
 
     const isParentBlock = parent instanceof Block;
+    const childBlocks = [];
+
+    /* istanbul ignore if */
+    if (name === 'iframe' && !('src' in attrs)) {
+      element.on('load', () => {
+        const document = element[0].contentDocument;
+        const doc = new Elem(document);
+
+        new Elem(document.documentElement).remove();
+        iterateChildren(childBlocks, true);
+
+        function iterateChildren(children, isRoot) {
+          iterateArray(children, (child) => {
+            if (child instanceof Block) {
+              if (isRoot) {
+                child.$$.parentElem = doc;
+                child.$$.parent = doc;
+                child.$$.content.into(doc);
+              }
+
+              iterateChildren(child.$$.children, false);
+            } else {
+              child.into(doc);
+            }
+          });
+        }
+      });
+    }
 
     if (prevBlock instanceof Block) {
       prevBlock.$$.insertAfterIt(element, false);
@@ -212,6 +240,7 @@ export function createBlock({ node, parent, parentElem, parentBlock, parentScope
           parentTemplate,
           prevBlock
         });
+        childBlocks.push(prevBlock);
       });
     }
 

@@ -1,6 +1,6 @@
 {
   "name": "dwayne",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "browser": "lib/index.js",
   "jsnext:main": "lib/es6.js",
   "module": "lib/es6.js",
@@ -49,7 +49,7 @@
   },
   "scripts": {
     "start": "concurrently \"npm run server\" \"rollup -w -c rollup.dev.config.js\"",
-    "server": "http-server -p 8888",
+    "server": "http-server -c-1 -p 8888",
     "test": "karma start --single-run",
     "debug": "karma start --auto-watch",
     "build": "gulp build",

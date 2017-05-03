@@ -22,7 +22,7 @@ class Mixin {
   static evaluate = true;
 
   /**
-   * @method Mixin.wrap
+   * @function Mixin.wrap
    * @public
    * @param {...Wrapper} wrappers - Functions that return wrapped mixin.
    * @returns {typeof Mixin} New mixin.
@@ -172,7 +172,7 @@ class Mixin {
   afterUpdate() {}
 
   /**
-   * @method Mixin#beforeRemove
+   * @function Mixin#beforeRemove
    * @public
    * @param {Boolean} isElementRemoved - If element removed as well.
    * @description Is called before the mixin removal.
@@ -180,7 +180,7 @@ class Mixin {
   beforeRemove(isElementRemoved) {}
 
   /**
-   * @method Block#evaluate
+   * @function Block#evaluate
    * @public
    * @param {Watcher} [callback] - If present, callback which is called when the mixin value is changed.
    * @returns {*} Evaluation result.
