@@ -6,10 +6,13 @@ node_modules/
 src/
 test/
 coverage/
+docs/
 
 .babelrc
 .editorconfig
 .eslintrc
+
+_config.yml
 
 entry.js
 bundle.js
