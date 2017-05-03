@@ -1,8 +1,8 @@
 {
   "name": "dwayne",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "browser": "lib/index.js",
-  "jsnext:main": "lib/es6.js",
+  "jsnext:main": "lib/esnext.js",
   "module": "lib/es6.js",
   "main": "lib/index.js",
   "devDependencies": {

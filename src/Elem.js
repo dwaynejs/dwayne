@@ -86,7 +86,7 @@ const emptyCollection = [];
  */
 class Elem extends Array {
   /**
-   * @function Elem.addMethods
+   * @method Elem.addMethods
    * @public
    * @param {String|Object.<String, ElemMethod>} methodName - Name of the method or object of
    * method names and methods.
@@ -126,7 +126,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#add
+   * @method Elem#add
    * @public
    * @param {...(Elem|Element|Element[])} elements - Each argument is a Elem, or Element, or array of Elements.
    * @returns {Elem} Returns this.
@@ -156,7 +156,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#addClass
+   * @method Elem#addClass
    * @public
    * @param {...String} classes - Classes to add.
    * @returns {Elem} Returns this.
@@ -174,7 +174,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#attr
+   * @method Elem#attr
    * @public
    * @param {String|Object.<String, String>} [attr] - Name of the attribute to get or
    * an object of the format { [attrName]: value, ... } to set attributes.
@@ -244,7 +244,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#children
+   * @method Elem#children
    * @public
    * @returns {Elem} D-Wrap of the children of the first element in the set.
    * @description Method for getting element's children.
@@ -257,7 +257,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#closest
+   * @method Elem#closest
    * @public
    * @param {String} selector - See the link.
    * @returns {Elem} Set of the closest elements.
@@ -277,7 +277,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#collect
+   * @method Elem#collect
    * @public
    * @param {CollectCallback} callback - Called on each iteration.
    * @returns {Elem} Returns eventual set.
@@ -300,7 +300,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#contains
+   * @method Elem#contains
    * @public
    * @param {Elem|Element} element - Element to find out if it's within the first element in the set.
    * @returns {Boolean} Returns if the argument within this element.
@@ -320,7 +320,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#create
+   * @method Elem#create
    * @public
    * @param {String} type - Type of created element. If type is "#text" a text node is created.
    * If type is "#comment" a comment node is created.
@@ -358,7 +358,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#css
+   * @method Elem#css
    * @public
    * @param {String|Object.<String, String>} [property] - Name of the property to get or
    * an object of the format { [property]: value, ... } to set styles.
@@ -420,7 +420,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#data
+   * @method Elem#data
    * @public
    * @param {String|Object.<String, String>} [key] - Name of the data attribute (without data- prefix)
    * to get or an object of the format { [attrName]: value, ... } to set attributes.
@@ -470,7 +470,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#dispatch
+   * @method Elem#dispatch
    * @public
    * @param {String|Event} event - Event or a string (new Event(event) is created).
    * @param {Object} [details = {}] - Object that is assigned to the event.
@@ -503,7 +503,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#elem
+   * @method Elem#elem
    * @public
    * @param {Number} [index = 0] - Index of the element of the set to get. Negative index means elem.length + index.
    * @returns {Elem} New instance of Elem.
@@ -521,7 +521,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#filter
+   * @method Elem#filter
    * @public
    * @param {IterationCallback|String} filter - Filter function or a selector.
    * @returns {Elem} New instance of Elem.
@@ -547,7 +547,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#find
+   * @method Elem#find
    * @public
    * @param {String} selector - Selector to find.
    * @returns {Elem} New instance of Elem.
@@ -561,7 +561,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#forEach
+   * @method Elem#forEach
    * @public
    * @param {IterationCallback} callback - Called on each iteration.
    * @returns {Elem} Returns this.
@@ -581,7 +581,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#hasAttr
+   * @method Elem#hasAttr
    * @public
    * @param {String} attr - Name of the attribute.
    * @returns {Boolean} If the first element in the set has the attribute.
@@ -606,7 +606,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#hasClass
+   * @method Elem#hasClass
    * @public
    * @param {String} cls - Name of the class.
    * @returns {Boolean} If the first element in the set has the class.
@@ -625,7 +625,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#hide
+   * @method Elem#hide
    * @public
    * @returns {Elem} Returns this.
    * @description Hides all elements in the set.
@@ -638,7 +638,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#html
+   * @method Elem#html
    * @public
    * @param {String|*} [html] - HTML to write instead of current HTML.
    * @returns {Elem|String} If no arguments passed HTML of the first element in the set returned.
@@ -664,7 +664,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#includes
+   * @method Elem#includes
    * @public
    * @param {Element|node} elem - Element to search.
    * @return {Boolean} If the element is in the set.
@@ -675,7 +675,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#insertAfter
+   * @method Elem#insertAfter
    * @public
    * @param {Elem|Element} element - Element to insert this element after.
    * @returns {Elem} Returns this.
@@ -715,7 +715,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#insertBefore
+   * @method Elem#insertBefore
    * @public
    * @param {Elem|Element} element - Element to insert this element before.
    * @returns {Elem} Returns this.
@@ -745,7 +745,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#into
+   * @method Elem#into
    * @public
    * @param {Elem|Element} element - Element to put this elements into.
    * @param {Boolean} end - If the elements should be inserted to the end. If false they are inserted to the start.
@@ -779,7 +779,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#is
+   * @method Elem#is
    * @public
    * @param {String} selector
    * @returns {Boolean} If the first element in the set matches the selector.
@@ -805,7 +805,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#name
+   * @method Elem#name
    * @public
    * @returns {String|void} nodeName (lowercased) of the first element in the set.
    * @description Method for getting name of the first element in the set.
@@ -822,7 +822,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#next
+   * @method Elem#next
    * @public
    * @returns {Elem} New instance of Elem.
    * @description Method for finding next element to each element in the set.
@@ -835,7 +835,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#on
+   * @method Elem#on
    * @public
    * @param {ElemEventString|Object.<ElemEventString|ElemListener>} event - Either a {@link ElemEventString} string
    * or an object with event keys (a key is also ElemEventString) and listeners values.
@@ -917,7 +917,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#parent
+   * @method Elem#parent
    * @public
    * @returns {Elem} New instance of Elem.
    * @description Method returns wrap of the set of the parent elements of each element in the set.
@@ -927,7 +927,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#prev
+   * @method Elem#prev
    * @public
    * @returns {Elem} New instance of Elem.
    * @description Method for finding previous element to each element in the set.
@@ -940,7 +940,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#prop
+   * @method Elem#prop
    * @public
    * @param {String|Object.<String, *>} property - Either a string of a property or an assigned object.
    * @param {*} [value] - If a property parameter is a string
@@ -970,7 +970,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#remove
+   * @method Elem#remove
    * @public
    * @returns {Elem} Returns this.
    * @description Removes all the elements from the set from the document.
@@ -984,7 +984,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#removeAttr
+   * @method Elem#removeAttr
    * @public
    * @param {...String} attributes - Attributes to remove.
    * @returns {Elem} Returns this.
@@ -1008,7 +1008,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#removeClass
+   * @method Elem#removeClass
    * @public
    * @param {...String} classes - Classes to remove.
    * @returns {Elem} Returns this.
@@ -1026,7 +1026,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#removeCSS
+   * @method Elem#removeCSS
    * @public
    * @param {...String} props - CSS properties to remove.
    * @returns {Elem} Returns this.
@@ -1044,7 +1044,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#replace
+   * @method Elem#replace
    * @public
    * @param {Elem|Element} element - Element to replace the first element in the set
    * with a set of elements specified by the argument (Element or Elem).
@@ -1086,7 +1086,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#show
+   * @method Elem#show
    * @public
    * @returns {Elem} Returns this.
    * @description Shows all elements in the set.
@@ -1100,7 +1100,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#slice
+   * @method Elem#slice
    * @public
    * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/slice
    * @returns {Elem}
@@ -1111,7 +1111,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#text
+   * @method Elem#text
    * @public
    * @param {String|*} [text] - Text to write instead of current text.
    * @returns {Elem|String} If no arguments passed text of the first element in the set returned.
@@ -1133,7 +1133,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#toggleAttr
+   * @method Elem#toggleAttr
    * @public
    * @param {String} attr - Attribute to toggle.
    * @param {Boolean|*} [condition] - If present and the condition is truthy method adds the attribute
@@ -1159,7 +1159,7 @@ class Elem extends Array {
   }
 
   /**
-   * @function Elem#toggleClass
+   * @method Elem#toggleClass
    * @public
    * @param {String} cls - Class to toggle.
    * @param {Boolean|*} [condition] - If present and the condition is truthy method adds the class
