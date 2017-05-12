@@ -180,7 +180,7 @@ class Elem extends Array {
    * an object of the format { [attrName]: value, ... } to set attributes.
    * @param {String} [value] - If the first argument is a string
    * it should be a value to set for that attribute.
-   * @returns {Object|String|Elem} If no arguments passed, D-Wrap of attributes of the first element in the set
+   * @returns {Object|String|Elem} If no arguments passed, object of attributes of the first element in the set
    * returned, if 1 string argument is passed the value of the attribute of the first element in the set
    * returned otherwise returns this.
    * @description Method for getting/setting attributes.
@@ -246,7 +246,7 @@ class Elem extends Array {
   /**
    * @method Elem#children
    * @public
-   * @returns {Elem} D-Wrap of the children of the first element in the set.
+   * @returns {Elem} Set of the children of the first element in the set.
    * @description Method for getting element's children.
    *
    * @example
@@ -363,7 +363,7 @@ class Elem extends Array {
    * @param {String|Object.<String, String>} [property] - Name of the property to get or
    * an object of the format { [property]: value, ... } to set styles.
    * @param {String} [value] - If the first argument is a string it should be a value to set for that property.
-   * @returns {Object|String|Elem} If no arguments passed, D-Wrap of css styles of the element returned,
+   * @returns {Object|String|Elem} If no arguments passed, object of css styles of the element returned,
    * if 1 string argument is passed the value of the property returned otherwise returns this.
    * @description Method for getting/setting styles. Supports !important.
    *
@@ -425,7 +425,7 @@ class Elem extends Array {
    * @param {String|Object.<String, String>} [key] - Name of the data attribute (without data- prefix)
    * to get or an object of the format { [attrName]: value, ... } to set attributes.
    * @param {String} [value] - If the first argument is a string it should be a value to set for that attribute.
-   * @returns {Object|String|Elem} If no arguments passed, D-Wrap of dataset of the element returned,
+   * @returns {Object|String|Elem} If no arguments passed, object of dataset of the element returned,
    * if 1 string argument is passed the value of the data attribute returned otherwise returns this.
    * @description Method for getting/setting data attributes. See
    * [HTMLElement#dataset]{@link https://developer.mozilla.org/en/docs/Web/API/HTMLElement/dataset}.

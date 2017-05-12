@@ -1,92 +1,64 @@
 import {
   except, create, assign,
   iterateObject, iterateArray,
-  isNil
+  isNil, isString, isArray
 } from '../../utils';
 import { isDocument } from '../Elem';
 import { Elem } from '../../Elem';
-import {
-  SVG_NS, D_REST_REGEX
-} from '../../constants';
+import { SVG_NS, blocks, mixins } from '../../constants';
 import { cleanProperty } from './cleanProperty';
-import { transformRestAttrs } from './transformRestAttrs';
 import { calculateAttrs } from './calculateAttrs';
 import { normalizeArgs } from './normalizeArgs';
-import { mixinMatch } from './mixinMatch';
 import { constructPrivateScope } from './constructPrivateScope';
 import { constructPublicScope } from './constructPublicScope';
+import { isInstanceOf } from './isInstanceOf';
+import { InternalMixin } from './InternalMixin';
 import { Block } from '../../Block';
+import { Mixin } from '../../Mixin';
 
-const NAMED_D_BLOCK_REGEX = /^d-block:([\s\S]+)$/;
 const emptyArray = [];
 
 export function createBlock({ node, parent, parentElem, parentBlock, parentScope, parentTemplate, prevBlock }) {
   const doc = isDocument(parentElem[0])
     ? parentElem
     : new Elem(parentElem[0].ownerDocument);
-  const elem = parentElem[0].namespaceURI === SVG_NS
-    ? doc.create('svg')
-    : doc;
-  const localBlocks = parentTemplate ? parentTemplate.$$.ns._blocks : Block._blocks;
-  const localMixins = parentTemplate ? parentTemplate.$$.ns._mixins : Block._mixins;
-  const args = node.attrs || {};
-  const name = node.name || 'UnknownBlock';
+  const args = node.args || {};
+  const { type } = node;
+  const isElements = type === blocks.Elements;
   let { children } = node;
-  let constructor = node.Constructor || (node.name && localBlocks[node.name]);
-  let dBlockMatch;
-  let dBlockName;
-  let dBlockArgs;
+  let constructor = !isString(type) && type;
+  let DynamicBlockArgs;
 
-  if (name === 'd-block' && args.name) {
-    dBlockArgs = except(args, 'name');
-  } else if (name === 'd-block' && args.Constructor) {
-    dBlockArgs = except(args, 'Constructor');
-  } else if ((dBlockMatch = name.match(NAMED_D_BLOCK_REGEX)) || name === 'd-block') {
-    constructor = Block._blocks['d-block'];
-    dBlockName = dBlockMatch ? dBlockMatch[1] : null;
+  if (type === blocks.DynamicBlock) {
+    DynamicBlockArgs = except(args, 'type');
   }
 
-  let blockInstance;
+  if (isArray(constructor)) {
+    constructor = class extends Block {
+      static html = constructor;
+    };
+  }
 
-  if (constructor) {
-    try {
-      blockInstance = new constructor({
-        name,
-        args,
-        dBlockName,
-        dBlockArgs,
-        children,
-        parent,
-        parentElem,
-        parentBlock,
-        parentScope,
-        parentTemplate,
-        prevBlock
-      });
-    } catch (err) {
-      console.error(`Uncaught error in new ${ name }:`, err);
-      constructor = null;
-    }
+  if (!isInstanceOf(Block, constructor) && !isString(type)) {
+    throw new Error(`Wrong block type given: ${ type }`);
   }
 
   if (!constructor) {
     const { value } = node;
-
-    const element = elem.create(name);
+    const elem = (
+      parentElem[0].namespaceURI === SVG_NS
+        ? doc.create('svg')
+        : doc
+    ).create(type);
     const currentAttrs = create(null);
+    const currentMixins = create(null);
     let attrs = create(null);
-    let wasDRest;
+    let wasRest;
     const attrsChain = [attrs];
-    const mixinDefaultOpts = {
-      elem: element,
-      parentBlock,
-      parentScope,
-      parentTemplate
-    };
 
     iterateObject(args, (value, attr) => {
-      const isDRest = D_REST_REGEX.test(attr);
-      const localAttrs = isDRest || wasDRest
+      const isRest = value.mixin === mixins.Rest;
+      const localAttrs = isRest || wasRest
         ? create(attrs)
         : attrs;
 
@@ -96,84 +68,88 @@ export function createBlock({ node, parent, parentElem, parentBlock, parentScope
 
       attrs = localAttrs;
 
-      if (isDRest) {
+      if (isRest) {
         const restAttrs = parentScope.$$.evaluate(value, (value) => {
           iterateObject(localAttrs, cleanProperty);
-          assign(localAttrs, transformRestAttrs(
-            value,
-            localMixins,
-            mixinDefaultOpts
-          ));
-          calculateAttrs(normalizeArgs(attrsChain), attrs, currentAttrs, element, false);
+          assign(localAttrs, value);
+          calculateAttrs({
+            newAttrs: normalizeArgs(attrsChain),
+            currentAttrs,
+            currentMixins,
+            elem,
+            parentBlock,
+            firstTime: false
+          });
         }, parentBlock);
 
-        wasDRest = true;
+        wasRest = true;
 
-        return assign(localAttrs, transformRestAttrs(
-          restAttrs, localMixins, mixinDefaultOpts
-        ));
+        return assign(localAttrs, restAttrs);
       }
 
-      const match = mixinMatch(localMixins, attr);
+      wasRest = false;
 
-      wasDRest = false;
-
-      if (match) {
-        localAttrs[attr] = {
-          type: 'mixin',
-          dynamic: false,
-          opts: {
-            value,
-            ...match,
-            ...mixinDefaultOpts
-          },
+      if (isInstanceOf(Mixin, value.mixin)) {
+        localAttrs[attr] = new InternalMixin({
+          Mixin: value.mixin,
+          args: value.args,
+          parentScope,
+          parentTemplate,
           value
-        };
+        });
 
         return;
       }
 
-      localAttrs[attr] = {
-        type: 'attr',
-        value: parentScope.$$.evaluate(value, (value) => {
-          localAttrs[attr] = {
-            type: 'attr',
-            value
-          };
-          calculateAttrs(normalizeArgs(attrsChain), attrs, currentAttrs, element, false);
-        }, parentBlock)
-      };
+      localAttrs[attr] = parentScope.$$.evaluate(value, (value) => {
+        localAttrs[attr] = value;
+        calculateAttrs({
+          newAttrs: normalizeArgs(attrsChain),
+          currentAttrs,
+          currentMixins,
+          elem,
+          parentBlock,
+          firstTime: false
+        });
+      }, parentBlock);
     });
 
-    parentBlock.$$.mixinsToBuild.push(calculateAttrs(normalizeArgs(attrsChain), attrs, currentAttrs, element, true));
+    parentBlock.$$.mixinsToBuild.push(calculateAttrs({
+      newAttrs: normalizeArgs(attrsChain),
+      currentAttrs,
+      currentMixins,
+      elem,
+      parentBlock,
+      firstTime: true
+    }));
 
-    if (name === '#comment') {
-      element.text(value);
+    if (type === '#comment') {
+      elem.text(value);
     }
 
-    if (name === '#text') {
+    if (type === '#text') {
       let text = parentScope.$$.evaluate(value, (value) => {
         if (isNil(value)) {
           value = '';
         }
 
-        element.text(`${ value }`);
+        elem.text(`${ value }`);
       }, parentBlock);
 
       if (isNil(text)) {
         text = '';
       }
 
-      element.text(`${ text }`);
+      elem.text(`${ text }`);
     }
 
     const isParentBlock = parent instanceof Block;
     const childBlocks = [];
 
     /* istanbul ignore if */
-    if (name === 'iframe' && !('src' in attrs)) {
-      element.on('load', () => {
-        const document = element[0].contentDocument;
+    if (type === 'iframe' && !('src' in attrs)) {
+      elem.on('load', () => {
+        const document = elem[0].contentDocument;
         const doc = new Elem(document);
 
         new Elem(document.documentElement).remove();
@@ -198,31 +174,31 @@ export function createBlock({ node, parent, parentElem, parentBlock, parentScope
     }
 
     if (prevBlock instanceof Block) {
-      prevBlock.$$.insertAfterIt(element, false);
+      prevBlock.$$.insertAfterIt(elem, false);
     } else if (prevBlock) {
-      element.insertAfter(prevBlock);
+      elem.insertAfter(prevBlock);
 
       if (isParentBlock) {
-        parent.$$.addContent(element);
+        parent.$$.addContent(elem);
       }
     } else if (isParentBlock) {
-      parent.$$.insertInStartOfIt(element, false);
+      parent.$$.insertInStartOfIt(elem, false);
     } else {
-      element.into(parentElem, false);
+      elem.into(parentElem, false);
     }
 
     if (children) {
       let prevBlock;
-      let parentElem = element;
+      let parentElem = elem;
 
       /* istanbul ignore if */
-      if (name === 'template') {
-        parentElem = new Elem(element[0].content = element[0].content || doc[0].createDocumentFragment());
-      } else if (name === 'iframe') {
+      if (type === 'template') {
+        parentElem = new Elem(elem[0].content = elem[0].content || doc[0].createDocumentFragment());
+      } else if (type === 'iframe') {
         if ('src' in attrs) {
           children = emptyArray;
         } else {
-          const document = element[0].contentDocument;
+          const document = elem[0].contentDocument;
 
           new Elem(document.documentElement).remove();
 
@@ -244,34 +220,45 @@ export function createBlock({ node, parent, parentElem, parentBlock, parentScope
       });
     }
 
-    return element;
+    return elem;
   }
 
+  const blockInstance = new constructor({
+    args,
+    DynamicBlockArgs,
+    children,
+    parent,
+    parentElem,
+    parentBlock,
+    parentScope,
+    parentTemplate,
+    prevBlock
+  });
   const {
     $$,
+    $$: { name },
     args: Args,
     globals,
     ...locals
   } = blockInstance;
 
-  const html = name === 'd-elements'
+  const html = isElements
     ? Args.value || []
-    : constructor.template.value || constructor.template;
+    : constructor.html;
 
   $$.args = constructPrivateScope(Args);
   $$.locals = constructPrivateScope(locals);
   $$.globals = constructPrivateScope(globals, 'globals', parentScope);
 
-  if (name === '#d-item') {
+  if (type === blocks.Item) {
     const scopeValues = {
       [node.itemName]: node.item,
       [node.indexName]: node.index
     };
-    const scope = parentScope.$$.name === '#d-item'
+    const scope = parentScope.$$.Constructor === blocks.Item
       ? parentScope.$$.scope
       : parentScope;
 
-    $$.ns = parentScope.$$.ns;
     $$.privateScope = constructPrivateScope(scopeValues);
     constructPublicScope($$.scope = create(scope), scopeValues, $$.privateScope);
   }
@@ -287,10 +274,10 @@ export function createBlock({ node, parent, parentElem, parentBlock, parentScope
   }
 
   prevBlock = undefined;
-  parentScope = name === 'd-elements'
+  parentScope = isElements
     ? Args.parentScope
     : blockInstance;
-  parentTemplate = name === 'd-elements'
+  parentTemplate = isElements
     ? Args.parentTemplate
     : blockInstance;
 

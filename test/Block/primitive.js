@@ -12,13 +12,31 @@ const remove = () => {
 };
 
 class Primitive extends Block {
-  static template = html`
+  static html = html`
     <span>Hello, world!</span>
   `;
 }
 
+class BlocksHelper extends Block {
+  static html = html`
+    <span>Hello, world, again!</span>
+  `;
+}
+
+class BlocksHelper2 extends Block {
+  static html = html`
+    <BlocksHelper/>
+  `;
+}
+
+const BlocksHelper3 = html`
+  <i>Goodbye, world, again!</i>
+`;
+
+class EmptyBlock extends Block {}
+
 class Blocks extends Block {
-  static template = html`
+  static html = html`
     <span>Hello, world!</span>
     <BlocksHelper/>
     <span>Goodbye, world!</span>
@@ -27,36 +45,32 @@ class Blocks extends Block {
       <BlocksHelper/>
     </div>
     <BlocksHelper2/>
+    <BlocksHelper3/>
   `;
 }
 
-class BlocksHelper extends Block {
-  static template = html`
-    <span>Hello, world, again!</span>
-  `;
-}
-
-class BlocksHelper2 extends Block {
-  static template = html`
-    <BlocksHelper/>
+class EmptySibling extends Block {
+  static html = html`
+    <EmptyBlock/>
+    <i/>
   `;
 }
 
 class EmptyBlocks extends Block {
-  static template = html`
+  static html = html`
     <div>
       <EmptyBlock/>
       <span>Hello, world!</span>
       <EmptyBlock/>
+      <EmptyBlock/>
       <span>Goodbye, world!</span>
+      <EmptySibling/>
     </div>
   `;
 }
 
-class EmptyBlock extends Block {}
-
 class Elements extends Block {
-  static template = html`
+  static html = html`
     <svg>
       <circle r="10" cx="10" cy="10"/>
     </svg>
@@ -77,10 +91,6 @@ class Elements extends Block {
     </iframe>
   `;
 }
-
-Block.block('BlocksHelper', BlocksHelper);
-Block.block('BlocksHelper2', BlocksHelper2);
-Block.block('EmptyBlock', EmptyBlock);
 
 export default () => {
   describe('primitive', () => {
@@ -109,6 +119,7 @@ export default () => {
           + '<span>Hello, world, again!</span>'
         + '</div>'
         + '<span>Hello, world, again!</span>'
+        + '<i>Goodbye, world, again!</i>'
       );
     });
 
@@ -120,7 +131,7 @@ export default () => {
     });
 
     it('should render empty blocks and elements', () => {
-      strictEqual(container.html(), '<div><span>Hello, world!</span><span>Goodbye, world!</span></div>');
+      strictEqual(container.html(), '<div><span>Hello, world!</span><span>Goodbye, world!</span><i></i></div>');
     });
 
     after(remove);
@@ -167,5 +178,22 @@ export default () => {
       container.remove();
     });
     after(remove);
+  });
+  describe('invalid blocks and elements', () => {
+    it('should throw an error when invalid block constructor given', (done) => {
+      const Block = 1;
+
+      try {
+        initApp(html`<Block/>`, doc.create('div'));
+      } catch (error) {
+        try {
+          strictEqual(error.message, 'Wrong block type given: 1');
+
+          done();
+        } catch (err) {
+          done(err);
+        }
+      }
+    });
   });
 };

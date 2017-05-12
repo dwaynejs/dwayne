@@ -1,5 +1,5 @@
 import { strictEqual, deepStrictEqual } from 'assert';
-import { Block, doc, initApp, removeApp } from '../../src';
+import { Block, doc, initApp, removeApp, Rest } from '../../src';
 
 let app;
 let block;
@@ -12,7 +12,7 @@ const remove = () => {
 };
 
 class Variables extends Block {
-  static template = html`
+  static html = html`
     <span>Hello, {caption}!</span>
   `;
 
@@ -20,7 +20,7 @@ class Variables extends Block {
 }
 
 class ChangingVariables extends Block {
-  static template = html`
+  static html = html`
     <span caption="{caption}">Hello, {caption}!</span>
   `;
 
@@ -31,22 +31,28 @@ class ChangingVariables extends Block {
   }
 }
 
+class ChangingArgs extends Block {
+  static html = html`
+    <span>{args.caption}</span>
+  `;
+}
+
 class ChangingArgsApp extends Block {
-  static template = html`<ChangingArgs caption="{caption}"/>`;
+  static html = html`<ChangingArgs caption="{caption}"/>`;
 
   afterRender() {
     app = this;
   }
 }
 
-class ChangingArgs extends Block {
-  static template = html`
-    <span>{args.caption}</span>
+class ChangingGlobals extends Block {
+  static html = html`
+    <span>{globals.caption}</span>
   `;
 }
 
 class ChangingGlobalsApp extends Block {
-  static template = html`<ChangingGlobals/>`;
+  static html = html`<ChangingGlobals/>`;
 
   constructor(opts) {
     super(opts);
@@ -56,27 +62,8 @@ class ChangingGlobalsApp extends Block {
   }
 }
 
-class ChangingGlobals extends Block {
-  static template = html`
-    <span>{globals.caption}</span>
-  `;
-}
-
-class ChangingMultipleVariablesApp extends Block {
-  static template = html`<ChangingMultipleVariables caption="{caption}"/>`;
-
-  caption = ', wonderful';
-
-  constructor(opts) {
-    super(opts);
-
-    this.globals.caption = 'Hello';
-    app = this;
-  }
-}
-
 class ChangingMultipleVariables extends Block {
-  static template = html`
+  static html = html`
     <span>
       {globals.caption + args.caption + caption}
     </span>
@@ -89,11 +76,39 @@ class ChangingMultipleVariables extends Block {
   }
 }
 
-class BlockDRestApp extends Block {
-  static template = html`
-    <BlockDRest
+class ChangingMultipleVariablesApp extends Block {
+  static html = html`<ChangingMultipleVariables caption="{caption}"/>`;
+
+  caption = ', wonderful';
+
+  constructor(opts) {
+    super(opts);
+
+    this.globals.caption = 'Hello';
+    app = this;
+  }
+}
+
+class BlockRest extends Block {
+  static args = {
+    a: {
+      default: 1
+    },
+    b: {
+      default: 2
+    }
+  };
+
+  afterRender() {
+    block = this;
+  }
+}
+
+class BlockRestApp extends Block {
+  static html = html`
+    <BlockRest
       arg="{arg}"
-      d-rest="{rest}"
+      Rest="{rest}"
     />
   `;
 
@@ -107,32 +122,11 @@ class BlockDRestApp extends Block {
   }
 }
 
-class BlockDRest extends Block {
-  static defaultArgs = {
-    a: 1,
-    b: 2
-  };
-
-  afterRender() {
-    block = this;
-  }
-}
-
-Block.block('Variables', Variables);
-Block.block('ChangingVariables', ChangingVariables);
-Block.block('ChangingArgsApp', ChangingArgsApp);
-Block.block('ChangingArgs', ChangingArgs);
-Block.block('ChangingGlobalsApp', ChangingGlobalsApp);
-Block.block('ChangingGlobals', ChangingGlobals);
-Block.block('ChangingMultipleVariablesApp', ChangingMultipleVariablesApp);
-Block.block('ChangingMultipleVariables', ChangingMultipleVariables);
-Block.block('BlockDRest', BlockDRest);
-
 export default () => {
   describe('variables', () => {
     describe('variables test', () => {
       before(() => {
-        initApp(htmlScopeless`<Variables/>`, container);
+        initApp(Variables, container);
       });
 
       it('should render caption using local variable from the block', () => {
@@ -143,7 +137,7 @@ export default () => {
     });
     describe('changing variables test', () => {
       before(() => {
-        initApp(htmlScopeless`<ChangingVariables/>`, container);
+        initApp(ChangingVariables, container);
       });
 
       it('should render caption using local variable from the block', () => {
@@ -159,7 +153,7 @@ export default () => {
 
         strictEqual(container.html(), '<span caption="dwayne">Hello, dwayne!</span>');
       });
-      it('should re-render caption again after it\'s been changed', () => {
+      it('should re-render caption again after it\'s been changed again', () => {
         app.caption = null;
 
         strictEqual(container.html(), '<span>Hello, !</span>');
@@ -169,7 +163,7 @@ export default () => {
     });
     describe('changing args variables test', () => {
       before(() => {
-        initApp(htmlScopeless`<ChangingArgsApp/>`, container);
+        initApp(ChangingArgsApp, container);
       });
 
       it('should render caption using args variable from the block', () => {
@@ -190,7 +184,7 @@ export default () => {
     });
     describe('changing globals test', () => {
       before(() => {
-        initApp(htmlScopeless`<ChangingGlobalsApp/>`, container);
+        initApp(ChangingGlobalsApp, container);
       });
 
       it('should render caption using global variable', () => {
@@ -211,7 +205,7 @@ export default () => {
     });
     describe('changing multiple variables test', () => {
       before(() => {
-        initApp(htmlScopeless`<ChangingMultipleVariablesApp/>`, container);
+        initApp(ChangingMultipleVariablesApp, container);
       });
 
       it('should render caption using variables', () => {
@@ -232,12 +226,12 @@ export default () => {
 
       after(remove);
     });
-    describe('d-rest test', () => {
+    describe('Rest test', () => {
       before(() => {
-        initApp(BlockDRestApp, container);
+        initApp(BlockRestApp, container);
       });
 
-      it('should pass args using Block.defaultArgs', () => {
+      it('should pass args using Block.args', () => {
         deepStrictEqual({ ...block.args }, {
           arg: null,
           a: 1,
@@ -255,20 +249,6 @@ export default () => {
           arg: 'a',
           a: 7,
           b: 2,
-          c: undefined
-        });
-      });
-      it('should handle nested d-rest', () => {
-        app.rest = {
-          'd-rest': {
-            b: 8
-          }
-        };
-
-        deepStrictEqual({ ...block.args }, {
-          arg: 'a',
-          a: 1,
-          b: 8,
           c: undefined
         });
       });

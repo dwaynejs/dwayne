@@ -1,6 +1,6 @@
 {
   "name": "dwayne",
-  "version": "3.0.4",
+  "version": "4.0.0",
   "browser": "lib/index.js",
   "jsnext:main": "lib/esnext.js",
   "module": "lib/es6.js",
@@ -11,7 +11,7 @@
     "babel-plugin-external-helpers": "^6.8.0",
     "babel-plugin-istanbul": "^4.1.1",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
-    "babel-preset-dwayne": "^1.2.0",
+    "babel-preset-dwayne": "^4.0.0",
     "babel-preset-es2015": "^6.3.13",
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.7.2",

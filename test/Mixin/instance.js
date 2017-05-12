@@ -1,19 +1,7 @@
 import { strictEqual } from 'assert';
-import { Block, Mixin, initApp, removeApp, doc } from '../../src/index';
+import { Block, Mixin, initApp, removeApp, doc, Rest } from '../../src/index';
 
 const error = new Error();
-
-class AfterUpdateError extends Block {
-  static template = html`
-    <div AfterUpdateErrorMixin/>
-  `;
-}
-
-class BeforeRemoveError extends Block {
-  static template = html`
-    <div BeforeRemoveErrorMixin/>
-  `;
-}
 
 class AfterUpdateMixin extends Mixin {}
 
@@ -27,12 +15,17 @@ class DefaultAfterUpdateMixin extends Mixin {}
 
 class ToStringMixin extends Mixin {}
 
-Block.mixin('AfterUpdateMixin', AfterUpdateMixin);
-Block.mixin('AfterUpdateErrorMixin', AfterUpdateErrorMixin);
-Block.mixin('BeforeRemoveMixin', BeforeRemoveMixin);
-Block.mixin('BeforeRemoveErrorMixin', BeforeRemoveErrorMixin);
-Block.mixin('DefaultAfterUpdateMixin', DefaultAfterUpdateMixin);
-Block.mixin('ToStringMixin', ToStringMixin);
+class AfterUpdateError extends Block {
+  static html = html`
+    <div AfterUpdateErrorMixin/>
+  `;
+}
+
+class BeforeRemoveError extends Block {
+  static html = html`
+    <div BeforeRemoveErrorMixin/>
+  `;
+}
 
 export default () => {
   const oldConsoleError = console.error;
@@ -47,7 +40,7 @@ export default () => {
       let app;
 
       class AfterUpdate extends Block {
-        static template = html`
+        static html = html`
           <div AfterUpdateMixin="{value}" DefaultAfterUpdateMixin/>
         `;
 
@@ -105,7 +98,7 @@ export default () => {
   describe('beforeRemove()', () => {
     it('should call beforeRemove on remove with true argument when removing the element as well', (done) => {
       class BeforeRemove extends Block {
-        static template = html`
+        static html = html`
           <div BeforeRemoveMixin/>
         `;
       }
@@ -129,13 +122,11 @@ export default () => {
       let app;
 
       class BeforeRemove extends Block {
-        static template = html`
-          <div d-rest="{rest}"/>
+        static html = html`
+          <div Rest="{rest}"/>
         `;
 
-        rest = {
-          BeforeRemoveMixin: 1
-        };
+        rest = { ...this.args };
 
         afterRender() {
           app = this;
@@ -152,7 +143,7 @@ export default () => {
         }
       };
 
-      initApp(BeforeRemove, doc.create('div'));
+      initApp(html`<BeforeRemove BeforeRemoveMixin/>`, doc.create('div'));
 
       app.rest = {};
     });
@@ -180,7 +171,7 @@ export default () => {
   describe('toString()', () => {
     it('should return "[object Mixin]"', (done) => {
       class ToString extends Block {
-        static template = html`
+        static html = html`
           <div ToStringMixin/>
         `;
       }

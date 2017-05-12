@@ -233,11 +233,17 @@ describe('Elem#', () => {
         wrap
           .attr({
             attr: '123',
-            contentEditable: ''
+            contentEditable: '',
+            a: true,
+            b: false,
+            c: null
           })
           .forEach((elem) => {
             strictEqual(elem.getAttribute('attr'), '123');
             strictEqual(elem.getAttribute('contentEditable'), '');
+            strictEqual(elem.getAttribute('a'), '');
+            strictEqual(elem.getAttribute('b'), null);
+            strictEqual(elem.getAttribute('c'), null);
 
             doneAll();
           });

@@ -1,4 +1,4 @@
-import { isArray, isString } from './utils';
+import { isArray } from './utils';
 import { createBlock, isInstanceOf } from './helpers/Block';
 import { Block } from './Block';
 import { Elem } from './Elem';
@@ -6,10 +6,9 @@ import { Elem } from './Elem';
 /**
  * @function initApp
  * @public
- * @param {Template|ScopelessTemplate|String|typeof Block} block - Root template (may be scopeless),
- * string defining a name of the root block or a block subclass.
+ * @param {Template|typeof Block} html - Root template or root block constructor.
  * @param {Elem|Element} container - Container of the app.
- * @returns {Block|void} Root block if the app has benn registered and undefined if not.
+ * @returns {Block|void} Root block if the app has been registered and undefined if not.
  * @description Method for initializing app.
  *
  * @example
@@ -20,9 +19,8 @@ import { Elem } from './Elem';
  * initApp('App', doc.create('div'));
  * initApp(App, doc.create('div'));
  */
-export function initApp(block, container) {
+export function initApp(html, container) {
   const parentElem = new Elem(container).elem(0);
-  let Constructor = block;
 
   if (!parentElem.length) {
     console.error('No valid element to insert the app into was given! (initApp)');
@@ -36,42 +34,23 @@ export function initApp(block, container) {
     return;
   }
 
-  if (isString(block)) {
-    Constructor = class RootBlock extends Block {
-      static template = {
-        vars: [],
-        value: [{
-          name: block
-        }]
-      };
+  let RootBlock = html;
+
+  if (isArray(html)) {
+    RootBlock = class RootBlock extends Block {
+      static html = html;
     };
   }
 
-  if (isArray(block)) {
-    Constructor = class RootBlock extends Block {
-      static template = {
-        vars: [],
-        value: block
-      };
-    };
-  }
-
-  if (block && !isInstanceOf(Block, block) && isArray(block.vars) && isArray(block.value)) {
-    Constructor = class RootBlock extends Block {
-      static template = block;
-    };
-  }
-
-  if (!isInstanceOf(Block, Constructor)) {
-    console.error('No valid root block to insert the app into was given! (initApp)');
+  if (!isInstanceOf(Block, RootBlock)) {
+    console.error('No valid root block was given! (initApp)');
 
     return;
   }
 
   const rootBlock = createBlock({
     node: {
-      name: '#RootBlock',
-      Constructor
+      type: RootBlock
     },
     parent: parentElem,
     parentElem

@@ -35,12 +35,9 @@ class Mixin {
 
   constructor(opts) {
     const {
-      name,
-      value,
-      dynamic,
+      internal,
       elem,
       args,
-      comment,
       parentBlock,
       parentScope,
       parentTemplate
@@ -48,15 +45,7 @@ class Mixin {
     const watchersToRemove = [];
     const watchers = [];
     const { constructor } = getProto(this);
-    const afterUpdate = (newValue, oldValue) => {
-      this.$$.value = newValue;
-
-      try {
-        this.afterUpdate(newValue, oldValue);
-      } catch (err) {
-        console.error(`Uncaught error in ${ name }#afterUpdate:`, err);
-      }
-    };
+    const name = constructor.displayName || constructor.name;
 
     defineFrozenProperties(this, {
       /**
@@ -64,20 +53,20 @@ class Mixin {
        * @type {Object}
        * @protected
        * @property {Function} Mixin#$$.evaluate - Evaluate function.
-       * @property {Boolean} Mixin#$$.isDynamic - If the mixin is dynamic.
        * @property {Boolean} Mixin#$$.isRemoved - If the block is removed.
+       * @property {InternalMixin} Mixin#$$.internal - Current internal mixin instance.
+       * @property {InternalMixin[]} Mixin#$$.internals - Array of internal mixins bound to the the mixin.
        * @property {String} Mixin#$$.name - Mixin name.
        * @property {Block|void} Mixin#$$.parentBlock - Parent block.
        * @property {Block|void} Mixin#$$.parentScope - Parent scope.
        * @property {Block|void} Mixin#$$.parentTemplate - Parent template.
+       * @property {*} Mixin#$$.value - Current value.
        * @property {Watcher[]} Block#$$.watchers - Temporary vars watchers.
        * @property {Object[]} Block#$$.watchersToRemove - Watchers to remove before removing mixin.
        */
       $$: {
         name,
-        _value: value,
-        value,
-        isDynamic: dynamic,
+        internal,
         parentScope,
         parentBlock,
         parentTemplate,
@@ -86,13 +75,12 @@ class Mixin {
         isRemoved: false,
         evaluate: (watcher) => {
           const {
-            isDynamic,
             value,
-            _value
+            internal
           } = this.$$;
-          const currentValue = isDynamic
+          const currentValue = constructor.evaluate
             ? value
-            : parentScope.$$.evaluate(_value);
+            : parentScope.$$.evaluate(internal.value);
 
           if (watcher) {
             watchers.push(watcher);
@@ -115,11 +103,6 @@ class Mixin {
           if (!isParentSignal) {
             removeArrayElem(parentBlock.$$.mixins, this);
           }
-        },
-        setAfterUpdate: () => {
-          if (constructor.evaluate) {
-            afterUpdate(this.$$.evaluate(afterUpdate));
-          }
         }
       }
     });
@@ -130,13 +113,6 @@ class Mixin {
      * @public
      */
     this.args = args;
-
-    /**
-     * @member {String} [Mixin#comment]
-     * @type {String}
-     * @public
-     */
-    this.comment = comment;
 
     /**
      * @member {Block} [Mixin#parentScope]
@@ -165,6 +141,13 @@ class Mixin {
      * @public
      */
     this.node = elem[0];
+
+    /**
+     * @member {String} [Mixin#name]
+     * @type {String}
+     * @public
+     */
+    this.name = name;
 
     parentBlock.$$.mixins.push(this);
   }

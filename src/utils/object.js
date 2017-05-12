@@ -1,18 +1,14 @@
-import { iterateArray } from './array';
-
 const {
   hasOwnProperty: has
 } = {};
 const { slice } = [];
 
 export function assign(target) {
-  iterateArray(arguments, (source, index) => {
-    if (index) {
-      iterateObject(source, (value, key) => {
-        target[key] = value;
-      });
-    }
-  });
+  for (let i = 1, length = arguments.length; i < length; i++) {
+    iterateObject(arguments[i], (value, key) => {
+      target[key] = value;
+    });
+  }
 
   return target;
 }

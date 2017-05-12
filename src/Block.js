@@ -2,32 +2,31 @@ import { Elem } from './Elem';
 import {
   defineFrozenProperties,
   assign, iterateArray, iterateObject,
-  isFunction, isArray,
-  setToStringTag, hasOwnProperty,
+  isFunction, setToStringTag,
   removeArrayElem, create,
   getProto, setProto
 } from './utils';
 import {
-  constructMixinRegex, isInstanceOf, normalizeArgs,
-  removeWatchers, removeWithParentSignal, cleanProperty,
-  transformRestArgs, calculateArgs, wrapBlock
+  normalizeArgs, removeWatchers, removeWithParentSignal,
+  cleanProperty, InternalMixin, calculateArgs,
+  wrapBlock, getDefaultArgs, isInstanceOf
 } from './helpers/Block';
-import {
-  D_REST_REGEX,
-  rootBlocks, rootMixins
-} from './constants';
+import { blocks, mixins } from './constants';
 import { Mixin } from './Mixin';
 
 /**
- * @typedef {Object} Template
+ * @typedef {BlockNode[]} Template
  * @public
  * @property {String[]} vars - Template used vars.
- * @property {Object[]} value - Template itself.
  */
 
 /**
- * @typedef {Object[]} ScopelessTemplate
+ * @typedef {Object} BlockNode
  * @public
+ * @property {String|typeof Block} type - Block type.
+ * @property {Object} [args] - Block args.
+ * @property {BlockNode[]} children - Block children.
+ * @property {*} value - Text or comment node value.
  */
 
 /**
@@ -52,43 +51,6 @@ import { Mixin } from './Mixin';
  * @returns {typeof Block} New Block class.
  */
 
-/**
- * @callback AfterUpdate
- * @public
- * @param {*} newValue - New value.
- * @param {*} oldValue - Old value.
- * @param {Mixin} mixin - Mixin instance.
- */
-
-/**
- * @callback BlockRegisterHook
- * @public
- * @param {typeof Block} Block - Registering block.
- * @param {String} name - Block name.
- * @returns Return value is used for registering the block.
- * If Block subclass returned it's registered instead of the initial block, otherwise
- * the initial block is used.
- */
-
-/**
- * @callback MixinRegisterHook
- * @public
- * @param {typeof Mixin} Mixin - Registering mixin.
- * @param {String} name - Mixin name.
- * @returns Return value is used for registering the mixin.
- * If Mixin subclass returned it's registered instead of the initial mixin, otherwise
- * the initial mixin is used.
- */
-
-/**
- * @callback RemoveHook
- * @public
- */
-
-const blockHooks = [];
-const mixinHooks = [];
-const TAG_NAME_REGEX = /^[a-z][a-z\d\-_.:!@#$%^&*()[\]{}='"\\]*$/i;
-const ATTR_NAME_REGEX = /^[^\u0000-\u0020\s'">/=]+$/;
 const toStringTag = '[object Block]';
 const afterElem = new Elem();
 const emptyObject = {};
@@ -106,7 +68,7 @@ let gettingVars = [];
  * import { Block, initApp } from 'dwayne';
  *
  * class App extends Block {
- *   static template = '<Hello text="{text}"/> ({ this.times })';
+ *   static html = html`<Hello text="{text}"/> ({ this.times })`;
  *
  *   constructor(opts) {
  *     super(opts);
@@ -135,28 +97,12 @@ let gettingVars = [];
  */
 class Block {
   /**
-   * @member {Object.<String, typeof Block>} Block._blocks
-   * @type {Object.<String, typeof Block>}
-   * @protected
-   * @description Block namespace blocks.
-   */
-  static _blocks = create(rootBlocks);
-
-  /**
-   * @member {Object.<String, typeof Mixin>} Block._mixins
-   * @type {Object.<String, typeof Mixin>}
-   * @protected
-   * @description Block namespace mixins.
-   */
-  static _mixins = create(rootMixins);
-
-  /**
-   * @member {Object} [Block.defaultArgs = null]
+   * @member {Object} [Block.args = null]
    * @type {Object}
    * @public
-   * @description Block default args.
+   * @description Block args description.
    */
-  static defaultArgs = null;
+  static args = null;
 
   /**
    * @member {Object} [Block.defaultLocals = null]
@@ -167,15 +113,20 @@ class Block {
   static defaultLocals = null;
 
   /**
-   * @member {Object} [Block.template = { vars: [], value: [] }]
-   * @type {Object}
+   * @member {String} [Block.displayName = null]
+   * @type {String}
+   * @public
+   * @description Block display name.
+   */
+  static displayName = null;
+
+  /**
+   * @member {Template} [Block.html = []]
+   * @type {Template}
    * @public
    * @description Block template.
    */
-  static template = {
-    vars: [],
-    value: []
-  };
+  static html = [];
 
   /**
    * @method Block.onEvalError
@@ -187,232 +138,12 @@ class Block {
   }
 
   /**
-   * @method Block.beforeRegisterBlock
-   * @public
-   * @param {BlockRegisterHook} hook - Block register hook.
-   * @returns {RemoveHook}
-   */
-  static beforeRegisterBlock(hook) {
-    blockHooks.push(hook);
-
-    return () => {
-      removeArrayElem(blockHooks, hook);
-    };
-  }
-
-  /**
-   * @method Block.beforeRegisterMixin
-   * @public
-   * @param {MixinRegisterHook} hook - Mixin register hook.
-   * @returns {RemoveHook}
-   */
-  static beforeRegisterMixin(hook) {
-    mixinHooks.push(hook);
-
-    return () => {
-      removeArrayElem(mixinHooks, hook);
-    };
-  }
-
-  /**
-   * @method Block.block
-   * @public
-   * @param {String} name - Block or mixin name.
-   * @param {Template|ScopelessTemplate|typeof Block} Subclass - Subclass of Block or template string of it.
-   * @returns {typeof Block|undefined} Returns registered Block or undefined if the block hasn't been registered.
-   * @description Register block in the namespace of this.
-   */
-  static block(name, Subclass) {
-    if (isFunction(Subclass) && !isInstanceOf(Block, Subclass)) {
-      const constructor = Subclass;
-
-      Subclass = class extends Block {
-        static template = constructor.template;
-
-        constructor(opts) {
-          super(opts);
-          this::constructor(opts);
-        }
-      };
-    }
-
-    if (!isFunction(Subclass) && isArray(Subclass)) {
-      Subclass = class extends Block {
-        static template = {
-          vars: [],
-          value: Subclass
-        };
-      };
-    }
-
-    if (!isFunction(Subclass) && isArray(Subclass.vars) && isArray(Subclass.value)) {
-      Subclass = class extends Block {
-        static template = Subclass;
-      };
-    }
-
-    if (!isInstanceOf(Block, Subclass)) {
-      console.warn(`Block must be a template (array or an object from an html loader), a function or a class that extends Block class (name: "${ name }") (Block.block)`);
-
-      return;
-    }
-
-    if (name === 'd-elements') {
-      console.warn('The "d-elements" block is a built-in block so the block will not be registered (Block.block)');
-
-      return;
-    }
-
-    if (!TAG_NAME_REGEX.test(name)) {
-      console.warn(`Name "${ name }" is not allowed for blocks so the block will not be registered (Block.block)`);
-
-      return;
-    }
-
-    if (!hasOwnProperty(this, '_blocks')) {
-      this._blocks = create(getProto(this)._blocks);
-    }
-
-    if (!hasOwnProperty(this, 'defaultLocals')) {
-      this.defaultLocals = {};
-    }
-
-    if (!hasOwnProperty(this, 'defaultArgs')) {
-      this.defaultArgs = create(null);
-    }
-
-    try {
-      Subclass = blockHooks.reduce((returnValue, hook) => {
-        const currentReturnValue = hook(returnValue, name, this);
-
-        return isInstanceOf(Block, currentReturnValue)
-          ? currentReturnValue
-          : returnValue;
-      }, Subclass);
-    } catch (err) {
-      console.error('Uncaught error in "beforeRegisterBlock" hook:', err);
-    }
-
-    Subclass._blocks = hasOwnProperty(Subclass, '_blocks')
-      ? Subclass._blocks
-      : create(this._blocks);
-    Subclass._mixins = hasOwnProperty(Subclass, '_mixins')
-      ? Subclass._mixins
-      : create(this._mixins);
-
-    if (hasOwnProperty(Subclass, 'defaultArgs')) {
-      setProto(Subclass.defaultArgs, null);
-    }
-
-    this._blocks[name] = Subclass;
-
-    return Subclass;
-  }
-
-  /**
-   * @method Block.get
-   * @public
-   * @param {String} name - Block name.
-   * @returns {typeof Block|undefined} Returns registered Block with specified name.
-   */
-  static get(name) {
-    return this._blocks[name];
-  }
-
-  /**
-   * @method Block.getMixin
-   * @public
-   * @param {String} name - Mixin name.
-   * @returns {typeof Mixin|undefined} Returns registered Mixin with specified name.
-   */
-  static getMixin(name) {
-    return this._mixins[name];
-  }
-
-  /**
-   * @method Block.mixin
-   * @public
-   * @param {String} name - Block or mixin name.
-   * @param {typeof Mixin|AfterUpdate} Subclass - Subclass of Mixin or AfterUpdate callback.
-   * @returns {typeof Mixin|undefined} Returns registered Block or undefined if the block hasn't been registered.
-   * @description Register mixin in the namespace of this.
-   */
-  static mixin(name, Subclass) {
-    if (isFunction(Subclass) && !isInstanceOf(Mixin, Subclass)) {
-      const afterUpdate = Subclass;
-
-      Subclass = class extends Mixin {
-        afterUpdate(newValue, oldValue) {
-          this::afterUpdate(newValue, oldValue, this);
-        }
-      };
-    }
-
-    if (!isInstanceOf(Mixin, Subclass)) {
-      console.warn(`The "${ name }" class does not extend Mixin or is not an afterUpdate function, so it will not be registered (Block.mixin)`);
-
-      return;
-    }
-
-    if (name === 'd-rest') {
-      console.warn('The "d-rest" mixin is a built-in mixin so the mixin will not be registered (Block.mixin)');
-
-      return;
-    }
-
-    if (!ATTR_NAME_REGEX.test(name)) {
-      console.warn(`Name "${ name }" is not allowed for mixins so the mixin will not be registered (Block.mixin)`);
-
-      return;
-    }
-
-    if (!hasOwnProperty(this, '_mixins')) {
-      this._mixins = create(getProto(this)._mixins);
-    }
-
-    try {
-      Subclass = mixinHooks.reduce((returnValue, hook) => {
-        const currentReturnValue = hook(returnValue, name, this);
-
-        return isInstanceOf(Mixin, currentReturnValue)
-          ? currentReturnValue
-          : returnValue;
-      }, Subclass);
-    } catch (err) {
-      console.error('Uncaught error in "beforeRegisterMixin" hook:', err);
-    }
-
-    Subclass._match = constructMixinRegex(name);
-
-    this._mixins[name] = Subclass;
-
-    return Subclass;
-  }
-
-  /**
    * @method Block.wrap
    * @public
    * @param {...Wrapper} wrappers - Functions that return wrapped block.
    * @returns {typeof Block} New block.
    * @description Method for wrapping blocks into another blocks.
    * It is considered best practice to just extends the old block with a new one.
-   *
-   * @example
-   * class MyBlock extends Block {
-   *   static template = '<div>123</div>';
-   * }
-   *
-   * MyBlock.wrap((Block) => {
-   *   return class extends Block {
-   *     static template = `<section class="wrapper">${ Block.template }</section>`;
-   *
-   *     constructor(opts) {
-   *       super(opts);
-   *
-   *       this.additionalVar = 'additional';
-   *     }
-   *   };
-   * });
    */
   static wrap(...wrappers) {
     return wrappers.reduce(wrapBlock, this);
@@ -420,10 +151,8 @@ class Block {
 
   constructor(opts) {
     const {
-      name,
       args: originalArgs,
-      dBlockName,
-      dBlockArgs,
+      DynamicBlockArgs,
       children,
       parent,
       parentElem,
@@ -434,9 +163,11 @@ class Block {
     } = opts;
     const watchersToRemove = [];
     const { constructor } = getProto(this);
+    const name = constructor.displayName || constructor.name;
     const childrenBlocks = [];
-    const mixins = [];
+    const childrenMixins = [];
     const isParentBlock = parent instanceof Block;
+    const isElements = constructor === blocks.Elements;
 
     defineFrozenProperties(this, {
       /**
@@ -446,9 +177,7 @@ class Block {
        * @property {Object} Block#$$.args - Private args scope.
        * @property {Block[]} Block#$$.children - Child blocks.
        * @property {Elem} Block#$$.content - Content elements.
-       * @property {Object|void} Block#$$.dBlockArgs - d-block args.
-       * @property {String|void} Block#$$.dBlockName - d-block name.
-       * @property {Block[]} Block#$$.dBlocks - d-block's within the block.
+       * @property {Object|void} Block#$$.DynamicBlockArgs - DynamicBlock args.
        * @property {Function} Block#$$.evaluate - Evaluate function.
        * @property {Object} Block#$$.globals - Private globals scope.
        * @property {Object[]} Block#$$.htmlChildren - Block html children.
@@ -458,7 +187,7 @@ class Block {
        * @property {Mixin[]} Block#$$.mixins - Child mixins.
        * @property {Function[]} Block#$$.mixinsToBuild - Pending mixins builders.
        * @property {String} Block#$$.name - Block name.
-       * @property {typeof Block} Block#$$.ns - Block constructor.
+       * @property {typeof Block} Block#$$.Constructor - Block constructor.
        * @property {Block|Elem|void} Block#$$.parent - Parent block or elem.
        * @property {Block|void} Block#$$.parentBlock - Parent block.
        * @property {Elem} parentElem - Parent element.
@@ -470,33 +199,30 @@ class Block {
        */
       $$: {
         name,
-        dBlockName,
-        dBlockArgs,
-        dBlocks: [],
+        DynamicBlockArgs,
         parent,
         parentElem,
         parentScope,
         parentBlock,
         parentTemplate,
         content: new Elem(),
-        ns: constructor,
+        Constructor: constructor,
         htmlChildren: children || [],
         children: childrenBlocks,
-        mixins,
+        mixins: childrenMixins,
         mixinsToBuild: [],
         prevBlock,
         watchersToRemove,
         isRemoved: false,
         isRendered: false,
-        evaluate: (func, onChange, targetBlock, forDElements, forDItem) => {
+        evaluate: (func, onChange, targetBlock, forElements, forItem) => {
           if (!isFunction(func)) {
             return func;
           }
 
-          forDElements = !!forDElements;
-          forDItem = !!forDItem;
+          forElements = !!forElements;
 
-          const scope = name === '#d-item' && !forDItem
+          const scope = constructor === blocks.Item && !forItem
             ? this.$$.scope
             : this;
           const { watchersToRemove } = targetBlock ? targetBlock.$$ : emptyObject;
@@ -548,7 +274,7 @@ class Block {
                   }
                 };
                 const watcherBlock = {
-                  forDElements,
+                  forElements,
                   watcher,
                   watchers
                 };
@@ -573,7 +299,7 @@ class Block {
           removeWatchers(watchersToRemove);
 
           iterateArray(childrenBlocks, removeWithParentSignal);
-          iterateArray(mixins, removeWithParentSignal);
+          iterateArray(childrenMixins, removeWithParentSignal);
 
           try {
             this.beforeRemove();
@@ -754,25 +480,22 @@ class Block {
     iterateObject(constructor.defaultLocals, (value, variable) => {
       this[variable] = value;
     });
-    iterateArray(constructor.template.vars || [], (variable) => {
+    iterateArray(constructor.html.vars || [], (variable) => {
       this[variable] = this[variable];
     });
 
     const argsObject = create(null);
-    const { defaultArgs } = constructor;
-    let args = create(defaultArgs || null);
-    let wasDRest;
-    const argsChain = [];
-
-    if (defaultArgs) {
-      argsChain.push(defaultArgs);
-    }
-
-    argsChain.push(args);
+    const {
+      args: argsDescriptions
+    } = constructor;
+    const defaultArgs = getDefaultArgs(argsDescriptions);
+    let args = create(defaultArgs);
+    let wasRest;
+    const argsChain = [defaultArgs, args];
 
     iterateObject(originalArgs, (value, arg) => {
-      const isDRest = D_REST_REGEX.test(arg);
-      const localArgs = isDRest || wasDRest
+      const isRest = value.mixin === mixins.Rest;
+      const localArgs = isRest || wasRest
         ? create(args)
         : args;
 
@@ -782,27 +505,38 @@ class Block {
 
       args = localArgs;
 
-      if (isDRest) {
+      if (isRest) {
         const restArgs = parentScope.$$.evaluate(value, (value) => {
           iterateObject(localArgs, cleanProperty);
-          assign(localArgs, transformRestArgs(value));
+          assign(localArgs, value);
           calculateArgs(normalizeArgs(argsChain), args, argsObject);
         }, this);
 
-        wasDRest = true;
+        wasRest = true;
 
-        return assign(localArgs, transformRestArgs(restArgs));
+        return assign(localArgs, restArgs);
       }
 
-      const isDElements = name === 'd-elements';
-      const forDElements = isDElements && arg === 'value';
+      wasRest = false;
 
-      wasDRest = false;
+      if (isInstanceOf(Mixin, value.mixin)) {
+        localArgs[arg] = new InternalMixin({
+          Mixin: value.mixin,
+          args: value.args,
+          value,
+          parentScope,
+          parentTemplate
+        });
+
+        return;
+      }
+
+      const forElements = isElements && arg === 'value';
 
       localArgs[arg] = parentScope.$$.evaluate(value, (value) => {
         localArgs[arg] = value;
         calculateArgs(normalizeArgs(argsChain), args, argsObject);
-      }, this, forDElements, isDElements && parentBlock.$$.name === '#d-item');
+      }, this, forElements, isElements && parentBlock.$$.Constructor === blocks.Item);
     });
 
     defineFrozenProperties(this, {

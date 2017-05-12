@@ -1,119 +1,94 @@
-import { iterateObject, iterateArray } from '../../utils';
+import { iterateObject, iterateArray, hasOwnProperty } from '../../utils';
 import { executeMixinWatchers } from './executeMixinWatchers';
+import { InternalMixin } from './InternalMixin';
 
-export function calculateAttrs(normalizedAttrs, attrs, attrsObject, elem, firstTime) {
-  iterateObject(attrsObject, ({ type, value }, attr) => {
-    if (!(attr in attrs)) {
-      if (type === 'attr') {
-        elem.removeAttr(attr);
+export function calculateAttrs({
+  newAttrs, currentAttrs, currentMixins,
+  elem, parentBlock, firstTime
+}) {
+  iterateObject(currentAttrs, (value, attr) => {
+    if (!hasOwnProperty(newAttrs, attr)) {
+      if (value instanceof InternalMixin) {
+        currentMixins[attr].$$.remove();
+        delete currentMixins[attr];
       } else {
-        value.$$.remove();
+        elem.removeAttr(attr);
       }
 
-      delete attrsObject[attr];
+      delete currentAttrs[attr];
     }
   });
 
   const mixins = [];
 
-  iterateObject(normalizedAttrs, ({ type, dynamic, value, opts }, attr) => {
-    let nextType;
-    let nextDynamic;
-    let nextValue;
+  iterateObject(newAttrs, (value, attr) => {
+    const prevValue = currentAttrs[attr];
 
-    if (attrsObject[attr]) {
+    if (prevValue === value) {
+      return;
+    }
+
+    if (value instanceof InternalMixin) {
       const {
-        type: prevType,
-        value: prevValue,
-        dynamic: prevDynamic
-      } = attrsObject[attr];
+        parentScope,
+        Mixin,
+        value: evalFn
+      } = value;
 
-      if (type === 'attr') {
-        if (prevType === 'mixin') {
-          prevValue.$$.remove();
-        }
+      if (prevValue) {
+        const mixin = currentMixins[attr];
+        const { $$ } = mixin;
+        let newValue;
 
-        if (prevValue !== value) {
-          elem.attr(attr, value);
-        }
+        $$.internal = value;
 
-        nextValue = value;
-      } else {
-        let mixin = prevValue;
-        let created;
+        if ($$.internals.indexOf(value) === -1) {
+          $$.internals.push(value);
 
-        if (prevType === 'attr') {
-          elem.removeAttr(attr);
-
-          created = true;
-          opts.dynamic = dynamic;
-          mixin = new opts.Mixin(opts);
-        } else {
-          mixin.$$.isDynamic = dynamic;
-        }
-
-        if (dynamic) {
-          executeMixinWatchers(mixin, value);
-        } else if (!mixin.$$.evaluated && opts.Mixin.evaluate) {
-          const newValue = mixin.$$.parentScope.$$.evaluate(
-            value,
-            constructMixinWatcher(mixin, attr, attrs),
-            mixin
-          );
-
-          mixin.$$.evaluated = true;
-
-          executeMixinWatchers(mixin, newValue);
-        } else if (prevDynamic && opts.Mixin.evaluate) {
-          executeMixinWatchers(mixin, mixin.$$.parentScope.$$.evaluate(value));
-        }
-
-        nextValue = mixin;
-
-        if (created) {
-          mixin.$$.setAfterUpdate();
-        }
-      }
-
-      nextType = type;
-      nextDynamic = dynamic;
-    } else {
-      if (type === 'attr') {
-        elem.attr(attr, value);
-
-        nextValue = value;
-      } else {
-        const buildMixin = () => {
-          opts.dynamic = dynamic;
-
-          const mixin = new opts.Mixin(opts);
-
-          if (!dynamic && opts.Mixin.evaluate) {
-            const {
-              parentScope,
-              value
-            } = opts;
-            const firstValue = parentScope.$$.evaluate(
-              value,
-              constructMixinWatcher(mixin, attr, attrs),
+          if (Mixin.evaluate) {
+            newValue = parentScope.$$.evaluate(
+              evalFn,
+              constructMixinWatcher(mixin, value),
               mixin
             );
-
-            mixin.$$.evaluated = true;
-            mixin.$$.value = firstValue;
           }
+        } else if (Mixin.evaluate) {
+          newValue = parentScope.$$.evaluate(evalFn);
+        }
 
-          nextValue = mixin;
-          mixin.$$.setAfterUpdate();
+        if (Mixin.evaluate) {
+          executeMixinWatchers(mixin, newValue);
+        }
+      } else {
+        const buildMixin = () => {
+          const mixin = new Mixin({
+            ...value,
+            parentBlock,
+            elem,
+            internal: value
+          });
+          const { $$ } = mixin;
 
-          return {
-            attr,
-            opts: {
-              type,
-              dynamic,
-              value: mixin
-            }
-          };
+          $$.internal = value;
+          $$.internals = [value];
+          currentMixins[attr] = mixin;
+
+          if (Mixin.evaluate) {
+            const afterUpdate = (newValue, oldValue) => {
+              try {
+                mixin.afterUpdate(newValue, oldValue);
+              } catch (err) {
+                console.error(`Uncaught error in ${ $$.name }#afterUpdate:`, err);
+              }
+            };
+
+            $$.value = parentScope.$$.evaluate(
+              evalFn,
+              constructMixinWatcher(mixin, value),
+              mixin
+            );
+            afterUpdate($$.evaluate(afterUpdate));
+          }
         };
 
         if (firstTime) {
@@ -122,41 +97,28 @@ export function calculateAttrs(normalizedAttrs, attrs, attrsObject, elem, firstT
           buildMixin();
         }
       }
-
-      nextType = type;
-      nextDynamic = dynamic;
+    } else {
+      elem.attr(attr, value);
     }
 
-    attrsObject[attr] = {
-      type: nextType,
-      dynamic: nextDynamic,
-      value: nextValue
-    };
+    currentAttrs[attr] = value;
   });
 
   if (firstTime) {
     return () => {
-      iterateArray(mixins, (buildMixin) => {
-        const {
-          attr,
-          opts
-        } = buildMixin();
-
-        attrsObject[attr] = opts;
-      });
+      iterateArray(mixins, buildMixin);
     };
   }
 }
 
-function constructMixinWatcher(mixin, attr, attrs) {
+function constructMixinWatcher(mixin, internalMixin) {
   return function (newValue) {
-    const {
-      type,
-      dynamic
-    } = attrs[attr];
-
-    if (type === 'mixin' && !dynamic) {
+    if (mixin.$$.internal === internalMixin) {
       executeMixinWatchers(mixin, newValue);
     }
   };
+}
+
+function buildMixin(builder) {
+  builder();
 }

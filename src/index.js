@@ -1,14 +1,15 @@
+export { version } from './constants';
+
 export { Block } from './Block';
 export * from './Elem';
 export * from './Mixin';
 
-import './blocks';
-import './mixins';
-import './helpers/Block/registerBuiltins';
+export * from './blocks';
+export * from './mixins';
 
 export * from './elems';
 export * from './find';
 
-export * from './insertTemplates';
+export * from './insertHtml';
 export * from './initApp';
 export * from './removeApp';

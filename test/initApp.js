@@ -10,12 +10,10 @@ const remove = () => {
 };
 
 class InitAppBlock extends Block {
-  static template = html`
+  static html = html`
     <span>Hello, world!</span>
   `;
 }
-
-Block.block('InitAppBlock', InitAppBlock);
 
 describe('initApp()', () => {
   const oldConsoleError = console.error;
@@ -28,18 +26,8 @@ describe('initApp()', () => {
     console.error = oldConsoleError;
   });
 
-  it('should test initializing app using an array', () => {
-    initApp(htmlScopeless`<InitAppBlock/>`, container);
-
-    strictEqual(container.html(), '<span>Hello, world!</span>');
-  });
-  it('should test initializing app using a template object', () => {
+  it('should test initializing app using a template', () => {
     initApp(html`<InitAppBlock/>`, container);
-
-    strictEqual(container.html(), '<span>Hello, world!</span>');
-  });
-  it('should test initializing app using a string', () => {
-    initApp('InitAppBlock', container);
 
     strictEqual(container.html(), '<span>Hello, world!</span>');
   });
@@ -56,14 +44,14 @@ describe('initApp()', () => {
       }
     };
 
-    initApp('InitAppBlock', new Elem());
+    initApp(InitAppBlock, new Elem());
   });
   it('should log an error if no proper block was given', (done) => {
     noApp = true;
 
     console.error = (message) => {
       try {
-        strictEqual(message, 'No valid root block to insert the app into was given! (initApp)');
+        strictEqual(message, 'No valid root block was given! (initApp)');
 
         done();
       } catch (err) {
@@ -86,7 +74,7 @@ describe('initApp()', () => {
       }
     };
 
-    initApp('InitAppBlock', container);
-    initApp('InitAppBlock', container);
+    initApp(InitAppBlock, container);
+    initApp(InitAppBlock, container);
   });
 });

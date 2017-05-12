@@ -25,8 +25,7 @@ export default () => {
   describe('wrap()', () => {
     it('should return new mixin', () => {
       const container = doc.create('div');
-
-      Block.mixin('WrappedMixin', Test.wrap(wrapper));
+      const WrappedMixin = Test.wrap(wrapper);
 
       initApp(html`<div WrappedMixin="123"/>`, container);
 
@@ -34,8 +33,7 @@ export default () => {
     });
     it('should return initial mixin if return value is not a mixin', () => {
       const container = doc.create('div');
-
-      Block.mixin('DoubleWrappedMixin', Test.wrap(wrapper, wrapper));
+      const DoubleWrappedMixin = Test.wrap(wrapper, wrapper);
 
       initApp(html`<div DoubleWrappedMixin="123"/>`, container);
 

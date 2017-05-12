@@ -1,5 +1,5 @@
 import { strictEqual } from 'assert';
-import { Block, initApp, removeApp, doc } from '../../src';
+import { Block, initApp, removeApp, doc, If } from '../../src';
 
 let app;
 let block;
@@ -12,19 +12,11 @@ const remove = () => {
   block = null;
 };
 
-class ErrorConstructor extends Block {
-  constructor(opts) {
-    super(opts);
-
-    throw error;
-  }
-}
-
 class DOMChange extends Block {
-  static template = html`
-    <d-if if="{value}">
+  static html = html`
+    <If if="{value}">
       <span>123</span>
-    </d-if>
+    </If>
   `;
 
   afterRender() {
@@ -39,7 +31,7 @@ class AfterRender extends Block {}
 class BeforeRemove extends Block {}
 
 class GetDOMApp extends Block {
-  static template = html`
+  static html = html`
     <div>123</div>
     <span>456</span>
   `;
@@ -55,19 +47,19 @@ class GetParentElemApp extends Block {
   }
 }
 
+class GetParentTemplate extends Block {
+  afterRender() {
+    block = this;
+  }
+}
+
 class GetParentTemplateApp extends Block {
-  static template = html`
+  static html = html`
     <GetParentTemplate/>
   `;
 
   afterRender() {
     app = this;
-  }
-}
-
-class GetParentTemplate extends Block {
-  afterRender() {
-    block = this;
   }
 }
 
@@ -77,10 +69,6 @@ class NameApp extends Block {
   }
 }
 
-Block.block('ErrorConstructor', ErrorConstructor);
-Block.block('GetParentTemplate', GetParentTemplate);
-Block.block('NameApp', NameApp);
-
 export default () => {
   const oldConsoleError = console.error;
 
@@ -88,32 +76,6 @@ export default () => {
     console.error = oldConsoleError;
   });
 
-  describe('constructor()', () => {
-    it('should log error in the constructor', (done) => {
-      const container = doc.create('div');
-
-      console.error = (message, e) => {
-        try {
-          strictEqual(message, 'Uncaught error in new ErrorConstructor:');
-          strictEqual(e, error);
-
-          setTimeout(() => {
-            try {
-              strictEqual(container.html(), '<errorconstructor></errorconstructor>');
-
-              done();
-            } catch (err) {
-              done(err);
-            }
-          }, 0);
-        } catch (err) {
-          done(err);
-        }
-      };
-
-      initApp(html`<ErrorConstructor/>`, container);
-    });
-  });
   describe('afterConstruct()', () => {
     it('should call afterConstruct after constructing', (done) => {
       const container = doc.create('div');
@@ -132,7 +94,7 @@ export default () => {
       };
       console.error = (message, e) => {
         try {
-          strictEqual(message, 'Uncaught error in #RootBlock#afterConstruct:');
+          strictEqual(message, 'Uncaught error in AfterConstruct#afterConstruct:');
           strictEqual(e, error);
 
           done();
@@ -163,7 +125,7 @@ export default () => {
       };
       console.error = (message, e) => {
         try {
-          strictEqual(message, 'Uncaught error in #RootBlock#afterRender:');
+          strictEqual(message, 'Uncaught error in AfterRender#afterRender:');
           strictEqual(e, error);
 
           done();
@@ -194,7 +156,7 @@ export default () => {
       };
       console.error = (message, e) => {
         try {
-          strictEqual(message, 'Uncaught error in #RootBlock#afterDOMChange:');
+          strictEqual(message, 'Uncaught error in DOMChange#afterDOMChange:');
           strictEqual(e, error);
 
           done();
@@ -227,7 +189,7 @@ export default () => {
       };
       console.error = (message, e) => {
         try {
-          strictEqual(message, 'Uncaught error in #RootBlock#beforeRemove:');
+          strictEqual(message, 'Uncaught error in BeforeRemove#beforeRemove:');
           strictEqual(e, error);
 
           done();
@@ -258,7 +220,7 @@ export default () => {
   });
   describe('getName()', () => {
     before(() => {
-      initApp(html`<NameApp/>`, container);
+      initApp(NameApp, container);
     });
 
     it('should return block name', () => {

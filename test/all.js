@@ -6,7 +6,7 @@ import './blocks';
 import './mixins';
 
 import './find';
-import './insertTemplates';
+import './insertHtml';
 import './initApp';
 import './removeApp';
 

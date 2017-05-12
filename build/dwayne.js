@@ -1,6 +1,26 @@
 (function (exports) {
 'use strict';
 
+/* eslint-disable no-nested-ternary */
+/* eslint-disable no-negated-condition */
+var global$1 = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+/* eslint-enable no-nested-ternary */
+/* eslint-enable no-negated-condition */
+
+var HIDE_CLASS = '__dwayne-hidden__';
+var SVG_NS = 'http://www.w3.org/2000/svg';
+
+var blocks = {};
+var mixins = {};
+var _global = global$1;
+var _global$document = _global.document;
+var document = _global$document === undefined ? {} : _global$document;
+var _global$Symbol = _global.Symbol;
+
+var _Symbol = _global$Symbol === undefined ? {} : _global$Symbol;
+
+var version = '4.0.0';
+
 function collectFromArray(array, callback) {
   var initialValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
@@ -67,13 +87,11 @@ var slice = [].slice;
 
 
 function assign(target) {
-  iterateArray(arguments, function (source, index) {
-    if (index) {
-      iterateObject(source, function (value, key) {
-        target[key] = value;
-      });
-    }
-  });
+  for (var i = 1, length = arguments.length; i < length; i++) {
+    iterateObject(arguments[i], function (value, key) {
+      target[key] = value;
+    });
+  }
 
   return target;
 }
@@ -146,15 +164,6 @@ function defineFrozenProperties(target, properties) {
   });
 }
 
-var regexpSpecialCharacters = ['.', '+', '*', '?', '(', ')', '[', ']', '{', '}', '<', '>', '^', '$', '!', '=', ':', '-', '|', ',', '\\'];
-var regexpSpecialsRegexp = new RegExp(regexpSpecialCharacters.map(function (s) {
-  return '\\' + s;
-}).join('|'), 'g');
-
-function escapeRegex(string) {
-  return string.replace(regexpSpecialsRegexp, '\\$&');
-}
-
 function noop() {}
 
 var create = Object.create;
@@ -165,25 +174,6 @@ var setProto = Object.setPrototypeOf || function (target, proto) {
   target.__proto__ = proto;
   /* eslint-enable no-proto */
 };
-
-/* eslint-disable no-nested-ternary */
-/* eslint-disable no-negated-condition */
-var global$1 = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-/* eslint-enable no-nested-ternary */
-/* eslint-enable no-negated-condition */
-
-var HIDE_CLASS = '__dwayne-hidden__';
-var SVG_NS = 'http://www.w3.org/2000/svg';
-var D_REST_REGEX = /^d-rest(?:#|$)/;
-
-var rootBlocks = create(null);
-var rootMixins = create(null);
-var _global = global$1;
-var _global$document = _global.document;
-var document = _global$document === undefined ? {} : _global$document;
-var _global$Symbol = _global.Symbol;
-
-var _Symbol = _global$Symbol === undefined ? {} : _global$Symbol;
 
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -780,7 +770,7 @@ var Elem = function (_Array) {
      * an object of the format { [attrName]: value, ... } to set attributes.
      * @param {String} [value] - If the first argument is a string
      * it should be a value to set for that attribute.
-     * @returns {Object|String|Elem} If no arguments passed, D-Wrap of attributes of the first element in the set
+     * @returns {Object|String|Elem} If no arguments passed, object of attributes of the first element in the set
      * returned, if 1 string argument is passed the value of the attribute of the first element in the set
      * returned otherwise returns this.
      * @description Method for getting/setting attributes.
@@ -847,7 +837,7 @@ var Elem = function (_Array) {
     /**
      * @method Elem#children
      * @public
-     * @returns {Elem} D-Wrap of the children of the first element in the set.
+     * @returns {Elem} Set of the children of the first element in the set.
      * @description Method for getting element's children.
      *
      * @example
@@ -973,7 +963,7 @@ var Elem = function (_Array) {
      * @param {String|Object.<String, String>} [property] - Name of the property to get or
      * an object of the format { [property]: value, ... } to set styles.
      * @param {String} [value] - If the first argument is a string it should be a value to set for that property.
-     * @returns {Object|String|Elem} If no arguments passed, D-Wrap of css styles of the element returned,
+     * @returns {Object|String|Elem} If no arguments passed, object of css styles of the element returned,
      * if 1 string argument is passed the value of the property returned otherwise returns this.
      * @description Method for getting/setting styles. Supports !important.
      *
@@ -1035,7 +1025,7 @@ var Elem = function (_Array) {
      * @param {String|Object.<String, String>} [key] - Name of the data attribute (without data- prefix)
      * to get or an object of the format { [attrName]: value, ... } to set attributes.
      * @param {String} [value] - If the first argument is a string it should be a value to set for that attribute.
-     * @returns {Object|String|Elem} If no arguments passed, D-Wrap of dataset of the element returned,
+     * @returns {Object|String|Elem} If no arguments passed, object of dataset of the element returned,
      * if 1 string argument is passed the value of the data attribute returned otherwise returns this.
      * @description Method for getting/setting data attributes. See
      * [HTMLElement#dataset]{@link https://developer.mozilla.org/en/docs/Web/API/HTMLElement/dataset}.
@@ -1918,6 +1908,12 @@ var Elem = function (_Array) {
 setToStringTag(Elem, 'Elem');
 setSymbolSpecies(Elem, Array);
 
+var InternalMixin = function InternalMixin(opts) {
+  classCallCheck(this, InternalMixin);
+
+  assign(this, opts);
+};
+
 function calculateArgs(normalizedArgs, args, argsObject) {
   iterateArray(keys(argsObject), function (arg) {
     if (!(arg in args)) {
@@ -1934,85 +1930,6 @@ function cleanProperty(value, arg, object) {
   delete object[arg];
 }
 
-function constructMixinRegex(name) {
-  return new RegExp('^' + escapeRegex(name) + '(?:\\(([^\\)]*)\\))?(?:#([\\s\\S]*))?$');
-}
-
-var COMMA_REGEX = /,/;
-
-function mixinMatch(mixins, attr) {
-  var match = void 0;
-
-  /* eslint-disable guard-for-in */
-  for (var name in mixins) {
-    var Mixin = mixins[name];
-    var localMatch = attr.match(Mixin._match);
-
-    if (localMatch) {
-      var argsMatch = localMatch[1];
-      var args = void 0;
-
-      if (argsMatch === '') {
-        args = [];
-      } else if (argsMatch) {
-        args = argsMatch.split(COMMA_REGEX);
-      }
-
-      match = {
-        args: args,
-        comment: localMatch[2],
-        Mixin: Mixin,
-        name: name
-      };
-
-      break;
-    }
-  }
-  /* eslint-enable guard-for-in */
-
-  return match;
-}
-
-function transformRestAttrs(attrs, mixins, mixinDefaultOpts) {
-  return collectFromObject(attrs, function (eventualAttrs, value, attr) {
-    if (D_REST_REGEX.test(attr)) {
-      return assign(eventualAttrs, transformRestAttrs(value, mixins, mixinDefaultOpts));
-    }
-
-    var match = mixinMatch(mixins, attr);
-
-    if (match) {
-      eventualAttrs[attr] = {
-        type: 'mixin',
-        dynamic: true,
-        opts: _extends({
-          value: value
-        }, match, mixinDefaultOpts),
-        value: value
-      };
-
-      return;
-    }
-
-    eventualAttrs[attr] = {
-      type: 'attr',
-      value: value
-    };
-  });
-}
-
-function transformRestArgs(args) {
-  return collectFromObject(args, addArgs);
-}
-
-function addArgs(args, value, arg) {
-  if (D_REST_REGEX.test(arg)) {
-    assign(args, transformRestArgs(value));
-  } else {
-    args[arg] = value;
-  }
-}
-
 function executeMixinWatchers(mixin, value) {
   var oldValue = mixin.$$.value;
 
@@ -2023,162 +1940,121 @@ function executeMixinWatchers(mixin, value) {
   });
 }
 
-function calculateAttrs(normalizedAttrs, attrs, attrsObject, elem, firstTime) {
-  iterateObject(attrsObject, function (_ref, attr) {
-    var type = _ref.type,
-        value = _ref.value;
+function calculateAttrs(_ref) {
+  var newAttrs = _ref.newAttrs,
+      currentAttrs = _ref.currentAttrs,
+      currentMixins = _ref.currentMixins,
+      elem = _ref.elem,
+      parentBlock = _ref.parentBlock,
+      firstTime = _ref.firstTime;
 
-    if (!(attr in attrs)) {
-      if (type === 'attr') {
-        elem.removeAttr(attr);
+  iterateObject(currentAttrs, function (value, attr) {
+    if (!hasOwnProperty(newAttrs, attr)) {
+      if (value instanceof InternalMixin) {
+        currentMixins[attr].$$.remove();
+        delete currentMixins[attr];
       } else {
-        value.$$.remove();
+        elem.removeAttr(attr);
       }
 
-      delete attrsObject[attr];
+      delete currentAttrs[attr];
     }
   });
 
   var mixins = [];
 
-  iterateObject(normalizedAttrs, function (_ref2, attr) {
-    var type = _ref2.type,
-        dynamic = _ref2.dynamic,
-        value = _ref2.value,
-        opts = _ref2.opts;
+  iterateObject(newAttrs, function (value, attr) {
+    var prevValue = currentAttrs[attr];
 
-    var nextType = void 0;
-    var nextDynamic = void 0;
-    var nextValue = void 0;
+    if (prevValue === value) {
+      return;
+    }
 
-    if (attrsObject[attr]) {
-      var _attrsObject$attr = attrsObject[attr],
-          prevType = _attrsObject$attr.type,
-          prevValue = _attrsObject$attr.value,
-          prevDynamic = _attrsObject$attr.dynamic;
+    if (value instanceof InternalMixin) {
+      var parentScope = value.parentScope,
+          Mixin = value.Mixin,
+          evalFn = value.value;
 
 
-      if (type === 'attr') {
-        if (prevType === 'mixin') {
-          prevValue.$$.remove();
-        }
+      if (prevValue) {
+        var mixin = currentMixins[attr];
+        var $$ = mixin.$$;
 
-        if (prevValue !== value) {
-          elem.attr(attr, value);
-        }
+        var newValue = void 0;
 
-        nextValue = value;
-      } else {
-        var mixin = prevValue;
-        var created = void 0;
+        $$.internal = value;
 
-        if (prevType === 'attr') {
-          elem.removeAttr(attr);
+        if ($$.internals.indexOf(value) === -1) {
+          $$.internals.push(value);
 
-          created = true;
-          opts.dynamic = dynamic;
-          mixin = new opts.Mixin(opts);
-        } else {
-          mixin.$$.isDynamic = dynamic;
-        }
-
-        if (dynamic) {
-          executeMixinWatchers(mixin, value);
-        } else if (!mixin.$$.evaluated && opts.Mixin.evaluate) {
-          var newValue = mixin.$$.parentScope.$$.evaluate(value, constructMixinWatcher(mixin, attr, attrs), mixin);
-
-          mixin.$$.evaluated = true;
-
-          executeMixinWatchers(mixin, newValue);
-        } else if (prevDynamic && opts.Mixin.evaluate) {
-          executeMixinWatchers(mixin, mixin.$$.parentScope.$$.evaluate(value));
-        }
-
-        nextValue = mixin;
-
-        if (created) {
-          mixin.$$.setAfterUpdate();
-        }
-      }
-
-      nextType = type;
-      nextDynamic = dynamic;
-    } else {
-      if (type === 'attr') {
-        elem.attr(attr, value);
-
-        nextValue = value;
-      } else {
-        var buildMixin = function buildMixin() {
-          opts.dynamic = dynamic;
-
-          var mixin = new opts.Mixin(opts);
-
-          if (!dynamic && opts.Mixin.evaluate) {
-            var parentScope = opts.parentScope,
-                _value = opts.value;
-
-            var firstValue = parentScope.$$.evaluate(_value, constructMixinWatcher(mixin, attr, attrs), mixin);
-
-            mixin.$$.evaluated = true;
-            mixin.$$.value = firstValue;
+          if (Mixin.evaluate) {
+            newValue = parentScope.$$.evaluate(evalFn, constructMixinWatcher(mixin, value), mixin);
           }
+        } else if (Mixin.evaluate) {
+          newValue = parentScope.$$.evaluate(evalFn);
+        }
 
-          nextValue = mixin;
-          mixin.$$.setAfterUpdate();
+        if (Mixin.evaluate) {
+          executeMixinWatchers(mixin, newValue);
+        }
+      } else {
+        var _buildMixin = function _buildMixin() {
+          var mixin = new Mixin(_extends({}, value, {
+            parentBlock: parentBlock,
+            elem: elem,
+            internal: value
+          }));
+          var $$ = mixin.$$;
 
-          return {
-            attr: attr,
-            opts: {
-              type: type,
-              dynamic: dynamic,
-              value: mixin
-            }
-          };
+
+          $$.internal = value;
+          $$.internals = [value];
+          currentMixins[attr] = mixin;
+
+          if (Mixin.evaluate) {
+            var afterUpdate = function afterUpdate(newValue, oldValue) {
+              try {
+                mixin.afterUpdate(newValue, oldValue);
+              } catch (err) {
+                console.error('Uncaught error in ' + $$.name + '#afterUpdate:', err);
+              }
+            };
+
+            $$.value = parentScope.$$.evaluate(evalFn, constructMixinWatcher(mixin, value), mixin);
+            afterUpdate($$.evaluate(afterUpdate));
+          }
         };
 
         if (firstTime) {
-          mixins.push(buildMixin);
+          mixins.push(_buildMixin);
         } else {
-          buildMixin();
+          _buildMixin();
         }
       }
-
-      nextType = type;
-      nextDynamic = dynamic;
+    } else {
+      elem.attr(attr, value);
     }
 
-    attrsObject[attr] = {
-      type: nextType,
-      dynamic: nextDynamic,
-      value: nextValue
-    };
+    currentAttrs[attr] = value;
   });
 
   if (firstTime) {
     return function () {
-      iterateArray(mixins, function (buildMixin) {
-        var _buildMixin = buildMixin(),
-            attr = _buildMixin.attr,
-            opts = _buildMixin.opts;
-
-        attrsObject[attr] = opts;
-      });
+      iterateArray(mixins, buildMixin);
     };
   }
 }
 
-function constructMixinWatcher(mixin, attr, attrs) {
+function constructMixinWatcher(mixin, internalMixin) {
   return function (newValue) {
-    var _attrs$attr = attrs[attr],
-        type = _attrs$attr.type,
-        dynamic = _attrs$attr.dynamic;
-
-
-    if (type === 'mixin' && !dynamic) {
+    if (mixin.$$.internal === internalMixin) {
       executeMixinWatchers(mixin, newValue);
     }
   };
+}
+
+function buildMixin(builder) {
+  builder();
 }
 
 function normalizeArgs(argsChain) {
@@ -2255,298 +2131,6 @@ function constructPublicScope(scope, scopeValues, privateScope) {
   }));
 }
 
-var NAMED_D_BLOCK_REGEX = /^d-block:([\s\S]+)$/;
-var emptyArray = [];
-
-function createBlock(_ref) {
-  var node = _ref.node,
-      parent = _ref.parent,
-      parentElem = _ref.parentElem,
-      parentBlock = _ref.parentBlock,
-      parentScope = _ref.parentScope,
-      parentTemplate = _ref.parentTemplate,
-      prevBlock = _ref.prevBlock;
-
-  var doc = isDocument(parentElem[0]) ? parentElem : new Elem(parentElem[0].ownerDocument);
-  var elem = parentElem[0].namespaceURI === SVG_NS ? doc.create('svg') : doc;
-  var localBlocks = parentTemplate ? parentTemplate.$$.ns._blocks : Block._blocks;
-  var localMixins = parentTemplate ? parentTemplate.$$.ns._mixins : Block._mixins;
-  var args = node.attrs || {};
-  var name = node.name || 'UnknownBlock';
-  var children = node.children;
-
-  var constructor = node.Constructor || node.name && localBlocks[node.name];
-  var dBlockMatch = void 0;
-  var dBlockName = void 0;
-  var dBlockArgs = void 0;
-
-  if (name === 'd-block' && args.name) {
-    dBlockArgs = except(args, 'name');
-  } else if (name === 'd-block' && args.Constructor) {
-    dBlockArgs = except(args, 'Constructor');
-  } else if ((dBlockMatch = name.match(NAMED_D_BLOCK_REGEX)) || name === 'd-block') {
-    constructor = Block._blocks['d-block'];
-    dBlockName = dBlockMatch ? dBlockMatch[1] : null;
-  }
-
-  var blockInstance = void 0;
-
-  if (constructor) {
-    try {
-      blockInstance = new constructor({
-        name: name,
-        args: args,
-        dBlockName: dBlockName,
-        dBlockArgs: dBlockArgs,
-        children: children,
-        parent: parent,
-        parentElem: parentElem,
-        parentBlock: parentBlock,
-        parentScope: parentScope,
-        parentTemplate: parentTemplate,
-        prevBlock: prevBlock
-      });
-    } catch (err) {
-      console.error('Uncaught error in new ' + name + ':', err);
-      constructor = null;
-    }
-  }
-
-  if (!constructor) {
-    var value = node.value;
-
-
-    var element = elem.create(name);
-    var currentAttrs = create(null);
-    var attrs = create(null);
-    var wasDRest = void 0;
-    var attrsChain = [attrs];
-    var mixinDefaultOpts = {
-      elem: element,
-      parentBlock: parentBlock,
-      parentScope: parentScope,
-      parentTemplate: parentTemplate
-    };
-
-    iterateObject(args, function (value, attr) {
-      var isDRest = D_REST_REGEX.test(attr);
-      var localAttrs = isDRest || wasDRest ? create(attrs) : attrs;
-
-      if (attrs !== localAttrs) {
-        attrsChain.push(localAttrs);
-      }
-
-      attrs = localAttrs;
-
-      if (isDRest) {
-        var restAttrs = parentScope.$$.evaluate(value, function (value) {
-          iterateObject(localAttrs, cleanProperty);
-          assign(localAttrs, transformRestAttrs(value, localMixins, mixinDefaultOpts));
-          calculateAttrs(normalizeArgs(attrsChain), attrs, currentAttrs, element, false);
-        }, parentBlock);
-
-        wasDRest = true;
-
-        return assign(localAttrs, transformRestAttrs(restAttrs, localMixins, mixinDefaultOpts));
-      }
-
-      var match = mixinMatch(localMixins, attr);
-
-      wasDRest = false;
-
-      if (match) {
-        localAttrs[attr] = {
-          type: 'mixin',
-          dynamic: false,
-          opts: _extends({
-            value: value
-          }, match, mixinDefaultOpts),
-          value: value
-        };
-
-        return;
-      }
-
-      localAttrs[attr] = {
-        type: 'attr',
-        value: parentScope.$$.evaluate(value, function (value) {
-          localAttrs[attr] = {
-            type: 'attr',
-            value: value
-          };
-          calculateAttrs(normalizeArgs(attrsChain), attrs, currentAttrs, element, false);
-        }, parentBlock)
-      };
-    });
-
-    parentBlock.$$.mixinsToBuild.push(calculateAttrs(normalizeArgs(attrsChain), attrs, currentAttrs, element, true));
-
-    if (name === '#comment') {
-      element.text(value);
-    }
-
-    if (name === '#text') {
-      var text = parentScope.$$.evaluate(value, function (value) {
-        if (isNil(value)) {
-          value = '';
-        }
-
-        element.text('' + value);
-      }, parentBlock);
-
-      if (isNil(text)) {
-        text = '';
-      }
-
-      element.text('' + text);
-    }
-
-    var isParentBlock = parent instanceof Block;
-    var childBlocks = [];
-
-    /* istanbul ignore if */
-    if (name === 'iframe' && !('src' in attrs)) {
-      element.on('load', function () {
-        var document$$1 = element[0].contentDocument;
-        var doc = new Elem(document$$1);
-
-        new Elem(document$$1.documentElement).remove();
-        iterateChildren(childBlocks, true);
-
-        function iterateChildren(children, isRoot) {
-          iterateArray(children, function (child) {
-            if (child instanceof Block) {
-              if (isRoot) {
-                child.$$.parentElem = doc;
-                child.$$.parent = doc;
-                child.$$.content.into(doc);
-              }
-
-              iterateChildren(child.$$.children, false);
-            } else {
-              child.into(doc);
-            }
-          });
-        }
-      });
-    }
-
-    if (prevBlock instanceof Block) {
-      prevBlock.$$.insertAfterIt(element, false);
-    } else if (prevBlock) {
-      element.insertAfter(prevBlock);
-
-      if (isParentBlock) {
-        parent.$$.addContent(element);
-      }
-    } else if (isParentBlock) {
-      parent.$$.insertInStartOfIt(element, false);
-    } else {
-      element.into(parentElem, false);
-    }
-
-    if (children) {
-      var _prevBlock = void 0;
-      var _parentElem = element;
-
-      /* istanbul ignore if */
-      if (name === 'template') {
-        _parentElem = new Elem(element[0].content = element[0].content || doc[0].createDocumentFragment());
-      } else if (name === 'iframe') {
-        if ('src' in attrs) {
-          children = emptyArray;
-        } else {
-          var document$$1 = element[0].contentDocument;
-
-          new Elem(document$$1.documentElement).remove();
-
-          _parentElem = new Elem(document$$1);
-        }
-      }
-
-      iterateArray(children, function (child) {
-        _prevBlock = createBlock({
-          node: child,
-          parent: _parentElem,
-          parentElem: _parentElem,
-          parentBlock: parentBlock,
-          parentScope: parentScope,
-          parentTemplate: parentTemplate,
-          prevBlock: _prevBlock
-        });
-        childBlocks.push(_prevBlock);
-      });
-    }
-
-    return element;
-  }
-
-  var _blockInstance = blockInstance,
-      $$ = _blockInstance.$$,
-      Args = _blockInstance.args,
-      globals = _blockInstance.globals,
-      locals = objectWithoutProperties(_blockInstance, ['$$', 'args', 'globals']);
-
-
-  var html = name === 'd-elements' ? Args.value || [] : constructor.template.value || constructor.template;
-
-  $$.args = constructPrivateScope(Args);
-  $$.locals = constructPrivateScope(locals);
-  $$.globals = constructPrivateScope(globals, 'globals', parentScope);
-
-  if (name === '#d-item') {
-    var _scopeValues;
-
-    var scopeValues = (_scopeValues = {}, defineProperty(_scopeValues, node.itemName, node.item), defineProperty(_scopeValues, node.indexName, node.index), _scopeValues);
-    var scope = parentScope.$$.name === '#d-item' ? parentScope.$$.scope : parentScope;
-
-    $$.ns = parentScope.$$.ns;
-    $$.privateScope = constructPrivateScope(scopeValues);
-    constructPublicScope($$.scope = create(scope), scopeValues, $$.privateScope);
-  }
-
-  constructPublicScope(Args, Args, $$.args);
-  constructPublicScope(globals, globals, $$.globals);
-  constructPublicScope(blockInstance, locals, $$.locals);
-
-  try {
-    blockInstance.afterConstruct();
-  } catch (err) {
-    console.error('Uncaught error in ' + name + '#afterConstruct:', err);
-  }
-
-  prevBlock = undefined;
-  parentScope = name === 'd-elements' ? Args.parentScope : blockInstance;
-  parentTemplate = name === 'd-elements' ? Args.parentTemplate : blockInstance;
-
-  iterateArray(html, function (child) {
-    prevBlock = createBlock({
-      node: child,
-      parent: blockInstance,
-      parentElem: parentElem,
-      parentBlock: blockInstance,
-      parentScope: parentScope,
-      parentTemplate: parentTemplate,
-      prevBlock: prevBlock
-    });
-  });
-
-  blockInstance.$$.isRendered = true;
-
-  iterateArray(blockInstance.$$.mixinsToBuild, function (executeBuilders) {
-    executeBuilders();
-  });
-  blockInstance.$$.mixinsToBuild = [];
-
-  try {
-    blockInstance.afterRender();
-  } catch (err) {
-    console.error('Uncaught error in ' + name + '#afterRender:', err);
-  }
-
-  return blockInstance;
-}
-
 var _ref$2 = {};
 var isPrototypeOf = _ref$2.isPrototypeOf;
 
@@ -2555,14 +2139,6 @@ function isInstanceOf(Class, Subclass) {
   var _context;
 
   return isPrototypeOf.call(Class, Subclass) && (_context = Class.prototype, isPrototypeOf).call(_context, Subclass.prototype);
-}
-
-function removeWithParentSignal(child) {
-  child.$$.remove(true);
-}
-
-function remove$1(child) {
-  child.$$.remove();
 }
 
 var toStringTag$2 = '[object Mixin]';
@@ -2607,12 +2183,9 @@ var Mixin = function () {
     var _this = this;
 
     classCallCheck(this, Mixin);
-    var name = opts.name,
-        value = opts.value,
-        dynamic = opts.dynamic,
+    var internal = opts.internal,
         elem = opts.elem,
         args = opts.args,
-        comment = opts.comment,
         parentBlock = opts.parentBlock,
         parentScope = opts.parentScope,
         parentTemplate = opts.parentTemplate;
@@ -2623,15 +2196,7 @@ var Mixin = function () {
     var _getProto = getProto(this),
         constructor = _getProto.constructor;
 
-    var afterUpdate = function afterUpdate(newValue, oldValue) {
-      _this.$$.value = newValue;
-
-      try {
-        _this.afterUpdate(newValue, oldValue);
-      } catch (err) {
-        console.error('Uncaught error in ' + name + '#afterUpdate:', err);
-      }
-    };
+    var name = constructor.displayName || constructor.name;
 
     defineFrozenProperties(this, {
       /**
@@ -2639,20 +2204,20 @@ var Mixin = function () {
        * @type {Object}
        * @protected
        * @property {Function} Mixin#$$.evaluate - Evaluate function.
-       * @property {Boolean} Mixin#$$.isDynamic - If the mixin is dynamic.
        * @property {Boolean} Mixin#$$.isRemoved - If the block is removed.
+       * @property {InternalMixin} Mixin#$$.internal - Current internal mixin instance.
+       * @property {InternalMixin[]} Mixin#$$.internals - Array of internal mixins bound to the the mixin.
        * @property {String} Mixin#$$.name - Mixin name.
        * @property {Block|void} Mixin#$$.parentBlock - Parent block.
        * @property {Block|void} Mixin#$$.parentScope - Parent scope.
        * @property {Block|void} Mixin#$$.parentTemplate - Parent template.
+       * @property {*} Mixin#$$.value - Current value.
        * @property {Watcher[]} Block#$$.watchers - Temporary vars watchers.
        * @property {Object[]} Block#$$.watchersToRemove - Watchers to remove before removing mixin.
        */
       $$: {
         name: name,
-        _value: value,
-        value: value,
-        isDynamic: dynamic,
+        internal: internal,
         parentScope: parentScope,
         parentBlock: parentBlock,
         parentTemplate: parentTemplate,
@@ -2661,11 +2226,10 @@ var Mixin = function () {
         isRemoved: false,
         evaluate: function evaluate(watcher) {
           var _$$ = _this.$$,
-              isDynamic = _$$.isDynamic,
               value = _$$.value,
-              _value = _$$._value;
+              internal = _$$.internal;
 
-          var currentValue = isDynamic ? value : parentScope.$$.evaluate(_value);
+          var currentValue = constructor.evaluate ? value : parentScope.$$.evaluate(internal.value);
 
           if (watcher) {
             watchers.push(watcher);
@@ -2688,11 +2252,6 @@ var Mixin = function () {
           if (!isParentSignal) {
             removeArrayElem(parentBlock.$$.mixins, _this);
           }
-        },
-        setAfterUpdate: function setAfterUpdate() {
-          if (constructor.evaluate) {
-            afterUpdate(_this.$$.evaluate(afterUpdate));
-          }
         }
       }
     });
@@ -2703,13 +2262,6 @@ var Mixin = function () {
      * @public
      */
     this.args = args;
-
-    /**
-     * @member {String} [Mixin#comment]
-     * @type {String}
-     * @public
-     */
-    this.comment = comment;
 
     /**
      * @member {Block} [Mixin#parentScope]
@@ -2738,6 +2290,13 @@ var Mixin = function () {
      * @public
      */
     this.node = elem[0];
+
+    /**
+     * @member {String} [Mixin#name]
+     * @type {String}
+     * @public
+     */
+    this.name = name;
 
     parentBlock.$$.mixins.push(this);
   }
@@ -2784,6 +2343,321 @@ Mixin.evaluate = true;
 
 setToStringTag(Mixin, 'Mixin');
 
+var emptyArray = [];
+
+function createBlock(_ref) {
+  var node = _ref.node,
+      parent = _ref.parent,
+      parentElem = _ref.parentElem,
+      parentBlock = _ref.parentBlock,
+      parentScope = _ref.parentScope,
+      parentTemplate = _ref.parentTemplate,
+      prevBlock = _ref.prevBlock;
+
+  var doc = isDocument(parentElem[0]) ? parentElem : new Elem(parentElem[0].ownerDocument);
+  var args = node.args || {};
+  var type = node.type;
+
+  var isElements = type === blocks.Elements;
+  var children = node.children;
+
+  var _constructor = !isString(type) && type;
+  var DynamicBlockArgs = void 0;
+
+  if (type === blocks.DynamicBlock) {
+    DynamicBlockArgs = except(args, 'type');
+  }
+
+  if (isArray(_constructor)) {
+    var _class, _temp;
+
+    _constructor = (_temp = _class = function (_Block) {
+      inherits(constructor, _Block);
+
+      function constructor() {
+        classCallCheck(this, constructor);
+        return possibleConstructorReturn(this, (constructor.__proto__ || Object.getPrototypeOf(constructor)).apply(this, arguments));
+      }
+
+      return constructor;
+    }(Block), _class.html = _constructor, _temp);
+  }
+
+  if (!isInstanceOf(Block, _constructor) && !isString(type)) {
+    throw new Error('Wrong block type given: ' + type);
+  }
+
+  if (!_constructor) {
+    var value = node.value;
+
+    var elem = (parentElem[0].namespaceURI === SVG_NS ? doc.create('svg') : doc).create(type);
+    var currentAttrs = create(null);
+    var currentMixins = create(null);
+    var attrs = create(null);
+    var wasRest = void 0;
+    var attrsChain = [attrs];
+
+    iterateObject(args, function (value, attr) {
+      var isRest = value.mixin === mixins.Rest;
+      var localAttrs = isRest || wasRest ? create(attrs) : attrs;
+
+      if (attrs !== localAttrs) {
+        attrsChain.push(localAttrs);
+      }
+
+      attrs = localAttrs;
+
+      if (isRest) {
+        var restAttrs = parentScope.$$.evaluate(value, function (value) {
+          iterateObject(localAttrs, cleanProperty);
+          assign(localAttrs, value);
+          calculateAttrs({
+            newAttrs: normalizeArgs(attrsChain),
+            currentAttrs: currentAttrs,
+            currentMixins: currentMixins,
+            elem: elem,
+            parentBlock: parentBlock,
+            firstTime: false
+          });
+        }, parentBlock);
+
+        wasRest = true;
+
+        return assign(localAttrs, restAttrs);
+      }
+
+      wasRest = false;
+
+      if (isInstanceOf(Mixin, value.mixin)) {
+        localAttrs[attr] = new InternalMixin({
+          Mixin: value.mixin,
+          args: value.args,
+          parentScope: parentScope,
+          parentTemplate: parentTemplate,
+          value: value
+        });
+
+        return;
+      }
+
+      localAttrs[attr] = parentScope.$$.evaluate(value, function (value) {
+        localAttrs[attr] = value;
+        calculateAttrs({
+          newAttrs: normalizeArgs(attrsChain),
+          currentAttrs: currentAttrs,
+          currentMixins: currentMixins,
+          elem: elem,
+          parentBlock: parentBlock,
+          firstTime: false
+        });
+      }, parentBlock);
+    });
+
+    parentBlock.$$.mixinsToBuild.push(calculateAttrs({
+      newAttrs: normalizeArgs(attrsChain),
+      currentAttrs: currentAttrs,
+      currentMixins: currentMixins,
+      elem: elem,
+      parentBlock: parentBlock,
+      firstTime: true
+    }));
+
+    if (type === '#comment') {
+      elem.text(value);
+    }
+
+    if (type === '#text') {
+      var text = parentScope.$$.evaluate(value, function (value) {
+        if (isNil(value)) {
+          value = '';
+        }
+
+        elem.text('' + value);
+      }, parentBlock);
+
+      if (isNil(text)) {
+        text = '';
+      }
+
+      elem.text('' + text);
+    }
+
+    var isParentBlock = parent instanceof Block;
+    var childBlocks = [];
+
+    /* istanbul ignore if */
+    if (type === 'iframe' && !('src' in attrs)) {
+      elem.on('load', function () {
+        var document$$1 = elem[0].contentDocument;
+        var doc = new Elem(document$$1);
+
+        new Elem(document$$1.documentElement).remove();
+        iterateChildren(childBlocks, true);
+
+        function iterateChildren(children, isRoot) {
+          iterateArray(children, function (child) {
+            if (child instanceof Block) {
+              if (isRoot) {
+                child.$$.parentElem = doc;
+                child.$$.parent = doc;
+                child.$$.content.into(doc);
+              }
+
+              iterateChildren(child.$$.children, false);
+            } else {
+              child.into(doc);
+            }
+          });
+        }
+      });
+    }
+
+    if (prevBlock instanceof Block) {
+      prevBlock.$$.insertAfterIt(elem, false);
+    } else if (prevBlock) {
+      elem.insertAfter(prevBlock);
+
+      if (isParentBlock) {
+        parent.$$.addContent(elem);
+      }
+    } else if (isParentBlock) {
+      parent.$$.insertInStartOfIt(elem, false);
+    } else {
+      elem.into(parentElem, false);
+    }
+
+    if (children) {
+      var _prevBlock = void 0;
+      var _parentElem = elem;
+
+      /* istanbul ignore if */
+      if (type === 'template') {
+        _parentElem = new Elem(elem[0].content = elem[0].content || doc[0].createDocumentFragment());
+      } else if (type === 'iframe') {
+        if ('src' in attrs) {
+          children = emptyArray;
+        } else {
+          var document$$1 = elem[0].contentDocument;
+
+          new Elem(document$$1.documentElement).remove();
+
+          _parentElem = new Elem(document$$1);
+        }
+      }
+
+      iterateArray(children, function (child) {
+        _prevBlock = createBlock({
+          node: child,
+          parent: _parentElem,
+          parentElem: _parentElem,
+          parentBlock: parentBlock,
+          parentScope: parentScope,
+          parentTemplate: parentTemplate,
+          prevBlock: _prevBlock
+        });
+        childBlocks.push(_prevBlock);
+      });
+    }
+
+    return elem;
+  }
+
+  var blockInstance = new _constructor({
+    args: args,
+    DynamicBlockArgs: DynamicBlockArgs,
+    children: children,
+    parent: parent,
+    parentElem: parentElem,
+    parentBlock: parentBlock,
+    parentScope: parentScope,
+    parentTemplate: parentTemplate,
+    prevBlock: prevBlock
+  });
+  var $$ = blockInstance.$$,
+      name = blockInstance.$$.name,
+      Args = blockInstance.args,
+      globals = blockInstance.globals,
+      locals = objectWithoutProperties(blockInstance, ['$$', '$$', 'args', 'globals']);
+
+
+  var html = isElements ? Args.value || [] : _constructor.html;
+
+  $$.args = constructPrivateScope(Args);
+  $$.locals = constructPrivateScope(locals);
+  $$.globals = constructPrivateScope(globals, 'globals', parentScope);
+
+  if (type === blocks.Item) {
+    var _scopeValues;
+
+    var scopeValues = (_scopeValues = {}, defineProperty(_scopeValues, node.itemName, node.item), defineProperty(_scopeValues, node.indexName, node.index), _scopeValues);
+    var scope = parentScope.$$.Constructor === blocks.Item ? parentScope.$$.scope : parentScope;
+
+    $$.privateScope = constructPrivateScope(scopeValues);
+    constructPublicScope($$.scope = create(scope), scopeValues, $$.privateScope);
+  }
+
+  constructPublicScope(Args, Args, $$.args);
+  constructPublicScope(globals, globals, $$.globals);
+  constructPublicScope(blockInstance, locals, $$.locals);
+
+  try {
+    blockInstance.afterConstruct();
+  } catch (err) {
+    console.error('Uncaught error in ' + name + '#afterConstruct:', err);
+  }
+
+  prevBlock = undefined;
+  parentScope = isElements ? Args.parentScope : blockInstance;
+  parentTemplate = isElements ? Args.parentTemplate : blockInstance;
+
+  iterateArray(html, function (child) {
+    prevBlock = createBlock({
+      node: child,
+      parent: blockInstance,
+      parentElem: parentElem,
+      parentBlock: blockInstance,
+      parentScope: parentScope,
+      parentTemplate: parentTemplate,
+      prevBlock: prevBlock
+    });
+  });
+
+  blockInstance.$$.isRendered = true;
+
+  iterateArray(blockInstance.$$.mixinsToBuild, function (executeBuilders) {
+    executeBuilders();
+  });
+  blockInstance.$$.mixinsToBuild = [];
+
+  try {
+    blockInstance.afterRender();
+  } catch (err) {
+    console.error('Uncaught error in ' + name + '#afterRender:', err);
+  }
+
+  return blockInstance;
+}
+
+function getDefaultArgs(argsDescriptions) {
+  var newArgs = create(null);
+
+  iterateObject(argsDescriptions, function (_ref, arg) {
+    var def = _ref.default;
+
+    newArgs[arg] = def;
+  });
+
+  return newArgs;
+}
+
+function removeWithParentSignal(child) {
+  child.$$.remove(true);
+}
+
+function remove$1(child) {
+  child.$$.remove();
+}
+
 function wrapBlock(block, wrapper) {
   var returnValue = wrapper(block);
 
@@ -2797,15 +2671,18 @@ function wrapMixin(mixin, wrapper) {
 }
 
 /**
- * @typedef {Object} Template
+ * @typedef {BlockNode[]} Template
  * @public
  * @property {String[]} vars - Template used vars.
- * @property {Object[]} value - Template itself.
  */
 
 /**
- * @typedef {Object[]} ScopelessTemplate
+ * @typedef {Object} BlockNode
  * @public
+ * @property {String|typeof Block} type - Block type.
+ * @property {Object} [args] - Block args.
+ * @property {BlockNode[]} children - Block children.
+ * @property {*} value - Text or comment node value.
  */
 
 /**
@@ -2830,43 +2707,6 @@ function wrapMixin(mixin, wrapper) {
  * @returns {typeof Block} New Block class.
  */
 
-/**
- * @callback AfterUpdate
- * @public
- * @param {*} newValue - New value.
- * @param {*} oldValue - Old value.
- * @param {Mixin} mixin - Mixin instance.
- */
-
-/**
- * @callback BlockRegisterHook
- * @public
- * @param {typeof Block} Block - Registering block.
- * @param {String} name - Block name.
- * @returns Return value is used for registering the block.
- * If Block subclass returned it's registered instead of the initial block, otherwise
- * the initial block is used.
- */
-
-/**
- * @callback MixinRegisterHook
- * @public
- * @param {typeof Mixin} Mixin - Registering mixin.
- * @param {String} name - Mixin name.
- * @returns Return value is used for registering the mixin.
- * If Mixin subclass returned it's registered instead of the initial mixin, otherwise
- * the initial mixin is used.
- */
-
-/**
- * @callback RemoveHook
- * @public
- */
-
-var blockHooks = [];
-var mixinHooks = [];
-var TAG_NAME_REGEX = /^[a-z][a-z\d\-_.:!@#$%^&*()[\]{}='"\\]*$/i;
-var ATTR_NAME_REGEX = /^[^\u0000-\u0020\s'">/=]+$/;
 var toStringTag$$1 = '[object Block]';
 var afterElem = new Elem();
 var emptyObject = {};
@@ -2884,7 +2724,7 @@ var gettingVars = [];
  * import { Block, initApp } from 'dwayne';
  *
  * class App extends Block {
- *   static template = '<Hello text="{text}"/> ({ this.times })';
+ *   static html = html`<Hello text="{text}"/> ({ this.times })`;
  *
  *   constructor(opts) {
  *     super(opts);
@@ -2925,298 +2765,20 @@ var Block = function () {
 
 
     /**
-     * @member {Object} [Block.defaultLocals = null]
-     * @type {Object}
+     * @member {String} [Block.displayName = null]
+     * @type {String}
      * @public
-     * @description Block default locals.
+     * @description Block display name.
      */
 
-
     /**
-     * @member {Object.<String, typeof Mixin>} Block._mixins
-     * @type {Object.<String, typeof Mixin>}
-     * @protected
-     * @description Block namespace mixins.
+     * @member {Object} [Block.args = null]
+     * @type {Object}
+     * @public
+     * @description Block args description.
      */
     value: function onEvalError(err) {
       console.error('Eval error (evaluating "' + (err.original || err.func) + '" in context of ' + err.block.$$.name + '):', err);
-    }
-
-    /**
-     * @method Block.beforeRegisterBlock
-     * @public
-     * @param {BlockRegisterHook} hook - Block register hook.
-     * @returns {RemoveHook}
-     */
-
-
-    /**
-     * @member {Object} [Block.template = { vars: [], value: [] }]
-     * @type {Object}
-     * @public
-     * @description Block template.
-     */
-
-
-    /**
-     * @member {Object} [Block.defaultArgs = null]
-     * @type {Object}
-     * @public
-     * @description Block default args.
-     */
-
-    /**
-     * @member {Object.<String, typeof Block>} Block._blocks
-     * @type {Object.<String, typeof Block>}
-     * @protected
-     * @description Block namespace blocks.
-     */
-
-  }, {
-    key: 'beforeRegisterBlock',
-    value: function beforeRegisterBlock(hook) {
-      blockHooks.push(hook);
-
-      return function () {
-        removeArrayElem(blockHooks, hook);
-      };
-    }
-
-    /**
-     * @method Block.beforeRegisterMixin
-     * @public
-     * @param {MixinRegisterHook} hook - Mixin register hook.
-     * @returns {RemoveHook}
-     */
-
-  }, {
-    key: 'beforeRegisterMixin',
-    value: function beforeRegisterMixin(hook) {
-      mixinHooks.push(hook);
-
-      return function () {
-        removeArrayElem(mixinHooks, hook);
-      };
-    }
-
-    /**
-     * @method Block.block
-     * @public
-     * @param {String} name - Block or mixin name.
-     * @param {Template|ScopelessTemplate|typeof Block} Subclass - Subclass of Block or template string of it.
-     * @returns {typeof Block|undefined} Returns registered Block or undefined if the block hasn't been registered.
-     * @description Register block in the namespace of this.
-     */
-
-  }, {
-    key: 'block',
-    value: function block(name, _Subclass2) {
-      var _this4 = this;
-
-      if (isFunction(_Subclass2) && !isInstanceOf(Block, _Subclass2)) {
-        var _class, _temp;
-
-        var _constructor = _Subclass2;
-
-        _Subclass2 = (_temp = _class = function (_Block) {
-          inherits(Subclass, _Block);
-
-          function Subclass(opts) {
-            classCallCheck(this, Subclass);
-
-            var _this = possibleConstructorReturn(this, (Subclass.__proto__ || Object.getPrototypeOf(Subclass)).call(this, opts));
-
-            _constructor.call(_this, opts);
-            return _this;
-          }
-
-          return Subclass;
-        }(Block), _class.template = _constructor.template, _temp);
-      }
-
-      if (!isFunction(_Subclass2) && isArray(_Subclass2)) {
-        var _class2, _temp2;
-
-        _Subclass2 = (_temp2 = _class2 = function (_Block2) {
-          inherits(Subclass, _Block2);
-
-          function Subclass() {
-            classCallCheck(this, Subclass);
-            return possibleConstructorReturn(this, (Subclass.__proto__ || Object.getPrototypeOf(Subclass)).apply(this, arguments));
-          }
-
-          return Subclass;
-        }(Block), _class2.template = {
-          vars: [],
-          value: _Subclass2
-        }, _temp2);
-      }
-
-      if (!isFunction(_Subclass2) && isArray(_Subclass2.vars) && isArray(_Subclass2.value)) {
-        var _class3, _temp3;
-
-        _Subclass2 = (_temp3 = _class3 = function (_Block3) {
-          inherits(_Subclass, _Block3);
-
-          function _Subclass() {
-            classCallCheck(this, _Subclass);
-            return possibleConstructorReturn(this, (_Subclass.__proto__ || Object.getPrototypeOf(_Subclass)).apply(this, arguments));
-          }
-
-          return _Subclass;
-        }(Block), _class3.template = _Subclass2, _temp3);
-      }
-
-      if (!isInstanceOf(Block, _Subclass2)) {
-        console.warn('Block must be a template (array or an object from an html loader), a function or a class that extends Block class (name: "' + name + '") (Block.block)');
-
-        return;
-      }
-
-      if (name === 'd-elements') {
-        console.warn('The "d-elements" block is a built-in block so the block will not be registered (Block.block)');
-
-        return;
-      }
-
-      if (!TAG_NAME_REGEX.test(name)) {
-        console.warn('Name "' + name + '" is not allowed for blocks so the block will not be registered (Block.block)');
-
-        return;
-      }
-
-      if (!hasOwnProperty(this, '_blocks')) {
-        this._blocks = create(getProto(this)._blocks);
-      }
-
-      if (!hasOwnProperty(this, 'defaultLocals')) {
-        this.defaultLocals = {};
-      }
-
-      if (!hasOwnProperty(this, 'defaultArgs')) {
-        this.defaultArgs = create(null);
-      }
-
-      try {
-        _Subclass2 = blockHooks.reduce(function (returnValue, hook) {
-          var currentReturnValue = hook(returnValue, name, _this4);
-
-          return isInstanceOf(Block, currentReturnValue) ? currentReturnValue : returnValue;
-        }, _Subclass2);
-      } catch (err) {
-        console.error('Uncaught error in "beforeRegisterBlock" hook:', err);
-      }
-
-      _Subclass2._blocks = hasOwnProperty(_Subclass2, '_blocks') ? _Subclass2._blocks : create(this._blocks);
-      _Subclass2._mixins = hasOwnProperty(_Subclass2, '_mixins') ? _Subclass2._mixins : create(this._mixins);
-
-      if (hasOwnProperty(_Subclass2, 'defaultArgs')) {
-        setProto(_Subclass2.defaultArgs, null);
-      }
-
-      this._blocks[name] = _Subclass2;
-
-      return _Subclass2;
-    }
-
-    /**
-     * @method Block.get
-     * @public
-     * @param {String} name - Block name.
-     * @returns {typeof Block|undefined} Returns registered Block with specified name.
-     */
-
-  }, {
-    key: 'get',
-    value: function get$$1(name) {
-      return this._blocks[name];
-    }
-
-    /**
-     * @method Block.getMixin
-     * @public
-     * @param {String} name - Mixin name.
-     * @returns {typeof Mixin|undefined} Returns registered Mixin with specified name.
-     */
-
-  }, {
-    key: 'getMixin',
-    value: function getMixin(name) {
-      return this._mixins[name];
-    }
-
-    /**
-     * @method Block.mixin
-     * @public
-     * @param {String} name - Block or mixin name.
-     * @param {typeof Mixin|AfterUpdate} Subclass - Subclass of Mixin or AfterUpdate callback.
-     * @returns {typeof Mixin|undefined} Returns registered Block or undefined if the block hasn't been registered.
-     * @description Register mixin in the namespace of this.
-     */
-
-  }, {
-    key: 'mixin',
-    value: function mixin(name, Subclass) {
-      var _this6 = this;
-
-      if (isFunction(Subclass) && !isInstanceOf(Mixin, Subclass)) {
-        var _afterUpdate = Subclass;
-
-        Subclass = function (_Mixin) {
-          inherits(Subclass, _Mixin);
-
-          function Subclass() {
-            classCallCheck(this, Subclass);
-            return possibleConstructorReturn(this, (Subclass.__proto__ || Object.getPrototypeOf(Subclass)).apply(this, arguments));
-          }
-
-          createClass(Subclass, [{
-            key: 'afterUpdate',
-            value: function afterUpdate(newValue, oldValue) {
-              _afterUpdate.call(this, newValue, oldValue, this);
-            }
-          }]);
-          return Subclass;
-        }(Mixin);
-      }
-
-      if (!isInstanceOf(Mixin, Subclass)) {
-        console.warn('The "' + name + '" class does not extend Mixin or is not an afterUpdate function, so it will not be registered (Block.mixin)');
-
-        return;
-      }
-
-      if (name === 'd-rest') {
-        console.warn('The "d-rest" mixin is a built-in mixin so the mixin will not be registered (Block.mixin)');
-
-        return;
-      }
-
-      if (!ATTR_NAME_REGEX.test(name)) {
-        console.warn('Name "' + name + '" is not allowed for mixins so the mixin will not be registered (Block.mixin)');
-
-        return;
-      }
-
-      if (!hasOwnProperty(this, '_mixins')) {
-        this._mixins = create(getProto(this)._mixins);
-      }
-
-      try {
-        Subclass = mixinHooks.reduce(function (returnValue, hook) {
-          var currentReturnValue = hook(returnValue, name, _this6);
-
-          return isInstanceOf(Mixin, currentReturnValue) ? currentReturnValue : returnValue;
-        }, Subclass);
-      } catch (err) {
-        console.error('Uncaught error in "beforeRegisterMixin" hook:', err);
-      }
-
-      Subclass._match = constructMixinRegex(name);
-
-      this._mixins[name] = Subclass;
-
-      return Subclass;
     }
 
     /**
@@ -3226,23 +2788,22 @@ var Block = function () {
      * @returns {typeof Block} New block.
      * @description Method for wrapping blocks into another blocks.
      * It is considered best practice to just extends the old block with a new one.
-     *
-     * @example
-     * class MyBlock extends Block {
-     *   static template = '<div>123</div>';
-     * }
-     *
-     * MyBlock.wrap((Block) => {
-     *   return class extends Block {
-     *     static template = `<section class="wrapper">${ Block.template }</section>`;
-     *
-     *     constructor(opts) {
-     *       super(opts);
-     *
-     *       this.additionalVar = 'additional';
-     *     }
-     *   };
-     * });
+     */
+
+
+    /**
+     * @member {Template} [Block.html = []]
+     * @type {Template}
+     * @public
+     * @description Block template.
+     */
+
+
+    /**
+     * @member {Object} [Block.defaultLocals = null]
+     * @type {Object}
+     * @public
+     * @description Block default locals.
      */
 
   }, {
@@ -3257,13 +2818,11 @@ var Block = function () {
   }]);
 
   function Block(opts) {
-    var _this7 = this;
+    var _this = this;
 
     classCallCheck(this, Block);
-    var name = opts.name,
-        originalArgs = opts.args,
-        dBlockName = opts.dBlockName,
-        dBlockArgs = opts.dBlockArgs,
+    var originalArgs = opts.args,
+        DynamicBlockArgs = opts.DynamicBlockArgs,
         children = opts.children,
         parent = opts.parent,
         parentElem = opts.parentElem,
@@ -3277,9 +2836,11 @@ var Block = function () {
     var _getProto = getProto(this),
         constructor = _getProto.constructor;
 
+    var name = constructor.displayName || constructor.name;
     var childrenBlocks = [];
-    var mixins = [];
+    var childrenMixins = [];
     var isParentBlock = parent instanceof Block;
+    var isElements = constructor === blocks.Elements;
 
     defineFrozenProperties(this, {
       /**
@@ -3289,9 +2850,7 @@ var Block = function () {
        * @property {Object} Block#$$.args - Private args scope.
        * @property {Block[]} Block#$$.children - Child blocks.
        * @property {Elem} Block#$$.content - Content elements.
-       * @property {Object|void} Block#$$.dBlockArgs - d-block args.
-       * @property {String|void} Block#$$.dBlockName - d-block name.
-       * @property {Block[]} Block#$$.dBlocks - d-block's within the block.
+       * @property {Object|void} Block#$$.DynamicBlockArgs - DynamicBlock args.
        * @property {Function} Block#$$.evaluate - Evaluate function.
        * @property {Object} Block#$$.globals - Private globals scope.
        * @property {Object[]} Block#$$.htmlChildren - Block html children.
@@ -3301,7 +2860,7 @@ var Block = function () {
        * @property {Mixin[]} Block#$$.mixins - Child mixins.
        * @property {Function[]} Block#$$.mixinsToBuild - Pending mixins builders.
        * @property {String} Block#$$.name - Block name.
-       * @property {typeof Block} Block#$$.ns - Block constructor.
+       * @property {typeof Block} Block#$$.Constructor - Block constructor.
        * @property {Block|Elem|void} Block#$$.parent - Parent block or elem.
        * @property {Block|void} Block#$$.parentBlock - Parent block.
        * @property {Elem} parentElem - Parent element.
@@ -3313,33 +2872,30 @@ var Block = function () {
        */
       $$: {
         name: name,
-        dBlockName: dBlockName,
-        dBlockArgs: dBlockArgs,
-        dBlocks: [],
+        DynamicBlockArgs: DynamicBlockArgs,
         parent: parent,
         parentElem: parentElem,
         parentScope: parentScope,
         parentBlock: parentBlock,
         parentTemplate: parentTemplate,
         content: new Elem(),
-        ns: constructor,
+        Constructor: constructor,
         htmlChildren: children || [],
         children: childrenBlocks,
-        mixins: mixins,
+        mixins: childrenMixins,
         mixinsToBuild: [],
         prevBlock: prevBlock,
         watchersToRemove: watchersToRemove,
         isRemoved: false,
         isRendered: false,
-        evaluate: function evaluate(func, onChange, targetBlock, forDElements, forDItem) {
+        evaluate: function evaluate(func, onChange, targetBlock, forElements, forItem) {
           if (!isFunction(func)) {
             return func;
           }
 
-          forDElements = !!forDElements;
-          forDItem = !!forDItem;
+          forElements = !!forElements;
 
-          var scope = name === '#d-item' && !forDItem ? _this7.$$.scope : _this7;
+          var scope = constructor === blocks.Item && !forItem ? _this.$$.scope : _this;
 
           var _ref = targetBlock ? targetBlock.$$ : emptyObject,
               watchersToRemove = _ref.watchersToRemove;
@@ -3359,7 +2915,7 @@ var Block = function () {
             } catch (err) {
               err.func = func;
               err.original = func.original;
-              err.block = _this7;
+              err.block = _this;
 
               if (isFunction(constructor.onEvalError)) {
                 try {
@@ -3386,12 +2942,12 @@ var Block = function () {
 
                   var newResult = evaluate();
 
-                  if (newResult !== result && !targetBlock.$$.isRemoved && !_this7.$$.isRemoved) {
+                  if (newResult !== result && !targetBlock.$$.isRemoved && !_this.$$.isRemoved) {
                     onChange(newResult, result);
                   }
                 };
                 var watcherBlock = {
-                  forDElements: forDElements,
+                  forElements: forElements,
                   watcher: watcher,
                   watchers: watchers
                 };
@@ -3411,42 +2967,42 @@ var Block = function () {
           return evaluate();
         },
         remove: function remove$$1(isParentSignal) {
-          _this7.$$.isRemoved = true;
+          _this.$$.isRemoved = true;
 
           removeWatchers(watchersToRemove);
 
           iterateArray(childrenBlocks, removeWithParentSignal);
-          iterateArray(mixins, removeWithParentSignal);
+          iterateArray(childrenMixins, removeWithParentSignal);
 
           try {
-            _this7.beforeRemove();
+            _this.beforeRemove();
           } catch (err) {
             console.error('Uncaught error in ' + name + '#beforeRemove:', err);
           }
 
           if (!isParentSignal && isParentBlock) {
-            parent.$$.removeContent(_this7.$$.content);
+            parent.$$.removeContent(_this.$$.content);
           }
 
           if (!isParentSignal && parentBlock) {
-            removeArrayElem(parentBlock.$$.children, _this7);
+            removeArrayElem(parentBlock.$$.children, _this);
           }
 
-          _this7.$$.content.remove();
+          _this.$$.content.remove();
         },
         changeContent: function changeContent(newContent) {
-          _this7.$$.content = newContent;
+          _this.$$.content = newContent;
 
-          if (_this7.$$.isRendered && !_this7.$$.isRemoved) {
+          if (_this.$$.isRendered && !_this.$$.isRemoved) {
             try {
-              _this7.afterDOMChange();
+              _this.afterDOMChange();
             } catch (err) {
               console.error('Uncaught error in ' + name + '#afterDOMChange:', err);
             }
           }
         },
         addContent: function addContent(contentToAdd, notRecursive) {
-          var oldContent = _this7.$$.content;
+          var oldContent = _this.$$.content;
           var index = oldContent.indexOf(contentToAdd[0].previousSibling) + 1;
           var newContent = void 0;
 
@@ -3456,14 +3012,14 @@ var Block = function () {
             newContent = oldContent.slice(0, index).add(contentToAdd, oldContent.slice(index));
           }
 
-          _this7.$$.changeContent(newContent);
+          _this.$$.changeContent(newContent);
 
           if (isParentBlock && !notRecursive) {
             parent.$$.addContent(contentToAdd, notRecursive);
           }
         },
         moveContent: function moveContent(contentToMove, after) {
-          var oldContent = _this7.$$.content;
+          var oldContent = _this.$$.content;
           var index = oldContent.indexOf(contentToMove[0]);
           var indexToPut = oldContent.indexOf(after[0]) + 1;
           var newContent = void 0;
@@ -3476,14 +3032,14 @@ var Block = function () {
             newContent = oldContent.slice(0, index).add(oldContent.slice(index + contentToMove.length, indexToPut), contentToMove, oldContent.slice(indexToPut));
           }
 
-          _this7.$$.changeContent(newContent);
+          _this.$$.changeContent(newContent);
 
           if (isParentBlock && indexToPut) {
             parent.$$.moveContent(contentToMove, after);
           }
         },
         removeContent: function removeContent(contentToRemove) {
-          _this7.$$.changeContent(_this7.$$.content.filter(function (elem) {
+          _this.$$.changeContent(_this.$$.content.filter(function (elem) {
             return contentToRemove.indexOf(elem) === -1;
           }));
 
@@ -3492,7 +3048,7 @@ var Block = function () {
           }
         },
         insertInStartOfIt: function insertInStartOfIt(contentToInsert, moveFlag) {
-          var prevBlock = _this7.$$.prevBlock;
+          var prevBlock = _this.$$.prevBlock;
 
           var after = afterElem;
 
@@ -3538,21 +3094,21 @@ var Block = function () {
           }
 
           if (moveFlag) {
-            _this7.$$.moveContent(contentToInsert, after);
+            _this.$$.moveContent(contentToInsert, after);
           } else {
-            _this7.$$.addContent(contentToInsert, true);
+            _this.$$.addContent(contentToInsert, true);
           }
 
           return after;
         },
         insertAfterIt: function insertAfterIt(contentToInsert, moveFlag) {
-          var prevBlock = _this7.$$.prevBlock;
+          var prevBlock = _this.$$.prevBlock;
 
           var after = afterElem;
           var tryToAddOrMove = void 0;
 
-          if (_this7.$$.content.length) {
-            after = _this7.$$.content.elem(-1);
+          if (_this.$$.content.length) {
+            after = _this.$$.content.elem(-1);
             tryToAddOrMove = true;
             contentToInsert.insertAfter(after);
           } else if (prevBlock instanceof Block) {
@@ -3581,28 +3137,23 @@ var Block = function () {
     });
 
     iterateObject(constructor.defaultLocals, function (value, variable) {
-      _this7[variable] = value;
+      _this[variable] = value;
     });
-    iterateArray(constructor.template.vars || [], function (variable) {
-      _this7[variable] = _this7[variable];
+    iterateArray(constructor.html.vars || [], function (variable) {
+      _this[variable] = _this[variable];
     });
 
     var argsObject = create(null);
-    var defaultArgs = constructor.defaultArgs;
+    var argsDescriptions = constructor.args;
 
-    var args = create(defaultArgs || null);
-    var wasDRest = void 0;
-    var argsChain = [];
-
-    if (defaultArgs) {
-      argsChain.push(defaultArgs);
-    }
-
-    argsChain.push(args);
+    var defaultArgs = getDefaultArgs(argsDescriptions);
+    var args = create(defaultArgs);
+    var wasRest = void 0;
+    var argsChain = [defaultArgs, args];
 
     iterateObject(originalArgs, function (value, arg) {
-      var isDRest = D_REST_REGEX.test(arg);
-      var localArgs = isDRest || wasDRest ? create(args) : args;
+      var isRest = value.mixin === mixins.Rest;
+      var localArgs = isRest || wasRest ? create(args) : args;
 
       if (args !== localArgs) {
         argsChain.push(localArgs);
@@ -3610,27 +3161,38 @@ var Block = function () {
 
       args = localArgs;
 
-      if (isDRest) {
+      if (isRest) {
         var restArgs = parentScope.$$.evaluate(value, function (value) {
           iterateObject(localArgs, cleanProperty);
-          assign(localArgs, transformRestArgs(value));
+          assign(localArgs, value);
           calculateArgs(normalizeArgs(argsChain), args, argsObject);
-        }, _this7);
+        }, _this);
 
-        wasDRest = true;
+        wasRest = true;
 
-        return assign(localArgs, transformRestArgs(restArgs));
+        return assign(localArgs, restArgs);
       }
 
-      var isDElements = name === 'd-elements';
-      var forDElements = isDElements && arg === 'value';
+      wasRest = false;
 
-      wasDRest = false;
+      if (isInstanceOf(Mixin, value.mixin)) {
+        localArgs[arg] = new InternalMixin({
+          Mixin: value.mixin,
+          args: value.args,
+          value: value,
+          parentScope: parentScope,
+          parentTemplate: parentTemplate
+        });
+
+        return;
+      }
+
+      var forElements = isElements && arg === 'value';
 
       localArgs[arg] = parentScope.$$.evaluate(value, function (value) {
         localArgs[arg] = value;
         calculateArgs(normalizeArgs(argsChain), args, argsObject);
-      }, _this7, forDElements, isDElements && parentBlock.$$.name === '#d-item');
+      }, _this, forElements, isElements && parentBlock.$$.Constructor === blocks.Item);
     });
 
     defineFrozenProperties(this, {
@@ -3791,210 +3353,256 @@ var Block = function () {
   return Block;
 }();
 
-Block._blocks = create(rootBlocks);
-Block._mixins = create(rootMixins);
-Block.defaultArgs = null;
+Block.args = null;
 Block.defaultLocals = null;
-Block.template = {
-  vars: [],
-  value: []
-};
+Block.displayName = null;
+Block.html = [];
 
 
 setToStringTag(Block, 'Block');
 setProto(Block.prototype, null);
 
-var watchNameArgs = function _(_$) {
-  return _$.args.name;
-};
-var watchConstructorArgs = function _(_$) {
-  return _$.args.Constructor;
+var Case = function (_Block) {
+  inherits(Case, _Block);
+
+  function Case() {
+    classCallCheck(this, Case);
+    return possibleConstructorReturn(this, (Case.__proto__ || Object.getPrototypeOf(Case)).apply(this, arguments));
+  }
+
+  return Case;
+}(Block);
+
+var watchArgs = function watchArgs(_$) {
+  return _$.args.value;
 };
 
-var DBlock = function (_Block) {
-  inherits(DBlock, _Block);
+var Elements = function (_Block) {
+  inherits(Elements, _Block);
 
-  function DBlock() {
+  function Elements() {
+    classCallCheck(this, Elements);
+    return possibleConstructorReturn(this, (Elements.__proto__ || Object.getPrototypeOf(Elements)).apply(this, arguments));
+  }
+
+  createClass(Elements, [{
+    key: 'afterConstruct',
+    value: function afterConstruct() {
+      var _this2 = this;
+
+      var parentElem = this.$$.parentElem;
+      var _args = this.args,
+          parentScope = _args.parentScope,
+          parentTemplate = _args.parentTemplate;
+
+
+      this.$$.evaluate(watchArgs, function (value) {
+        var _$$ = _this2.$$,
+            children = _$$.children,
+            mixins$$1 = _$$.mixins,
+            parent = _$$.parent,
+            watchersToRemove = _$$.watchersToRemove,
+            content = _$$.content;
+
+
+        iterateArray(children, removeWithParentSignal);
+        iterateArray(mixins$$1, removeWithParentSignal);
+        content.remove();
+
+        if (parent instanceof Block) {
+          parent.$$.removeContent(content);
+        }
+
+        _this2.$$.children = [];
+        _this2.$$.mixins = [];
+        _this2.$$.watchersToRemove = watchersToRemove.filter(function (_ref) {
+          var watchers = _ref.watchers,
+              watcher = _ref.watcher,
+              forElements = _ref.forElements;
+
+          if (forElements) {
+            return true;
+          }
+
+          removeArrayElem(watchers, watcher);
+        });
+        _this2.$$.content = new Elem();
+
+        var prevBlock = void 0;
+
+        iterateArray(value || [], function (child) {
+          prevBlock = createBlock({
+            node: child,
+            parent: _this2,
+            parentElem: parentElem,
+            parentBlock: _this2,
+            parentScope: parentScope,
+            parentTemplate: parentTemplate,
+            prevBlock: prevBlock
+          });
+        });
+        iterateArray(_this2.$$.mixinsToBuild, function (executeBuilders) {
+          executeBuilders();
+        });
+        _this2.$$.mixinsToBuild = [];
+      }, this, true);
+    }
+  }]);
+  return Elements;
+}(Block);
+
+blocks.Elements = Elements;
+
+var _tmpl;
+
+var Children = function (_Block) {
+  inherits(Children, _Block);
+
+  function Children(opts) {
+    classCallCheck(this, Children);
+
+    var _this = possibleConstructorReturn(this, (Children.__proto__ || Object.getPrototypeOf(Children)).call(this, opts));
+
+    var htmlChildren = _this.$$.parentTemplate.$$.htmlChildren;
+    var name = _this.args.name;
+
+    var found = void 0;
+
+    if (name) {
+      found = findInArray(htmlChildren, function (_ref) {
+        var type = _ref.type,
+            args = _ref.args;
+        return type === Children && args && args.name === name;
+      });
+
+      _this.elems = found ? found.value.children : null;
+    } else {
+      _this.elems = htmlChildren;
+    }
+    return _this;
+  }
+
+  return Children;
+}(Block);
+
+Children.html = (_tmpl = [{
+  "type": Elements,
+  "args": {
+    "value": function value(_$) {
+      return _$.elems;
+    },
+    "parentScope": function parentScope(_$) {
+      return _$.$$.parentTemplate.$$.parentScope;
+    },
+    "parentTemplate": function parentTemplate(_$) {
+      return _$.$$.parentTemplate.$$.parentTemplate;
+    }
+  }
+}], _tmpl.vars = ["elems"], _tmpl);
+
+var _tmpl$1;
+
+var watchArgs$1 = function watchArgs(_$) {
+  return _$.args.type;
+};
+
+var DynamicBlock = function (_Block) {
+  inherits(DynamicBlock, _Block);
+
+  function DynamicBlock() {
     var _ref;
 
     var _temp, _this, _ret;
 
-    classCallCheck(this, DBlock);
+    classCallCheck(this, DynamicBlock);
 
     for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
       args[_key] = arguments[_key];
     }
 
-    return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = DBlock.__proto__ || Object.getPrototypeOf(DBlock)).call.apply(_ref, [this].concat(args))), _this), _this.constructDynamicNameBlock = function (name) {
+    return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = DynamicBlock.__proto__ || Object.getPrototypeOf(DynamicBlock)).call.apply(_ref, [this].concat(args))), _this), _this.construct = function (type) {
       var _this$$$ = _this.$$,
           htmlChildren = _this$$$.htmlChildren,
-          dBlockArgs = _this$$$.dBlockArgs;
+          DynamicBlockArgs = _this$$$.DynamicBlockArgs;
 
 
       _this.elems = [{
-        name: name,
-        attrs: dBlockArgs,
-        children: htmlChildren
-      }];
-    }, _this.constructDynamicConstructorBlock = function (Constructor) {
-      if (!isFunction(Constructor)) {
-        _this.elems = null;
-
-        return;
-      }
-
-      var _this$$$2 = _this.$$,
-          htmlChildren = _this$$$2.htmlChildren,
-          dBlockArgs = _this$$$2.dBlockArgs;
-
-
-      _this.elems = [{
-        Constructor: Constructor,
-        attrs: dBlockArgs,
+        type: type,
+        args: DynamicBlockArgs,
         children: htmlChildren
       }];
     }, _temp), possibleConstructorReturn(_this, _ret);
   }
 
-  createClass(DBlock, [{
+  createClass(DynamicBlock, [{
     key: 'afterConstruct',
-    value: function afterConstruct(opts) {
-      var _$$ = this.$$,
-          _$$$parentScope$$$ = _$$.parentScope.$$,
-          parentParentScope = _$$$parentScope$$$.parentScope,
-          parentParentTemplate = _$$$parentScope$$$.parentTemplate,
-          children = _$$$parentScope$$$.htmlChildren,
-          ownChildren = _$$.htmlChildren,
-          parentScope = _$$.parentScope,
-          parentTemplate = _$$.parentTemplate,
-          DBlockName = _$$.dBlockName;
-      var _args = this.args,
-          name = _args.name,
-          Constructor = _args.Constructor;
-
-      var found = void 0;
-
-      this.ParentScope = parentScope;
-      this.ParentTemplate = parentTemplate;
-
-      if (name) {
-        this.constructDynamicNameBlock(this.evaluate(watchNameArgs, this.constructDynamicNameBlock));
-
-        return;
-      }
-
-      if (Constructor) {
-        this.constructDynamicConstructorBlock(this.evaluate(watchConstructorArgs, this.constructDynamicConstructorBlock));
-
-        return;
-      }
-
-      if (ownChildren.length) {
-        parentTemplate.$$.dBlocks.push(this);
-
-        return;
-      }
-
-      this.ParentScope = parentParentScope;
-      this.ParentTemplate = parentParentTemplate;
-
-      if (DBlockName) {
-        found = findInArray(children, function (_ref2) {
-          var nodeName = _ref2.name;
-          return nodeName === 'd-block:' + DBlockName;
-        });
-
-        if (!found) {
-          found = findInArray(parentTemplate.$$.dBlocks, function (_ref3) {
-            var dBlockName = _ref3.$$.dBlockName;
-            return dBlockName === DBlockName;
-          });
-
-          if (found) {
-            this.ParentScope = parentTemplate;
-            this.ParentTemplate = parentTemplate;
-            found.value = {
-              children: found.value.$$.htmlChildren
-            };
-          }
-        }
-
-        this.elems = found ? found.value.children : null;
-      } else {
-        this.elems = children;
-      }
+    value: function afterConstruct() {
+      this.construct(this.evaluate(watchArgs$1, this.construct));
     }
   }]);
-  return DBlock;
+  return DynamicBlock;
 }(Block);
 
-DBlock.template = {
-  "vars": ["elems", "ParentScope", "ParentTemplate"],
-  "value": [{
-    "name": "d-elements",
-    "attrs": {
-      "value": function _(_$) {
-        return _$.elems;
-      },
-      "parentScope": function _(_$) {
-        return _$.ParentScope;
-      },
-      "parentTemplate": function _(_$) {
-        return _$.ParentTemplate;
-      }
+DynamicBlock.html = (_tmpl$1 = [{
+  "type": Elements,
+  "args": {
+    "value": function value(_$) {
+      return _$.elems;
+    },
+    "parentScope": function parentScope(_$) {
+      return _$.$$.parentScope;
+    },
+    "parentTemplate": function parentTemplate(_$) {
+      return _$.$$.parentTemplate;
     }
-  }]
-};
+  }
+}], _tmpl$1.vars = ["elems"], _tmpl$1);
 
 
-rootBlocks['d-block'] = DBlock;
+blocks.DynamicBlock = DynamicBlock;
 
-var template = {
-  "vars": [],
-  "value": [{
-    "name": "d-elements",
-    "attrs": {
-      "value": function _(_$) {
-        return _$.$$.htmlChildren;
-      },
-      "parentScope": function _(_$) {
-        return _$;
-      },
-      "parentTemplate": function _(_$) {
-        return _$.$$.parentTemplate;
-      }
-    }
-  }]
-};
+var _tmpl$2;
 
-var DItem = function (_Block) {
-  inherits(DItem, _Block);
+var Item = function (_Block) {
+  inherits(Item, _Block);
 
-  function DItem() {
-    classCallCheck(this, DItem);
-    return possibleConstructorReturn(this, (DItem.__proto__ || Object.getPrototypeOf(DItem)).apply(this, arguments));
+  function Item() {
+    classCallCheck(this, Item);
+    return possibleConstructorReturn(this, (Item.__proto__ || Object.getPrototypeOf(Item)).apply(this, arguments));
   }
 
-  return DItem;
+  return Item;
 }(Block);
 
-DItem.template = template;
+Item.html = (_tmpl$2 = [{
+  "type": Elements,
+  "args": {
+    "value": function value(_$) {
+      return _$.$$.htmlChildren;
+    },
+    "parentScope": function parentScope(_$) {
+      return _$;
+    },
+    "parentTemplate": function parentTemplate(_$) {
+      return _$.$$.parentTemplate;
+    }
+  }
+}], _tmpl$2.vars = [], _tmpl$2);
 
-var _class;
-var _temp;
-var _initialiseProps;
 
-var watchArgs = function _(_$) {
+blocks.Item = Item;
+
+var watchArgs$2 = function watchArgs(_$) {
   return [_$.args.set, _$.args.filterBy, _$.args.sortBy];
 };
 
-rootBlocks['d-each'] = (_temp = _class = function (_Block) {
-  inherits(DEach, _Block);
+var Each = function (_Block) {
+  inherits(Each, _Block);
 
-  function DEach(opts) {
-    classCallCheck(this, DEach);
+  function Each(opts) {
+    classCallCheck(this, Each);
 
-    var _this = possibleConstructorReturn(this, (DEach.__proto__ || Object.getPrototypeOf(DEach)).call(this, opts));
+    var _this = possibleConstructorReturn(this, (Each.__proto__ || Object.getPrototypeOf(Each)).call(this, opts));
 
     _initialiseProps.call(_this);
 
@@ -4011,18 +3619,24 @@ rootBlocks['d-each'] = (_temp = _class = function (_Block) {
     return _this;
   }
 
-  createClass(DEach, [{
+  createClass(Each, [{
     key: 'afterConstruct',
     value: function afterConstruct() {
-      this.renderSet(this.evaluate(watchArgs, this.renderSet));
+      this.renderSet(this.evaluate(watchArgs$2, this.renderSet));
     }
   }]);
-  return DEach;
-}(Block), _class.defaultArgs = {
-  uid: function uid(item, index) {
-    return index;
+  return Each;
+}(Block);
+
+Each.args = {
+  uid: {
+    default: function _default(item, index) {
+      return index;
+    }
   }
-}, _initialiseProps = function _initialiseProps() {
+};
+
+var _initialiseProps = function _initialiseProps() {
   var _this2 = this;
 
   this.renderSet = function (args) {
@@ -4107,12 +3721,11 @@ rootBlocks['d-each'] = (_temp = _class = function (_Block) {
       } else {
         block = createBlock({
           node: {
+            type: Item,
             itemName: itemName,
             indexName: indexName,
             item: item,
             index: index,
-            name: '#d-item',
-            Constructor: DItem,
             children: htmlChildren
           },
           parent: _this2,
@@ -4131,108 +3744,29 @@ rootBlocks['d-each'] = (_temp = _class = function (_Block) {
 
     _this2.itemsByUIDs = newItemsByUIDs;
   };
-}, _temp);
-
-var watchArgs$1 = function _(_$) {
-  return _$.args.value;
 };
 
-rootBlocks['d-elements'] = function (_Block) {
-  inherits(DElements, _Block);
+var _tmpl$3;
 
-  function DElements() {
-    classCallCheck(this, DElements);
-    return possibleConstructorReturn(this, (DElements.__proto__ || Object.getPrototypeOf(DElements)).apply(this, arguments));
-  }
-
-  createClass(DElements, [{
-    key: 'afterConstruct',
-    value: function afterConstruct() {
-      var _this2 = this;
-
-      var parentElem = this.$$.parentElem;
-      var _args = this.args,
-          parentScope = _args.parentScope,
-          parentTemplate = _args.parentTemplate;
-
-
-      this.$$.evaluate(watchArgs$1, function (value) {
-        var _$$ = _this2.$$,
-            children = _$$.children,
-            mixins = _$$.mixins,
-            parent = _$$.parent,
-            watchersToRemove = _$$.watchersToRemove,
-            content = _$$.content;
-
-
-        iterateArray(children, removeWithParentSignal);
-        iterateArray(mixins, removeWithParentSignal);
-        content.remove();
-
-        if (parent instanceof Block) {
-          parent.$$.removeContent(content);
-        }
-
-        _this2.$$.children = [];
-        _this2.$$.mixins = [];
-        _this2.$$.watchersToRemove = watchersToRemove.filter(function (_ref) {
-          var watchers = _ref.watchers,
-              watcher = _ref.watcher,
-              forDElements = _ref.forDElements;
-
-          if (forDElements) {
-            return true;
-          }
-
-          removeArrayElem(watchers, watcher);
-        });
-        _this2.$$.content = new Elem();
-
-        var prevBlock = void 0;
-
-        iterateArray(value || [], function (child) {
-          prevBlock = createBlock({
-            node: child,
-            parent: _this2,
-            parentElem: parentElem,
-            parentBlock: _this2,
-            parentScope: parentScope,
-            parentTemplate: parentTemplate,
-            prevBlock: prevBlock
-          });
-        });
-        iterateArray(_this2.$$.mixinsToBuild, function (executeBuilders) {
-          executeBuilders();
-        });
-        _this2.$$.mixinsToBuild = [];
-      }, this, true);
-    }
-  }]);
-  return DElements;
-}(Block);
-
-var _class$1;
-var _temp2;
-
-var watchArgs$2 = function _(_$) {
+var watchArgs$3 = function watchArgs(_$) {
   return _$.args.if;
 };
 
-rootBlocks['d-if'] = (_temp2 = _class$1 = function (_Block) {
-  inherits(DIf, _Block);
+var If = function (_Block) {
+  inherits(If, _Block);
 
-  function DIf() {
+  function If() {
     var _ref;
 
     var _temp, _this, _ret;
 
-    classCallCheck(this, DIf);
+    classCallCheck(this, If);
 
     for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
       args[_key] = arguments[_key];
     }
 
-    return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = DIf.__proto__ || Object.getPrototypeOf(DIf)).call.apply(_ref, [this].concat(args))), _this), _this.constructElems = function (condition) {
+    return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = If.__proto__ || Object.getPrototypeOf(If)).call.apply(_ref, [this].concat(args))), _this), _this.constructElems = function (condition) {
       condition = !!condition;
 
       if (_this.condition !== condition) {
@@ -4242,60 +3776,59 @@ rootBlocks['d-if'] = (_temp2 = _class$1 = function (_Block) {
     }, _temp), possibleConstructorReturn(_this, _ret);
   }
 
-  createClass(DIf, [{
+  createClass(If, [{
     key: 'afterConstruct',
     value: function afterConstruct() {
       this.condition = false;
-      this.constructElems(this.evaluate(watchArgs$2, this.constructElems));
+      this.constructElems(this.evaluate(watchArgs$3, this.constructElems));
     }
   }]);
-  return DIf;
-}(Block), _class$1.template = {
-  "vars": ["elems"],
-  "value": [{
-    "name": "d-elements",
-    "attrs": {
-      "value": function _(_$) {
-        return _$.elems;
-      },
-      "parentScope": function _(_$) {
-        return _$.$$.parentScope;
-      },
-      "parentTemplate": function _(_$) {
-        return _$.$$.parentTemplate;
-      }
+  return If;
+}(Block);
+
+If.html = (_tmpl$3 = [{
+  "type": Elements,
+  "args": {
+    "value": function value(_$) {
+      return _$.elems;
+    },
+    "parentScope": function parentScope(_$) {
+      return _$.$$.parentScope;
+    },
+    "parentTemplate": function parentTemplate(_$) {
+      return _$.$$.parentTemplate;
     }
-  }]
-}, _temp2);
+  }
+}], _tmpl$3.vars = ["elems"], _tmpl$3);
 
-var _class$2;
-var _temp$1;
+var _tmpl$4;
 
-var watchArgs$3 = function _(_$) {
+var watchArgs$4 = function watchArgs(_$) {
   return [_$.args.value, _$.args.compareFn];
 };
 
-rootBlocks['d-switch'] = (_temp$1 = _class$2 = function (_Block) {
-  inherits(DSwitch, _Block);
+var Switch = function (_Block) {
+  inherits(Switch, _Block);
 
-  function DSwitch(opts) {
-    classCallCheck(this, DSwitch);
+  function Switch(opts) {
+    classCallCheck(this, Switch);
 
-    var _this = possibleConstructorReturn(this, (DSwitch.__proto__ || Object.getPrototypeOf(DSwitch)).call(this, opts));
+    var _this = possibleConstructorReturn(this, (Switch.__proto__ || Object.getPrototypeOf(Switch)).call(this, opts));
 
     _this.index = Infinity;
     var _this$$$ = _this.$$,
         htmlChildren = _this$$$.htmlChildren,
         parentScope = _this$$$.parentScope,
-        args = _this.args,
+        switchArgs = _this.args,
         value = _this.args.value;
 
     var wasDefault = false;
 
     _this.values = htmlChildren.filter(function (_ref) {
-      var name = _ref.name;
+      var type = _ref.type,
+          args = _ref.args;
 
-      if (name !== 'd-case' && name !== 'd-default') {
+      if (type !== Case) {
         return;
       }
 
@@ -4303,21 +3836,20 @@ rootBlocks['d-switch'] = (_temp$1 = _class$2 = function (_Block) {
         return;
       }
 
-      if (name === 'd-default') {
+      if (args && args.default) {
         wasDefault = true;
       }
 
       return true;
     }).map(function (child, i) {
-      var name = child.name,
-          _child$attrs = child.attrs,
-          attrs = _child$attrs === undefined ? {} : _child$attrs,
+      var _child$args = child.args,
+          args = _child$args === undefined ? {} : _child$args,
           children = child.children;
 
       var val = void 0;
 
-      if (name !== 'd-default') {
-        val = parentScope.$$.evaluate(attrs.if, function (newValue) {
+      if (!args.default) {
+        val = parentScope.$$.evaluate(args.when, function (newValue) {
           _this.values[i].value = newValue;
 
           if (i > _this.index) {
@@ -4325,9 +3857,9 @@ rootBlocks['d-switch'] = (_temp$1 = _class$2 = function (_Block) {
           }
 
           var found = findInArray(_this.values, function (_ref2) {
-            var name = _ref2.name,
+            var args = _ref2.args,
                 value = _ref2.value;
-            return name === 'd-default' || _this.args.compareFn(args.value, value);
+            return args.default || _this.args.compareFn(switchArgs.value, value);
           });
 
           _this.index = found ? found.key : Infinity;
@@ -4335,13 +3867,13 @@ rootBlocks['d-switch'] = (_temp$1 = _class$2 = function (_Block) {
         }, _this);
       }
 
-      if (_this.index === Infinity && (name === 'd-default' || _this.args.compareFn(value, val))) {
+      if (_this.index === Infinity && (args.default || _this.args.compareFn(value, val))) {
         _this.index = i;
         _this.elems = children;
       }
 
       return {
-        name: name,
+        args: args,
         children: children,
         value: val
       };
@@ -4349,23 +3881,23 @@ rootBlocks['d-switch'] = (_temp$1 = _class$2 = function (_Block) {
     return _this;
   }
 
-  createClass(DSwitch, [{
+  createClass(Switch, [{
     key: 'afterConstruct',
     value: function afterConstruct() {
       var _this2 = this;
 
-      this.evaluate(watchArgs$3, function (args) {
+      this.evaluate(watchArgs$4, function (args) {
         var newValue = args[0];
         var compareFn = args[1];
 
         _this2.index = Infinity;
 
         _this2.values.some(function (_ref3, i) {
-          var name = _ref3.name,
+          var args = _ref3.args,
               value = _ref3.value,
               children = _ref3.children;
 
-          if (name === 'd-default' || compareFn(newValue, value)) {
+          if (args.default || compareFn(newValue, value)) {
             _this2.index = i;
             _this2.elems = children;
 
@@ -4379,47 +3911,52 @@ rootBlocks['d-switch'] = (_temp$1 = _class$2 = function (_Block) {
       });
     }
   }]);
-  return DSwitch;
-}(Block), _class$2.template = {
-  "vars": ["elems"],
-  "value": [{
-    "name": "d-elements",
-    "attrs": {
-      "value": function _(_$) {
-        return _$.elems;
-      },
-      "parentScope": function _(_$) {
-        return _$.$$.parentScope;
-      },
-      "parentTemplate": function _(_$) {
-        return _$.$$.parentTemplate;
-      }
+  return Switch;
+}(Block);
+
+Switch.html = (_tmpl$4 = [{
+  "type": Elements,
+  "args": {
+    "value": function value(_$) {
+      return _$.elems;
+    },
+    "parentScope": function parentScope(_$) {
+      return _$.$$.parentScope;
+    },
+    "parentTemplate": function parentTemplate(_$) {
+      return _$.$$.parentTemplate;
     }
-  }]
-}, _class$2.defaultArgs = {
-  compareFn: function compareFn(switchValue, caseValue) {
-    return switchValue === caseValue || switchValue !== switchValue && caseValue !== caseValue;
   }
-}, _temp$1);
+}], _tmpl$4.vars = ["elems"], _tmpl$4);
+Switch.args = {
+  default: {
+    default: false
+  },
+  compareFn: {
+    default: function _default(switchValue, caseValue) {
+      return switchValue === caseValue || switchValue !== switchValue && caseValue !== caseValue;
+    }
+  }
+};
 
-rootMixins['d-bind'] = function (_Mixin) {
-  inherits(DBind, _Mixin);
+var Bind = function (_Mixin) {
+  inherits(Bind, _Mixin);
 
-  function DBind() {
+  function Bind() {
     var _ref;
 
     var _temp, _this, _ret;
 
-    classCallCheck(this, DBind);
+    classCallCheck(this, Bind);
 
     for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
       args[_key] = arguments[_key];
     }
 
-    return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = DBind.__proto__ || Object.getPrototypeOf(DBind)).call.apply(_ref, [this].concat(args))), _this), _this.off = noop, _temp), possibleConstructorReturn(_this, _ret);
+    return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = Bind.__proto__ || Object.getPrototypeOf(Bind)).call.apply(_ref, [this].concat(args))), _this), _this.off = noop, _temp), possibleConstructorReturn(_this, _ret);
   }
 
-  createClass(DBind, [{
+  createClass(Bind, [{
     key: 'afterUpdate',
     value: function afterUpdate(value) {
       this.off();
@@ -4433,7 +3970,7 @@ rootMixins['d-bind'] = function (_Mixin) {
       } else {
         this.off = noop;
 
-        console.error('Provide "d-bind" mixin with an event names (like "d-bind(click)" or "d-bind(keyup, keypress)")!');
+        console.error('Provide "Bind" mixin with event name args (like "Bind(click)" or "Bind(keyup, keypress)")!');
       }
     }
   }, {
@@ -4444,29 +3981,29 @@ rootMixins['d-bind'] = function (_Mixin) {
       }
     }
   }]);
-  return DBind;
+  return Bind;
 }(Mixin);
 
 var EMPTY_SPACE_REGEX = /\s+/;
 
-rootMixins['d-class'] = function (_Mixin) {
-  inherits(DClass, _Mixin);
+var Class = function (_Mixin) {
+  inherits(Class, _Mixin);
 
-  function DClass() {
+  function Class() {
     var _ref;
 
     var _temp, _this, _ret;
 
-    classCallCheck(this, DClass);
+    classCallCheck(this, Class);
 
     for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
       args[_key] = arguments[_key];
     }
 
-    return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = DClass.__proto__ || Object.getPrototypeOf(DClass)).call.apply(_ref, [this].concat(args))), _this), _this.classes = [], _temp), possibleConstructorReturn(_this, _ret);
+    return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = Class.__proto__ || Object.getPrototypeOf(Class)).call.apply(_ref, [this].concat(args))), _this), _this.classes = [], _temp), possibleConstructorReturn(_this, _ret);
   }
 
-  createClass(DClass, [{
+  createClass(Class, [{
     key: 'afterUpdate',
     value: function afterUpdate(newValue) {
       var elem = this.elem,
@@ -4523,19 +4060,16 @@ rootMixins['d-class'] = function (_Mixin) {
       }
     }
   }]);
-  return DClass;
+  return Class;
 }(Mixin);
 
-var _class$3;
-var _temp$2;
+var Elem$1 = function (_Mixin) {
+  inherits(Elem, _Mixin);
 
-rootMixins['d-elem'] = (_temp$2 = _class$3 = function (_Mixin) {
-  inherits(DElem, _Mixin);
+  function Elem(opts) {
+    classCallCheck(this, Elem);
 
-  function DElem(opts) {
-    classCallCheck(this, DElem);
-
-    var _this = possibleConstructorReturn(this, (DElem.__proto__ || Object.getPrototypeOf(DElem)).call(this, opts));
+    var _this = possibleConstructorReturn(this, (Elem.__proto__ || Object.getPrototypeOf(Elem)).call(this, opts));
 
     var args = _this.args,
         parentTemplate = _this.parentTemplate,
@@ -4557,18 +4091,20 @@ rootMixins['d-elem'] = (_temp$2 = _class$3 = function (_Mixin) {
     return _this;
   }
 
-  return DElem;
-}(Mixin), _class$3.evaluate = false, _temp$2);
+  return Elem;
+}(Mixin);
 
-var DHide = function (_Mixin) {
-  inherits(DHide, _Mixin);
+Elem$1.evaluate = false;
 
-  function DHide() {
-    classCallCheck(this, DHide);
-    return possibleConstructorReturn(this, (DHide.__proto__ || Object.getPrototypeOf(DHide)).apply(this, arguments));
+var Hide = function (_Mixin) {
+  inherits(Hide, _Mixin);
+
+  function Hide() {
+    classCallCheck(this, Hide);
+    return possibleConstructorReturn(this, (Hide.__proto__ || Object.getPrototypeOf(Hide)).apply(this, arguments));
   }
 
-  createClass(DHide, [{
+  createClass(Hide, [{
     key: 'afterUpdate',
     value: function afterUpdate(value) {
       var elem = this.elem;
@@ -4588,21 +4124,16 @@ var DHide = function (_Mixin) {
       }
     }
   }]);
-  return DHide;
+  return Hide;
 }(Mixin);
 
-rootMixins['d-hide'] = DHide;
+var Node = function (_Mixin) {
+  inherits(Node, _Mixin);
 
-var _class$4;
-var _temp$3;
+  function Node(opts) {
+    classCallCheck(this, Node);
 
-rootMixins['d-node'] = (_temp$3 = _class$4 = function (_Mixin) {
-  inherits(DNode, _Mixin);
-
-  function DNode(opts) {
-    classCallCheck(this, DNode);
-
-    var _this = possibleConstructorReturn(this, (DNode.__proto__ || Object.getPrototypeOf(DNode)).call(this, opts));
+    var _this = possibleConstructorReturn(this, (Node.__proto__ || Object.getPrototypeOf(Node)).call(this, opts));
 
     var args = _this.args,
         parentTemplate = _this.parentTemplate,
@@ -4624,19 +4155,18 @@ rootMixins['d-node'] = (_temp$3 = _class$4 = function (_Mixin) {
     return _this;
   }
 
-  return DNode;
-}(Mixin), _class$4.evaluate = false, _temp$3);
+  return Node;
+}(Mixin);
 
-var _class$5;
-var _temp$4;
+Node.evaluate = false;
 
-rootMixins['d-on'] = (_temp$4 = _class$5 = function (_Mixin) {
-  inherits(DOn, _Mixin);
+var On = function (_Mixin) {
+  inherits(On, _Mixin);
 
-  function DOn(opts) {
-    classCallCheck(this, DOn);
+  function On(opts) {
+    classCallCheck(this, On);
 
-    var _this = possibleConstructorReturn(this, (DOn.__proto__ || Object.getPrototypeOf(DOn)).call(this, opts));
+    var _this = possibleConstructorReturn(this, (On.__proto__ || Object.getPrototypeOf(On)).call(this, opts));
 
     if (_this.args) {
       _this.off = _this.elem.on(_this.args.join(','), function () {
@@ -4645,12 +4175,12 @@ rootMixins['d-on'] = (_temp$4 = _class$5 = function (_Mixin) {
     } else {
       _this.off = noop;
 
-      console.error('Provide "d-on" mixin with an event names (like "d-on(click)" or "d-on(keyup, keypress)")!');
+      console.error('Provide "On" mixin with event name args (like "On(click)" or "On(keyup, keypress)")!');
     }
     return _this;
   }
 
-  createClass(DOn, [{
+  createClass(On, [{
     key: 'beforeRemove',
     value: function beforeRemove(isElementRemoved) {
       if (!isElementRemoved) {
@@ -4658,18 +4188,33 @@ rootMixins['d-on'] = (_temp$4 = _class$5 = function (_Mixin) {
       }
     }
   }]);
-  return DOn;
-}(Mixin), _class$5.evaluate = false, _temp$4);
+  return On;
+}(Mixin);
 
-rootMixins['d-show'] = function (_Mixin) {
-  inherits(DShow, _Mixin);
+On.evaluate = false;
 
-  function DShow() {
-    classCallCheck(this, DShow);
-    return possibleConstructorReturn(this, (DShow.__proto__ || Object.getPrototypeOf(DShow)).apply(this, arguments));
+var Rest = function (_Mixin) {
+  inherits(Rest, _Mixin);
+
+  function Rest() {
+    classCallCheck(this, Rest);
+    return possibleConstructorReturn(this, (Rest.__proto__ || Object.getPrototypeOf(Rest)).apply(this, arguments));
   }
 
-  createClass(DShow, [{
+  return Rest;
+}(Mixin);
+
+mixins.Rest = Rest;
+
+var Show = function (_Mixin) {
+  inherits(Show, _Mixin);
+
+  function Show() {
+    classCallCheck(this, Show);
+    return possibleConstructorReturn(this, (Show.__proto__ || Object.getPrototypeOf(Show)).apply(this, arguments));
+  }
+
+  createClass(Show, [{
     key: 'afterUpdate',
     value: function afterUpdate(value) {
       var elem = this.elem;
@@ -4689,30 +4234,30 @@ rootMixins['d-show'] = function (_Mixin) {
       }
     }
   }]);
-  return DShow;
+  return Show;
 }(Mixin);
 
 var CSS_STYLES_SEPARATOR_REGEX$1 = /\s*;\s*/;
 var CSS_STYLE_SEPARATOR_REGEX = /\s*:\s*/;
 
-rootMixins['d-style'] = function (_Mixin) {
-  inherits(DStyle, _Mixin);
+var Style = function (_Mixin) {
+  inherits(Style, _Mixin);
 
-  function DStyle() {
+  function Style() {
     var _ref;
 
     var _temp, _this, _ret;
 
-    classCallCheck(this, DStyle);
+    classCallCheck(this, Style);
 
     for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
       args[_key] = arguments[_key];
     }
 
-    return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = DStyle.__proto__ || Object.getPrototypeOf(DStyle)).call.apply(_ref, [this].concat(args))), _this), _this.css = {}, _temp), possibleConstructorReturn(_this, _ret);
+    return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = Style.__proto__ || Object.getPrototypeOf(Style)).call.apply(_ref, [this].concat(args))), _this), _this.css = {}, _temp), possibleConstructorReturn(_this, _ret);
   }
 
-  createClass(DStyle, [{
+  createClass(Style, [{
     key: 'afterUpdate',
     value: function afterUpdate(newValue, oldValue) {
       var elem = this.elem,
@@ -4751,7 +4296,7 @@ rootMixins['d-style'] = function (_Mixin) {
       }
     }
   }]);
-  return DStyle;
+  return Style;
 }(Mixin);
 
 function addCSSProp$1(css, item) {
@@ -4768,16 +4313,13 @@ function constructStyleFromString(style) {
   return [split[0].trim(), split[1].trim()];
 }
 
-var _class$6;
-var _temp$5;
+var Value = function (_Mixin) {
+  inherits(Value, _Mixin);
 
-rootMixins['d-value'] = (_temp$5 = _class$6 = function (_Mixin) {
-  inherits(DValue, _Mixin);
+  function Value(opts) {
+    classCallCheck(this, Value);
 
-  function DValue(opts) {
-    classCallCheck(this, DValue);
-
-    var _this = possibleConstructorReturn(this, (DValue.__proto__ || Object.getPrototypeOf(DValue)).call(this, opts));
+    var _this = possibleConstructorReturn(this, (Value.__proto__ || Object.getPrototypeOf(Value)).call(this, opts));
 
     var args = _this.args,
         parentTemplate = _this.parentTemplate,
@@ -4838,7 +4380,7 @@ rootMixins['d-value'] = (_temp$5 = _class$6 = function (_Mixin) {
     return _this;
   }
 
-  createClass(DValue, [{
+  createClass(Value, [{
     key: 'changeScope',
     value: function changeScope() {
       var scope = this.scope,
@@ -4896,8 +4438,11 @@ rootMixins['d-value'] = (_temp$5 = _class$6 = function (_Mixin) {
       this.offFormListener();
     }
   }]);
-  return DValue;
-}(Mixin), _class$6.evaluate = false, _temp$5);
+  return Value;
+}(Mixin);
+
+Value.evaluate = false;
+
 
 function getProp(name, type, elem) {
   switch (name) {
@@ -5011,10 +4556,6 @@ function addValue(values, _ref) {
   }
 }
 
-iterateObject(rootMixins, function (Mixin, name) {
-  Mixin._match = constructMixinRegex(name);
-});
-
 /**
  * @const {Elem} doc
  * @type {Elem}
@@ -5049,31 +4590,30 @@ var head = new Elem(document.head);
 
 createHideStyleNode(head);
 
-function insertTemplates(template, templates) {
-  var vars = template.vars,
-      value = template.value;
+function insertHtml(html, templates) {
+  var _html$vars = html.vars,
+      vars = _html$vars === undefined ? [] : _html$vars;
 
   var newTemplates = create(null);
   var newVars = toObjectKeys(vars);
 
   assign(newTemplates, templates);
-  iterateAndChangeChildren(value);
 
-  function iterateAndChangeChildren() {
+  (function iterateAndChangeChildren() {
     var nodes = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
     for (var i = 0; i < nodes.length; i++) {
       var _nodes$i = nodes[i],
-          name = _nodes$i.name,
-          _value = _nodes$i.value,
+          type = _nodes$i.type,
+          value = _nodes$i.value,
           children = _nodes$i.children;
 
 
-      if (name === '#comment') {
-        var trimmed = _value.trim();
+      if (type === '#comment') {
+        var trimmed = value.trim();
 
         if (newTemplates[trimmed]) {
-          var newTemplate = newTemplates[trimmed].value;
+          var newTemplate = newTemplates[trimmed];
 
           nodes.splice.apply(nodes, [i, 1].concat(toConsumableArray(newTemplate)));
           assign(newVars, toObjectKeys(newTemplates[trimmed].vars));
@@ -5084,21 +4624,19 @@ function insertTemplates(template, templates) {
         iterateAndChangeChildren(children);
       }
     }
-  }
+  })(html);
 
-  vars.length = 0;
-  vars.push.apply(vars, toConsumableArray(keys(newVars)));
+  html.vars = keys(newVars);
 
-  return template;
+  return html;
 }
 
 /**
  * @function initApp
  * @public
- * @param {Template|ScopelessTemplate|String|typeof Block} block - Root template (may be scopeless),
- * string defining a name of the root block or a block subclass.
+ * @param {Template|typeof Block} html - Root template or root block constructor.
  * @param {Elem|Element} container - Container of the app.
- * @returns {Block|void} Root block if the app has benn registered and undefined if not.
+ * @returns {Block|void} Root block if the app has been registered and undefined if not.
  * @description Method for initializing app.
  *
  * @example
@@ -5109,9 +4647,8 @@ function insertTemplates(template, templates) {
  * initApp('App', doc.create('div'));
  * initApp(App, doc.create('div'));
  */
-function initApp(block, container) {
+function initApp(html, container) {
   var parentElem = new Elem(container).elem(0);
-  var Constructor = block;
 
   if (!parentElem.length) {
     console.error('No valid element to insert the app into was given! (initApp)');
@@ -5125,10 +4662,12 @@ function initApp(block, container) {
     return;
   }
 
-  if (isString(block)) {
+  var RootBlock = html;
+
+  if (isArray(html)) {
     var _class, _temp;
 
-    Constructor = (_temp = _class = function (_Block) {
+    RootBlock = (_temp = _class = function (_Block) {
       inherits(RootBlock, _Block);
 
       function RootBlock() {
@@ -5137,57 +4676,18 @@ function initApp(block, container) {
       }
 
       return RootBlock;
-    }(Block), _class.template = {
-      vars: [],
-      value: [{
-        name: block
-      }]
-    }, _temp);
+    }(Block), _class.html = html, _temp);
   }
 
-  if (isArray(block)) {
-    var _class2, _temp2;
-
-    Constructor = (_temp2 = _class2 = function (_Block2) {
-      inherits(RootBlock, _Block2);
-
-      function RootBlock() {
-        classCallCheck(this, RootBlock);
-        return possibleConstructorReturn(this, (RootBlock.__proto__ || Object.getPrototypeOf(RootBlock)).apply(this, arguments));
-      }
-
-      return RootBlock;
-    }(Block), _class2.template = {
-      vars: [],
-      value: block
-    }, _temp2);
-  }
-
-  if (block && !isInstanceOf(Block, block) && isArray(block.vars) && isArray(block.value)) {
-    var _class3, _temp3;
-
-    Constructor = (_temp3 = _class3 = function (_Block3) {
-      inherits(RootBlock, _Block3);
-
-      function RootBlock() {
-        classCallCheck(this, RootBlock);
-        return possibleConstructorReturn(this, (RootBlock.__proto__ || Object.getPrototypeOf(RootBlock)).apply(this, arguments));
-      }
-
-      return RootBlock;
-    }(Block), _class3.template = block, _temp3);
-  }
-
-  if (!isInstanceOf(Block, Constructor)) {
-    console.error('No valid root block to insert the app into was given! (initApp)');
+  if (!isInstanceOf(Block, RootBlock)) {
+    console.error('No valid root block was given! (initApp)');
 
     return;
   }
 
   var rootBlock = createBlock({
     node: {
-      name: '#RootBlock',
-      Constructor: Constructor
+      type: RootBlock
     },
     parent: parentElem,
     parentElem: parentElem
@@ -5237,15 +4737,33 @@ function removeApp(container) {
   delete container.DwayneRootBlock;
 }
 
+exports.version = version;
 exports.Block = Block;
 exports.Elem = Elem;
 exports.Mixin = Mixin;
+exports.Case = Case;
+exports.Children = Children;
+exports.DynamicBlock = DynamicBlock;
+exports.Each = Each;
+exports.Elements = Elements;
+exports.If = If;
+exports.Switch = Switch;
+exports.Bind = Bind;
+exports.Class = Class;
+exports.ElemMixin = Elem$1;
+exports.Hide = Hide;
+exports.NodeMixin = Node;
+exports.On = On;
+exports.Rest = Rest;
+exports.Show = Show;
+exports.Style = Style;
+exports.Value = Value;
 exports.doc = doc;
 exports.html = html;
 exports.body = body;
 exports.head = head;
 exports.find = find;
-exports.insertTemplates = insertTemplates;
+exports.insertHtml = insertHtml;
 exports.initApp = initApp;
 exports.removeApp = removeApp;
 
