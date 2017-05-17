@@ -2,6 +2,7 @@ export * from './InternalMixin';
 export * from './calculateArgs';
 export * from './cleanProperty';
 export * from './createBlock';
+export * from './extend';
 export * from './getDefaultArgs';
 export * from './isInstanceOf';
 export * from './normalizeArgs';

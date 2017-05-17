@@ -1,6 +1,6 @@
 export { version } from './constants';
 
-export { Block } from './Block';
+export * from './BlockPublic';
 export * from './Elem';
 export * from './Mixin';
 

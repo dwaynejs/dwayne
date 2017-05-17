@@ -75,6 +75,67 @@ export default () => {
       strictEqual(app.b, 2);
     });
   });
+  describe('extend()', () => {
+    it('should return the same block but extended', () => {
+      class MyBlock extends Block {
+        static html = html`<span>Hello, {who}!</span>`;
+      }
+
+      class ExtendBlock extends Block {
+        _afterConstruct() {
+          this.who = 'world';
+        }
+      }
+
+      MyBlock.extend(ExtendBlock);
+
+      const container = doc.create('div');
+
+      initApp(MyBlock, container);
+
+      strictEqual(container.html(), '<span>Hello, world!</span>');
+    });
+    it('should do nothing if the extend block is not a Block', () => {
+      class MyBlock extends Block {
+        static html = html`<span>Hello, {who}!</span>`;
+      }
+
+      class ExtendBlock {
+        _afterConstruct() {
+          this.who = 'world';
+        }
+      }
+
+      MyBlock.extend(ExtendBlock);
+
+      const container = doc.create('div');
+
+      initApp(MyBlock, container);
+
+      strictEqual(container.html(), '<span>Hello, !</span>');
+    });
+    it('should resolve cyclic inheritance', () => {
+      class MyBlock extends Block {
+        static html = html`<span>Hello, {who}!</span>`;
+      }
+
+      class InTheMiddleBlock extends MyBlock {}
+
+      class ExtendBlock extends InTheMiddleBlock {
+        _afterConstruct() {
+          this.who = 'world';
+        }
+      }
+
+      MyBlock.extend(ExtendBlock);
+
+      const container = doc.create('div');
+
+      initApp(MyBlock, container);
+
+      strictEqual(container.html(), '<span>Hello, world!</span>');
+    });
+  });
   describe('onEvalError()', () => {
     const oldConsoleError = console.error;
 

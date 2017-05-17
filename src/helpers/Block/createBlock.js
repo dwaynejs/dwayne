@@ -268,7 +268,7 @@ export function createBlock({ node, parent, parentElem, parentBlock, parentScope
   constructPublicScope(blockInstance, locals, $$.locals);
 
   try {
-    blockInstance.afterConstruct();
+    blockInstance._afterConstruct();
   } catch (err) {
     console.error(`Uncaught error in ${ name }#afterConstruct:`, err);
   }
@@ -301,7 +301,7 @@ export function createBlock({ node, parent, parentElem, parentBlock, parentScope
   blockInstance.$$.mixinsToBuild = [];
 
   try {
-    blockInstance.afterRender();
+    blockInstance._afterRender();
   } catch (err) {
     console.error(`Uncaught error in ${ name }#afterRender:`, err);
   }

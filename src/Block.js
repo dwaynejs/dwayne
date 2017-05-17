@@ -9,7 +9,7 @@ import {
 import {
   normalizeArgs, removeWatchers, removeWithParentSignal,
   cleanProperty, InternalMixin, calculateArgs,
-  wrapBlock, getDefaultArgs, isInstanceOf
+  wrapBlock, extendBlock, getDefaultArgs, isInstanceOf
 } from './helpers/Block';
 import { blocks, mixins } from './constants';
 import { Mixin } from './Mixin';
@@ -127,6 +127,17 @@ class Block {
    * @description Block template.
    */
   static html = [];
+
+  /**
+   * @method Block.extend
+   * @public
+   * @param {...(typeof Block)} blocks - Blocks that will be extended by the context.
+   * @returns {typeof Block} Returns this.
+   * @description Method for extending blocks. Usually used with extending the default block.
+   */
+  static extend(...blocks) {
+    return blocks.reduce(extendBlock, this);
+  }
 
   /**
    * @method Block.onEvalError
@@ -302,7 +313,7 @@ class Block {
           iterateArray(childrenMixins, removeWithParentSignal);
 
           try {
-            this.beforeRemove();
+            this._beforeRemove();
           } catch (err) {
             console.error(`Uncaught error in ${ name }#beforeRemove:`, err);
           }
@@ -322,7 +333,7 @@ class Block {
 
           if (this.$$.isRendered && !this.$$.isRemoved) {
             try {
-              this.afterDOMChange();
+              this._afterDOMChange();
             } catch (err) {
               console.error(`Uncaught error in ${ name }#afterDOMChange:`, err);
             }
@@ -567,12 +578,28 @@ class Block {
   }
 
   /**
+   * @method Block#_afterConstruct
+   * @protected
+   */
+  _afterConstruct() {
+    this.afterConstruct();
+  }
+
+  /**
    * @method Block#afterConstruct
    * @public
    * @description Is called after block construction (including all scopes)
    * but before rendering the block and its children.
    */
   afterConstruct() {}
+
+  /**
+   * @method Block#_afterDOMChange
+   * @protected
+   */
+  _afterDOMChange() {
+    this.afterDOMChange();
+  }
 
   /**
    * @method Block#afterDOMChange
@@ -584,6 +611,14 @@ class Block {
   afterDOMChange() {}
 
   /**
+   * @method Block#_afterRender
+   * @protected
+   */
+  _afterRender() {
+    this.afterRender();
+  }
+
+  /**
    * @method Block#afterRender
    * @public
    * @description Is called after block has been rendered.
@@ -591,11 +626,29 @@ class Block {
   afterRender() {}
 
   /**
+   * @method Block#_beforeRemove
+   * @protected
+   */
+  _beforeRemove() {
+    this.beforeRemove();
+  }
+
+  /**
    * @method Block#beforeRemove
    * @public
    * @description Is called before the block removal.
    */
   beforeRemove() {}
+
+  /**
+   * @method Block#getConstructor
+   * @public
+   * @returns {typeof Block}
+   * @description Returns Block constructor.
+   */
+  getConstructor() {
+    return getProto(this).constructor;
+  }
 
   /**
    * @method Block#getDOM

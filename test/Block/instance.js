@@ -202,6 +202,17 @@ export default () => {
       removeApp(container);
     });
   });
+  describe('getConstructor()', () => {
+    before(() => {
+      initApp(NameApp, container);
+    });
+
+    it('should return block name', () => {
+      strictEqual(app.getConstructor(), NameApp);
+    });
+
+    after(remove);
+  });
   describe('getDOM()', () => {
     before(() => {
       initApp(GetDOMApp, container);

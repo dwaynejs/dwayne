@@ -3,17 +3,17 @@ import { Block } from '../../Block';
 import { Mixin } from '../../Mixin';
 
 export function wrapBlock(block, wrapper) {
-  const returnValue = wrapper(block);
+  const newBlock = wrapper(block);
 
-  return isInstanceOf(Block, returnValue)
-    ? returnValue
+  return isInstanceOf(Block, newBlock)
+    ? newBlock
     : block;
 }
 
 export function wrapMixin(mixin, wrapper) {
-  const returnValue = wrapper(mixin);
+  const newMixin = wrapper(mixin);
 
-  return isInstanceOf(Mixin, returnValue)
-    ? returnValue
+  return isInstanceOf(Mixin, newMixin)
+    ? newMixin
     : mixin;
 }
