@@ -1,5 +1,5 @@
-import { Block as BaseBlock } from './Block';
+import { Block } from './Block';
 
-class Block extends BaseBlock {}
+class BlockPublic extends Block {}
 
-export { Block };
+export { BlockPublic as Block };

@@ -17,7 +17,7 @@ var _global$Symbol = _global.Symbol;
 
 var _Symbol = _global$Symbol === undefined ? {} : _global$Symbol;
 
-var version = '4.1.1';
+var version = '4.1.2';
 
 function collectFromArray(array, callback) {
   var initialValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -2378,10 +2378,10 @@ function createBlock(_ref) {
       }
 
       return constructor;
-    }(Block$1), _class.html = _constructor, _temp);
+    }(Block), _class.html = _constructor, _temp);
   }
 
-  if (!isInstanceOf(Block$1, _constructor) && !isString(type)) {
+  if (!isInstanceOf(Block, _constructor) && !isString(type)) {
     throw new Error('Wrong block type given: ' + type);
   }
 
@@ -2480,7 +2480,7 @@ function createBlock(_ref) {
       elem.text('' + text);
     }
 
-    var isParentBlock = parent instanceof Block$1;
+    var isParentBlock = parent instanceof Block;
     var childBlocks = [];
 
     /* istanbul ignore if */
@@ -2494,7 +2494,7 @@ function createBlock(_ref) {
 
         function iterateChildren(children, isRoot) {
           iterateArray(children, function (child) {
-            if (child instanceof Block$1) {
+            if (child instanceof Block) {
               if (isRoot) {
                 child.$$.parentElem = doc;
                 child.$$.parent = doc;
@@ -2510,7 +2510,7 @@ function createBlock(_ref) {
       });
     }
 
-    if (prevBlock instanceof Block$1) {
+    if (prevBlock instanceof Block) {
       prevBlock.$$.insertAfterIt(elem, false);
     } else if (prevBlock) {
       elem.insertAfter(prevBlock);
@@ -2637,7 +2637,7 @@ function createBlock(_ref) {
 }
 
 function extendBlock(block, newBlock) {
-  if (isInstanceOf(Block$1, newBlock)) {
+  if (isInstanceOf(Block, newBlock)) {
     if (isInstanceOf(block, newBlock)) {
       var currentBlock = newBlock;
       var proto = void 0;
@@ -2683,7 +2683,7 @@ function remove$1(child) {
 function wrapBlock(block, wrapper) {
   var newBlock = wrapper(block);
 
-  return isInstanceOf(Block$1, newBlock) ? newBlock : block;
+  return isInstanceOf(Block, newBlock) ? newBlock : block;
 }
 
 function wrapMixin(mixin, wrapper) {
@@ -2774,7 +2774,7 @@ var gettingVars = [];
  * initApp('App', document.getElementById('root'));
  */
 
-var Block$1 = function () {
+var Block = function () {
   createClass(Block, null, [{
     key: 'extend',
 
@@ -3450,25 +3450,25 @@ var Block$1 = function () {
   return Block;
 }();
 
-Block$1.args = null;
-Block$1.defaultLocals = null;
-Block$1.displayName = null;
-Block$1.html = [];
+Block.args = null;
+Block.defaultLocals = null;
+Block.displayName = null;
+Block.html = [];
 
 
-setToStringTag(Block$1, 'Block');
-setProto(Block$1.prototype, null);
+setToStringTag(Block, 'Block');
+setProto(Block.prototype, null);
 
-var Block$$1 = function (_BaseBlock) {
-  inherits(Block$$1, _BaseBlock);
+var BlockPublic = function (_Block) {
+  inherits(BlockPublic, _Block);
 
-  function Block$$1() {
-    classCallCheck(this, Block$$1);
-    return possibleConstructorReturn(this, (Block$$1.__proto__ || Object.getPrototypeOf(Block$$1)).apply(this, arguments));
+  function BlockPublic() {
+    classCallCheck(this, BlockPublic);
+    return possibleConstructorReturn(this, (BlockPublic.__proto__ || Object.getPrototypeOf(BlockPublic)).apply(this, arguments));
   }
 
-  return Block$$1;
-}(Block$1);
+  return BlockPublic;
+}(Block);
 
 var Case = function (_Block) {
   inherits(Case, _Block);
@@ -3479,7 +3479,7 @@ var Case = function (_Block) {
   }
 
   return Case;
-}(Block$1);
+}(Block);
 
 var watchArgs = function watchArgs(_$) {
   return _$.args.value;
@@ -3517,7 +3517,7 @@ var Elements = function (_Block) {
         iterateArray(mixins$$1, removeWithParentSignal);
         content.remove();
 
-        if (parent instanceof Block$1) {
+        if (parent instanceof Block) {
           parent.$$.removeContent(content);
         }
 
@@ -3557,7 +3557,7 @@ var Elements = function (_Block) {
     }
   }]);
   return Elements;
-}(Block$1);
+}(Block);
 
 blocks.Elements = Elements;
 
@@ -3591,7 +3591,7 @@ var Children = function (_Block) {
   }
 
   return Children;
-}(Block$1);
+}(Block);
 
 Children.html = (_tmpl = [{
   "type": Elements,
@@ -3649,7 +3649,7 @@ var DynamicBlock = function (_Block) {
     }
   }]);
   return DynamicBlock;
-}(Block$1);
+}(Block);
 
 DynamicBlock.html = (_tmpl$1 = [{
   "type": Elements,
@@ -3680,7 +3680,7 @@ var Item = function (_Block) {
   }
 
   return Item;
-}(Block$1);
+}(Block);
 
 Item.html = (_tmpl$2 = [{
   "type": Elements,
@@ -3734,7 +3734,7 @@ var Each = function (_Block) {
     }
   }]);
   return Each;
-}(Block$1);
+}(Block);
 
 Each.args = {
   uid: {
@@ -3892,7 +3892,7 @@ var If = function (_Block) {
     }
   }]);
   return If;
-}(Block$1);
+}(Block);
 
 If.html = (_tmpl$3 = [{
   "type": Elements,
@@ -4020,7 +4020,7 @@ var Switch = function (_Block) {
     }
   }]);
   return Switch;
-}(Block$1);
+}(Block);
 
 Switch.html = (_tmpl$4 = [{
   "type": Elements,
@@ -4187,7 +4187,7 @@ var Elem$1 = function (_Mixin) {
     var value = _this.evaluate();
 
     if (args) {
-      scope = value instanceof Block$1 ? value : parentTemplate;
+      scope = value instanceof Block ? value : parentTemplate;
       value = args[0];
     }
 
@@ -4251,7 +4251,7 @@ var Node = function (_Mixin) {
     var value = _this.evaluate();
 
     if (args) {
-      scope = value instanceof Block$1 ? value : parentTemplate;
+      scope = value instanceof Block ? value : parentTemplate;
       value = args[0];
     }
 
@@ -4446,7 +4446,7 @@ var Value = function (_Mixin) {
     _this.scope = parentTemplate;
 
     if (args) {
-      _this.scope = value instanceof Block$1 ? value : parentTemplate;
+      _this.scope = value instanceof Block ? value : parentTemplate;
       _this.value = args[0];
     }
 
@@ -4784,10 +4784,10 @@ function initApp(html, container) {
       }
 
       return RootBlock;
-    }(Block$1), _class.html = html, _temp);
+    }(Block), _class.html = html, _temp);
   }
 
-  if (!isInstanceOf(Block$1, RootBlock)) {
+  if (!isInstanceOf(Block, RootBlock)) {
     console.error('No valid root block was given! (initApp)');
 
     return;
@@ -4833,7 +4833,7 @@ function removeApp(container) {
       DwayneRootBlock = _container.DwayneRootBlock;
 
 
-  if (!(DwayneRootBlock instanceof Block$1)) {
+  if (!(DwayneRootBlock instanceof Block)) {
     console.error('No app registered inside the given element! (removeApp)');
 
     return;
@@ -4846,7 +4846,7 @@ function removeApp(container) {
 }
 
 exports.version = version;
-exports.Block = Block$$1;
+exports.Block = BlockPublic;
 exports.Elem = Elem;
 exports.Mixin = Mixin;
 exports.Case = Case;

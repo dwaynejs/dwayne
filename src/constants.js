@@ -7,4 +7,4 @@ export const {
   document = {},
   Symbol = {}
 } = global;
-export const version = '4.1.1';
+export const version = '4.1.2';
