@@ -1,11 +1,9 @@
 (function (exports) {
 'use strict';
 
-/* eslint-disable no-nested-ternary */
-/* eslint-disable no-negated-condition */
+/* eslint-disable no-nested-ternary, no-negated-condition */
 var global$1 = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-/* eslint-enable no-nested-ternary */
-/* eslint-enable no-negated-condition */
+/* eslint-enable no-nested-ternary, no-negated-condition */
 
 var HIDE_CLASS = '__dwayne-hidden__';
 var SVG_NS = 'http://www.w3.org/2000/svg';
@@ -19,7 +17,7 @@ var _global$Symbol = _global.Symbol;
 
 var _Symbol = _global$Symbol === undefined ? {} : _global$Symbol;
 
-var version = '4.0.0';
+var version = '4.1.1';
 
 function collectFromArray(array, callback) {
   var initialValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -2380,10 +2378,10 @@ function createBlock(_ref) {
       }
 
       return constructor;
-    }(Block), _class.html = _constructor, _temp);
+    }(Block$1), _class.html = _constructor, _temp);
   }
 
-  if (!isInstanceOf(Block, _constructor) && !isString(type)) {
+  if (!isInstanceOf(Block$1, _constructor) && !isString(type)) {
     throw new Error('Wrong block type given: ' + type);
   }
 
@@ -2482,7 +2480,7 @@ function createBlock(_ref) {
       elem.text('' + text);
     }
 
-    var isParentBlock = parent instanceof Block;
+    var isParentBlock = parent instanceof Block$1;
     var childBlocks = [];
 
     /* istanbul ignore if */
@@ -2496,7 +2494,7 @@ function createBlock(_ref) {
 
         function iterateChildren(children, isRoot) {
           iterateArray(children, function (child) {
-            if (child instanceof Block) {
+            if (child instanceof Block$1) {
               if (isRoot) {
                 child.$$.parentElem = doc;
                 child.$$.parent = doc;
@@ -2512,7 +2510,7 @@ function createBlock(_ref) {
       });
     }
 
-    if (prevBlock instanceof Block) {
+    if (prevBlock instanceof Block$1) {
       prevBlock.$$.insertAfterIt(elem, false);
     } else if (prevBlock) {
       elem.insertAfter(prevBlock);
@@ -2601,7 +2599,7 @@ function createBlock(_ref) {
   constructPublicScope(blockInstance, locals, $$.locals);
 
   try {
-    blockInstance.afterConstruct();
+    blockInstance._afterConstruct();
   } catch (err) {
     console.error('Uncaught error in ' + name + '#afterConstruct:', err);
   }
@@ -2630,12 +2628,36 @@ function createBlock(_ref) {
   blockInstance.$$.mixinsToBuild = [];
 
   try {
-    blockInstance.afterRender();
+    blockInstance._afterRender();
   } catch (err) {
     console.error('Uncaught error in ' + name + '#afterRender:', err);
   }
 
   return blockInstance;
+}
+
+function extendBlock(block, newBlock) {
+  if (isInstanceOf(Block$1, newBlock)) {
+    if (isInstanceOf(block, newBlock)) {
+      var currentBlock = newBlock;
+      var proto = void 0;
+
+      while ((proto = getProto(currentBlock)) !== block) {
+        currentBlock = proto;
+      }
+
+      extend(currentBlock, getProto(block));
+    }
+
+    extend(block, newBlock);
+  }
+
+  return block;
+}
+
+function extend(Block$$1, BaseBlock) {
+  setProto(Block$$1, BaseBlock);
+  setProto(Block$$1.prototype, BaseBlock.prototype);
 }
 
 function getDefaultArgs(argsDescriptions) {
@@ -2659,15 +2681,15 @@ function remove$1(child) {
 }
 
 function wrapBlock(block, wrapper) {
-  var returnValue = wrapper(block);
+  var newBlock = wrapper(block);
 
-  return isInstanceOf(Block, returnValue) ? returnValue : block;
+  return isInstanceOf(Block$1, newBlock) ? newBlock : block;
 }
 
 function wrapMixin(mixin, wrapper) {
-  var returnValue = wrapper(mixin);
+  var newMixin = wrapper(mixin);
 
-  return isInstanceOf(Mixin, returnValue) ? returnValue : mixin;
+  return isInstanceOf(Mixin, newMixin) ? newMixin : mixin;
 }
 
 /**
@@ -2752,15 +2774,17 @@ var gettingVars = [];
  * initApp('App', document.getElementById('root'));
  */
 
-var Block = function () {
+var Block$1 = function () {
   createClass(Block, null, [{
-    key: 'onEvalError',
+    key: 'extend',
 
 
     /**
-     * @method Block.onEvalError
+     * @method Block.extend
      * @public
-     * @param {EvaluationError} err - The method is called when an evaluation error occurs.
+     * @param {...(typeof Block)} blocks - Blocks that will be extended by the context.
+     * @returns {typeof Block} Returns this.
+     * @description Method for extending blocks. Usually used with extending the default block.
      */
 
 
@@ -2777,17 +2801,18 @@ var Block = function () {
      * @public
      * @description Block args description.
      */
-    value: function onEvalError(err) {
-      console.error('Eval error (evaluating "' + (err.original || err.func) + '" in context of ' + err.block.$$.name + '):', err);
+    value: function extend() {
+      for (var _len = arguments.length, blocks$$1 = Array(_len), _key = 0; _key < _len; _key++) {
+        blocks$$1[_key] = arguments[_key];
+      }
+
+      return blocks$$1.reduce(extendBlock, this);
     }
 
     /**
-     * @method Block.wrap
+     * @method Block.onEvalError
      * @public
-     * @param {...Wrapper} wrappers - Functions that return wrapped block.
-     * @returns {typeof Block} New block.
-     * @description Method for wrapping blocks into another blocks.
-     * It is considered best practice to just extends the old block with a new one.
+     * @param {EvaluationError} err - The method is called when an evaluation error occurs.
      */
 
 
@@ -2807,10 +2832,25 @@ var Block = function () {
      */
 
   }, {
+    key: 'onEvalError',
+    value: function onEvalError(err) {
+      console.error('Eval error (evaluating "' + (err.original || err.func) + '" in context of ' + err.block.$$.name + '):', err);
+    }
+
+    /**
+     * @method Block.wrap
+     * @public
+     * @param {...Wrapper} wrappers - Functions that return wrapped block.
+     * @returns {typeof Block} New block.
+     * @description Method for wrapping blocks into another blocks.
+     * It is considered best practice to just extends the old block with a new one.
+     */
+
+  }, {
     key: 'wrap',
     value: function wrap() {
-      for (var _len = arguments.length, wrappers = Array(_len), _key = 0; _key < _len; _key++) {
-        wrappers[_key] = arguments[_key];
+      for (var _len2 = arguments.length, wrappers = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        wrappers[_key2] = arguments[_key2];
       }
 
       return wrappers.reduce(wrapBlock, this);
@@ -2975,7 +3015,7 @@ var Block = function () {
           iterateArray(childrenMixins, removeWithParentSignal);
 
           try {
-            _this.beforeRemove();
+            _this._beforeRemove();
           } catch (err) {
             console.error('Uncaught error in ' + name + '#beforeRemove:', err);
           }
@@ -2995,7 +3035,7 @@ var Block = function () {
 
           if (_this.$$.isRendered && !_this.$$.isRemoved) {
             try {
-              _this.afterDOMChange();
+              _this._afterDOMChange();
             } catch (err) {
               console.error('Uncaught error in ' + name + '#afterDOMChange:', err);
             }
@@ -3219,16 +3259,38 @@ var Block = function () {
   }
 
   /**
-   * @method Block#afterConstruct
-   * @public
-   * @description Is called after block construction (including all scopes)
-   * but before rendering the block and its children.
+   * @method Block#_afterConstruct
+   * @protected
    */
 
 
   createClass(Block, [{
+    key: '_afterConstruct',
+    value: function _afterConstruct() {
+      this.afterConstruct();
+    }
+
+    /**
+     * @method Block#afterConstruct
+     * @public
+     * @description Is called after block construction (including all scopes)
+     * but before rendering the block and its children.
+     */
+
+  }, {
     key: 'afterConstruct',
     value: function afterConstruct() {}
+
+    /**
+     * @method Block#_afterDOMChange
+     * @protected
+     */
+
+  }, {
+    key: '_afterDOMChange',
+    value: function _afterDOMChange() {
+      this.afterDOMChange();
+    }
 
     /**
      * @method Block#afterDOMChange
@@ -3243,6 +3305,17 @@ var Block = function () {
     value: function afterDOMChange() {}
 
     /**
+     * @method Block#_afterRender
+     * @protected
+     */
+
+  }, {
+    key: '_afterRender',
+    value: function _afterRender() {
+      this.afterRender();
+    }
+
+    /**
      * @method Block#afterRender
      * @public
      * @description Is called after block has been rendered.
@@ -3253,6 +3326,17 @@ var Block = function () {
     value: function afterRender() {}
 
     /**
+     * @method Block#_beforeRemove
+     * @protected
+     */
+
+  }, {
+    key: '_beforeRemove',
+    value: function _beforeRemove() {
+      this.beforeRemove();
+    }
+
+    /**
      * @method Block#beforeRemove
      * @public
      * @description Is called before the block removal.
@@ -3261,6 +3345,19 @@ var Block = function () {
   }, {
     key: 'beforeRemove',
     value: function beforeRemove() {}
+
+    /**
+     * @method Block#getConstructor
+     * @public
+     * @returns {typeof Block}
+     * @description Returns Block constructor.
+     */
+
+  }, {
+    key: 'getConstructor',
+    value: function getConstructor() {
+      return getProto(this).constructor;
+    }
 
     /**
      * @method Block#getDOM
@@ -3353,14 +3450,25 @@ var Block = function () {
   return Block;
 }();
 
-Block.args = null;
-Block.defaultLocals = null;
-Block.displayName = null;
-Block.html = [];
+Block$1.args = null;
+Block$1.defaultLocals = null;
+Block$1.displayName = null;
+Block$1.html = [];
 
 
-setToStringTag(Block, 'Block');
-setProto(Block.prototype, null);
+setToStringTag(Block$1, 'Block');
+setProto(Block$1.prototype, null);
+
+var Block$$1 = function (_BaseBlock) {
+  inherits(Block$$1, _BaseBlock);
+
+  function Block$$1() {
+    classCallCheck(this, Block$$1);
+    return possibleConstructorReturn(this, (Block$$1.__proto__ || Object.getPrototypeOf(Block$$1)).apply(this, arguments));
+  }
+
+  return Block$$1;
+}(Block$1);
 
 var Case = function (_Block) {
   inherits(Case, _Block);
@@ -3371,7 +3479,7 @@ var Case = function (_Block) {
   }
 
   return Case;
-}(Block);
+}(Block$1);
 
 var watchArgs = function watchArgs(_$) {
   return _$.args.value;
@@ -3409,7 +3517,7 @@ var Elements = function (_Block) {
         iterateArray(mixins$$1, removeWithParentSignal);
         content.remove();
 
-        if (parent instanceof Block) {
+        if (parent instanceof Block$1) {
           parent.$$.removeContent(content);
         }
 
@@ -3449,7 +3557,7 @@ var Elements = function (_Block) {
     }
   }]);
   return Elements;
-}(Block);
+}(Block$1);
 
 blocks.Elements = Elements;
 
@@ -3483,7 +3591,7 @@ var Children = function (_Block) {
   }
 
   return Children;
-}(Block);
+}(Block$1);
 
 Children.html = (_tmpl = [{
   "type": Elements,
@@ -3541,7 +3649,7 @@ var DynamicBlock = function (_Block) {
     }
   }]);
   return DynamicBlock;
-}(Block);
+}(Block$1);
 
 DynamicBlock.html = (_tmpl$1 = [{
   "type": Elements,
@@ -3572,7 +3680,7 @@ var Item = function (_Block) {
   }
 
   return Item;
-}(Block);
+}(Block$1);
 
 Item.html = (_tmpl$2 = [{
   "type": Elements,
@@ -3626,7 +3734,7 @@ var Each = function (_Block) {
     }
   }]);
   return Each;
-}(Block);
+}(Block$1);
 
 Each.args = {
   uid: {
@@ -3784,7 +3892,7 @@ var If = function (_Block) {
     }
   }]);
   return If;
-}(Block);
+}(Block$1);
 
 If.html = (_tmpl$3 = [{
   "type": Elements,
@@ -3912,7 +4020,7 @@ var Switch = function (_Block) {
     }
   }]);
   return Switch;
-}(Block);
+}(Block$1);
 
 Switch.html = (_tmpl$4 = [{
   "type": Elements,
@@ -4079,7 +4187,7 @@ var Elem$1 = function (_Mixin) {
     var value = _this.evaluate();
 
     if (args) {
-      scope = value instanceof Block ? value : parentTemplate;
+      scope = value instanceof Block$1 ? value : parentTemplate;
       value = args[0];
     }
 
@@ -4143,7 +4251,7 @@ var Node = function (_Mixin) {
     var value = _this.evaluate();
 
     if (args) {
-      scope = value instanceof Block ? value : parentTemplate;
+      scope = value instanceof Block$1 ? value : parentTemplate;
       value = args[0];
     }
 
@@ -4338,7 +4446,7 @@ var Value = function (_Mixin) {
     _this.scope = parentTemplate;
 
     if (args) {
-      _this.scope = value instanceof Block ? value : parentTemplate;
+      _this.scope = value instanceof Block$1 ? value : parentTemplate;
       _this.value = args[0];
     }
 
@@ -4676,10 +4784,10 @@ function initApp(html, container) {
       }
 
       return RootBlock;
-    }(Block), _class.html = html, _temp);
+    }(Block$1), _class.html = html, _temp);
   }
 
-  if (!isInstanceOf(Block, RootBlock)) {
+  if (!isInstanceOf(Block$1, RootBlock)) {
     console.error('No valid root block was given! (initApp)');
 
     return;
@@ -4725,7 +4833,7 @@ function removeApp(container) {
       DwayneRootBlock = _container.DwayneRootBlock;
 
 
-  if (!(DwayneRootBlock instanceof Block)) {
+  if (!(DwayneRootBlock instanceof Block$1)) {
     console.error('No app registered inside the given element! (removeApp)');
 
     return;
@@ -4738,7 +4846,7 @@ function removeApp(container) {
 }
 
 exports.version = version;
-exports.Block = Block;
+exports.Block = Block$$1;
 exports.Elem = Elem;
 exports.Mixin = Mixin;
 exports.Case = Case;
