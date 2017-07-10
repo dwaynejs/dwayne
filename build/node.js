@@ -2710,7 +2710,7 @@ var Super = function () {
 
   }, {
     key: 'instanceof',
-    value: function _instanceof(constructor) {
+    value: function _instanceof$$1(constructor) {
       return this.$ instanceof constructor;
     }
 
@@ -7815,11 +7815,11 @@ var statics = Object.freeze({
 	when: when
 });
 
-var D$$1 = D$2;
+var D = D$2;
 
 
-assign(D$$1, statics);
+assign(D, statics);
 
-delete D$$1.D;
+delete D.D;
 
-module.exports = D$$1;
+module.exports = D;

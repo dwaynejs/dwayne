@@ -4812,7 +4812,7 @@ var Super = function () {
 
   }, {
     key: 'instanceof',
-    value: function _instanceof(constructor) {
+    value: function _instanceof$$1(constructor) {
       return this.$ instanceof constructor;
     }
 
@@ -12983,8 +12983,15 @@ function registerDEach(Block, createBlock) {
               block.$$.scope[indexName] = index;
               block.$$.scope[itemName] = item;
 
-              if (block.$$.prevBlock !== prevBlock && prevBlock) {
-                prevBlock.$$.insertAfterIt(block.$$.content, true);
+              if (block.$$.prevBlock !== prevBlock) {
+                var content = block.$$.content;
+
+
+                if (prevBlock) {
+                  prevBlock.$$.insertAfterIt(content, true);
+                } else {
+                  _this2.$$.insertInStartOfIt(content, true);
+                }
               }
             } else {
               block = newKeys[uid][index] = createBlock({
@@ -15241,7 +15248,7 @@ var Block = function () {
               if (moveFlag) {
                 parent.$$.moveContent(contentToInsert, after);
               } else {
-                parent.$$.addContent(contentToInsert, true);
+                parent.$$.addContent(contentToInsert, false);
               }
             }
           } else if (isParentBlock) {
@@ -19365,11 +19372,11 @@ var statics = Object.freeze({
 	when: when
 });
 
-var D$$1 = D$2;
+var D = D$2;
 
 
-assign(D$$1, statics);
+assign(D, statics);
 
-delete D$$1.D;
+delete D.D;
 
-export { D$2 as D, isArray, isArrayLike, isBoolean, isDate, isDateLike, isElement, isFinite, isFunction, isInteger, isIntegerLike, isNaN, isNull, isNil, isNumber, isNumberLike, isObject, isPlainObject, isPrimitive, isRegExp, isString, isSymbol, isUndefined, Alphabet, alphabet, Arr, array, iterate$1 as iterate, BlobObject, blob, Block, Mixin, initApp, removeApp, insertTemplates, Dat, now, date, Elem, win, doc, html, body, head, _find as find, parseHTML, px, Fetch, fetch, Func, method, noop, prop, self$1 as self, Num, rand, random, Promise$1 as Promise, makeRoute, router, Str, parseJSON$1 as parseJSON, Super, Switcher, switcher, when };export default D$$1;
+export { D$2 as D, isArray, isArrayLike, isBoolean, isDate, isDateLike, isElement, isFinite, isFunction, isInteger, isIntegerLike, isNaN, isNull, isNil, isNumber, isNumberLike, isObject, isPlainObject, isPrimitive, isRegExp, isString, isSymbol, isUndefined, Alphabet, alphabet, Arr, array, iterate$1 as iterate, BlobObject, blob, Block, Mixin, initApp, removeApp, insertTemplates, Dat, now, date, Elem, win, doc, html, body, head, _find as find, parseHTML, px, Fetch, fetch, Func, method, noop, prop, self$1 as self, Num, rand, random, Promise$1 as Promise, makeRoute, router, Str, parseJSON$1 as parseJSON, Super, Switcher, switcher, when };export default D;

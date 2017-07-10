@@ -4816,7 +4816,7 @@ var Super = function () {
 
   }, {
     key: 'instanceof',
-    value: function _instanceof(constructor) {
+    value: function _instanceof$$1(constructor) {
       return this.$ instanceof constructor;
     }
 
@@ -12987,8 +12987,15 @@ function registerDEach(Block, createBlock) {
               block.$$.scope[indexName] = index;
               block.$$.scope[itemName] = item;
 
-              if (block.$$.prevBlock !== prevBlock && prevBlock) {
-                prevBlock.$$.insertAfterIt(block.$$.content, true);
+              if (block.$$.prevBlock !== prevBlock) {
+                var content = block.$$.content;
+
+
+                if (prevBlock) {
+                  prevBlock.$$.insertAfterIt(content, true);
+                } else {
+                  _this2.$$.insertInStartOfIt(content, true);
+                }
               }
             } else {
               block = newKeys[uid][index] = createBlock({
@@ -15245,7 +15252,7 @@ var Block = function () {
               if (moveFlag) {
                 parent.$$.moveContent(contentToInsert, after);
               } else {
-                parent.$$.addContent(contentToInsert, true);
+                parent.$$.addContent(contentToInsert, false);
               }
             }
           } else if (isParentBlock) {
@@ -19369,14 +19376,14 @@ var statics = Object.freeze({
 	when: when
 });
 
-var D$$1 = D$2;
+var D = D$2;
 
 
-assign(D$$1, statics);
+assign(D, statics);
 
-delete D$$1.D;
+delete D.D;
 
-exports['default'] = D$$1;
+exports['default'] = D;
 exports.D = D$2;
 exports.isArray = isArray;
 exports.isArrayLike = isArrayLike;
